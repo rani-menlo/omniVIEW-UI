@@ -50,7 +50,7 @@ module.exports = {
       inject: false,
       hash: true,
       template: "./public/index.html",
-      filename: "index.html",
+      filename: "index.html"
     })
   ],
   devtool: "inline-source-map"
