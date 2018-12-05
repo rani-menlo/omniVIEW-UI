@@ -3,6 +3,7 @@
   "plugins": [
     [
       "import",
+      "@babel/plugin-proposal-class-properties",
       { "libraryName": "antd", "libraryDirectory": "es", "style": "css" }
     ]
   ]
