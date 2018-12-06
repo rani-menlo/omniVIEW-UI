@@ -4,9 +4,7 @@ const CleanWebpackPlugin = require("clean-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
-  entry: {
-    main: "./src/index.js"
-  },
+  entry: ["babel-polyfill", "./src/index.js"],
   output: {
     path: path.resolve(__dirname, "dist"),
     filename: "[name].[hash].js"
@@ -16,7 +14,19 @@ module.exports = {
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        use: ["babel-loader", "eslint-loader"]
+        use: ["babel-loader"]
+      },
+      {
+        test: /\.(js)$/,
+        exclude: /node_modules/,
+        use: [
+          {
+            loader: "eslint-loader",
+            options: {
+              emitWarning: true
+            }
+          }
+        ]
       },
       {
         test: /\.(scss|css)$/,

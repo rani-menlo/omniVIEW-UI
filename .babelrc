@@ -1,10 +1,4 @@
 {
-  "presets": ["@babel/preset-env", "@babel/preset-react"],
-  "plugins": [
-    [
-      "import",
-      "@babel/plugin-proposal-class-properties",
-      { "libraryName": "antd", "libraryDirectory": "es", "style": "css" }
-    ]
-  ]
+  "presets": ["react", "es2015", "stage-0"],
+  "plugins": [["import", { "libraryName": "antd", "style": "css" }]]
 }
