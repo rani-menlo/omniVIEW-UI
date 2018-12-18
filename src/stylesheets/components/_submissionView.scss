@@ -1,0 +1,130 @@
+.submissionview {
+  &__profilebar {
+    display: flex;
+    justify-content: space-between;
+
+    &__title {
+      @include text-normal(14px);
+    }
+
+    &__section {
+      display: flex;
+      align-items: center;
+
+      .text {
+        @include text-normal;
+      }
+    }
+  }
+  &__header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    border-bottom-style: solid;
+    border-bottom-width: 0.2px;
+    padding: 0px 5px 5px;
+
+    .icon_text_border {
+      display: flex;
+      align-items: center;
+      padding: 5px;
+      border: solid 0.5px $sky-of-margritte;
+      border-radius: 4px;
+
+      .text {
+        @include text-bold-active;
+      }
+    }
+
+    &__mode {
+      display: flex;
+      align-items: flex-end;
+      // padding: 5px;
+
+      .mode-text {
+        @include text-bold-inactive;
+      }
+      &__tabs {
+        @extend tabs;
+      }
+    }
+
+    &__view {
+      display: flex;
+      align-items: flex-end;
+      // padding: 5px;
+
+      .view-text {
+        @include text-bold-inactive;
+      }
+      &__tabs {
+        @extend tabs;
+      }
+    }
+
+    &__validate {
+      margin-left: 10px;
+    }
+  }
+  &__panels {
+    display: flex;
+    height: 100%;
+    overflow-x: hidden;
+    .panel {
+      background-color: $froasted-glass;
+      border-right: solid 0.2px;
+      height: 100%;
+    }
+    .panels__tree {
+      overflow-y: auto;
+    }
+  }
+  &__siders {
+    display: flex;
+    background-color: $froasted-glass;
+    border-bottom: solid 0.2px;
+    padding: 2px;
+
+    &__sequence {
+      width: 20%;
+      @include text-bold-active(14px);
+    }
+    &__tree {
+      width: 50%;
+    }
+    &__properties {
+      width: 30%;
+      @include text-bold-active(14px);
+    }
+  }
+}
+tabs {
+  margin-left: 10px;
+
+  .ant-tabs {
+    overflow: visible;
+  }
+
+  .ant-tabs-bar {
+    margin-bottom: -5px;
+  }
+  .ant-tabs-tab {
+    height: auto;
+    @include text-bold-inactive;
+    font-weight: normal;
+  }
+
+  .ant-tabs-tab-active {
+    @include text-bold-active;
+  }
+}
+
+.icon-label {
+  @include text-bold-active;
+  font-weight: normal;
+  align-self: center;
+}
+
+.align-right {
+  text-align: right;
+}

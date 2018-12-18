@@ -1,0 +1,9 @@
+.node {
+  height: 25px;
+  display: flex;
+  align-items: center;
+
+  &:nth-child(even) {
+    background-color: $froasted-glass;
+  }
+}

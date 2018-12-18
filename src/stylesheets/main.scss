@@ -1,3 +1,3 @@
-div {
-    color: #16692E;
-}
+@import "utils/colors", "utils/mixins", "utils/globals";
+@import "components/submissionView", "components/treeNode",
+  "components/nodeProperties", "components/nodeSequences", "components/sidebar";

@@ -1,0 +1,30 @@
+.global__node-text {
+  @include text-normal;
+  margin-left: 0px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  cursor: default;
+}
+
+.global__node-selected {
+  background-color: $rockman-blue !important;
+}
+
+.global__icon {
+  color: $blue;
+  font-size: 24px;
+  margin-left: 16px;
+}
+
+.global__file-folder {
+  font-size: 20px;
+  margin-right: 8px;
+  color: $softsun;
+}
+
+.global__caret {
+  font-size: 20px;
+  margin-right: 4px;
+  color: $spanish-grey;
+}

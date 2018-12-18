@@ -1,0 +1,24 @@
+@import "./colors";
+
+@mixin text-bold-active($fontSize: 12px) {
+  margin-left: 8px;
+  font-weight: 800;
+  font-size: $fontSize;
+  color: $black;
+}
+@mixin text-bold-inactive($fontSize: 12px) {
+  @include text-bold-active;
+  color: rgba($black, 0.4);
+  font-size: $fontSize;
+}
+
+@mixin text-normal($fontSize: 12px) {
+  @include text-bold-active;
+  font-weight: normal;
+  font-size: $fontSize;
+}
+
+/* @font-face {
+  font-family: Heebo;
+  src: url(../../../assets/fonts/heebo_regular.ttf);
+} */
