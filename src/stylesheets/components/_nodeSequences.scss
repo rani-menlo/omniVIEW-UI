@@ -20,7 +20,7 @@
     }
   }
 
-  .selected-section {
+  .selected-sortby {
     border: solid 0.5px $sky-of-margritte;
     border-radius: 4px;
     padding: 2px;
@@ -29,5 +29,10 @@
 }
 
 .sequenceslist {
+  &__sequence {
+    display: flex;
+    align-items: center;
+    height: 25px;
+  }
   padding: 10px;
 }

@@ -1,0 +1,30 @@
+.ant-form-explain {
+  margin-bottom: 10px;
+}
+.ant-form-item-children {
+  input {
+    border-color: $black;
+  }
+}
+.ant-checkbox,
+.ant-radio {
+  &-wrapper {
+    span {
+      @include text-normal;
+      margin-left: 0px;
+    }
+  }
+  &-inner {
+    border-color: $black;
+  }
+}
+
+.ant-btn {
+  @include text-bold-active(16px);
+  margin-left: 0px;
+  border-color: $blue;
+
+  &-primary {
+    background-color: $blue !important;
+  }
+}

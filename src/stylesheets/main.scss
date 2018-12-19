@@ -1,3 +1,5 @@
 @import "utils/colors", "utils/mixins", "utils/globals";
+@import "vendors/antd";
 @import "components/submissionView", "components/treeNode",
-  "components/nodeProperties", "components/nodeSequences", "components/sidebar";
+  "components/nodeProperties", "components/nodeSequences", "components/sidebar",
+  "components/login", "components/loginAuth1";

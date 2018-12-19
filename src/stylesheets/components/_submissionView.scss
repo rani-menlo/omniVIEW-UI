@@ -72,8 +72,13 @@
     overflow-x: hidden;
     .panel {
       background-color: $froasted-glass;
-      border-right: solid 0.2px;
       height: 100%;
+      &-sequences {
+        border-right: solid 0.2px;
+      }
+      &-properties {
+        border-left: solid 0.2px;
+      }
     }
     .panels__tree {
       overflow-y: auto;
@@ -107,9 +112,10 @@ tabs {
 
   .ant-tabs-bar {
     margin-bottom: -5px;
+    border-bottom: 0px
   }
   .ant-tabs-tab {
-    height: auto;
+    height: auto !important;
     @include text-bold-inactive;
     font-weight: normal;
   }

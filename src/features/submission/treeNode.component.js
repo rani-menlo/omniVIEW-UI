@@ -128,7 +128,6 @@ class TreeNode extends Component {
               expand={this.props.expand}
               paddingLeft={paddingLeft}
               key={node.label + idx}
-              // key={`${node.label}_${this.props.expand}`}
               label={node.label}
               content={node.value}
               selectedNodeId={selectedNodeId}

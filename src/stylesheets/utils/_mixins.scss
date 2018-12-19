@@ -1,4 +1,3 @@
-@import "./colors";
 
 @mixin text-bold-active($fontSize: 12px) {
   margin-left: 8px;
@@ -8,12 +7,18 @@
 }
 @mixin text-bold-inactive($fontSize: 12px) {
   @include text-bold-active;
-  color: rgba($black, 0.4);
+  color: rgba($black, 0.5);
   font-size: $fontSize;
 }
 
 @mixin text-normal($fontSize: 12px) {
   @include text-bold-active;
+  font-weight: normal;
+  font-size: $fontSize;
+}
+
+@mixin text-normal-inactive($fontSize: 12px) {
+  @include text-bold-inactive;
   font-weight: normal;
   font-size: $fontSize;
 }

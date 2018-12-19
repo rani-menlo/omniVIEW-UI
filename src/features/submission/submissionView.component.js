@@ -105,7 +105,7 @@ class SubmissionView extends Component {
             {/* <Icon type="hdd" theme="filled" className="global__icon" />
             <span className="mode-text">Mode:</span> */}
             <div className="submissionview__header__mode__tabs">
-              <Tabs defaultActiveKey="1" tabBarStyle={{ height: "auto" }}>
+              <Tabs defaultActiveKey="1">
                 <TabPane tab="Standard" key="1" />
                 {/* <TabPane tab="Qc" key="2" /> */}
               </Tabs>
@@ -115,7 +115,7 @@ class SubmissionView extends Component {
             {/* <Icon type="eye" theme="filled" className="global__icon" />
             <span className="view-text">View:</span> */}
             <div className="submissionview__header__view__tabs">
-              <Tabs defaultActiveKey="1" tabBarStyle={{ height: "auto" }}>
+              <Tabs defaultActiveKey="1">
                 <TabPane tab="Current" key="1" />
                 <TabPane tab="Life Cycle" key="2" />
               </Tabs>
@@ -160,7 +160,11 @@ class SubmissionView extends Component {
             className={`submissionview__siders__properties ${!this.state
               .propertiesExpand && "align-right"}`}
           >
-            <span style={{ marginRight: "8px" }}>Properties</span>
+            <span style={{ marginRight: "8px" }}>
+              {_.get(this.state, "nodeProperties.title", "")
+                ? "Document Properties"
+                : "Heading Properties"}
+            </span>
             <img
               src={this.state.propertiesExpand ? RightArrowHide : LeftArrowHide}
               onClick={this.togglePropertiesPane}
@@ -173,7 +177,7 @@ class SubmissionView extends Component {
             direction="ltr"
             expand={this.state.sequencesExpand}
           >
-            <div className="panel">
+            <div className="panel panel-sequences">
               <NodeSequences
                 sequences={this.state.sequences}
                 onSelectedSequence={this.onSelectedSequence}
@@ -198,7 +202,7 @@ class SubmissionView extends Component {
             direction="rtl"
             expand={this.state.propertiesExpand}
           >
-            <div className="panel">
+            <div className="panel panel-properties">
               <NodeProperties properties={this.state.nodeProperties} />
             </div>
           </Sidebar>

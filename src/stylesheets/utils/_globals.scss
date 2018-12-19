@@ -28,3 +28,16 @@
   margin-right: 4px;
   color: $spanish-grey;
 }
+
+.global__field-label {
+  @include text-normal-inactive;
+  margin-left: 0px;
+  margin-bottom: 4px;
+}
+
+.global__container {
+  background: linear-gradient(to bottom, #5aa3cd 1%, $white 100%);
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
