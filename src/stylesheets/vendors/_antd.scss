@@ -1,20 +1,14 @@
+// form field text size like error message
 .ant-form-explain {
-  margin-bottom: 10px;
+  // font-size: 12px;
+}
+
+// form text field color
+.ant-input {
+  color: $black !important;
 }
 .ant-form-item-children {
   input {
-    border-color: $black;
-  }
-}
-.ant-checkbox,
-.ant-radio {
-  &-wrapper {
-    span {
-      @include text-normal;
-      margin-left: 0px;
-    }
-  }
-  &-inner {
     border-color: $black;
   }
 }

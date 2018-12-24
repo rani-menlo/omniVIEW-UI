@@ -38,9 +38,9 @@ class Login extends Component {
                 ]
               })(<Input placeholder="Username" />)}
             </FormItem>
-            <div style={{ marginBottom: "4px" }}>
+            <div className="login__pwdsection">
               <span className="global__field-label">Password</span>
-              <a className="login-forgot-pwd" href="">
+              <a className="login__pwdsection-forgot-pwd" href="">
                 Forgot your password?
               </a>
             </div>
@@ -51,7 +51,7 @@ class Login extends Component {
                 ]
               })(<Input type="password" placeholder="Password" />)}
             </FormItem>
-            <Checkbox>Remember Password?</Checkbox>
+            <Checkbox className="login-rememberpwd">Remember Password?</Checkbox>
             <FormItem>
               <Button
                 type="primary"

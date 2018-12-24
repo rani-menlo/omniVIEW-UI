@@ -76,7 +76,7 @@ class NodeSequences extends Component {
             <div
               key={sequence}
               onClick={this.onSelected(sequence)}
-              className={`sequenceslist__sequence ${this.state.selected ===
+              className={`sequenceslist__sequence global__cursor-pointer ${this.state.selected ===
                 sequence && "global__node-selected"}`}
             >
               <Icon
@@ -84,7 +84,7 @@ class NodeSequences extends Component {
                 theme="filled"
                 className="global__file-folder"
               />
-              <span className="global__node-text">{sequence}</span>
+              <span className="global__node-text global__cursor-pointer">{sequence}</span>
             </div>
           ))}
         </div>

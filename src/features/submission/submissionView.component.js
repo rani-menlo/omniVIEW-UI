@@ -44,7 +44,7 @@ class SubmissionView extends Component {
   };
 
   onSelectedSequence = sequence => {
-    this.setState({ currentSequence: sequence });
+    this.setState({ currentSequence: sequence, treeExpand: false });
   };
 
   togglePropertiesPane = () => {
@@ -67,6 +67,17 @@ class SubmissionView extends Component {
       sequencesExpand,
       treePanelWidth
     });
+  };
+
+  getPropertiesPaneTitle = () => {
+    const { nodeProperties } = this.state;
+    if (!_.size(nodeProperties)) {
+      return "Properties";
+    } else if (!nodeProperties.title) {
+      return "Heading Properties";
+    } else {
+      return "Document Properties";
+    }
   };
 
   render() {
@@ -150,6 +161,7 @@ class SubmissionView extends Component {
         <div className="submissionview__siders">
           <div className="submissionview__siders__sequence">
             <img
+              className="global__cursor-pointer"
               src={this.state.sequencesExpand ? LeftArrowHide : RightArrowHide}
               onClick={this.toggleSequencesPane}
             />
@@ -161,11 +173,10 @@ class SubmissionView extends Component {
               .propertiesExpand && "align-right"}`}
           >
             <span style={{ marginRight: "8px" }}>
-              {_.get(this.state, "nodeProperties.title", "")
-                ? "Document Properties"
-                : "Heading Properties"}
+              {this.getPropertiesPaneTitle()}
             </span>
             <img
+              className="global__cursor-pointer"
               src={this.state.propertiesExpand ? RightArrowHide : LeftArrowHide}
               onClick={this.togglePropertiesPane}
             />

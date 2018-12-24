@@ -25,10 +25,25 @@
     background: $froasted-glass;
     margin: 10px 0px 20px;
   }
-  &-forgot-pwd {
-    float: right;
+  &__pwdsection {
+    &-forgot-pwd {
+      float: right;
+      font-size: 12px;
+    }
+  }
+  &-rememberpwd {
+    span > span {
+      border-color: $black;
+      font-size: 12px;
+    }
   }
   &-form-button {
     width: 100%;
+    margin-top: 10px;
+    span {
+      @include text-bold-active(12px);
+      color: $white;
+      margin-left: 0px;
+    }
   }
 }
