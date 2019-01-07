@@ -13,6 +13,7 @@
 
       .text {
         @include text-normal;
+        margin-left: 8px;
       }
     }
   }
@@ -33,6 +34,7 @@
 
       .text {
         @include text-bold-active;
+        margin-left: 8px;
       }
     }
 
@@ -75,6 +77,7 @@
       height: 100%;
       &-sequences {
         border-right: solid 0.2px;
+        overflow: auto;
       }
       &-properties {
         border-left: solid 0.2px;
@@ -127,6 +130,7 @@ tabs {
 
 .icon-label {
   @include text-bold-active;
+  margin-left: 8px;
   font-weight: normal;
   align-self: center;
 }

@@ -1,25 +1,45 @@
 import React, { Component } from "react";
 import { Radio, Button } from "antd";
-import { withRouter } from "react-router-dom";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
+import { Redirect } from "react-router-dom";
+import AuthLayout from "./authLayout.component";
+import { LoginActions } from "../../redux/actions";
+import Loader from "../../uikit/components/loader";
 
 const RadioGroup = Radio.Group;
 
 class LoginAuth1 extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      selected: ""
+    };
+  }
   sendCode = () => {
-    this.props.history.push("/submission");
+    const data = {
+      isEmail: this.state.selected === "email"
+    };
+    this.props.actions.sendOtp(data);
+  };
+
+  onSelect = e => {
+    this.setState({ selected: e.target.value });
   };
 
   render() {
-    return (
-      <div className="global__container">
-        <div className="auth1">
-          <p className="auth1-login">Login</p>
-          <div className="auth1__text">
-            Before we can sign you in, we need to verify you are the account
-            owner. Choose to send an authentication code to your email or to
-            your phone via SMS.
-          </div>
-          <RadioGroup>
+    const { loading, otpReceived } = this.props;
+    return otpReceived ? (
+      <Redirect to={`/verify/${this.state.selected}`} />
+    ) : (
+      <React.Fragment>
+        <Loader loading={loading} />
+        <AuthLayout
+          heading="Before we can sign you in, we need to verify you are the account
+      owner. Choose to send an authentication code to your email or to your
+      phone via SMS."
+        >
+          <RadioGroup onChange={this.onSelect} value={this.state.selected}>
             <Radio value="email" className="auth1-radio">
               Email Address
             </Radio>
@@ -27,22 +47,42 @@ class LoginAuth1 extends Component {
               SMS
             </Radio>
           </RadioGroup>
-          <div className="auth1__buttons">
-            <Button className="auth1__buttons-btn auth1__buttons-btn-cancel">
+          {/* <form>
+          <input type="radio" name="gender" value="male" checked />
+          <input type="radio" name="gender" value="female" checked />
+        </form> */}
+          <div className="common_authbuttons">
+            <Button className="common_authbuttons-btn common_authbuttons-btn-cancel">
               Cancel
             </Button>
             <Button
               type="primary"
-              className="auth1__buttons-btn auth1__buttons-btn-send"
+              className="common_authbuttons-btn common_authbuttons-btn-send"
               onClick={this.sendCode}
             >
               Send Code
             </Button>
           </div>
-        </div>
-      </div>
+        </AuthLayout>
+      </React.Fragment>
     );
   }
 }
 
-export default withRouter(LoginAuth1);
+function mapStateToProps(state) {
+  return {
+    loading: state.Api.loading,
+    otpReceived: state.Login.otpReceived
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    actions: bindActionCreators({ ...LoginActions }, dispatch)
+  };
+}
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(LoginAuth1);

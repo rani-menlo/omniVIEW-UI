@@ -37,7 +37,7 @@
 }
 
 .global__container {
-  background: linear-gradient(to bottom, #5aa3cd 1%, $white 100%);
+  background: $blue-gradient;
   display: flex;
   align-items: center;
   height: 100%;
@@ -45,4 +45,10 @@
 
 .global__cursor-pointer {
   cursor: pointer;
+}
+
+.global__hr-line {
+  width: 100%;
+  height: 1px;
+  background: $froasted-glass;
 }

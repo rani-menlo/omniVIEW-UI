@@ -1,0 +1,100 @@
+import React, { Component } from "react";
+import { Input, Form, Button, Spin, Icon } from "antd";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
+import _ from "lodash";
+import AuthLayout from "./authLayout.component";
+import { LoginActions } from "../../redux/actions";
+import Loader from "../../uikit/components/loader";
+
+class AuthenticationCode extends Component {
+  onInputCode = e => {
+    const otp = e.target.value;
+    if (_.size(otp) === 5) {
+      this.props.actions.verifyOtp({ otp });
+    }
+  };
+
+  openDashboard = () => {
+    this.props.history.push("/customers");
+  };
+
+  resendOtp = () => {
+    const { mode } = this.props.match.params;
+    const data = {
+      isEmail: mode === "email"
+    };
+    this.props.actions.sendOtp(data);
+  };
+
+  render() {
+    const { verified, verifying, loading } = this.props;
+    return (
+      <React.Fragment>
+        <Loader loading={loading} />
+        <AuthLayout heading="Enter the five digit code we sent to (***)***-**34 below">
+          <div className="authenticationCode">
+            <span className="global__field-label">Authentication Code</span>
+            <span className="authenticationCode-send" onClick={this.resendOtp}>
+              Send another code
+            </span>
+          </div>
+          <Form.Item className="authenticationCode-form">
+            <Input
+              disabled={verifying}
+              placeholder="code"
+              className="authenticationCode-form-input"
+              onChange={this.onInputCode}
+            />
+            <div className="authenticationCode-form__icons">
+              {verifying && <Spin />}
+              {verified && (
+                <Icon
+                  type="check"
+                  className="authenticationCode-form__icons-tick"
+                />
+              )}
+            </div>
+          </Form.Item>
+          {verified && (
+            <span className="authenticationCode-verify">Code Verified</span>
+          )}
+          <div className="common_authbuttons">
+            <Button className="common_authbuttons-btn common_authbuttons-btn-cancel">
+              Cancel
+            </Button>
+            <Button
+              disabled={!verified}
+              type="primary"
+              className={`common_authbuttons-btn common_authbuttons-btn-send authenticationCode-login-${
+                verified ? "enable" : "disable"
+              }`}
+              onClick={this.openDashboard}
+            >
+              Login
+            </Button>
+          </div>
+        </AuthLayout>
+      </React.Fragment>
+    );
+  }
+}
+
+function mapStateToProps(state) {
+  return {
+    loading: state.Api.loading,
+    verified: state.Login.otp.verified,
+    verifying: state.Login.otp.verifying
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    actions: bindActionCreators({ ...LoginActions }, dispatch)
+  };
+}
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(AuthenticationCode);

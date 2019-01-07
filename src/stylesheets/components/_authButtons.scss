@@ -1,4 +1,4 @@
-.auth1__buttons {
+.common_authbuttons {
   position: absolute;
   bottom: 0;
   right: 0;
@@ -20,11 +20,5 @@
         color: $white;
       }
     }
-  }
-}
-
-.auth1-radio {
-  span > span {
-    border-color: $black;
   }
 }

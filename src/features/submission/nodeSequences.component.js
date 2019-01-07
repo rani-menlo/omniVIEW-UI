@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { Icon } from "antd";
-import FilterIcon from "../../../assets/images/filter.svg";
+import FilterIcon from "../../../assets/images/filter-blue.svg";
 import SortIcon from "../../../assets/images/sort.svg";
 import _ from "lodash";
 

@@ -118,7 +118,7 @@ class SubmissionView extends Component {
             <div className="submissionview__header__mode__tabs">
               <Tabs defaultActiveKey="1">
                 <TabPane tab="Standard" key="1" />
-                {/* <TabPane tab="Qc" key="2" /> */}
+                <TabPane tab="Qc" key="2" />
               </Tabs>
             </div>
           </div>

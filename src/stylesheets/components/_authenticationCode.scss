@@ -1,0 +1,38 @@
+.authenticationCode {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  &-send {
+    @include text-normal;
+    color: $sky-of-margritte;
+    cursor: pointer;
+  }
+  &-login-disable {
+    background: lighten($black, 75%) !important;
+    border-width: 0px !important;
+  }
+  &-login-enable {
+    background: $blue !important;
+    border-width: 0px;
+  }
+  &-form {
+    margin-bottom: 0px !important;
+    &-input {
+      padding-right: 40px !important;
+    }
+    &__icons {
+      position: absolute;
+      right: 5;
+      top: 0;
+      &-tick {
+        color: $caribbean-green;
+      }
+    }
+  }
+  &-verify {
+    display: block;
+    text-align: right;
+    @include text-normal;
+    color: $caribbean-green;
+  }
+}
