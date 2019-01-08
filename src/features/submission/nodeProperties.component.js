@@ -1,6 +1,7 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import _ from 'lodash';
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+import _ from "lodash";
+import { SERVER_URL, URI } from "../../constants";
 
 class NodeProperties extends Component {
   static propTypes = {
@@ -42,15 +43,17 @@ class NodeProperties extends Component {
               <td className="value">{properties.ID}</td>
             </tr>
           )}
-          {properties.href && (
+          {properties.fileID && (
             <tr>
               <td className="label">File Link(Href):</td>
               <td className="value link">
                 <a
                   target="_blank"
-                  href="http://www.africau.edu/images/default/sample.pdf"
+                  href={`${SERVER_URL}${URI.GET_RESOURCE_FILE}/${
+                    properties.fileID
+                  }`}
                 >
-                  {properties.href}
+                  {properties.title}
                 </a>
               </td>
             </tr>
@@ -61,10 +64,10 @@ class NodeProperties extends Component {
               <td className="value">{properties.checksum}</td>
             </tr>
           )}
-          {properties['checksum-type'] && (
+          {properties["checksum-type"] && (
             <tr>
               <td className="label">Checksum type:</td>
-              <td className="value">{properties['checksum-type']}</td>
+              <td className="value">{properties["checksum-type"]}</td>
             </tr>
           )}
           {properties.type && (

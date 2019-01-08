@@ -1,8 +1,8 @@
-import React, { Component } from 'react';
-import { Icon } from 'antd';
-import PropTypes from 'prop-types';
-import _ from 'lodash';
-import uuidv4 from 'uuid/v4';
+import React, { Component } from "react";
+import { Icon } from "antd";
+import PropTypes from "prop-types";
+import _ from "lodash";
+import uuidv4 from "uuid/v4";
 
 class TreeNode extends Component {
   constructor(props) {
@@ -42,18 +42,23 @@ class TreeNode extends Component {
   }
 
   componentDidMount() {
-    const { content } = this.props;
+    let { content } = this.props;
     const properties = {};
     const nodes = [];
+    content = _.get(content, "ectd:ectd", content);
     _.map(content, (value, key) => {
-      if (typeof value === 'string') {
+      if (typeof value === "string") {
         properties[key] = value;
       } else {
         const node = { label: key, value };
-        if (_.isArray(content)) {
-          node.label = 'leaf';
+        if (_.isArray(value) && key === "leaf") {
+          _.map(value, val => {
+            const newNode = { label: "leaf", value: val };
+            nodes.push(newNode);
+          });
+        } else {
+          nodes.push(node);
         }
-        nodes.push(node);
       }
     });
     this.setState({ properties, nodes });
@@ -64,7 +69,7 @@ class TreeNode extends Component {
   };
 
   getCaretIcon = () => {
-    if (this.props.label === 'leaf') {
+    if (this.props.label === "leaf") {
       return null;
     }
     return this.state.expand ? (
@@ -79,7 +84,7 @@ class TreeNode extends Component {
   };
 
   getLeafIcon = () => {
-    return this.props.label === 'leaf' ? (
+    return this.props.label === "leaf" ? (
       <Icon type="file-text" className="global__file-folder" />
     ) : (
       <Icon type="folder" theme="filled" className="global__file-folder" />
@@ -112,14 +117,14 @@ class TreeNode extends Component {
       <React.Fragment>
         <div
           className={`node ${selectedNodeId === this.state.nodeId &&
-            'global__node-selected'}`}
+            "global__node-selected"}`}
           style={{ paddingLeft }}
           onClick={this.selectNode}
         >
           {this.getCaretIcon()}
           {this.getLeafIcon()}
           <span className="global__node-text">
-            {label === 'leaf' ? title : label}
+            {label === "leaf" ? title : label}
           </span>
         </div>
         {expand &&

@@ -3,7 +3,7 @@ import { ApplicationApi } from "../api";
 import { ApiActions } from ".";
 
 export default {
-  fetchApplications: (customerId) => {
+  fetchApplications: customerId => {
     return async dispatch => {
       ApiActions.request(dispatch);
       try {
@@ -17,6 +17,12 @@ export default {
         console.log(err);
         ApiActions.failure(dispatch);
       }
+    };
+  },
+  setSelectedSubmission: submission => {
+    return {
+      type: ApplicationActionTypes.SET_SELECTED_SUBMISSION,
+      submission
     };
   }
 };

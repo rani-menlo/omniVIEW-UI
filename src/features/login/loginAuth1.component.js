@@ -13,7 +13,7 @@ class LoginAuth1 extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      selected: ""
+      selected: "email"
     };
   }
   sendCode = () => {
@@ -43,7 +43,7 @@ class LoginAuth1 extends Component {
             <Radio value="email" className="auth1-radio">
               Email Address
             </Radio>
-            <Radio value="phone" className="auth1-radio">
+            <Radio disabled value="phone" className="auth1-radio">
               SMS
             </Radio>
           </RadioGroup>

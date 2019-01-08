@@ -43,10 +43,10 @@ class CustomerCard extends Component {
   render() {
     const { customer, onSelect } = this.props;
     return (
-      <div className="customercard" onClick={onSelect && onSelect(customer)}>
+      <div className="customercard">
         <div className="customercard__heading">
           <span className="customercard__heading-text">
-            {customer.company_name}
+            {_.get(customer, 'company_name') || _.get(customer, 'name')}
           </span>
           <Dropdown
             overlay={this.getMenu()}
@@ -56,7 +56,7 @@ class CustomerCard extends Component {
             <img src={DotsIcon} className="customercard__heading-more" />
           </Dropdown>
         </div>
-        <div className="customercard__content">
+        <div className="customercard__content" onClick={onSelect && onSelect(customer)}>
           <div className="customercard__content__item">
             <img src={UsersIcon} />
             <span className="customercard__content__item-text">

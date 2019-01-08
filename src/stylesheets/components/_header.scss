@@ -1,0 +1,16 @@
+.headerbar {
+  position: absolute;
+  height: 64px;
+  width: 100%;
+  top: 0px;
+  box-shadow: 0 4px 8px 0 $shadowed-steel;
+  background-color: $white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0px 8px;
+   &-logo {
+    width: 176px;
+    height: 36px;
+  }
+}

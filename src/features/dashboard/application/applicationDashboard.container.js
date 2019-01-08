@@ -8,6 +8,8 @@ import PlusIcon from "../../../../assets/images/plus.svg";
 import SearchIcon from "../../../../assets/images/search.svg";
 import CustomerCard from "../customerCard.component";
 import { ApplicationActions } from "../../../redux/actions";
+import Loader from "../../../uikit/components/loader";
+import Header from "../../header.component";
 // import { Customers } from "./sampleCustomers";
 
 class ApplicationDashboard extends Component {
@@ -19,72 +21,90 @@ class ApplicationDashboard extends Component {
   }
 
   componentDidMount() {
-    const { customerId } = this.props.match.params;
-    this.props.actions.fetchApplications(customerId);
+    const { selectedCustomer } = this.props;
+    selectedCustomer && this.props.actions.fetchApplications(selectedCustomer.id);
   }
 
   changeView = type => () => {
     this.setState({ viewBy: type });
   };
 
+  onSubmissionSelected = submission => () => {
+    this.props.actions.setSelectedSubmission(submission);
+    this.props.history.push("/submission");
+  };
+
   render() {
     const { viewBy } = this.state;
-    const { submissions } = this.props;
+    const { submissions, loading, selectedCustomer } = this.props;
     return (
-      <div className="maindashboard">
-        <div className="maindashboard__header">
-          <div
-            className={`maindashboard__header__icon maindashboard__header__icon-cards ${viewBy ===
-              "cards" && "maindashboard__header__icon-selected"}`}
-            onClick={this.changeView("cards")}
-          >
-            <Icon
-              type="appstore"
-              theme="filled"
-              className={`card-icon ${viewBy === "cards" &&
-                "card-icon-colored"}`}
-            />
-          </div>
-          <div
-            className={`maindashboard__header__icon maindashboard__header__icon-lists ${viewBy ===
-              "lists" && "maindashboard__header__icon-selected"}`}
-            onClick={this.changeView("lists")}
-          >
-            <img src={ListViewIcon} />
-          </div>
-          <div className="maindashboard__header__icon maindashboard__header__icon-filter">
-            <img src={FilterIcon} />
-          </div>
-          <span className="maindashboard__header-filter-text">
-            Filters: Off
-          </span>
-          <div className="maindashboard__header__search">
-            <Input
-              className="maindashboard__header__search-box"
-              prefix={<img src={SearchIcon} />}
-              placeholder="Search Applications..."
-            />
-          </div>
-        </div>
-        <div className="maindashboard__content">
-          <div className="maindashboard__content__header">
-            <span className="maindashboard__content__header-customers">
-              Customers ({submissions.length})
+      <React.Fragment>
+        <Loader loading={loading} />
+        <Header />
+        <div className="maindashboard" style={{ marginTop: "60px" }}>
+          <div className="maindashboard__header">
+            <div
+              className={`maindashboard__header__icon maindashboard__header__icon-cards ${viewBy ===
+                "cards" && "maindashboard__header__icon-selected"}`}
+              onClick={this.changeView("cards")}
+            >
+              <Icon
+                type="appstore"
+                theme="filled"
+                className={`card-icon ${viewBy === "cards" &&
+                  "card-icon-colored"}`}
+              />
+            </div>
+            <div
+              className={`maindashboard__header__icon maindashboard__header__icon-lists ${viewBy ===
+                "lists" && "maindashboard__header__icon-selected"}`}
+              onClick={this.changeView("lists")}
+            >
+              <img src={ListViewIcon} />
+            </div>
+            <div className="maindashboard__header__icon maindashboard__header__icon-filter">
+              <img src={FilterIcon} />
+            </div>
+            <span className="maindashboard__header-filter-text">
+              Filters: Off
             </span>
-            <span className="maindashboard__content__header-addcustomer">
-              <img src={PlusIcon} />
-              <span className="maindashboard__content__header-addcustomer--text">
-                Add New Application{" "}
+            <div className="maindashboard__header__search">
+              <Input
+                className="maindashboard__header__search-box"
+                prefix={<img src={SearchIcon} />}
+                placeholder="Search Applications..."
+              />
+            </div>
+          </div>
+          <div className="maindashboard__content">
+            <div className="maindashboard__content__header">
+              <span className="maindashboard__content__header-customers">
+                {_.get(selectedCustomer, "company_name", "")}
               </span>
-            </span>
-          </div>
-          <div className="maindashboard__content__cards">
-            {_.map(submissions,  submission=> (
-              <CustomerCard customer={submission} type="customer"/>
-            ))}
+              <span className="maindashboard__content__header-addcustomer">
+                <img src={PlusIcon} />
+                <span className="maindashboard__content__header-addcustomer--text">
+                  Add New Application{" "}
+                </span>
+              </span>
+            </div>
+            <div>
+              <span>Subscription Licenses:</span>
+              <span>11 in use</span>
+              <span>3 unassigned</span>
+            </div>
+            <div className="maindashboard__content__cards">
+              {_.map(submissions, submission => (
+                <CustomerCard
+                  key={submission.id}
+                  customer={submission}
+                  onSelect={this.onSubmissionSelected}
+                />
+              ))}
+            </div>
           </div>
         </div>
-      </div>
+      </React.Fragment>
     );
   }
 }
@@ -92,7 +112,8 @@ class ApplicationDashboard extends Component {
 function mapStateToProps(state) {
   return {
     loading: state.Api.loading,
-    submissions: state.Application.submissions
+    submissions: state.Application.submissions,
+    selectedCustomer: state.Customer.selectedCustomer
   };
 }
 

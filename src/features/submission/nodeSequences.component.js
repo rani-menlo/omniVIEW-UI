@@ -74,7 +74,7 @@ class NodeSequences extends Component {
         <div className="sequenceslist">
           {_.map(sequences, sequence => (
             <div
-              key={sequence}
+              key={sequence.id}
               onClick={this.onSelected(sequence)}
               className={`sequenceslist__sequence global__cursor-pointer ${this.state.selected ===
                 sequence && "global__node-selected"}`}
@@ -84,7 +84,7 @@ class NodeSequences extends Component {
                 theme="filled"
                 className="global__file-folder"
               />
-              <span className="global__node-text global__cursor-pointer">{sequence}</span>
+              <span className="global__node-text global__cursor-pointer">{sequence.name}</span>
             </div>
           ))}
         </div>

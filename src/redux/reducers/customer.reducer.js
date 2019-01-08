@@ -1,7 +1,8 @@
 import { CustomerActionTypes } from "../actionTypes";
 
 const initialState = {
-  customers: []
+  customers: [],
+  selectedCustomer: null
 };
 
 export default (state = initialState, action) => {
@@ -10,6 +11,12 @@ export default (state = initialState, action) => {
       return {
         ...state,
         customers: action.data.customers
+      };
+    }
+    case CustomerActionTypes.SET_SELECTED_CUSTOMER: {
+      return {
+        ...state,
+        selectedCustomer: action.customer
       };
     }
     default:

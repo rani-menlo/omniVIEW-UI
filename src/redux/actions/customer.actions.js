@@ -18,5 +18,11 @@ export default {
         ApiActions.failure(dispatch);
       }
     };
+  },
+  setSelectedCustomer: customer => {
+    return {
+      type: CustomerActionTypes.SET_SELECTED_CUSTOMER,
+      customer
+    };
   }
 };

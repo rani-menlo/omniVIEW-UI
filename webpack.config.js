@@ -7,7 +7,11 @@ module.exports = {
   entry: ["babel-polyfill", "./src/index.js"],
   output: {
     path: path.resolve(__dirname, "dist"),
-    filename: "[name].[hash].js"
+    filename: "[name].[hash].js",
+    publicPath: "/"
+  },
+  devServer: {
+    historyApiFallback: true
   },
   module: {
     rules: [
@@ -42,7 +46,7 @@ module.exports = {
         use: {
           loader: "file-loader",
           options: {
-            name: "[path][name].[hash].[ext]"
+            name: "[name].[hash].[ext]"
           }
         }
       }

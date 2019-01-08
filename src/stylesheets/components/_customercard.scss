@@ -1,5 +1,4 @@
 .customercard {
-  cursor: pointer;
   background: $blue;
   width: 230px;
   height: 230px;
@@ -37,6 +36,7 @@
     }
   }
   &__content {
+    cursor: pointer;
     background: $white;
     margin: 3px 3px 3px;
     padding: 15px;

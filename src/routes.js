@@ -21,7 +21,7 @@ const Routes = () => {
           <Route path="/verify/:mode" component={AuthenticationCode} />
           <Route path="/customers" component={CustomerDashboardContainer} />
           <Route
-            path="/applications/:customerId"
+            path="/applications"
             component={ApplicationDashboardContainer}
           />
           <Route path="/submission" component={SubmissionView} />

@@ -1,7 +1,8 @@
 import { ApplicationActionTypes } from "../actionTypes";
 
 const initialState = {
-  submissions: []
+  submissions: [],
+  selectedSubmission: null
 };
 
 export default (state = initialState, action) => {
@@ -10,6 +11,12 @@ export default (state = initialState, action) => {
       return {
         ...state,
         submissions: action.data.message
+      };
+    }
+    case ApplicationActionTypes.SET_SELECTED_SUBMISSION: {
+      return {
+        ...state,
+        selectedSubmission: action.submission
       };
     }
     default:
