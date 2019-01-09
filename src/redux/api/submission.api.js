@@ -1,8 +1,8 @@
-import api from ".";
-import { URI } from "../../constants";
+import api from '.';
+import { URI } from '../../constants';
 
 export default {
-  fetchSequences: (data) => {
+  fetchSequences: data => {
     return api.post(URI.GET_SEQUENCES, data);
   },
   fetchJson: data => {

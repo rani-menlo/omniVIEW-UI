@@ -1,6 +1,6 @@
-import { CustomerActionTypes } from "../actionTypes";
-import { CustomerApi } from "../api";
-import { ApiActions } from ".";
+import { CustomerActionTypes } from '../actionTypes';
+import { CustomerApi } from '../api';
+import { ApiActions } from '.';
 
 export default {
   fetchCustomers: () => {

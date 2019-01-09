@@ -1,7 +1,7 @@
-import _ from "lodash";
-import { SubmissionActionTypes } from "../actionTypes";
-import { SubmissionApi } from "../api";
-import { ApiActions } from ".";
+import _ from 'lodash';
+import { SubmissionActionTypes } from '../actionTypes';
+import { SubmissionApi } from '../api';
+import { ApiActions } from '.';
 
 export default {
   fetchSequences: submissionId => {
@@ -13,7 +13,7 @@ export default {
           type: SubmissionActionTypes.FETCH_SEQUENCES,
           data: res.data
         });
-        const firstSequence = _.get(res, "data.message[0]");
+        /* const firstSequence = _.get(res, "data.message[0]");
         if (firstSequence) {
           res = await SubmissionApi.fetchJson({ id: firstSequence.json_path });
           dispatch({
@@ -21,7 +21,7 @@ export default {
             sequence: firstSequence,
             data: res.data
           });
-        }
+        } */
         ApiActions.success(dispatch);
       } catch (err) {
         console.log(err);
@@ -29,11 +29,13 @@ export default {
       }
     };
   },
-  fetchLifeCycleJson: lifeCyclePath => {
+  fetchLifeCycleJson: submission => {
     return async dispatch => {
       ApiActions.request(dispatch);
       try {
-        const res = await SubmissionApi.fetchJson({ id: lifeCyclePath });
+        const res = await SubmissionApi.fetchJson({
+          id: submission.life_cycle_json_path
+        });
         dispatch({
           type: SubmissionActionTypes.FETCH_LIFE_CYCLE_JSON,
           data: res.data
@@ -52,7 +54,6 @@ export default {
         const res = await SubmissionApi.fetchJson({ id: sequence.json_path });
         dispatch({
           type: SubmissionActionTypes.FETCH_SEQUENCE_JSON,
-          sequence,
           data: res.data
         });
         ApiActions.success(dispatch);
@@ -60,6 +61,12 @@ export default {
         console.log(err);
         ApiActions.failure(dispatch);
       }
+    };
+  },
+  setSelectedSequence: sequence => {
+    return {
+      type: SubmissionActionTypes.SET_SELECTED_SEQUENCE,
+      sequence
     };
   }
 };

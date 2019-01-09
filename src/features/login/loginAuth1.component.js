@@ -1,11 +1,11 @@
-import React, { Component } from "react";
-import { Radio, Button } from "antd";
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
-import { Redirect } from "react-router-dom";
-import AuthLayout from "./authLayout.component";
-import { LoginActions } from "../../redux/actions";
-import Loader from "../../uikit/components/loader";
+import React, { Component } from 'react';
+import { Radio, Button } from 'antd';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import { Redirect } from 'react-router-dom';
+import AuthLayout from './authLayout.component';
+import { LoginActions } from '../../redux/actions';
+import Loader from '../../uikit/components/loader';
 
 const RadioGroup = Radio.Group;
 
@@ -13,14 +13,19 @@ class LoginAuth1 extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      selected: "email"
+      selected: 'email'
     };
   }
   sendCode = () => {
     const data = {
-      isEmail: this.state.selected === "email"
+      isEmail: this.state.selected === 'email'
     };
     this.props.actions.sendOtp(data);
+  };
+
+  goBack = () => {
+    this.props.actions.setLoggedInStatus(false);
+    this.props.history.push('/');
   };
 
   onSelect = e => {
@@ -52,7 +57,10 @@ class LoginAuth1 extends Component {
           <input type="radio" name="gender" value="female" checked />
         </form> */}
           <div className="common_authbuttons">
-            <Button className="common_authbuttons-btn common_authbuttons-btn-cancel">
+            <Button
+              className="common_authbuttons-btn common_authbuttons-btn-cancel"
+              onClick={this.goBack}
+            >
               Cancel
             </Button>
             <Button
@@ -72,7 +80,7 @@ class LoginAuth1 extends Component {
 function mapStateToProps(state) {
   return {
     loading: state.Api.loading,
-    otpReceived: state.Login.otpReceived
+    otpReceived: state.Login.otp.otpReceived
   };
 }
 

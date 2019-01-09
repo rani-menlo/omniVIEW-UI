@@ -1,4 +1,4 @@
-import { ApiActionTypes } from "../actionTypes";
+import { ApiActionTypes } from '../actionTypes';
 
 export default {
   request: dispatch => {

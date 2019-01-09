@@ -1,6 +1,6 @@
-import { ApplicationActionTypes } from "../actionTypes";
-import { ApplicationApi } from "../api";
-import { ApiActions } from ".";
+import { ApplicationActionTypes } from '../actionTypes';
+import { ApplicationApi } from '../api';
+import { ApiActions } from '.';
 
 export default {
   fetchApplications: customerId => {

@@ -1,9 +1,9 @@
 const requestInterceptor = reqConfig => {
   try {
-    let token = localStorage.getItem("token");
+    let token = localStorage.getItem('token');
     reqConfig.headers = {
       ...reqConfig.headers,
-      "x-auth-token": token
+      'x-auth-token': token
     };
     return reqConfig;
   } catch (error) {

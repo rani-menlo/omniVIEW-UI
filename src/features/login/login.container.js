@@ -1,8 +1,8 @@
-import React, { Component } from "react";
-import { Redirect } from "react-router-dom";
-import PropTypes from "prop-types";
-import { connect } from "react-redux";
-import LoginComponent from "./login.component";
+import React, { Component } from 'react';
+import { Redirect } from 'react-router-dom';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import LoginComponent from './login.component';
 
 class LoginContainer extends Component {
   static propTypes = {
@@ -17,7 +17,7 @@ class LoginContainer extends Component {
 
 function mapStateToProps(state) {
   return {
-    loggedIn: state.Login.loggedIn
+    loggedIn: state.Login.login.loggedIn
   };
 }
 

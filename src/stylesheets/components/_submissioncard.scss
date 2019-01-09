@@ -1,0 +1,71 @@
+.submissioncard {
+    background: $blue;
+    width: 230px;
+    height: 230px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 8px;
+    margin-right: 40px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.75);
+    &-more {
+      float: right;
+    }
+    &__heading {
+      display: flex;
+      align-items: center;
+      height: 60px;
+      overflow: hidden;
+      &-text {
+        @include text-bold-active(16px);
+        margin-top: 5px;
+        width: 100%;
+        color: $white;
+        padding: 0px 0px 4px 24px;
+        overflow: hidden;
+      }
+      &-more {
+        padding: 0px 10px;
+        cursor: pointer;
+      }
+      &-dropdown {
+        width: 148px;
+        &--item {
+          @include text-normal;
+        }
+      }
+    }
+    &__content {
+      cursor: pointer;
+      background: $white;
+      margin: 3px 3px 3px;
+      padding: 0px 5px;
+      height: 100%;
+      border-bottom-left-radius: 8px;
+      border-bottom-right-radius: 8px;
+      img {
+        width: 20px;
+        height: 20px;
+      }
+      &__item {
+        display: flex;
+        justify-content: space-between;
+        height: 20px;
+        padding: 10px;
+        margin-bottom: 10px;
+        &-label {
+            width: 45%;
+            @include text-bold-active;
+            color: lighten($black, 50%)
+        }
+        &-text {
+          @include text-normal;
+        }
+      }
+    }
+  }
+  
+  .red-text {
+    color: red;
+  }
+  

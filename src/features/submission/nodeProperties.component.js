@@ -1,7 +1,7 @@
-import React, { Component } from "react";
-import PropTypes from "prop-types";
-import _ from "lodash";
-import { SERVER_URL, URI } from "../../constants";
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import _ from 'lodash';
+import { SERVER_URL, URI } from '../../constants';
 
 class NodeProperties extends Component {
   static propTypes = {
@@ -64,10 +64,10 @@ class NodeProperties extends Component {
               <td className="value">{properties.checksum}</td>
             </tr>
           )}
-          {properties["checksum-type"] && (
+          {properties['checksum-type'] && (
             <tr>
               <td className="label">Checksum type:</td>
-              <td className="value">{properties["checksum-type"]}</td>
+              <td className="value">{properties['checksum-type']}</td>
             </tr>
           )}
           {properties.type && (

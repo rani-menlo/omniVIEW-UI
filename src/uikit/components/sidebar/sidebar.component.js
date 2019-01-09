@@ -1,5 +1,5 @@
-import React, { Component } from "react";
-import PropTypes from "prop-types";
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 
 class Sidebar extends Component {
   constructor(props) {
@@ -11,12 +11,12 @@ class Sidebar extends Component {
 
   static propTypes = {
     containerStyle: PropTypes.object,
-    direction: PropTypes.oneOf(["ltr", "rtl"]),
+    direction: PropTypes.oneOf(['ltr', 'rtl']),
     expand: PropTypes.bool
   };
 
   static defaultProps = {
-    direction: "ltr"
+    direction: 'ltr'
   };
 
   componentDidUpdate(prevProps) {
@@ -27,7 +27,7 @@ class Sidebar extends Component {
 
   setVisibility = () => {
     const { expand } = this.props;
-    this.setState({ hide: expand ? false : true });
+    this.setState({ hide: !expand });
   };
 
   render() {
@@ -38,7 +38,7 @@ class Sidebar extends Component {
           <div
             style={containerStyle}
             className={`slider ${direction}__${
-              expand ? "slide-in" : "slide-out"
+              expand ? 'slide-in' : 'slide-out'
             }`}
           >
             {children}

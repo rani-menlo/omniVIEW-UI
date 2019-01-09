@@ -1,12 +1,12 @@
-import React, { Component } from "react";
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
-import { Form, Input, Button, Checkbox, message as MessageBox } from "antd";
-import PropTypes from "prop-types";
-import OmniciaLogo from "../../../assets/images/omnicia-logo.svg";
-import _ from "lodash";
-import { LoginActions } from "../../redux/actions";
-import Loader from "../../uikit/components/loader";
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import { Form, Input, Button, Checkbox } from 'antd';
+import PropTypes from 'prop-types';
+import OmniciaLogo from '../../../assets/images/omnicia-logo.svg';
+import _ from 'lodash';
+import { LoginActions } from '../../redux/actions';
+import Loader from '../../uikit/components/loader';
 
 const FormItem = Form.Item;
 
@@ -14,8 +14,14 @@ class Login extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      username: "",
-      password: ""
+      username: {
+        value: '',
+        error: ''
+      },
+      password: {
+        value: '',
+        error: ''
+      }
     };
   }
   static propTypes = {
@@ -25,27 +31,44 @@ class Login extends Component {
   handleSubmit = e => {
     e.preventDefault();
     let { username, password } = this.state;
-    username = username.trim();
-    password = password.trim();
-    if (!username) {
-      MessageBox.error("Invalid username");
-    } else if (!password) {
-      MessageBox.error("Invalid password");
+    if (!username.value) {
+      this.setState({
+        username: { ...username, error: 'Username is required' }
+      });
+    } else if (!password.value) {
+      this.setState({
+        password: { ...password, error: 'Password is required' }
+      });
     } else {
-      this.props.actions.login({ username, password });
+      this.props.actions.login({
+        username: username.value,
+        password: password.value
+      });
     }
   };
 
   onUsernameChange = e => {
-    this.setState({ username: e.target.value });
+    this.props.error && this.props.actions.resetLoginError();
+    const text = e.target.value;
+    let error = '';
+    if (/\s/.test(text)) {
+      error = 'Inavlid Username';
+    }
+    this.setState({
+      username: { ...this.state.username, value: text, error }
+    });
   };
 
   onPasswordChange = e => {
-    this.setState({ password: e.target.value });
+    this.props.error && this.props.actions.resetLoginError();
+    const text = e.target.value;
+    this.setState({
+      password: { ...this.state.password, value: text, error: '' }
+    });
   };
 
   render() {
-    const { loading } = this.props;
+    const { loading, error } = this.props;
     const { username, password } = this.state;
     return (
       <React.Fragment>
@@ -55,18 +78,27 @@ class Login extends Component {
             <img src={OmniciaLogo} className="login-logo" />
             <p className="login-text">Login</p>
             <div className="login__hr-line global__hr-line" />
+            {error && <p className="login-error">{error}</p>}
             <Form onSubmit={this.handleSubmit}>
               <p className="global__field-label">Username</p>
               <FormItem>
                 <Input
                   placeholder="Username"
                   onChange={this.onUsernameChange}
-                  value={username}
+                  value={username.value}
+                  className={username.error && 'login-errorbox'}
                 />
               </FormItem>
+              {username.error && (
+                <p className="login-fieldError">{username.error}</p>
+              )}
               <div className="login__pwdsection">
                 <span className="global__field-label">Password</span>
-                <a className="login__pwdsection-forgot-pwd" href="">
+                <a
+                  className="login__pwdsection-forgot-pwd"
+                  href=""
+                  tabIndex="3"
+                >
                   Forgot your password?
                 </a>
               </div>
@@ -74,10 +106,14 @@ class Login extends Component {
                 <Input
                   type="password"
                   placeholder="Password"
-                  value={password}
+                  value={password.value}
                   onChange={this.onPasswordChange}
+                  className={password.error && 'login-errorbox'}
                 />
               </FormItem>
+              {password.error && (
+                <p className="login-fieldError">{password.error}</p>
+              )}
               <Checkbox className="login-rememberpwd">
                 Remember Password?
               </Checkbox>
@@ -87,7 +123,7 @@ class Login extends Component {
                   htmlType="submit"
                   className="login-form-button"
                 >
-                  Sign in
+                  Sign In
                 </Button>
               </FormItem>
             </Form>
@@ -100,7 +136,8 @@ class Login extends Component {
 
 function mapStateToProps(state) {
   return {
-    loading: state.Api.loading
+    loading: state.Api.loading,
+    error: state.Login.login.error
   };
 }
 

@@ -1,6 +1,6 @@
-const path = "/api/v1/";
+const path = '/api/v1/';
 
-const SERVER_URL = "http://192.168.1.44:3000";
+const SERVER_URL = 'http://23.100.29.9:3000'; // "http://192.168.1.44:3000";
 
 const URI = {
   LOGIN: `${path}login`,

@@ -8,6 +8,20 @@
   border-width: 1px;
   border-style: solid;
   box-shadow: 0 16px 24px 0 rgba(0, 0, 0, 0.1);
+  &-errorbox {
+    border-color: $red !important;
+  }
+  &-error {
+    @include text-normal;
+    margin-bottom: 15px;
+    color: $red;
+  }
+  &-fieldError {
+    @include text-normal;
+    margin-bottom: 15px;
+    margin-top: -25px;
+    color: $red;
+  }
   &-text {
     @include text-bold-active(20px);
     margin-left: 0px;

@@ -1,4 +1,4 @@
-import { CustomerActionTypes } from "../actionTypes";
+import { CustomerActionTypes } from '../actionTypes';
 
 const initialState = {
   customers: [],

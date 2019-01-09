@@ -1,22 +1,22 @@
-import React, { Component } from "react";
-import { Icon, Input } from "antd";
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
-import ListViewIcon from "../../../../assets/images/list-view.svg";
-import ListViewIconActive from "../../../../assets/images/list-view-active.svg";
-import FilterIcon from "../../../../assets/images/filter.svg";
-import PlusIcon from "../../../../assets/images/plus.svg";
-import SearchIcon from "../../../../assets/images/search.svg";
-import CustomerCard from "../customerCard.component";
-import { CustomerActions } from "../../../redux/actions";
-import Header from "../../header.component";
-import Loader from "../../../uikit/components/loader";
+import React, { Component } from 'react';
+import { Icon, Input, message as MessageBox } from 'antd';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import ListViewIcon from '../../../../assets/images/list-view.svg';
+import ListViewIconActive from '../../../../assets/images/list-view-active.svg';
+import FilterIcon from '../../../../assets/images/filter.svg';
+import PlusIcon from '../../../../assets/images/plus.svg';
+import SearchIcon from '../../../../assets/images/search.svg';
+import CustomerCard from '../customerCard.component';
+import { CustomerActions } from '../../../redux/actions';
+import Header from '../../header.component';
+import Loader from '../../../uikit/components/loader';
 
 class CustomerDashboard extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      viewBy: "cards"
+      viewBy: 'cards'
     };
   }
 
@@ -29,8 +29,14 @@ class CustomerDashboard extends Component {
   };
 
   onCustomerSelected = customer => () => {
+    if (customer.id === 4) {
+      MessageBox.error(
+        `No Applications are available for customer ${customer.company_name}`
+      );
+      return;
+    }
     this.props.actions.setSelectedCustomer(customer);
-    this.props.history.push("/applications");
+    this.props.history.push('/applications');
   };
 
   render() {
@@ -40,27 +46,27 @@ class CustomerDashboard extends Component {
       <React.Fragment>
         <Loader loading={loading} />
         <Header />
-        <div className="maindashboard" style={{ marginTop: "60px" }}>
+        <div className="maindashboard" style={{ marginTop: '60px' }}>
           <div className="maindashboard__header">
             <div
               className={`maindashboard__header__icon maindashboard__header__icon-cards ${viewBy ===
-                "cards" && "maindashboard__header__icon-selected"}`}
-              onClick={this.changeView("cards")}
+                'cards' && 'maindashboard__header__icon-selected'}`}
+              onClick={this.changeView('cards')}
             >
               <Icon
                 type="appstore"
                 theme="filled"
-                className={`card-icon ${viewBy === "cards" &&
-                  "card-icon-colored"}`}
+                className={`card-icon ${viewBy === 'cards' &&
+                  'card-icon-colored'}`}
               />
             </div>
             <div
               className={`maindashboard__header__icon maindashboard__header__icon-lists ${viewBy ===
-                "lists" && "maindashboard__header__icon-selected"}`}
-              onClick={this.changeView("lists")}
+                'lists' && 'maindashboard__header__icon-selected'}`}
+              onClick={this.changeView('lists')}
             >
               <img
-                src={viewBy === "lists" ? ListViewIconActive : ListViewIcon}
+                src={viewBy === 'lists' ? ListViewIconActive : ListViewIcon}
               />
             </div>
             <div className="maindashboard__header__icon maindashboard__header__icon-filter">
@@ -85,7 +91,7 @@ class CustomerDashboard extends Component {
               <span className="maindashboard__content__header-addcustomer">
                 <img src={PlusIcon} />
                 <span className="maindashboard__content__header-addcustomer--text">
-                  Add New Customer{" "}
+                  Add New Customer{' '}
                 </span>
               </span>
             </div>

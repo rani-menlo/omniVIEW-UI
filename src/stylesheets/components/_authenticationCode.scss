@@ -2,6 +2,14 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  &-errorbox {
+    border-color: $red !important;
+  }
+  &-fieldError {
+    @include text-normal;
+    margin-bottom: 15px;
+    color: $red;
+  }
   &-send {
     @include text-normal;
     color: $sky-of-margritte;

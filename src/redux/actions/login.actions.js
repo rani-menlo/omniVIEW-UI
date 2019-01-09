@@ -1,6 +1,6 @@
-import { LoginActionTypes } from "../actionTypes";
-import { ApiActions } from ".";
-import { LoginApi } from "../api";
+import { LoginActionTypes } from '../actionTypes';
+import { ApiActions } from '.';
+import { LoginApi } from '../api';
 
 export default {
   login: data => {
@@ -51,6 +51,39 @@ export default {
         console.log(err);
         ApiActions.failure(dispatch);
       }
+    };
+  },
+  setLoggedInStatus: status => {
+    return {
+      type: LoginActionTypes.SET_LOGGED_STATUS,
+      status
+    };
+  },
+  setOtpStatus: status => {
+    return {
+      type: LoginActionTypes.SET_OTP_STATUS,
+      status
+    };
+  },
+  resetOtp: () => {
+    return {
+      type: LoginActionTypes.RESET_OTP
+    };
+  },
+  resetLoginError: () => {
+    return {
+      type: LoginActionTypes.RESET_LOGIN_ERROR
+    };
+  },
+  resetOtpError: () => {
+    return {
+      type: LoginActionTypes.RESET_OTP_ERROR
+    };
+  },
+  setOtpError: error => {
+    return {
+      type: LoginActionTypes.SET_OTP_ERROR,
+      error
     };
   }
 };

@@ -1,8 +1,8 @@
-import { ApiActionTypes } from "../actionTypes";
+import { ApiActionTypes } from '../actionTypes';
 
 const initialState = {
   loading: false,
-  error: ""
+  error: ''
 };
 
 export default (state = initialState, action) => {

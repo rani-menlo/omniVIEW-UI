@@ -1,5 +1,5 @@
-import api from ".";
-import { URI } from "../../constants";
+import api from '.';
+import { URI } from '../../constants';
 
 export default {
   fetchCustomers: () => {
