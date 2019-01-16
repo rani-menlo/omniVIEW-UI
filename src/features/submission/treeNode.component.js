@@ -1,12 +1,12 @@
-import React, { Component } from 'react';
-import { Icon } from 'antd';
-import PropTypes from 'prop-types';
-import _ from 'lodash';
-import uuidv4 from 'uuid/v4';
-import FileNew from '../../../assets/images/file-new.svg';
-import FileAppend from '../../../assets/images/file-append.svg';
-import FileReplace from '../../../assets/images/file-replace.svg';
-import FileDelete from '../../../assets/images/file-delete.svg';
+import React, { Component } from "react";
+import { Icon } from "antd";
+import PropTypes from "prop-types";
+import _ from "lodash";
+import uuidv4 from "uuid/v4";
+import FileNew from "../../../public/images/file-new.svg";
+import FileAppend from "../../../public/images/file-append.svg";
+import FileReplace from "../../../public/images/file-replace.svg";
+import FileDelete from "../../../public/images/file-delete.svg";
 
 class TreeNode extends Component {
   constructor(props) {
@@ -28,7 +28,8 @@ class TreeNode extends Component {
     defaultPaddingLeft: PropTypes.number,
     expand: PropTypes.bool,
     selectedNodeId: PropTypes.string,
-    onNodeSelected: PropTypes.func
+    onNodeSelected: PropTypes.func,
+    mode: PropTypes.string
   };
 
   static defaultProps = {
@@ -49,15 +50,15 @@ class TreeNode extends Component {
     let { content } = this.props;
     const properties = {};
     const nodes = [];
-    content = _.get(content, 'ectd:ectd', content);
+    content = _.get(content, "ectd:ectd", content);
     _.map(content, (value, key) => {
-      if (typeof value === 'string') {
+      if (typeof value === "string") {
         properties[key] = value;
       } else {
         const node = { label: key, value };
-        if (_.isArray(value) && key === 'leaf') {
+        if (_.isArray(value) && key === "leaf") {
           _.map(value, val => {
-            const newNode = { label: 'leaf', value: val };
+            const newNode = { label: "leaf", value: val };
             nodes.push(newNode);
           });
         } else {
@@ -73,7 +74,7 @@ class TreeNode extends Component {
   };
 
   getCaretIcon = () => {
-    if (this.props.label === 'leaf') {
+    if (this.props.label === "leaf") {
       return null;
     }
     return this.state.expand ? (
@@ -91,13 +92,13 @@ class TreeNode extends Component {
     let icon = (
       <Icon type="folder" theme="filled" className="global__file-folder" />
     );
-    if (this.props.label === 'leaf') {
+    if (this.props.label === "leaf") {
       const { properties } = this.state;
-      if (properties.operation === 'new') {
+      if (properties.operation === "new") {
         icon = <img src={FileNew} className="global__file-folder" />;
-      } else if (properties.operation === 'append') {
+      } else if (properties.operation === "append") {
         icon = <img src={FileAppend} className="global__file-folder" />;
-      } else if (properties.operation === 'replace') {
+      } else if (properties.operation === "replace") {
         icon = <img src={FileReplace} className="global__file-folder" />;
       } else {
         icon = <img src={FileDelete} className="global__file-folder" />;
@@ -115,43 +116,42 @@ class TreeNode extends Component {
     this.setState({ selected: false });
   };
 
+  getLabel = () => {
+    const { label, mode } = this.props;
+    const { properties } = this.state;
+    if (label === "leaf" || mode === "standard") {
+      return _.get(properties, "title", "");
+    }
+    return label || "Submission[Life cycle view]";
+  };
+
   render() {
-    const {
-      nodes,
-      expand,
-      properties: { title }
-    } = this.state;
-    const {
-      defaultPaddingLeft,
-      label,
-      selectedNodeId,
-      onNodeSelected
-    } = this.props;
+    const { nodes, expand } = this.state;
+    const { defaultPaddingLeft, selectedNodeId, onNodeSelected, mode } = this.props;
     const paddingLeft = this.props.paddingLeft + defaultPaddingLeft;
     return (
       <React.Fragment>
         <div
           className={`node ${selectedNodeId === this.state.nodeId &&
-            'global__node-selected'}`}
+            "global__node-selected"}`}
           style={{ paddingLeft }}
           onClick={this.selectNode}
         >
           {this.getCaretIcon()}
           {this.getLeafIcon()}
-          <span className="global__node-text">
-            {label === 'leaf' ? title : label || 'Submission[Life cycle view]'}
-          </span>
+          <span className="global__node-text">{this.getLabel()}</span>
         </div>
         {expand &&
           _.map(nodes, (node, idx) => (
             <TreeNode
               expand={this.props.expand}
               paddingLeft={paddingLeft}
-              key={node.label + idx}
+              key={node.label + idx + mode}
               label={node.label}
               content={node.value}
               selectedNodeId={selectedNodeId}
               onNodeSelected={onNodeSelected}
+              mode={mode}
             />
           ))}
       </React.Fragment>

@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Form, Input, Button, Checkbox } from 'antd';
 import PropTypes from 'prop-types';
-import OmniciaLogo from '../../../assets/images/omnicia-logo.svg';
+import OmniciaLogo from '../../../public/images/omnicia-logo.svg';
 import _ from 'lodash';
 import { LoginActions } from '../../redux/actions';
 import Loader from '../../uikit/components/loader';

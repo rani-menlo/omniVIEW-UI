@@ -1,6 +1,6 @@
 import React from 'react';
 import { Avatar } from 'antd';
-import OmniciaLogo from '../../assets/images/omnicia-logo.svg';
+import OmniciaLogo from '../../public/images/omnicia-logo.png';
 
 const Header = () => {
   return (

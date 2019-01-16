@@ -2,10 +2,10 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Icon, Dropdown, Menu } from 'antd';
 import _ from 'lodash';
-import UsersIcon from '../../../assets/images/users.svg';
-import ApplicationsIcon from '../../../assets/images/applications.svg';
-import DatabaseIcon from '../../../assets/images/database.svg';
-import DotsIcon from '../../../assets/images/overflow.svg';
+import UsersIcon from '../../../public/images/users.svg';
+import ApplicationsIcon from '../../../public/images/applications.svg';
+import DatabaseIcon from '../../../public/images/database.svg';
+import DotsIcon from '../../../public/images/overflow.svg';
 
 class CustomerCard extends Component {
   static propTypes = {

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Dropdown, Menu, Avatar } from 'antd';
 import _ from 'lodash';
 import moment from 'moment';
-import DotsIcon from '../../../assets/images/overflow.svg';
+import DotsIcon from '../../../public/images/overflow.svg';
 
 const DATE_FORMAT = 'DD/MM/YYYY';
 

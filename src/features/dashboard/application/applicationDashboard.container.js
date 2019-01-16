@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
+import _ from 'lodash';
 import { Icon, Input } from 'antd';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import ListViewIcon from '../../../../assets/images/list-view.svg';
-import ListViewIconActive from '../../../../assets/images/list-view-active.svg';
-import FilterIcon from '../../../../assets/images/filter.svg';
-import PlusIcon from '../../../../assets/images/plus.svg';
-import SearchIcon from '../../../../assets/images/search.svg';
+import ListViewIcon from '../../../../public/images/list-view.svg';
+import ListViewIconActive from '../../../../public/images/list-view-active.svg';
+import FilterIcon from '../../../../public/images/filter.svg';
+import PlusIcon from '../../../../public/images/plus.svg';
+import SearchIcon from '../../../../public/images/search.svg';
 import SubmissionCard from '../submissionCard.component';
 import { ApplicationActions } from '../../../redux/actions';
 import Loader from '../../../uikit/components/loader';

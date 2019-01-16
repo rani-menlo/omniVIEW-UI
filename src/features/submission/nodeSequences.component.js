@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Icon } from 'antd';
-import FilterIcon from '../../../assets/images/filter-blue.svg';
-import SortIcon from '../../../assets/images/sort.svg';
+import FilterIcon from '../../../public/images/filter-blue.svg';
+import SortIcon from '../../../public/images/sort.svg';
 import _ from 'lodash';
 
 class NodeSequences extends Component {
