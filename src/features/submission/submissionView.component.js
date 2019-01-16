@@ -5,7 +5,6 @@ import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import styled from "styled-components";
 import TreeNode from "./treeNode.component";
-import { sampleData } from "./sample";
 import NodeProperties from "./nodeProperties.component";
 import NodeSequences from "./nodeSequences.component";
 import Sidebar from "../../uikit/components/sidebar/sidebar.component";
