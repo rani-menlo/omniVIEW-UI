@@ -5,15 +5,9 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import styled from 'styled-components';
 import TreeNode from './treeNode.component';
-import { sampleData } from './sample';
 import NodeProperties from './nodeProperties.component';
 import NodeSequences from './nodeSequences.component';
 import Sidebar from '../../uikit/components/sidebar/sidebar.component';
-import LeftArrowHide from '../../../assets/images/left-arrow-hide.svg';
-import RightArrowHide from '../../../assets/images/right-arrow-hide.svg';
-import ValidateIcon from '../../../assets/images/folder-validate.svg';
-import ListIcon from '../../../assets/images/list.svg';
-import OpenFolderIcon from '../../../assets/images/open-folder.svg';
 import submissionActions from '../../redux/actions/submission.actions';
 import Loader from '../../uikit/components/loader';
 import Header from '../header.component';
@@ -122,7 +116,7 @@ class SubmissionView extends Component {
           <div className="submissionview__header">
             <div className="icon_text_border">
               <img
-                src={OpenFolderIcon}
+                src='/images/open-folder.svg'
                 className="global__icon"
                 style={{ marginLeft: '0px' }}
               />
@@ -175,14 +169,14 @@ class SubmissionView extends Component {
             </FlexBox>
             <div className="submissionview__header__validate icon_text_border">
               <img
-                src={ValidateIcon}
+                src='/images/folder-validate.svg'
                 className="global__icon"
                 style={{ marginLeft: '0px' }}
               />
               <span className="text">Validate Sequence</span>
             </div>
             <FlexBox>
-              <img src={ListIcon} className="global__icon" />
+              <img src='/images/list.svg' className="global__icon" />
               <span className="icon-label">Show Amendment List</span>
             </FlexBox>
           </div>
@@ -191,7 +185,7 @@ class SubmissionView extends Component {
               <img
                 className="global__cursor-pointer"
                 src={
-                  this.state.sequencesExpand ? LeftArrowHide : RightArrowHide
+                  this.state.sequencesExpand ? '/images/left-arrow-hide.svg' : '/images/right-arrow-hide.svg'
                 }
                 onClick={this.toggleSequencesPane}
               />
@@ -208,7 +202,7 @@ class SubmissionView extends Component {
               <img
                 className="global__cursor-pointer"
                 src={
-                  this.state.propertiesExpand ? RightArrowHide : LeftArrowHide
+                  this.state.propertiesExpand ? '/images/right-arrow-hide.svg' : '/images/left-arrow-hide.svg'
                 }
                 onClick={this.togglePropertiesPane}
               />

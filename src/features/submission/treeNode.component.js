@@ -3,10 +3,6 @@ import { Icon } from 'antd';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 import uuidv4 from 'uuid/v4';
-import FileNew from '../../../assets/images/file-new.svg';
-import FileAppend from '../../../assets/images/file-append.svg';
-import FileReplace from '../../../assets/images/file-replace.svg';
-import FileDelete from '../../../assets/images/file-delete.svg';
 
 class TreeNode extends Component {
   constructor(props) {
@@ -94,13 +90,13 @@ class TreeNode extends Component {
     if (this.props.label === 'leaf') {
       const { properties } = this.state;
       if (properties.operation === 'new') {
-        icon = <img src={FileNew} className="global__file-folder" />;
+        icon = <img src='/images/file-new.svg' className="global__file-folder" />;
       } else if (properties.operation === 'append') {
-        icon = <img src={FileAppend} className="global__file-folder" />;
+        icon = <img src='/images/file-append.svg' className="global__file-folder" />;
       } else if (properties.operation === 'replace') {
-        icon = <img src={FileReplace} className="global__file-folder" />;
+        icon = <img src='/images/file-replace.svg' className="global__file-folder" />;
       } else {
-        icon = <img src={FileDelete} className="global__file-folder" />;
+        icon = <img src='/images/file-delete.svg' className="global__file-folder" />;
       }
     }
     return icon;

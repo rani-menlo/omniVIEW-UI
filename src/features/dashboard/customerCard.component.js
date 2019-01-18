@@ -1,11 +1,7 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { Icon, Dropdown, Menu } from 'antd';
-import _ from 'lodash';
-import UsersIcon from '../../../assets/images/users.svg';
-import ApplicationsIcon from '../../../assets/images/applications.svg';
-import DatabaseIcon from '../../../assets/images/database.svg';
-import DotsIcon from '../../../assets/images/overflow.svg';
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+import { Icon, Dropdown, Menu } from "antd";
+import _ from "lodash";
 
 class CustomerCard extends Component {
   static propTypes = {
@@ -46,14 +42,17 @@ class CustomerCard extends Component {
       <div className="customercard">
         <div className="customercard__heading">
           <span className="customercard__heading-text">
-            {_.get(customer, 'company_name') || _.get(customer, 'name')}
+            {_.get(customer, "company_name") || _.get(customer, "name")}
           </span>
           <Dropdown
             overlay={this.getMenu()}
-            trigger={['click']}
+            trigger={["click"]}
             overlayClassName="customercard__heading-dropdown"
           >
-            <img src={DotsIcon} className="customercard__heading-more" />
+            <img
+              src="/images/overflow.svg"
+              className="customercard__heading-more"
+            />
           </Dropdown>
         </div>
         <div
@@ -61,23 +60,23 @@ class CustomerCard extends Component {
           onClick={onSelect && onSelect(customer)}
         >
           <div className="customercard__content__item">
-            <img src={UsersIcon} />
+            <img src="/images/users.svg" />
             <span className="customercard__content__item-text">
-              {_.get(customer, 'users.length', '0')} users
+              {_.get(customer, "users.length", "0")} users
             </span>
           </div>
           <div className="global__hr-line" />
           <div className="customercard__content__item">
-            <img src={ApplicationsIcon} />
+            <img src="/images/applications.svg" />
             <span className="customercard__content__item-text">
-              {_.get(customer, 'submissions.length', '0')} applications
+              {_.get(customer, "submissions.length", "0")} applications
             </span>
           </div>
           <div className="global__hr-line" />
           <div className="customercard__content__item">
-            <img src={DatabaseIcon} />
+            <img src="/images/database.svg" />
             <span className="customercard__content__item-text">
-              {_.get(customer, 'max_space') || '0'} TB
+              {_.get(customer, "max_space") || "0"} TB
             </span>
           </div>
         </div>

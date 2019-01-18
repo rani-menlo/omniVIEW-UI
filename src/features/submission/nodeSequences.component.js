@@ -1,15 +1,13 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { Icon } from 'antd';
-import FilterIcon from '../../../assets/images/filter-blue.svg';
-import SortIcon from '../../../assets/images/sort.svg';
-import _ from 'lodash';
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+import { Icon } from "antd";
+import _ from "lodash";
 
 class NodeSequences extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      sortBy: 'filter'
+      sortBy: "filter"
     };
   }
 
@@ -31,11 +29,11 @@ class NodeSequences extends Component {
   };
 
   filter = () => {
-    this.setState({ sortBy: 'filter' });
+    this.setState({ sortBy: "filter" });
   };
 
   sort = () => {
-    this.setState({ sortBy: 'sort' });
+    this.setState({ sortBy: "sort" });
   };
 
   onSelected = sequence => () => {
@@ -51,19 +49,19 @@ class NodeSequences extends Component {
         <div className="sortheader">
           <div className="sortheader__text">Sort by:</div>
           <div
-            className={`sortheader__section ${sortBy === 'filter' &&
-              'selected-sortby'}`}
+            className={`sortheader__section ${sortBy === "filter" &&
+              "selected-sortby"}`}
             onClick={this.filter}
           >
-            <img src={FilterIcon} />
+            <img src="/images/filter-blue.svg" />
             <span className="label">Submission Type</span>
           </div>
           <div
-            className={`sortheader__section ${sortBy === 'sort' &&
-              'selected-sortby'}`}
+            className={`sortheader__section ${sortBy === "sort" &&
+              "selected-sortby"}`}
             onClick={this.sort}
           >
-            <img src={SortIcon} />
+            <img src="/images/sort.svg" />
             <span className="label">Sequence</span>
           </div>
         </div>
@@ -73,7 +71,7 @@ class NodeSequences extends Component {
               key={sequence.id}
               onClick={this.onSelected(sequence)}
               className={`sequenceslist__sequence global__cursor-pointer ${selected ===
-                sequence && 'global__node-selected'}`}
+                sequence && "global__node-selected"}`}
             >
               <Icon
                 type="folder"
