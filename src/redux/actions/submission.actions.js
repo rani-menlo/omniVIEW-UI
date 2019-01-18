@@ -24,7 +24,6 @@ export default {
         } */
         ApiActions.success(dispatch);
       } catch (err) {
-        console.log(err);
         ApiActions.failure(dispatch);
       }
     };
@@ -42,7 +41,6 @@ export default {
         });
         ApiActions.success(dispatch);
       } catch (err) {
-        console.log(err);
         ApiActions.failure(dispatch);
       }
     };
@@ -58,7 +56,6 @@ export default {
         });
         ApiActions.success(dispatch);
       } catch (err) {
-        console.log(err);
         ApiActions.failure(dispatch);
       }
     };
@@ -67,6 +64,21 @@ export default {
     return {
       type: SubmissionActionTypes.SET_SELECTED_SEQUENCE,
       sequence
+    };
+  },
+  validateSequence: (sequenceId) => {
+    return async dispatch => {
+      ApiActions.request(dispatch);
+      try {
+        const res = await SubmissionApi.validateSquence({ id: sequenceId });
+        dispatch({
+          type: SubmissionActionTypes.VALIDATE_SEQUENCE,
+          data: res.data
+        });
+        ApiActions.success(dispatch);
+      } catch (err) {
+        ApiActions.failure(dispatch);
+      }
     };
   }
 };

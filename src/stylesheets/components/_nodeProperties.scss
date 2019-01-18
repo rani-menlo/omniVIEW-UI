@@ -1,29 +1,67 @@
-.properties_table {
-  table-layout: fixed;
-  border-collapse: separate;
-  border-spacing: 10px;
-  padding: 10px 0px;
+.properties {
+  &__table {
+    table-layout: fixed;
+    border-collapse: separate;
+    border-spacing: 10px;
+    padding: 10px 0px;
 
-  .label {
-    @include text-normal(14px);
-    color: rgba($black, 0.5);
-    width: 120px;
-  }
+    .label {
+      @include text-normal(14px);
+      color: rgba($black, 0.5);
+      width: 120px;
+    }
 
-  .value {
-    @include text-normal(14px);
-    white-space: -moz-pre-wrap !important;  /* Mozilla, since 1999 */
-    white-space: -pre-wrap;      /* Opera 4-6 */
-    white-space: -o-pre-wrap;    /* Opera 7 */
-    white-space: pre-wrap;       /* css-3 */
-    word-wrap: break-word;       /* Internet Explorer 5.5+ */
-    white-space: -webkit-pre-wrap; /* Newer versions of Chrome/Safari*/
-    word-break: break-all;
-    white-space: normal;
-  }
+    .value {
+      @include text-normal(14px);
+      white-space: -moz-pre-wrap !important; /* Mozilla, since 1999 */
+      white-space: -pre-wrap; /* Opera 4-6 */
+      white-space: -o-pre-wrap; /* Opera 7 */
+      white-space: pre-wrap; /* css-3 */
+      word-wrap: break-word; /* Internet Explorer 5.5+ */
+      white-space: -webkit-pre-wrap; /* Newer versions of Chrome/Safari*/
+      word-break: break-all;
+      white-space: normal;
+    }
 
-  .link {
+    .link {
       color: $sky-of-margritte;
       cursor: pointer;
+    }
+  }
+  &__ash-blue {
+    background: $ash-blue;
+  }
+  &-life-cycle-title {
+    @include text-bold-active(14px);
+    display: block;
+    border-top: solid 1px $ash-blue;
+    padding: 6px 12px;
+  }
+  &__life-cycle-table {
+    overflow-x: auto;
+    table {
+      border-bottom: solid 1px $ash-blue;
+      thead > tr {
+        background: $rockman-blue;
+        border-top: solid 1px $ash-blue;
+        border-bottom: solid 1px $ash-blue;
+      }
+      th {
+        @include text-normal(14px);
+        opacity: 0.5;
+        padding: 6px 12px;
+        border-right: solid 1px $ash-blue;
+      }
+      td {
+        @include text-normal(14px);
+        border-right: solid 1px $ash-blue;
+        padding: 6px 12px;
+        opacity: 0.5;
+      }
+    }
+    &-link {
+      color: $sky-of-margritte !important;
+      opacity: 1 !important;
+    }
   }
 }

@@ -1,22 +1,22 @@
-import React, { Component } from 'react';
-import { Icon, Tabs } from 'antd';
-import _ from 'lodash';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import styled from 'styled-components';
-import TreeNode from './treeNode.component';
-import { sampleData } from './sample';
-import NodeProperties from './nodeProperties.component';
-import NodeSequences from './nodeSequences.component';
-import Sidebar from '../../uikit/components/sidebar/sidebar.component';
-import LeftArrowHide from '../../../assets/images/left-arrow-hide.svg';
-import RightArrowHide from '../../../assets/images/right-arrow-hide.svg';
-import ValidateIcon from '../../../assets/images/folder-validate.svg';
-import ListIcon from '../../../assets/images/list.svg';
-import OpenFolderIcon from '../../../assets/images/open-folder.svg';
-import submissionActions from '../../redux/actions/submission.actions';
-import Loader from '../../uikit/components/loader';
-import Header from '../header.component';
+import React, { Component } from "react";
+import { Icon, Tabs, Modal } from "antd";
+import _ from "lodash";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
+import styled from "styled-components";
+import TreeNode from "./treeNode.component";
+import NodeProperties from "./nodeProperties.component";
+import NodeSequences from "./nodeSequences.component";
+import Sidebar from "../../uikit/components/sidebar/sidebar.component";
+import LeftArrowHide from "../../../assets/images/left-arrow-hide.svg";
+import RightArrowHide from "../../../assets/images/right-arrow-hide.svg";
+import ValidateIcon from "../../../assets/images/folder-validate.svg";
+import ListIcon from "../../../assets/images/list.svg";
+import OpenFolderIcon from "../../../assets/images/open-folder.svg";
+import { SubmissionActions } from "../../redux/actions";
+import Loader from "../../uikit/components/loader";
+import Header from "../header.component";
+import ValidationResults from "./validationResults.component";
 
 const TabPane = Tabs.TabPane;
 
@@ -27,10 +27,12 @@ class SubmissionView extends Component {
       treeExpand: false,
       propertiesExpand: true,
       sequencesExpand: true,
-      selectedNodeId: '',
-      selectedView: 'lifeCycle',
+      selectedNodeId: "",
+      selectedView: "lifeCycle",
+      selectedMode: "qc",
       nodeProperties: {},
-      treePanelWidth: 50
+      treePanelWidth: 50,
+      openValidationModal: false
     };
   }
 
@@ -46,12 +48,24 @@ class SubmissionView extends Component {
     this.setState({ treeExpand: !this.state.treeExpand });
   };
 
-  onNodeSelected = (id, properties) => {
+  onNodeSelected = (id, properties, leafParent) => {
+    if (leafParent) {
+      let lifeCycles = [];
+      if (_.isArray(leafParent)) {
+        lifeCycles = _.filter(
+          leafParent,
+          leaf => leaf.title === properties.title
+        );
+      } else {
+        lifeCycles.push(leafParent);
+      }
+      properties.lifeCycles = lifeCycles;
+    }
     this.setState({ selectedNodeId: id, nodeProperties: properties });
   };
 
   onSelectedSequence = sequence => {
-    this.setState({ treeExpand: false, selectedView: 'current' }, () => {
+    this.setState({ treeExpand: false, selectedView: "current" }, () => {
       this.props.actions.setSelectedSequence(sequence);
       this.props.actions.fetchSequenceJson(sequence);
     });
@@ -59,9 +73,9 @@ class SubmissionView extends Component {
 
   togglePropertiesPane = () => {
     const propertiesExpand = !this.state.propertiesExpand;
-    const treePanelWidth = propertiesExpand ?
-      this.state.treePanelWidth - 30 :
-      this.state.treePanelWidth + 30;
+    const treePanelWidth = propertiesExpand
+      ? this.state.treePanelWidth - 30
+      : this.state.treePanelWidth + 30;
     this.setState({
       propertiesExpand,
       treePanelWidth
@@ -70,9 +84,9 @@ class SubmissionView extends Component {
 
   toggleSequencesPane = () => {
     const sequencesExpand = !this.state.sequencesExpand;
-    const treePanelWidth = sequencesExpand ?
-      this.state.treePanelWidth - 20 :
-      this.state.treePanelWidth + 20;
+    const treePanelWidth = sequencesExpand
+      ? this.state.treePanelWidth - 20
+      : this.state.treePanelWidth + 20;
     this.setState({
       sequencesExpand,
       treePanelWidth
@@ -82,17 +96,17 @@ class SubmissionView extends Component {
   getPropertiesPaneTitle = () => {
     const { nodeProperties } = this.state;
     if (!_.size(nodeProperties)) {
-      return 'Properties';
+      return "Properties";
     } else if (!nodeProperties.title) {
-      return 'Heading Properties';
+      return "Heading Properties";
     } else {
-      return 'Document Properties';
+      return "Document Properties";
     }
   };
 
-  onViewTabChange = key => {
-    this.setState({ selectedView: key });
-    if (key === 'lifeCycle') {
+  onViewTabChange = view => {
+    this.setState({ selectedView: view });
+    if (view === "lifeCycle") {
       const { selectedSubmission } = this.props;
       this.props.actions.setSelectedSequence(null);
       this.props.actions.fetchLifeCycleJson(selectedSubmission);
@@ -101,9 +115,27 @@ class SubmissionView extends Component {
     }
   };
 
+  onModeTabChange = mode => {
+    this.setState({ selectedMode: mode });
+  };
+
+  validate = () => {
+    this.setState({ openValidationModal: true });
+  };
+
+  closeValidationModal = () => {
+    this.setState({ openValidationModal: false });
+  };
+
   render() {
-    const { loading, sequences, selectedSequence, jsonData } = this.props;
-    const { selectedView } = this.state;
+    const {
+      loading,
+      sequences,
+      selectedSequence,
+      jsonData,
+      selectedSubmission
+    } = this.props;
+    const { selectedView, selectedMode } = this.state;
     return (
       <React.Fragment>
         <Loader loading={loading} />
@@ -124,7 +156,7 @@ class SubmissionView extends Component {
               <img
                 src={OpenFolderIcon}
                 className="global__icon"
-                style={{ marginLeft: '0px' }}
+                style={{ marginLeft: "0px" }}
               />
               <span className="text">Open</span>
             </div>
@@ -141,9 +173,12 @@ class SubmissionView extends Component {
               {/* <Icon type="hdd" theme="filled" className="global__icon" />
             <span className="mode-text">Mode:</span> */}
               <div className="submissionview__header__mode__tabs">
-                <Tabs defaultActiveKey="2">
-                  <TabPane tab="Standard" disabled key="1" />
-                  <TabPane tab="Qc" key="2" />
+                <Tabs
+                  defaultActiveKey={selectedMode}
+                  onChange={this.onModeTabChange}
+                >
+                  <TabPane tab="Standard" key="standard" />
+                  <TabPane tab="QC" key="qc" />
                 </Tabs>
               </div>
             </div>
@@ -162,22 +197,25 @@ class SubmissionView extends Component {
             </div>
             <FlexBox onClick={this.toggle}>
               <Icon
-                type={this.state.treeExpand ? 'minus' : 'plus'}
+                type={this.state.treeExpand ? "minus" : "plus"}
                 className="global__icon"
               />
               <span className="icon-label">
-                {this.state.treeExpand ? 'Collapse All' : 'Expand All'}
+                {this.state.treeExpand ? "Collapse All" : "Expand All"}
               </span>
             </FlexBox>
             <FlexBox>
               <Icon type="search" className="global__icon" />
               <span className="icon-label">Find</span>
             </FlexBox>
-            <div className="submissionview__header__validate icon_text_border">
+            <div
+              className="submissionview__header__validate icon_text_border"
+              onClick={this.validate}
+            >
               <img
                 src={ValidateIcon}
                 className="global__icon"
-                style={{ marginLeft: '0px' }}
+                style={{ marginLeft: "0px" }}
               />
               <span className="text">Validate Sequence</span>
             </div>
@@ -195,14 +233,14 @@ class SubmissionView extends Component {
                 }
                 onClick={this.toggleSequencesPane}
               />
-              <span style={{ marginLeft: '8px' }}>Sequences</span>
+              <span style={{ marginLeft: "8px" }}>Sequences</span>
             </div>
             <div className="submissionview__siders__tree" />
             <div
               className={`submissionview__siders__properties ${!this.state
-                .propertiesExpand && 'align-right'}`}
+                .propertiesExpand && "align-right"}`}
             >
-              <span style={{ marginRight: '8px' }}>
+              <span style={{ marginRight: "8px" }}>
                 {this.getPropertiesPaneTitle()}
               </span>
               <img
@@ -216,7 +254,7 @@ class SubmissionView extends Component {
           </div>
           <div className="submissionview__panels">
             <Sidebar
-              containerStyle={{ width: '20%' }}
+              containerStyle={{ width: "20%" }}
               direction="ltr"
               expand={this.state.sequencesExpand}
             >
@@ -233,16 +271,17 @@ class SubmissionView extends Component {
               style={{ width: `${this.state.treePanelWidth}%` }}
             >
               <TreeNode
-                key={_.get(jsonData, 'ectd:ectd.sequence', '')}
-                label={_.get(selectedSequence, 'name', '')}
+                key={_.get(jsonData, "ectd:ectd.sequence", "") + selectedMode}
+                label={_.get(selectedSequence, "name", "")}
                 content={jsonData}
                 expand={this.state.treeExpand}
                 onNodeSelected={this.onNodeSelected}
                 selectedNodeId={this.state.selectedNodeId}
+                mode={this.state.selectedMode}
               />
             </div>
             <Sidebar
-              containerStyle={{ width: '30%' }}
+              containerStyle={{ width: "30%" }}
               direction="rtl"
               expand={this.state.propertiesExpand}
             >
@@ -252,6 +291,25 @@ class SubmissionView extends Component {
             </Sidebar>
           </div>
         </div>
+        <Modal
+          visible={this.state.openValidationModal}
+          closable={false}
+          footer={null}
+          destroyOnClose
+          wrapClassName="validationResults__dialog"
+        >
+          <ValidationResults
+            sequenceId={
+              _.get(selectedSequence, "id", "") ||
+              _.get(selectedSubmission, "id", "")
+            }
+            label={
+              _.get(selectedSequence, "name", "") ||
+              _.get(selectedSubmission, "name", "")
+            }
+            onClose={this.closeValidationModal}
+          />
+        </Modal>
       </React.Fragment>
     );
   }
@@ -274,7 +332,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ ...submissionActions }, dispatch)
+    actions: bindActionCreators({ ...SubmissionActions }, dispatch)
   };
 }
 

@@ -7,5 +7,8 @@ export default {
   },
   fetchJson: data => {
     return api.post(URI.GET_JSON, data);
+  },
+  validateSquence: id => {
+    return api.post(URI.VALIDATE_SEQUENCE, id);
   }
 };

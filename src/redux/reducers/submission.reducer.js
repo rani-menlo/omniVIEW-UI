@@ -3,7 +3,8 @@ import { SubmissionActionTypes } from '../actionTypes';
 const initialState = {
   sequences: [],
   selectedSequence: null,
-  jsonData: null
+  jsonData: null,
+  validations: [],
 };
 
 export default (state = initialState, action) => {
@@ -11,7 +12,7 @@ export default (state = initialState, action) => {
     case SubmissionActionTypes.FETCH_SEQUENCES: {
       return {
         ...state,
-        sequences: action.data.message
+        sequences: action.data.data
       };
     }
     case SubmissionActionTypes.FETCH_SEQUENCE_JSON:
@@ -25,6 +26,12 @@ export default (state = initialState, action) => {
       return {
         ...state,
         selectedSequence: action.sequence
+      };
+    }
+    case SubmissionActionTypes.VALIDATE_SEQUENCE: {
+      return {
+        ...state,
+        validations: action.data.data
       };
     }
     default:
