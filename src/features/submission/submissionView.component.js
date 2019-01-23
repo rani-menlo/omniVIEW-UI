@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Icon, Tabs, Modal } from "antd";
+import { Icon, Tabs, Modal, Avatar } from "antd";
 import _ from "lodash";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
@@ -28,16 +28,20 @@ class SubmissionView extends Component {
       propertiesExpand: true,
       sequencesExpand: true,
       selectedNodeId: "",
-      selectedView: "lifeCycle",
-      selectedMode: "qc",
+      selectedView: "current",
+      selectedMode: "standard",
       nodeProperties: {},
       treePanelWidth: 50,
-      openValidationModal: false
+      openValidationModal: false,
+      parentHeaderHeight: 0
     };
+    this.parentHeaderRef = React.createRef();
   }
 
   componentDidMount() {
     const { selectedSubmission } = this.props;
+    const parentHeaderHeight = this.parentHeaderRef.current.clientHeight + 5;
+    this.setState({ parentHeaderHeight });
     if (selectedSubmission) {
       this.props.actions.fetchSequences(selectedSubmission.id);
       this.props.actions.fetchLifeCycleJson(selectedSubmission);
@@ -65,7 +69,7 @@ class SubmissionView extends Component {
   };
 
   onSelectedSequence = sequence => {
-    this.setState({ treeExpand: false, selectedView: "current" }, () => {
+    this.setState({ treeExpand: false, selectedView: "" }, () => {
       this.props.actions.setSelectedSequence(sequence);
       this.props.actions.fetchSequenceJson(sequence);
     });
@@ -110,8 +114,6 @@ class SubmissionView extends Component {
       const { selectedSubmission } = this.props;
       this.props.actions.setSelectedSequence(null);
       this.props.actions.fetchLifeCycleJson(selectedSubmission);
-    } else {
-      this.onSelectedSequence(this.props.sequences[0]);
     }
   };
 
@@ -127,6 +129,10 @@ class SubmissionView extends Component {
     this.setState({ openValidationModal: false });
   };
 
+  openApplicationsScreen = () => {
+    this.props.history.goBack();
+  };
+
   render() {
     const {
       loading,
@@ -140,119 +146,136 @@ class SubmissionView extends Component {
       <React.Fragment>
         <Loader loading={loading} />
         <div className="submissionview">
-          <div className="submissionview__profilebar">
-            <div className="submissionview__profilebar__section">
-              <Icon type="left" />
-              <span className="text">Dashboard</span>
+          <div ref={this.parentHeaderRef}>
+            <div className="submissionview__profilebar">
+              <div
+                className="submissionview__profilebar__section"
+                onClick={this.openApplicationsScreen}
+              >
+                <Icon type="left" />
+                <span className="text">Dashboard</span>
+              </div>
+              <div className="submissionview__profilebar__title">omniVIEW</div>
+              <div className="submissionview__profilebar__section">
+                <Avatar
+                  size="small"
+                  icon="user"
+                  style={{ width: "20px", height: "20px" }}
+                />
+                <span className="submissionview__profilebar__section-username">
+                  John Smith
+                </span>
+                <Icon type="down" />
+              </div>
             </div>
-            <div className="submissionview__profilebar__title">omniVIEW</div>
-            <div className="submissionview__profilebar__section">
-              <span className="text">John Smith</span>
-              <Icon type="down" />
-            </div>
-          </div>
-          <div className="submissionview__header">
-            <div className="icon_text_border">
-              <img
-                src={OpenFolderIcon}
-                className="global__icon"
-                style={{ marginLeft: "0px" }}
-              />
-              <span className="text">Open</span>
-            </div>
-            {/* <Icon type="close-circle" theme="filled" className="global__icon" /> */}
-            {/* <Icon type="interation" theme="filled" className="global__icon" /> */}
-            {/* <Icon
+            <div className="submissionview__header">
+              <div className="icon_text_border">
+                <img
+                  src={OpenFolderIcon}
+                  className="global__icon"
+                  style={{ marginLeft: "0px" }}
+                />
+                <span className="text">Open</span>
+              </div>
+              {/* <Icon type="close-circle" theme="filled" className="global__icon" /> */}
+              {/* <Icon type="interation" theme="filled" className="global__icon" /> */}
+              {/* <Icon
             type="left-circle"
             theme="filled"
             className="global__icon"
             style={{ marginLeft: "2%" }}
           />
           <Icon type="right-circle" theme="filled" className="global__icon" /> */}
-            <div className="submissionview__header__mode">
-              {/* <Icon type="hdd" theme="filled" className="global__icon" />
+              <div className="submissionview__header__mode">
+                {/* <Icon type="hdd" theme="filled" className="global__icon" />
             <span className="mode-text">Mode:</span> */}
-              <div className="submissionview__header__mode__tabs">
-                <Tabs
-                  defaultActiveKey={selectedMode}
-                  onChange={this.onModeTabChange}
-                >
-                  <TabPane tab="Standard" key="standard" />
-                  <TabPane tab="QC" key="qc" />
-                </Tabs>
+                <div className="submissionview__header__mode__tabs">
+                  <Tabs
+                    defaultActiveKey={selectedMode}
+                    onChange={this.onModeTabChange}
+                  >
+                    <TabPane tab="Standard" key="standard" />
+                    <TabPane tab="QC" key="qc" />
+                  </Tabs>
+                </div>
               </div>
-            </div>
-            <div className="submissionview__header__view" key={selectedView}>
-              {/* <Icon type="eye" theme="filled" className="global__icon" />
+              <div className="submissionview__header__view" key={selectedView}>
+                {/* <Icon type="eye" theme="filled" className="global__icon" />
             <span className="view-text">View:</span> */}
-              <div className="submissionview__header__view__tabs">
-                <Tabs
-                  defaultActiveKey={selectedView}
-                  onChange={this.onViewTabChange}
-                >
-                  <TabPane tab="Current" disabled key="current" />
-                  <TabPane tab="Life Cycle" key="lifeCycle" />
-                </Tabs>
+                <div className="submissionview__header__view__tabs">
+                  <Tabs
+                    activeKey={selectedView}
+                    onChange={this.onViewTabChange}
+                  >
+                    <TabPane tab="Current" key="current" />
+                    <TabPane tab="Life Cycle" key="lifeCycle" />
+                  </Tabs>
+                </div>
+              </div>
+              <FlexBox onClick={this.toggle}>
+                <Icon
+                  type={this.state.treeExpand ? "minus" : "plus"}
+                  className="global__icon"
+                />
+                <span className="icon-label">
+                  {this.state.treeExpand ? "Collapse All" : "Expand All"}
+                </span>
+              </FlexBox>
+              <FlexBox>
+                <Icon type="search" className="global__icon" />
+                <span className="icon-label">Find</span>
+              </FlexBox>
+              <div
+                className="submissionview__header__validate icon_text_border"
+                onClick={this.validate}
+              >
+                <img
+                  src={ValidateIcon}
+                  className="global__icon"
+                  style={{ marginLeft: "0px" }}
+                />
+                <span className="text">Validate Sequence</span>
+              </div>
+              <FlexBox>
+                <img src={ListIcon} className="global__icon" />
+                <span className="icon-label">Show Amendment List</span>
+              </FlexBox>
+            </div>
+            <div className="submissionview__siders">
+              <div className="submissionview__siders__sequence">
+                <img
+                  className="global__cursor-pointer"
+                  src={
+                    this.state.sequencesExpand ? LeftArrowHide : RightArrowHide
+                  }
+                  onClick={this.toggleSequencesPane}
+                />
+                <span style={{ marginLeft: "8px" }}>Sequences</span>
+              </div>
+              <div className="submissionview__siders__tree" />
+              <div
+                className={`submissionview__siders__properties ${!this.state
+                  .propertiesExpand && "align-right"}`}
+              >
+                <span style={{ marginRight: "8px" }}>
+                  {this.getPropertiesPaneTitle()}
+                </span>
+                <img
+                  className="global__cursor-pointer"
+                  src={
+                    this.state.propertiesExpand ? RightArrowHide : LeftArrowHide
+                  }
+                  onClick={this.togglePropertiesPane}
+                />
               </div>
             </div>
-            <FlexBox onClick={this.toggle}>
-              <Icon
-                type={this.state.treeExpand ? "minus" : "plus"}
-                className="global__icon"
-              />
-              <span className="icon-label">
-                {this.state.treeExpand ? "Collapse All" : "Expand All"}
-              </span>
-            </FlexBox>
-            <FlexBox>
-              <Icon type="search" className="global__icon" />
-              <span className="icon-label">Find</span>
-            </FlexBox>
-            <div
-              className="submissionview__header__validate icon_text_border"
-              onClick={this.validate}
-            >
-              <img
-                src={ValidateIcon}
-                className="global__icon"
-                style={{ marginLeft: "0px" }}
-              />
-              <span className="text">Validate Sequence</span>
-            </div>
-            <FlexBox>
-              <img src={ListIcon} className="global__icon" />
-              <span className="icon-label">Show Amendment List</span>
-            </FlexBox>
           </div>
-          <div className="submissionview__siders">
-            <div className="submissionview__siders__sequence">
-              <img
-                className="global__cursor-pointer"
-                src={
-                  this.state.sequencesExpand ? LeftArrowHide : RightArrowHide
-                }
-                onClick={this.toggleSequencesPane}
-              />
-              <span style={{ marginLeft: "8px" }}>Sequences</span>
-            </div>
-            <div className="submissionview__siders__tree" />
-            <div
-              className={`submissionview__siders__properties ${!this.state
-                .propertiesExpand && "align-right"}`}
-            >
-              <span style={{ marginRight: "8px" }}>
-                {this.getPropertiesPaneTitle()}
-              </span>
-              <img
-                className="global__cursor-pointer"
-                src={
-                  this.state.propertiesExpand ? RightArrowHide : LeftArrowHide
-                }
-                onClick={this.togglePropertiesPane}
-              />
-            </div>
-          </div>
-          <div className="submissionview__panels">
+          <div
+            className="submissionview__panels"
+            style={{
+              height: `calc(100% - ${this.state.parentHeaderHeight}px)`
+            }}
+          >
             <Sidebar
               containerStyle={{ width: "20%" }}
               direction="ltr"
@@ -271,13 +294,18 @@ class SubmissionView extends Component {
               style={{ width: `${this.state.treePanelWidth}%` }}
             >
               <TreeNode
-                key={_.get(jsonData, "ectd:ectd.sequence", "") + selectedMode}
+                key={
+                  _.get(jsonData, "ectd:ectd.sequence", "") +
+                  selectedMode +
+                  selectedView
+                }
                 label={_.get(selectedSequence, "name", "")}
                 content={jsonData}
                 expand={this.state.treeExpand}
                 onNodeSelected={this.onNodeSelected}
                 selectedNodeId={this.state.selectedNodeId}
-                mode={this.state.selectedMode}
+                mode={selectedMode}
+                view={selectedView}
               />
             </div>
             <Sidebar

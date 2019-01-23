@@ -4,6 +4,7 @@ import { Icon } from "antd";
 import FilterIcon from "../../../assets/images/filter-blue.svg";
 import SortIcon from "../../../assets/images/sort.svg";
 import _ from "lodash";
+import NodeSequenceTree from "./nodeSequenceTree";
 
 class NodeSequences extends Component {
   constructor(props) {
@@ -12,13 +13,6 @@ class NodeSequences extends Component {
       sortBy: "submission"
     };
   }
-
-  /* componentDidUpdate() {
-    if (!this.state.selected) {
-      const { sequences } = this.props;
-      sequences.length && this.setState({ selected: sequences[0] });
-    }
-  } */
 
   static propTypes = {
     sequences: PropTypes.arrayOf(PropTypes.object),
@@ -39,25 +33,11 @@ class NodeSequences extends Component {
     onSelectedSequence && onSelectedSequence(sequence);
   };
 
-  iterateTreeSequence = sequence => {
-    if (_.get(sequence, "childs.length", 0)) {
-      return (
-        <React.Fragment>
-          <div className="node" onClick={this.selectNode}>
-            <Icon type="caret-right" className="global__caret" />
-            <span className="global__node-text">{sequence.name}</span>
-          </div>
-          {_.map(sequence.childs, seq => this.iterateTreeSequence(seq))}
-        </React.Fragment>
-      );
-    } else {
-      return <div>{sequence.name}</div>;
-    }
-  };
-
   getTree = () => {
     const { sequences } = this.props;
-    return _.map(sequences, sequence => this.iterateTreeSequence(sequence));
+    return _.map(sequences, sequence => (
+      <NodeSequenceTree sequence={sequence} onSelected={this.onSelected} />
+    ));
   };
 
   getListSequence = (sequence, array = []) => {
@@ -67,7 +47,7 @@ class NodeSequences extends Component {
         this.getListSequence(seq, array);
       });
     }
-    return array;
+    return _.sortBy(array, s => Number(s.name)).reverse();
   };
 
   getList = () => {

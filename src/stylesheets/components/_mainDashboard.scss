@@ -1,14 +1,16 @@
 .maindashboard {
   background: $blue-gradient;
   height: 100%;
+  margin-top: 64px;
   &__header {
     display: flex;
     padding: 8px 15%;
     background: $white;
+    align-items: center;
     &__icon {
       border: 1px solid $shadowed-steel;
-      width: 44px;
-      height: 40px;
+      width: 38px;
+      height: 35px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -56,6 +58,8 @@
           border-radius: 22px;
           margin-left: 6px;
           height: 44px;
+          font-size: 16px;
+          padding-left: 35px !important;
         }
       }
     }
@@ -98,18 +102,6 @@
           color: $white;
           margin-left: 4px;
         }
-      }
-    }
-    &__subscription {
-      &-license {
-        @include text-normal(16px);
-        color: lighten($color: $black, $amount: 25%);
-      }
-      &-use {
-        @include text-normal(17px);
-        margin-left: 15px;
-        text-decoration: underline;
-        color: lighten($color: $black, $amount: 25%);
       }
     }
     &__cards {

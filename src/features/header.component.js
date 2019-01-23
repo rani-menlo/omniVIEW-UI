@@ -1,6 +1,6 @@
-import React from 'react';
-import { Avatar } from 'antd';
-import OmniciaLogo from '../../assets/images/omnicia-logo.svg';
+import React from "react";
+import { Avatar, Icon } from "antd";
+import OmniciaLogo from "../../assets/images/omnicia-logo.svg";
 
 const Header = () => {
   return (
@@ -8,9 +8,8 @@ const Header = () => {
       <img src={OmniciaLogo} className="headerbar-logo" />
       <div>
         <Avatar size="small" icon="user" />
-        <span style={{ marginLeft: '10px', marginRight: '10px' }}>
-          John Smith
-        </span>
+        <span className="headerbar-username">John Smith</span>
+        <Icon type="down" />
       </div>
     </div>
   );

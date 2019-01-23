@@ -7,6 +7,7 @@ import FileNew from "../../../assets/images/file-new.svg";
 import FileAppend from "../../../assets/images/file-append.svg";
 import FileReplace from "../../../assets/images/file-replace.svg";
 import FileDelete from "../../../assets/images/file-delete.svg";
+import { SERVER_URL, URI } from "../../constants";
 
 class TreeNode extends Component {
   constructor(props) {
@@ -29,7 +30,8 @@ class TreeNode extends Component {
     expand: PropTypes.bool,
     selectedNodeId: PropTypes.string,
     onNodeSelected: PropTypes.func,
-    mode: PropTypes.string,
+    mode: PropTypes.oneOf(["standard", "qc"]),
+    view: PropTypes.oneOf(["current", "lifeCycle"]),
     leafParent: PropTypes.object | PropTypes.arrayOf(PropTypes.object)
   };
 
@@ -48,17 +50,21 @@ class TreeNode extends Component {
   }
 
   componentDidMount() {
-    let { content } = this.props;
+    let { content, view } = this.props;
     const properties = {};
     const nodes = [];
     content = _.get(content, "ectd:ectd", content);
     _.map(content, (value, key) => {
-      if (typeof value === "string") {
+      if (typeof value === "string" || typeof value === "boolean") {
         properties[key] = value;
       } else {
         const node = { label: key, value };
         if (_.isArray(value) && key === "leaf") {
           _.map(value, val => {
+            this.setCurrentView(val, value);
+            if (view === "current" && !val.showInCurrentView) {
+              return;
+            }
             const newNode = { label: "leaf", value: val, leafParent: value };
             nodes.push(newNode);
           });
@@ -72,6 +78,14 @@ class TreeNode extends Component {
     });
     this.setState({ properties, nodes });
   }
+
+  setCurrentView = (obj, array) => {
+    const itemsByTitle = _.groupBy(array, "title");
+    const items = itemsByTitle[obj.title];
+    const operation = _.get(items, `[${items.length - 1}].operation`, "");
+    obj.showInCurrentView =
+      operation !== "delete" && obj.operation === operation;
+  };
 
   toggle = () => {
     this.setState({ expand: !this.state.expand });
@@ -130,13 +144,23 @@ class TreeNode extends Component {
     return label || "Submission[Life cycle view]";
   };
 
+  openFile = () => {
+    const { properties } = this.state;
+    properties.fileID &&
+      window.open(
+        `${SERVER_URL}${URI.GET_RESOURCE_FILE}/${properties.fileID}`,
+        "_blank"
+      );
+  };
+
   render() {
     const { nodes, expand } = this.state;
     const {
       defaultPaddingLeft,
       selectedNodeId,
       onNodeSelected,
-      mode
+      mode,
+      view
     } = this.props;
     const paddingLeft = this.props.paddingLeft + defaultPaddingLeft;
     return (
@@ -146,6 +170,7 @@ class TreeNode extends Component {
             "global__node-selected"}`}
           style={{ paddingLeft }}
           onClick={this.selectNode}
+          onDoubleClick={this.openFile}
         >
           {this.getCaretIcon()}
           {this.getLeafIcon()}
@@ -162,6 +187,7 @@ class TreeNode extends Component {
               selectedNodeId={selectedNodeId}
               onNodeSelected={onNodeSelected}
               mode={mode}
+              view={view}
               leafParent={node.leafParent}
             />
           ))}

@@ -9,8 +9,12 @@
   justify-content: space-between;
   align-items: center;
   padding: 0px 8px;
-   &-logo {
+  &-logo {
     width: 176px;
     height: 36px;
+  }
+  &-username {
+    margin: 0px 10px;
+    @include text-normal(16px);
   }
 }

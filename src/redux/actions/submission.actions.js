@@ -1,7 +1,7 @@
-import _ from 'lodash';
-import { SubmissionActionTypes } from '../actionTypes';
-import { SubmissionApi } from '../api';
-import { ApiActions } from '.';
+import _ from "lodash";
+import { SubmissionActionTypes } from "../actionTypes";
+import { SubmissionApi } from "../api";
+import { ApiActions } from ".";
 
 export default {
   fetchSequences: submissionId => {
@@ -13,15 +13,6 @@ export default {
           type: SubmissionActionTypes.FETCH_SEQUENCES,
           data: res.data
         });
-        /* const firstSequence = _.get(res, "data.message[0]");
-        if (firstSequence) {
-          res = await SubmissionApi.fetchJson({ id: firstSequence.json_path });
-          dispatch({
-            type: SubmissionActionTypes.FETCH_SEQUENCE_JSON,
-            sequence: firstSequence,
-            data: res.data
-          });
-        } */
         ApiActions.success(dispatch);
       } catch (err) {
         ApiActions.failure(dispatch);
@@ -66,7 +57,7 @@ export default {
       sequence
     };
   },
-  validateSequence: (sequenceId) => {
+  validateSequence: sequenceId => {
     return async dispatch => {
       ApiActions.request(dispatch);
       try {
