@@ -52,3 +52,22 @@
   height: 1px;
   background: $froasted-glass;
 }
+
+.global__center-vert {
+  display: flex;
+  align-items: center;
+}
+
+.global__center-horiz-vert {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.global__disabled-box {
+  border: 0 !important;
+  background: $black;
+  opacity: 0.25;
+  color: $white !important;
+  cursor: default !important;
+}

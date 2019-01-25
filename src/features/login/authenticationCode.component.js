@@ -1,11 +1,12 @@
-import React, { Component } from 'react';
-import { Input, Form, Button, Spin, Icon } from 'antd';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import _ from 'lodash';
-import AuthLayout from './authLayout.component';
-import { LoginActions } from '../../redux/actions';
-import Loader from '../../uikit/components/loader';
+import React, { Component } from "react";
+import { Input, Form, Button, Spin, Icon } from "antd";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
+import _ from "lodash";
+import AuthLayout from "./authLayout.component";
+import { LoginActions } from "../../redux/actions";
+import Loader from "../../uikit/components/loader";
+import Footer from "../../uikit/components/footer/footer.component";
 
 class AuthenticationCode extends Component {
   constructor(props) {
@@ -17,7 +18,7 @@ class AuthenticationCode extends Component {
     verified && this.props.actions.resetOtp();
     const otp = e.target.value;
     if (/\s/.test(otp)) {
-      this.props.actions.setOtpError('Invalid Code.');
+      this.props.actions.setOtpError("Invalid Code.");
       return;
     }
     if (_.size(otp) === 5) {
@@ -26,20 +27,27 @@ class AuthenticationCode extends Component {
   };
 
   openDashboard = () => {
-    this.props.history.push('/customers');
+    this.props.history.push("/customers");
   };
 
   resendOtp = () => {
     const { mode } = this.props.match.params;
     const data = {
-      isEmail: mode === 'email'
+      isEmail: mode === "email"
     };
     this.props.actions.sendOtp(data);
   };
 
   goBack = () => {
     this.props.actions.setOtpStatus(false);
-    this.props.history.push('/auth');
+    this.props.actions.resetOtpError();
+    this.props.actions.resetOtp();
+    this.props.history.push("/auth");
+  };
+
+  getMode = () => {
+    const { mode } = this.props.match.params;
+    return mode === "email" ? "Email Address" : "Mobile Number";
   };
 
   render() {
@@ -47,7 +55,9 @@ class AuthenticationCode extends Component {
     return (
       <React.Fragment>
         <Loader loading={loading} />
-        <AuthLayout heading="Enter the five digit code that we sent to your email">
+        <AuthLayout
+          heading={`Enter the five digit code we sent to your registered ${this.getMode()}`}
+        >
           <div className="authenticationCode">
             <span className="global__field-label">Authentication Code</span>
             <span className="authenticationCode-send" onClick={this.resendOtp}>
@@ -59,7 +69,7 @@ class AuthenticationCode extends Component {
               disabled={verifying}
               placeholder="code"
               className={`authenticationCode-form-input ${error &&
-                'authenticationCode-errorbox'}`}
+                "authenticationCode-errorbox"}`}
               onChange={this.onInputCode}
             />
             <div className="authenticationCode-form__icons">
@@ -87,7 +97,7 @@ class AuthenticationCode extends Component {
               disabled={!verified}
               type="primary"
               className={`common_authbuttons-btn common_authbuttons-btn-send authenticationCode-login-${
-                verified ? 'enable' : 'disable'
+                verified ? "enable" : "disable"
               }`}
               onClick={this.openDashboard}
             >
@@ -95,6 +105,7 @@ class AuthenticationCode extends Component {
             </Button>
           </div>
         </AuthLayout>
+        <Footer alignToBottom />
       </React.Fragment>
     );
   }

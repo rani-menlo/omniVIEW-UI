@@ -17,6 +17,7 @@ import { SubmissionActions } from "../../redux/actions";
 import Loader from "../../uikit/components/loader";
 import Header from "../header.component";
 import ValidationResults from "./validationResults.component";
+import Footer from "../../uikit/components/footer/footer.component";
 
 const TabPane = Tabs.TabPane;
 
@@ -30,7 +31,7 @@ class SubmissionView extends Component {
       selectedNodeId: "",
       selectedView: "current",
       selectedMode: "standard",
-      nodeProperties: {},
+      nodeProperties: null,
       treePanelWidth: 50,
       openValidationModal: false,
       parentHeaderHeight: 0
@@ -40,7 +41,8 @@ class SubmissionView extends Component {
 
   componentDidMount() {
     const { selectedSubmission } = this.props;
-    const parentHeaderHeight = this.parentHeaderRef.current.clientHeight + 5;
+    const parentHeaderHeight =
+      this.parentHeaderRef.current.clientHeight + 4 + 28;
     this.setState({ parentHeaderHeight });
     if (selectedSubmission) {
       this.props.actions.fetchSequences(selectedSubmission.id);
@@ -69,10 +71,13 @@ class SubmissionView extends Component {
   };
 
   onSelectedSequence = sequence => {
-    this.setState({ treeExpand: false, selectedView: "" }, () => {
-      this.props.actions.setSelectedSequence(sequence);
-      this.props.actions.fetchSequenceJson(sequence);
-    });
+    this.setState(
+      { treeExpand: false, selectedView: "", nodeProperties: null },
+      () => {
+        this.props.actions.setSelectedSequence(sequence);
+        this.props.actions.fetchSequenceJson(sequence);
+      }
+    );
   };
 
   togglePropertiesPane = () => {
@@ -101,18 +106,22 @@ class SubmissionView extends Component {
     const { nodeProperties } = this.state;
     if (!_.size(nodeProperties)) {
       return "Properties";
-    } else if (!nodeProperties.title) {
-      return "Heading Properties";
-    } else {
+    } else if (nodeProperties["dtd-version"]) {
+      return "Submission Properties";
+    } else if (nodeProperties.name === "m1-regional") {
+      return "M1 Regional Properties";
+    } else if (nodeProperties.fileID) {
       return "Document Properties";
+    } else {
+      return "Heading Properties";
     }
   };
 
   onViewTabChange = view => {
     this.setState({ selectedView: view });
+    this.props.actions.setSelectedSequence(null);
     if (view === "lifeCycle") {
       const { selectedSubmission } = this.props;
-      this.props.actions.setSelectedSequence(null);
       this.props.actions.fetchLifeCycleJson(selectedSubmission);
     }
   };
@@ -133,6 +142,24 @@ class SubmissionView extends Component {
     this.props.history.goBack();
   };
 
+  getTreeLabel = jsonData => {
+    const { selectedSubmission, selectedSequence } = this.props;
+    const label = _.get(jsonData, "ectd:ectd.label", "");
+    if (this.state.selectedView) {
+      const selectedView =
+        this.state.selectedView === "current"
+          ? "[Current View]"
+          : "[Life Cycle View]";
+      return `Submission ${label} ${selectedView}`;
+    } else {
+      return `Sequence ${_.get(selectedSubmission, "name", "")}\\${_.get(
+        selectedSequence,
+        "name",
+        ""
+      )}`;
+    }
+  };
+
   render() {
     const {
       loading,
@@ -142,6 +169,9 @@ class SubmissionView extends Component {
       selectedSubmission
     } = this.props;
     const { selectedView, selectedMode } = this.state;
+    const key =
+      _.get(jsonData, "ectd:ectd.sequence", "") + selectedMode + selectedView;
+    console.log("key:", key);
     return (
       <React.Fragment>
         <Loader loading={loading} />
@@ -226,15 +256,25 @@ class SubmissionView extends Component {
                 <span className="icon-label">Find</span>
               </FlexBox>
               <div
-                className="submissionview__header__validate icon_text_border"
-                onClick={this.validate}
+                className={`submissionview__header__validate icon_text_border ${selectedSequence &&
+                  "global__cursor-pointer"}`}
+                style={!selectedSequence ? { border: 0 } : {}}
+                onClick={selectedSequence && this.validate}
               >
                 <img
                   src={ValidateIcon}
                   className="global__icon"
-                  style={{ marginLeft: "0px" }}
+                  style={{
+                    marginLeft: "0px",
+                    opacity: !selectedSequence ? 0.2 : 1
+                  }}
                 />
-                <span className="text">Validate Sequence</span>
+                <span
+                  className="text"
+                  style={!selectedSequence ? { opacity: 0.2 } : {}}
+                >
+                  Validate Sequence
+                </span>
               </div>
               <FlexBox>
                 <img src={ListIcon} className="global__icon" />
@@ -299,13 +339,14 @@ class SubmissionView extends Component {
                   selectedMode +
                   selectedView
                 }
-                label={_.get(selectedSequence, "name", "")}
+                label={this.getTreeLabel(jsonData)}
                 content={jsonData}
                 expand={this.state.treeExpand}
                 onNodeSelected={this.onNodeSelected}
                 selectedNodeId={this.state.selectedNodeId}
                 mode={selectedMode}
                 view={selectedView}
+                defaultExpand
               />
             </div>
             <Sidebar
@@ -327,17 +368,12 @@ class SubmissionView extends Component {
           wrapClassName="validationResults__dialog"
         >
           <ValidationResults
-            sequenceId={
-              _.get(selectedSequence, "id", "") ||
-              _.get(selectedSubmission, "id", "")
-            }
-            label={
-              _.get(selectedSequence, "name", "") ||
-              _.get(selectedSubmission, "name", "")
-            }
+            sequence={selectedSequence}
+            label={_.get(selectedSubmission, "name", "")}
             onClose={this.closeValidationModal}
           />
         </Modal>
+        <Footer alignToBottom />
       </React.Fragment>
     );
   }
@@ -345,7 +381,7 @@ class SubmissionView extends Component {
 
 const FlexBox = styled.div`
   display: flex;
-  cursor: default;
+  cursor: pointer;
 `;
 
 function mapStateToProps(state) {

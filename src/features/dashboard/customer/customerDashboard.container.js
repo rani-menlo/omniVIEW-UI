@@ -12,6 +12,7 @@ import CustomerCard from "../customerCard.component";
 import { CustomerActions } from "../../../redux/actions";
 import Header from "../../header.component";
 import Loader from "../../../uikit/components/loader";
+import Footer from "../../../uikit/components/footer/footer.component";
 
 class CustomerDashboard extends Component {
   constructor(props) {
@@ -70,12 +71,12 @@ class CustomerDashboard extends Component {
                 src={viewBy === "lists" ? ListViewIconActive : ListViewIcon}
               />
             </div>
-            <div className="maindashboard__header__icon maindashboard__header__icon-filter">
+            {/* <div className="maindashboard__header__icon maindashboard__header__icon-filter">
               <img src={FilterIcon} />
             </div>
             <span className="maindashboard__header-filter-text">
               Filters: Off
-            </span>
+            </span> */}
             <div className="maindashboard__header__search">
               <Input
                 className="maindashboard__header__search-box"
@@ -106,6 +107,7 @@ class CustomerDashboard extends Component {
               ))}
             </div>
           </div>
+          <Footer />
         </div>
       </React.Fragment>
     );

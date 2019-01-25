@@ -18,7 +18,7 @@ const addM1RegionalData = data => {
     if (submissionInfo) {
       let subInfo = {
         name: submissionInfo.name || "",
-        title: submissionInfo.title || ""
+        title: submissionInfo.title || "Submission Forms"
       };
       _.map(_.get(submissionInfo, "form.leaf"), leaf => {
         const title = leaf.title;
@@ -28,7 +28,8 @@ const addM1RegionalData = data => {
           [folderName]: {
             leaf: {
               ...leaf
-            }
+            },
+            title: folderName
           }
         };
       });
@@ -40,8 +41,17 @@ const addM1RegionalData = data => {
       };
     }
   }
+
+  let regionalData = _.get(data, "[fda-regional:fda-regional][m1-regional]");
+  if (regionalData) {
+    regionalData = _.omit(regionalData, "leaf");
+    m1Regional = {
+      ...m1Regional,
+      ...regionalData
+    };
+  }
   const m1 = {
-    "m1-administrative-information-and-prescribing-information ": {
+    "m1-administrative-information-and-prescribing-information": {
       name: "m1-administrative-information-and-prescribing-information",
       folder: "m1",
       title: "Administrative Information and Prescribing Information",
@@ -53,9 +63,17 @@ const addM1RegionalData = data => {
       }
     }
   };
+  const label = _.get(
+    admin,
+    "[application-set][application][application-information][application-number][$t]"
+  );
   data["ectd:ectd"] = {
     ...m1,
-    ...data["ectd:ectd"]
+    ..._.omit(
+      data["ectd:ectd"],
+      "m1-administrative-information-and-prescribing-information"
+    ),
+    label
   };
 };
 

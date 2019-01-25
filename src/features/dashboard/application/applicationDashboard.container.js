@@ -12,6 +12,7 @@ import SubmissionCard from "../submissionCard.component";
 import { ApplicationActions } from "../../../redux/actions";
 import Loader from "../../../uikit/components/loader";
 import Header from "../../header.component";
+import Footer from "../../../uikit/components/footer/footer.component";
 // import { Customers } from "./sampleCustomers";
 
 class ApplicationDashboard extends Component {
@@ -35,6 +36,10 @@ class ApplicationDashboard extends Component {
   onSubmissionSelected = submission => () => {
     this.props.actions.setSelectedSubmission(submission);
     this.props.history.push("/submission");
+  };
+
+  openCustomersScreen = () => {
+    this.props.history.goBack();
   };
 
   render() {
@@ -67,12 +72,12 @@ class ApplicationDashboard extends Component {
                 src={viewBy === "lists" ? ListViewIconActive : ListViewIcon}
               />
             </div>
-            <div className="maindashboard__header__icon maindashboard__header__icon-filter">
+            {/* <div className="maindashboard__header__icon maindashboard__header__icon-filter">
               <img src={FilterIcon} />
             </div>
             <span className="maindashboard__header-filter-text">
               Filters: Off
-            </span>
+            </span> */}
             <div className="maindashboard__header__search">
               <Input
                 className="maindashboard__header__search-box"
@@ -82,6 +87,19 @@ class ApplicationDashboard extends Component {
             </div>
           </div>
           <div className="maindashboard__content">
+            <span
+              className="maindashboard__content-breadcrum"
+              onClick={this.openCustomersScreen}
+            >
+              Customers
+            </span>
+            <span style={{ margin: "0px 5px" }}>></span>
+            <span
+              className="maindashboard__content-breadcrum"
+              style={{ opacity: 0.4, cursor: "default" }}
+            >
+              Applications
+            </span>
             <div className="maindashboard__content__header">
               <div>
                 <span className="maindashboard__content__header-customers">
@@ -108,6 +126,7 @@ class ApplicationDashboard extends Component {
               ))}
             </div>
           </div>
+          <Footer />
         </div>
       </React.Fragment>
     );

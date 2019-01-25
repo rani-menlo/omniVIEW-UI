@@ -16,7 +16,7 @@ class TreeNode extends Component {
       nodeId: uuidv4(),
       properties: {},
       nodes: [],
-      expand: this.props.expand,
+      expand: this.props.defaultExpand || this.props.expand,
       prevProps: this.props
     };
   }
@@ -32,13 +32,15 @@ class TreeNode extends Component {
     onNodeSelected: PropTypes.func,
     mode: PropTypes.oneOf(["standard", "qc"]),
     view: PropTypes.oneOf(["current", "lifeCycle"]),
+    defaultExpand: PropTypes.bool,
     leafParent: PropTypes.object | PropTypes.arrayOf(PropTypes.object)
   };
 
   static defaultProps = {
     paddingLeft: 0, // px
     defaultPaddingLeft: 31, // px
-    expand: false
+    expand: false,
+    defaultExpand: false
   };
 
   static getDerivedStateFromProps(props, state) {
@@ -92,7 +94,8 @@ class TreeNode extends Component {
   };
 
   getCaretIcon = () => {
-    if (this.props.label === "leaf") {
+    const { label } = this.props;
+    if (label === "leaf") {
       return null;
     }
     return this.state.expand ? (
@@ -112,14 +115,27 @@ class TreeNode extends Component {
     );
     if (this.props.label === "leaf") {
       const { properties } = this.state;
+      const style = { width: "18px", height: "21px" };
       if (properties.operation === "new") {
-        icon = <img src={FileNew} className="global__file-folder" />;
+        icon = (
+          <img src={FileNew} className="global__file-folder" style={style} />
+        );
       } else if (properties.operation === "append") {
-        icon = <img src={FileAppend} className="global__file-folder" />;
+        icon = (
+          <img src={FileAppend} className="global__file-folder" style={style} />
+        );
       } else if (properties.operation === "replace") {
-        icon = <img src={FileReplace} className="global__file-folder" />;
+        icon = (
+          <img
+            src={FileReplace}
+            className="global__file-folder"
+            style={style}
+          />
+        );
       } else {
-        icon = <img src={FileDelete} className="global__file-folder" />;
+        icon = (
+          <img src={FileDelete} className="global__file-folder" style={style} />
+        );
       }
     }
     return icon;
@@ -138,10 +154,24 @@ class TreeNode extends Component {
   getLabel = () => {
     const { label, mode } = this.props;
     const { properties } = this.state;
+    let name = label;
     if (label === "leaf" || mode === "standard") {
-      return _.get(properties, "title", "");
+      name = _.get(properties, "title", label);
     }
-    return label || "Submission[Life cycle view]";
+    const append = [];
+    if (properties["product-name"]) {
+      append.push(properties["product-name"]);
+    }
+    if (properties.substance) {
+      append.push(properties.substance);
+    }
+    if (properties.manufacturer) {
+      append.push(properties.manufacturer);
+    }
+    if (properties.dosageform) {
+      append.push(properties.dosageform);
+    }
+    return `${name} ${append.length > 0 ? `(${append.join(", ")})` : ""}`;
   };
 
   openFile = () => {
@@ -160,7 +190,8 @@ class TreeNode extends Component {
       selectedNodeId,
       onNodeSelected,
       mode,
-      view
+      view,
+      defaultExpand
     } = this.props;
     const paddingLeft = this.props.paddingLeft + defaultPaddingLeft;
     return (

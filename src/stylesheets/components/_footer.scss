@@ -1,0 +1,10 @@
+.footer {
+  height: 28px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: $shadowed-steel-dark;
+  text-align: center;
+  @include text-normal(14px);
+  color: $white;
+}

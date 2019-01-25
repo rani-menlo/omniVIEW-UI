@@ -7,7 +7,7 @@ class NodeSequenceTree extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      expand: false
+      expand: true
     };
   }
 
@@ -47,15 +47,16 @@ class NodeSequenceTree extends Component {
   };
 
   render() {
-    const { sequence, paddingLeft, onSelected } = this.props;
+    const { sequence, paddingLeft, onSelected, selected } = this.props;
     return (
-      <div className="global__cursor-pointer">
-        {this.getCaretIcon()}
+      <React.Fragment>
         <div
-          className="node"
-          style={{ paddingLeft, display: "inline-flex" }}
+          className={`node global__cursor-pointer ${selected === sequence &&
+            "global__node-selected"}`}
+          style={{ paddingLeft }}
           onClick={onSelected(sequence)}
         >
+          {this.getCaretIcon()}
           <Icon type="folder" theme="filled" className="global__file-folder" />
           <span className="global__node-text global__cursor-pointer">
             {sequence.name}
@@ -67,9 +68,10 @@ class NodeSequenceTree extends Component {
               sequence={seq}
               paddingLeft={paddingLeft + 35}
               onSelected={onSelected}
+              selected={selected}
             />
           ))}
-      </div>
+      </React.Fragment>
     );
   }
 }

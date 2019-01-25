@@ -7,22 +7,36 @@ import ValidateIcon from "../../../assets/images/folder-validate.svg";
 import AlertHighIcon from "../../../assets/images/alert-high.svg";
 import AlertMediumIcon from "../../../assets/images/alert-medium.svg";
 import AlertLowIcon from "../../../assets/images/alert-low.svg";
+import FileNew from "../../../assets/images/file-new.svg";
+import SortResultIcon from "../../../assets/images/sort-result.svg";
 import { SubmissionActions } from "../../redux/actions";
 import Loader from "../../uikit/components/loader";
-import _ from 'lodash';
+import _ from "lodash";
 
 class ValidationResults extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      sort: "asc",
+      validationResults: []
+    };
+  }
+
   static propTypes = {
     onClose: PropTypes.func,
-    sequenceId: PropTypes.string | PropTypes.number,
+    sequence: PropTypes.object,
     label: PropTypes.string
   };
-  static defaultProps = {
-    label: ""
-  };
+
   componentDidMount() {
-    const { sequenceId } = this.props;
-    sequenceId && this.props.actions.validateSequence(sequenceId);
+    const { sequence } = this.props;
+    sequence && this.props.actions.validateSequence(sequence.id);
+  }
+
+  componentDidUpdate() {
+    if (this.props.validations.length && !this.state.validationResults.length) {
+      this.setState({ validationResults: this.props.validations });
+    }
   }
 
   getAlertIcon = severity => {
@@ -34,18 +48,29 @@ class ValidationResults extends Component {
       return AlertHighIcon;
     }
   };
+
+  sortColumn = key => () => {
+    const { validationResults, sort } = this.state;
+    const sortBy = sort === "asc" ? "desc" : "asc";
+    const data = _.orderBy(validationResults, key, sortBy);
+    this.setState({
+      sort: sortBy,
+      validationResults: data
+    });
+  };
+
   render() {
-    const { onClose, validations, loading, label } = this.props;
+    const { onClose, loading, label, sequence } = this.props;
     return (
       <React.Fragment>
         <Loader loading={loading} />
         <div className="validationResults">
           <div className="validationResults__header">
-            <div className="validationResults__header__title">
-              <img src={ValidateIcon} />
+            <div className="validationResults__header__title global__center-horiz-vert">
+              <img src={ValidateIcon} style={{ marginRight: "5px" }} />
               <span className="validationResults__header__title-text">
                 {" "}
-                eCTD Sequence Validation [{label}]
+                eCTD Sequence Validation [{label}\{_.get(sequence, "name", "")}]
               </span>
             </div>
             <Icon
@@ -59,17 +84,33 @@ class ValidationResults extends Component {
               <table>
                 <thead>
                   <tr>
-                    <th className="validationResults__table-col col-node">
-                      Node
+                    <th
+                      className="validationResults__table-col col-node global__cursor-pointer"
+                      onClick={this.sortColumn("node")}
+                    >
+                      Node{" "}
+                      <img className="col-node-icon" src={SortResultIcon} />
                     </th>
-                    <th className="validationResults__table-col col-error">
-                      Error
+                    <th
+                      className="validationResults__table-col col-error global__cursor-pointer"
+                      onClick={this.sortColumn("error_no")}
+                    >
+                      Error{" "}
+                      <img className="col-node-icon" src={SortResultIcon} />
                     </th>
-                    <th className="validationResults__table-col col-severity">
-                      Severity
+                    <th
+                      className="validationResults__table-col col-severity global__cursor-pointer"
+                      onClick={this.sortColumn("severity")}
+                    >
+                      Severity{" "}
+                      <img className="col-node-icon" src={SortResultIcon} />
                     </th>
-                    <th className="validationResults__table-col col-description">
-                      Description
+                    <th
+                      className="validationResults__table-col col-description global__cursor-pointer"
+                      onClick={this.sortColumn("description")}
+                    >
+                      Description{" "}
+                      <img className="col-node-icon" src={SortResultIcon} />
                     </th>
                   </tr>
                 </thead>
@@ -78,16 +119,30 @@ class ValidationResults extends Component {
             <div className="validationResults__table__body">
               <table>
                 <tbody>
-                  {_.map(validations, validation => {
+                  {_.map(this.state.validationResults, validation => {
                     return (
                       <tr>
                         <td className="col-node">
-                          <Icon
-                            type="folder"
-                            theme="filled"
-                            className="global__file-folder"
-                          />
-                          <span>{validation.node}</span>
+                          <div
+                            style={{ display: "flex", alignItems: "center" }}
+                          >
+                            <span>
+                              {validation.is_file ? (
+                                <img
+                                  src={FileNew}
+                                  className="global__file-folder"
+                                  style={{ width: "18px", height: "22px" }}
+                                />
+                              ) : (
+                                <Icon
+                                  type="folder"
+                                  theme="filled"
+                                  className="global__file-folder"
+                                />
+                              )}
+                            </span>
+                            <span>{validation.node}</span>
+                          </div>
                         </td>
                         <td className="col-error">{validation.error_no}</td>
                         <td className="col-severity">
@@ -108,11 +163,11 @@ class ValidationResults extends Component {
             </div>
           </div>
           <div className="validationResults__footer">
-            <div className="validationResults__footer__viewreport">
+            <div className="validationResults__footer__viewreport global__disabled-box">
               View Report
             </div>
             <Button type="primary" onClick={onClose}>
-              close
+              Close
             </Button>
           </div>
         </div>

@@ -14,7 +14,7 @@
   &__heading {
     display: flex;
     align-items: center;
-    height: 60px;
+    height: 22%; //60px;
     overflow: hidden;
     &-text {
       @include text-bold-active(16px);
@@ -39,8 +39,8 @@
     cursor: pointer;
     background: $white;
     margin: 3px 3px 3px;
-    padding: 0px 12px;
-    height: 100%;
+    padding-left: 12px;
+    height: 78%; //100%;
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
     img {

@@ -6,6 +6,7 @@ import { Redirect } from 'react-router-dom';
 import AuthLayout from './authLayout.component';
 import { LoginActions } from '../../redux/actions';
 import Loader from '../../uikit/components/loader';
+import Footer from '../../uikit/components/footer/footer.component';
 
 const RadioGroup = Radio.Group;
 
@@ -48,7 +49,7 @@ class LoginAuth1 extends Component {
             <Radio value="email" className="auth1-radio">
               Email Address
             </Radio>
-            <Radio disabled value="phone" className="auth1-radio">
+            <Radio value="phone" className="auth1-radio">
               SMS
             </Radio>
           </RadioGroup>
@@ -72,6 +73,7 @@ class LoginAuth1 extends Component {
             </Button>
           </div>
         </AuthLayout>
+        <Footer alignToBottom />
       </React.Fragment>
     );
   }

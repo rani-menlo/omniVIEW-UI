@@ -1,4 +1,5 @@
 .submissionview {
+  height: 100%;
   &__profilebar {
     display: flex;
     justify-content: space-between;
@@ -88,6 +89,7 @@
       }
       &-properties {
         border-left: solid 0.2px;
+        overflow: auto;
       }
     }
     .panels__tree {

@@ -19,11 +19,6 @@ class CustomerCard extends Component {
       <Menu>
         <Menu.Item>
           <span className="customercard__heading-dropdown--item">
-            View License History
-          </span>
-        </Menu.Item>
-        <Menu.Item>
-          <span className="customercard__heading-dropdown--item">
             Edit Customer
           </span>
         </Menu.Item>

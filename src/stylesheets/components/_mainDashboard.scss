@@ -72,9 +72,15 @@
     box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.5);
     padding: 12px 36px;
     overflow-y: auto;
+    &-breadcrum {
+      @include text-normal(14px);
+      color: $sky-of-margritte;
+      cursor: pointer;
+    }
     &__header {
       display: flex;
       justify-content: space-between;
+      flex-wrap: wrap;
       &__addEdit {
         @include text-bold-active;
         cursor: pointer;

@@ -10,7 +10,8 @@ class NodeSequences extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      sortBy: "submission"
+      sortBy: "submission",
+      order: "desc"
     };
   }
 
@@ -25,7 +26,10 @@ class NodeSequences extends Component {
   };
 
   sortBy = sortBy => () => {
-    this.setState({ sortBy });
+    this.setState({
+      sortBy,
+      order: this.state.order === "desc" ? "asc" : "desc"
+    });
   };
 
   onSelected = sequence => () => {
@@ -34,9 +38,13 @@ class NodeSequences extends Component {
   };
 
   getTree = () => {
-    const { sequences } = this.props;
+    const { sequences, selected } = this.props;
     return _.map(sequences, sequence => (
-      <NodeSequenceTree sequence={sequence} onSelected={this.onSelected} />
+      <NodeSequenceTree
+        sequence={sequence}
+        onSelected={this.onSelected}
+        selected={selected}
+      />
     ));
   };
 
@@ -47,7 +55,8 @@ class NodeSequences extends Component {
         this.getListSequence(seq, array);
       });
     }
-    return _.sortBy(array, s => Number(s.name)).reverse();
+    const newArray = _.sortBy(array, s => Number(s.name));
+    return this.state.order === "desc" ? newArray : newArray.reverse();
   };
 
   getList = () => {

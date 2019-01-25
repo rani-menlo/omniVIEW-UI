@@ -1,11 +1,10 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { Dropdown, Menu, Avatar } from 'antd';
-import _ from 'lodash';
-import moment from 'moment';
-import DotsIcon from '../../../assets/images/overflow.svg';
-
-const DATE_FORMAT = 'DD/MM/YYYY';
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+import { Dropdown, Menu, Avatar } from "antd";
+import _ from "lodash";
+import moment from "moment";
+import DotsIcon from "../../../assets/images/overflow.svg";
+import { DATE_FORMAT } from "../../constants";
 
 class SubmissionCard extends Component {
   static propTypes = {
@@ -18,22 +17,12 @@ class SubmissionCard extends Component {
       <Menu>
         <Menu.Item>
           <span className="submissioncard__heading-dropdown--item">
-            View License History
-          </span>
-        </Menu.Item>
-        <Menu.Item>
-          <span className="submissioncard__heading-dropdown--item">
-            Edit Customer
-          </span>
-        </Menu.Item>
-        <Menu.Item>
-          <span className="submissioncard__heading-dropdown--item">
-            Add/Edit Users
+            Edit User Permissions
           </span>
         </Menu.Item>
         <Menu.Item>
           <span className="submissioncard__heading-dropdown--item red-text">
-            Deactivate Customer
+            Remove Application
           </span>
         </Menu.Item>
       </Menu>
@@ -46,11 +35,11 @@ class SubmissionCard extends Component {
       <div className="submissioncard">
         <div className="submissioncard__heading">
           <span className="submissioncard__heading-text">
-            {_.get(submission, 'name')}
+            {_.get(submission, "name")}
           </span>
           <Dropdown
             overlay={this.getMenu()}
-            trigger={['click']}
+            trigger={["click"]}
             overlayClassName="submissioncard__heading-dropdown"
           >
             <img src={DotsIcon} className="submissioncard__heading-more" />
@@ -64,45 +53,45 @@ class SubmissionCard extends Component {
             <span className="submissioncard__content__item-label">
               Added by:
             </span>
-            <div style={{ whiteSpace: 'nowrap' }}>
+            <div style={{ whiteSpace: "nowrap" }}>
               <Avatar size="small" icon="user" />
               <span
                 className="submissioncard__content__item-text"
-                style={{ marginLeft: '6px' }}
+                style={{ marginLeft: "6px" }}
               >
-                {_.get(submission, 'addedBy', 'Corabelle Durrad')}
+                {_.get(submission, "addedBy", "Corabelle Durrad")}
               </span>
             </div>
           </div>
           <div className="submissioncard__content__item">
             <span className="submissioncard__content__item-label">
-              Sequences:{' '}
+              Sequences:{" "}
             </span>
             <span className="submissioncard__content__item-text">
-              {_.get(submission, 'sequences', 5)}
+              {_.get(submission, "sequences", 5)}
             </span>
           </div>
           <div className="submissioncard__content__item">
             <span className="submissioncard__content__item-label">
-              Added On:{' '}
+              Added On:{" "}
             </span>
             <span className="submissioncard__content__item-text">
-              {moment(_.get(submission, 'created_at', '12/01/2018')).format(
+              {moment(_.get(submission, "created_at", "12/01/2018")).format(
                 DATE_FORMAT
               )}
             </span>
           </div>
           <div className="submissioncard__content__item">
             <span className="submissioncard__content__item-label">
-              Last Updated:{' '}
+              Last Updated:{" "}
             </span>
             <span className="submissioncard__content__item-text">
-              {moment(_.get(submission, 'updated_at', '12/01/2018')).format(
+              {moment(_.get(submission, "updated_at", "12/01/2018")).format(
                 DATE_FORMAT
               )}
             </span>
           </div>
-          <div className="global__hr-line" style={{ marginTop: '20px' }} />
+          <div className="global__hr-line" style={{ marginTop: "20px" }} />
           <div className="submissioncard__content__item">
             <span className="submissioncard__content__item-label">Users:</span>
             <div>

@@ -1,12 +1,13 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import { Form, Input, Button, Checkbox } from 'antd';
-import PropTypes from 'prop-types';
-import OmniciaLogo from '../../../assets/images/omnicia-logo.svg';
-import _ from 'lodash';
-import { LoginActions } from '../../redux/actions';
-import Loader from '../../uikit/components/loader';
+import React, { Component } from "react";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
+import { Form, Input, Button, Checkbox } from "antd";
+import PropTypes from "prop-types";
+import OmniciaLogo from "../../../assets/images/omnicia-logo.svg";
+import _ from "lodash";
+import { LoginActions } from "../../redux/actions";
+import Loader from "../../uikit/components/loader";
+import Footer from "../../uikit/components/footer/footer.component";
 
 const FormItem = Form.Item;
 
@@ -15,12 +16,12 @@ class Login extends Component {
     super(props);
     this.state = {
       username: {
-        value: '',
-        error: ''
+        value: "",
+        error: ""
       },
       password: {
-        value: '',
-        error: ''
+        value: "",
+        error: ""
       }
     };
   }
@@ -33,11 +34,11 @@ class Login extends Component {
     let { username, password } = this.state;
     if (!username.value) {
       this.setState({
-        username: { ...username, error: 'Username is required' }
+        username: { ...username, error: "Username is required" }
       });
     } else if (!password.value) {
       this.setState({
-        password: { ...password, error: 'Password is required' }
+        password: { ...password, error: "Password is required" }
       });
     } else {
       this.props.actions.login({
@@ -50,9 +51,9 @@ class Login extends Component {
   onUsernameChange = e => {
     this.props.error && this.props.actions.resetLoginError();
     const text = e.target.value;
-    let error = '';
+    let error = "";
     if (/\s/.test(text)) {
-      error = 'Inavlid Username';
+      error = "Inavlid Username";
     }
     this.setState({
       username: { ...this.state.username, value: text, error }
@@ -63,7 +64,7 @@ class Login extends Component {
     this.props.error && this.props.actions.resetLoginError();
     const text = e.target.value;
     this.setState({
-      password: { ...this.state.password, value: text, error: '' }
+      password: { ...this.state.password, value: text, error: "" }
     });
   };
 
@@ -86,7 +87,7 @@ class Login extends Component {
                   placeholder="Username"
                   onChange={this.onUsernameChange}
                   value={username.value}
-                  className={username.error && 'login-errorbox'}
+                  className={username.error && "login-errorbox"}
                 />
               </FormItem>
               {username.error && (
@@ -108,7 +109,7 @@ class Login extends Component {
                   placeholder="Password"
                   value={password.value}
                   onChange={this.onPasswordChange}
-                  className={password.error && 'login-errorbox'}
+                  className={password.error && "login-errorbox"}
                 />
               </FormItem>
               {password.error && (
@@ -129,6 +130,7 @@ class Login extends Component {
             </Form>
           </div>
         </div>
+        <Footer alignToBottom />
       </React.Fragment>
     );
   }

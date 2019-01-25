@@ -35,6 +35,11 @@
     .col {
       &-node {
         width: 35%;
+        &-icon {
+          float: right;
+          width: 16px;
+          height: 16px;
+        }
       }
       &-error {
         width: 10%;
