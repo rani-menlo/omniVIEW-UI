@@ -3,11 +3,6 @@ import _ from "lodash";
 import { Icon, Input } from "antd";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import ListViewIcon from "../../../../assets/images/list-view.svg";
-import ListViewIconActive from "../../../../assets/images/list-view-active.svg";
-import FilterIcon from "../../../../assets/images/filter.svg";
-import PlusIcon from "../../../../assets/images/plus.svg";
-import SearchIcon from "../../../../assets/images/search.svg";
 import SubmissionCard from "../submissionCard.component";
 import { ApplicationActions } from "../../../redux/actions";
 import Loader from "../../../uikit/components/loader";
@@ -69,7 +64,11 @@ class ApplicationDashboard extends Component {
               onClick={this.changeView("lists")}
             >
               <img
-                src={viewBy === "lists" ? ListViewIconActive : ListViewIcon}
+                src={
+                  viewBy === "lists"
+                    ? "/images/list-view-active.svg"
+                    : "/images/list-view.svg"
+                }
               />
             </div>
             {/* <div className="maindashboard__header__icon maindashboard__header__icon-filter">
@@ -81,7 +80,9 @@ class ApplicationDashboard extends Component {
             <div className="maindashboard__header__search">
               <Input
                 className="maindashboard__header__search-box"
-                prefix={<img src={SearchIcon} style={{ marginLeft: "5px" }} />}
+                prefix={
+                  <img src="/images/search.svg" style={{ marginLeft: "5px" }} />
+                }
                 placeholder="Search Applications..."
               />
             </div>
@@ -110,7 +111,7 @@ class ApplicationDashboard extends Component {
                 </div>
               </div>
               <span className="maindashboard__content__header-addcustomer">
-                <img src={PlusIcon} />
+                <img src="/images/plus.svg" />
                 <span className="maindashboard__content__header-addcustomer--text">
                   Add New Application{" "}
                 </span>

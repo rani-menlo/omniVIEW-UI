@@ -1,8 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { Icon } from "antd";
-import FilterIcon from "../../../assets/images/filter-blue.svg";
-import SortIcon from "../../../assets/images/sort.svg";
 import _ from "lodash";
 import NodeSequenceTree from "./nodeSequenceTree";
 
@@ -80,7 +78,7 @@ class NodeSequences extends Component {
               "selected-sortby"}`}
             onClick={this.sortBy("submission")}
           >
-            <img src={FilterIcon} />
+            <img src='/images/filter-blue.svg' />
             <span className="label">Submission Type</span>
           </div>
           <div
@@ -88,7 +86,7 @@ class NodeSequences extends Component {
               "selected-sortby"}`}
             onClick={this.sortBy("sequence")}
           >
-            <img src={SortIcon} />
+            <img src='/images/sort.svg' />
             <span className="label">Sequence</span>
           </div>
         </div>

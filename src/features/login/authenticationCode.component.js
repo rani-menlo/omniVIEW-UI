@@ -74,12 +74,12 @@ class AuthenticationCode extends Component {
             />
             <div className="authenticationCode-form__icons">
               {verifying && <Spin />}
-              {verified && (
+              {verified &&
                 <Icon
                   type="check"
                   className="authenticationCode-form__icons-tick"
                 />
-              )}
+              }
             </div>
           </Form.Item>
           {error && <p className="authenticationCode-fieldError">{error}</p>}

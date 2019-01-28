@@ -3,7 +3,6 @@ import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { Form, Input, Button, Checkbox } from "antd";
 import PropTypes from "prop-types";
-import OmniciaLogo from "../../../assets/images/omnicia-logo.svg";
 import _ from "lodash";
 import { LoginActions } from "../../redux/actions";
 import Loader from "../../uikit/components/loader";
@@ -76,7 +75,7 @@ class Login extends Component {
         <Loader loading={loading} />
         <div className="global__container">
           <div className="login">
-            <img src={OmniciaLogo} className="login-logo" />
+            <img src="/images/omnicia-logo.svg" className="login-logo" />
             <p className="login-text">Login</p>
             <div className="login__hr-line global__hr-line" />
             {error && <p className="login-error">{error}</p>}

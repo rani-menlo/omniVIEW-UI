@@ -3,12 +3,6 @@ import PropTypes from "prop-types";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { Icon, Button } from "antd";
-import ValidateIcon from "../../../assets/images/folder-validate.svg";
-import AlertHighIcon from "../../../assets/images/alert-high.svg";
-import AlertMediumIcon from "../../../assets/images/alert-medium.svg";
-import AlertLowIcon from "../../../assets/images/alert-low.svg";
-import FileNew from "../../../assets/images/file-new.svg";
-import SortResultIcon from "../../../assets/images/sort-result.svg";
 import { SubmissionActions } from "../../redux/actions";
 import Loader from "../../uikit/components/loader";
 import _ from "lodash";
@@ -41,11 +35,11 @@ class ValidationResults extends Component {
 
   getAlertIcon = severity => {
     if (severity === "Low") {
-      return AlertLowIcon;
+      return "/images/alert-low.svg";
     } else if (severity === "Medium") {
-      return AlertMediumIcon;
+      return "/images/alert-medium.svg";
     } else {
-      return AlertHighIcon;
+      return "/images/alert-high.svg";
     }
   };
 
@@ -67,7 +61,10 @@ class ValidationResults extends Component {
         <div className="validationResults">
           <div className="validationResults__header">
             <div className="validationResults__header__title global__center-horiz-vert">
-              <img src={ValidateIcon} style={{ marginRight: "5px" }} />
+              <img
+                src="/images/folder-validate.svg"
+                style={{ marginRight: "5px" }}
+              />
               <span className="validationResults__header__title-text">
                 {" "}
                 eCTD Sequence Validation [{label}\{_.get(sequence, "name", "")}]
@@ -89,28 +86,40 @@ class ValidationResults extends Component {
                       onClick={this.sortColumn("node")}
                     >
                       Node{" "}
-                      <img className="col-node-icon" src={SortResultIcon} />
+                      <img
+                        className="col-node-icon"
+                        src="/images/sort-result.svg"
+                      />
                     </th>
                     <th
                       className="validationResults__table-col col-error global__cursor-pointer"
                       onClick={this.sortColumn("error_no")}
                     >
                       Error{" "}
-                      <img className="col-node-icon" src={SortResultIcon} />
+                      <img
+                        className="col-node-icon"
+                        src="/images/sort-result.svg"
+                      />
                     </th>
                     <th
                       className="validationResults__table-col col-severity global__cursor-pointer"
                       onClick={this.sortColumn("severity")}
                     >
                       Severity{" "}
-                      <img className="col-node-icon" src={SortResultIcon} />
+                      <img
+                        className="col-node-icon"
+                        src="/images/sort-result.svg"
+                      />
                     </th>
                     <th
                       className="validationResults__table-col col-description global__cursor-pointer"
                       onClick={this.sortColumn("description")}
                     >
                       Description{" "}
-                      <img className="col-node-icon" src={SortResultIcon} />
+                      <img
+                        className="col-node-icon"
+                        src="/images/sort-result.svg"
+                      />
                     </th>
                   </tr>
                 </thead>
@@ -129,7 +138,7 @@ class ValidationResults extends Component {
                             <span>
                               {validation.is_file ? (
                                 <img
-                                  src={FileNew}
+                                  src="/images/file-new.svg"
                                   className="global__file-folder"
                                   style={{ width: "18px", height: "22px" }}
                                 />

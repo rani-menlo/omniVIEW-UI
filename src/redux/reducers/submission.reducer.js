@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { SubmissionActionTypes } from "../actionTypes";
 
 const initialState = {

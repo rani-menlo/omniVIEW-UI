@@ -1,12 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { Icon, Dropdown, Menu } from "antd";
+import { Dropdown, Menu } from "antd";
 import _ from "lodash";
-import UsersIcon from "../../../assets/images/users.svg";
-import ApplicationsIcon from "../../../assets/images/applications.svg";
-import DatabaseIcon from "../../../assets/images/database.svg";
-import KeyIcon from "../../../assets/images/key.svg";
-import DotsIcon from "../../../assets/images/overflow.svg";
 
 class CustomerCard extends Component {
   static propTypes = {
@@ -54,7 +49,10 @@ class CustomerCard extends Component {
             trigger={["click"]}
             overlayClassName="customercard__heading-dropdown"
           >
-            <img src={DotsIcon} className="customercard__heading-more" />
+            <img
+              src="/images/overflow.svg"
+              className="customercard__heading-more"
+            />
           </Dropdown>
         </div>
         <div
@@ -62,28 +60,28 @@ class CustomerCard extends Component {
           onClick={onSelect && onSelect(customer)}
         >
           <div className="customercard__content__item">
-            <img src={UsersIcon} />
+            <img src="/images/users.svg" />
             <span className="customercard__content__item-text">
               {_.get(customer, "users.length", "0")} users
             </span>
           </div>
           <div className="global__hr-line" />
           <div className="customercard__content__item">
-            <img src={ApplicationsIcon} />
+            <img src="/images/applications.svg" />
             <span className="customercard__content__item-text">
               {_.get(customer, "submissions.length", "0")} applications
             </span>
           </div>
           <div className="global__hr-line" />
           <div className="customercard__content__item">
-            <img src={DatabaseIcon} />
+            <img src="/images/database.svg" />
             <span className="customercard__content__item-text">
               {_.get(customer, "max_space") || "0"} TB
             </span>
           </div>
           <div className="global__hr-line" />
           <div className="customercard__content__item">
-            <img src={KeyIcon} />
+            <img src="/images/key.svg" />
             <span
               className="customercard__content__item-text"
               style={{ fontSize: "14px" }}

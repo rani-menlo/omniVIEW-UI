@@ -3,7 +3,6 @@ import PropTypes from "prop-types";
 import { Dropdown, Menu, Avatar } from "antd";
 import _ from "lodash";
 import moment from "moment";
-import DotsIcon from "../../../assets/images/overflow.svg";
 import { DATE_FORMAT } from "../../constants";
 
 class SubmissionCard extends Component {
@@ -42,7 +41,7 @@ class SubmissionCard extends Component {
             trigger={["click"]}
             overlayClassName="submissioncard__heading-dropdown"
           >
-            <img src={DotsIcon} className="submissioncard__heading-more" />
+            <img src='/images/overflow.svg' className="submissioncard__heading-more" />
           </Dropdown>
         </div>
         <div
