@@ -1,6 +1,6 @@
 const path = "/api/v1/";
 
-const SERVER_URL = "http://23.100.29.9:3000";
+const SERVER_URL = "https://omniview.omniciainc.com";
 // const SERVER_URL = "http://192.168.1.44:3000";
 // const SERVER_URL = "https://omniciastage.azurewebsites.net";
 // const SERVER_URL = "https://omniciadev.azurewebsites.net";
