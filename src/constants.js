@@ -1,7 +1,7 @@
 const path = "/api/v1/";
 
-const SERVER_URL = "http://23.100.29.9:3000";
-// const SERVER_URL = "http://192.168.1.44:3000";
+const SERVER_URL = "https://omniview.omniciainc.com";
+// const SERVER_URL = "http://192.168.1.227:3000";
 // const SERVER_URL = "https://omniciastage.azurewebsites.net";
 // const SERVER_URL = "https://omniciadev.azurewebsites.net";
 
@@ -14,9 +14,16 @@ const URI = {
   GET_SEQUENCES: `${path}sequences`,
   GET_JSON: `${path}getFile`,
   GET_RESOURCE_FILE: `${path}getResourceFile`,
-  VALIDATE_SEQUENCE: `${path}sequenceValidation`
+  VALIDATE_SEQUENCE: `${path}sequenceValidation`,
+  GET_FILE_SIZE: `${path}getFileSize`,
+  GET_NEW_PATH: `${path}getNewPath`
 };
 
-const DATE_FORMAT = 'MM/DD/YYYY';
+const DATE_FORMAT = "MM/DD/YYYY";
 
-export { URI, SERVER_URL, DATE_FORMAT };
+const VIEWER = {
+  PDF_MAX_SIZE: 22 * 1024 * 1024, // 22MB
+  DOC_MAX_SIZE: 10 * 1024 * 1024 // 10MB
+};
+
+export { URI, SERVER_URL, DATE_FORMAT, VIEWER };

@@ -5,22 +5,27 @@
     border-spacing: 10px;
     padding: 10px 0px;
 
+    .section-title {
+      @include text-bold-active(14px);
+      margin: 5px 5px;
+      &::after {
+        content: "";
+        display: block;
+        width: 100%;
+        height: 1px;
+        background: $ash-blue;
+      }
+    }
+
     .label {
-      @include text-normal(14px);
+      @include text-normal(12px);
       color: rgba($black, 0.5);
-      width: 120px;
+      width: 40%;
     }
 
     .value {
-      @include text-normal(14px);
-      white-space: -moz-pre-wrap !important; /* Mozilla, since 1999 */
-      white-space: -pre-wrap; /* Opera 4-6 */
-      white-space: -o-pre-wrap; /* Opera 7 */
-      white-space: pre-wrap; /* css-3 */
-      word-wrap: break-word; /* Internet Explorer 5.5+ */
-      white-space: -webkit-pre-wrap; /* Newer versions of Chrome/Safari*/
-      word-break: break-all;
-      white-space: normal;
+      width: 65%;
+      @include text-normal(12px);
     }
 
     .link {
@@ -47,13 +52,13 @@
         border-bottom: solid 1px $ash-blue;
       }
       th {
-        @include text-normal(14px);
+        @include text-normal(12px);
         opacity: 0.5;
         padding: 6px 12px;
         border-right: solid 1px $ash-blue;
       }
       td {
-        @include text-normal(14px);
+        @include text-normal(12px);
         border-right: solid 1px $ash-blue;
         padding: 6px 12px;
         opacity: 0.5;

@@ -12,17 +12,17 @@ class CustomerCard extends Component {
   getMenu = () => {
     return (
       <Menu>
-        <Menu.Item>
+        <Menu.Item disabled>
           <span className="customercard__heading-dropdown--item">
             Edit Customer
           </span>
         </Menu.Item>
-        <Menu.Item>
+        <Menu.Item disabled>
           <span className="customercard__heading-dropdown--item">
             Add/Edit Users
           </span>
         </Menu.Item>
-        <Menu.Item>
+        <Menu.Item disabled>
           <span className="customercard__heading-dropdown--item red-text">
             Deactivate Customer
           </span>
@@ -41,7 +41,10 @@ class CustomerCard extends Component {
     return (
       <div className="customercard">
         <div className="customercard__heading">
-          <span className="customercard__heading-text">
+          <span
+            className="customercard__heading-text global__cursor-pointer"
+            onClick={onSelect && onSelect(customer)}
+          >
             {this.getName(customer)}
           </span>
           <Dropdown

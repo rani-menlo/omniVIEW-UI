@@ -1,16 +1,24 @@
-import { ApplicationActionTypes } from '../actionTypes';
-import { ApplicationApi } from '../api';
-import { ApiActions } from '.';
+import { ApplicationActionTypes } from "../actionTypes";
+import { ApplicationApi } from "../api";
+import { ApiActions } from ".";
 
 export default {
   fetchApplications: customerId => {
-    return async dispatch => {
+    return async (dispatch, getState) => {
       ApiActions.request(dispatch);
       try {
-        const res = await ApplicationApi.fetchApplications(customerId);
+        let data = {data: []};
+        const submissions = getState().Application.submissions;
+        if (submissions[customerId]) {
+          data.data = submissions[customerId];
+        } else {
+          const res = await ApplicationApi.fetchApplications(customerId);
+          data = res.data;
+        }
         dispatch({
           type: ApplicationActionTypes.FETCH_APPLICATIONS,
-          data: res.data
+          data,
+          customerId
         });
         ApiActions.success(dispatch);
       } catch (err) {

@@ -93,7 +93,8 @@
       }
     }
     .panels__tree {
-      overflow-y: auto;
+      overflow: auto;
+      height: 100%;
     }
   }
   &__siders {

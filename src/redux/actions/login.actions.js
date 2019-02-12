@@ -1,6 +1,6 @@
-import { LoginActionTypes } from '../actionTypes';
-import { ApiActions } from '.';
-import { LoginApi } from '../api';
+import { LoginActionTypes } from "../actionTypes";
+import { ApiActions } from ".";
+import { LoginApi } from "../api";
 
 export default {
   login: data => {
@@ -84,6 +84,11 @@ export default {
     return {
       type: LoginActionTypes.SET_OTP_ERROR,
       error
+    };
+  },
+  logOut: () => {
+    return {
+      type: LoginActionTypes.LOGOUT
     };
   }
 };

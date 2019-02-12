@@ -1,6 +1,14 @@
 .validationResults {
+  height: 100%;
   &__dialog > .ant-modal {
-    width: 60% !important;
+    width: 75% !important;
+    height: 75% !important;
+    .ant-modal-content {
+      height: 100% !important;
+    }
+    .ant-modal-body {
+      height: 100%;
+    }
   }
   &__header {
     display: flex;
@@ -19,6 +27,7 @@
     }
   }
   &__table {
+    height: 80%;
     table {
       width: 100%;
     }
@@ -29,7 +38,7 @@
       width: 100%;
     }
     &__body {
-      height: 50%;
+      height: 87%;
       overflow-y: auto;
     }
     .col {

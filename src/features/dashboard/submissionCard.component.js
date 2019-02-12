@@ -14,12 +14,12 @@ class SubmissionCard extends Component {
   getMenu = () => {
     return (
       <Menu>
-        <Menu.Item>
+        <Menu.Item disabled>
           <span className="submissioncard__heading-dropdown--item">
             Edit User Permissions
           </span>
         </Menu.Item>
-        <Menu.Item>
+        <Menu.Item disabled>
           <span className="submissioncard__heading-dropdown--item red-text">
             Remove Application
           </span>
@@ -33,7 +33,10 @@ class SubmissionCard extends Component {
     return (
       <div className="submissioncard">
         <div className="submissioncard__heading">
-          <span className="submissioncard__heading-text">
+          <span
+            className="submissioncard__heading-text global__cursor-pointer"
+            onClick={onSelect && onSelect(submission)}
+          >
             {_.get(submission, "name")}
           </span>
           <Dropdown
@@ -41,7 +44,10 @@ class SubmissionCard extends Component {
             trigger={["click"]}
             overlayClassName="submissioncard__heading-dropdown"
           >
-            <img src='/images/overflow.svg' className="submissioncard__heading-more" />
+            <img
+              src="/images/overflow.svg"
+              className="submissioncard__heading-more"
+            />
           </Dropdown>
         </div>
         <div

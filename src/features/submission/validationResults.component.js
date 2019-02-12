@@ -6,6 +6,7 @@ import { Icon, Button } from "antd";
 import { SubmissionActions } from "../../redux/actions";
 import Loader from "../../uikit/components/loader";
 import _ from "lodash";
+import { getValidationsBySequence } from "../../redux/selectors/validationResults.selector";
 
 class ValidationResults extends Component {
   constructor(props) {
@@ -27,10 +28,12 @@ class ValidationResults extends Component {
     sequence && this.props.actions.validateSequence(sequence.id);
   }
 
-  componentDidUpdate() {
-    if (this.props.validations.length && !this.state.validationResults.length) {
-      this.setState({ validationResults: this.props.validations });
+  static getDerivedStateFromProps(props, state) {
+    const newState = {};
+    if (!state.validationResults.length) {
+      newState.validationResults = props.validations;
     }
+    return _.size(newState) ? { ...newState } : null;
   }
 
   getAlertIcon = severity => {
@@ -44,8 +47,24 @@ class ValidationResults extends Component {
   };
 
   sortColumn = key => () => {
-    const { validationResults, sort } = this.state;
-    const sortBy = sort === "asc" ? "desc" : "asc";
+    const { validationResults } = this.state;
+    const sortBy = this.state.sort === "asc" ? "desc" : "asc";
+    /* if (key === "severity") {
+      validationResults.sort((result1, result2) => {
+        if (result1.severity === "High") {
+          return sortBy === "asc" ? 1 : -1;
+        } else if (result1.severity === "Low") {
+          return sortBy === "asc" ? -1 : 1;
+        } else {
+          return 0;
+        }
+      });
+      this.setState({
+        sort: sortBy,
+        validationResults
+      });
+      return;
+    } */
     const data = _.orderBy(validationResults, key, sortBy);
     this.setState({
       sort: sortBy,
@@ -55,6 +74,7 @@ class ValidationResults extends Component {
 
   render() {
     const { onClose, loading, label, sequence } = this.props;
+    const { validationResults, sort } = this.state;
     return (
       <React.Fragment>
         <Loader loading={loading} />
@@ -127,10 +147,10 @@ class ValidationResults extends Component {
             </div>
             <div className="validationResults__table__body">
               <table>
-                <tbody>
-                  {_.map(this.state.validationResults, validation => {
+                <tbody key={sort}>
+                  {_.map(validationResults, validation => {
                     return (
-                      <tr>
+                      <tr key={validation.error_no}>
                         <td className="col-node">
                           <div
                             style={{ display: "flex", alignItems: "center" }}
@@ -175,7 +195,7 @@ class ValidationResults extends Component {
             <div className="validationResults__footer__viewreport global__disabled-box">
               View Report
             </div>
-            <Button type="primary" onClick={onClose}>
+            <Button type="primary" onClick={onClose} style={{ color: "white" }}>
               Close
             </Button>
           </div>
@@ -185,10 +205,10 @@ class ValidationResults extends Component {
   }
 }
 
-function mapStateToProps(state) {
+function mapStateToProps(state, props) {
   return {
     loading: state.Api.loading,
-    validations: state.Submission.validations
+    validations: getValidationsBySequence(state, props)
   };
 }
 

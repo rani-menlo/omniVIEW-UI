@@ -1,0 +1,22 @@
+.profile {
+  display: flex;
+  align-items: center;
+  &__menu {
+    cursor: pointer;
+    &-username {
+      margin: 0px 10px;
+      @include text-normal(16px);
+    }
+  }
+
+  &-help {
+    margin-right: 10px;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+  }
+
+  .profilemenu-dropdown-item {
+    @include text-normal;
+  }
+}

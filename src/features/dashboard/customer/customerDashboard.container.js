@@ -5,7 +5,7 @@ import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import CustomerCard from "../customerCard.component";
 import { CustomerActions } from "../../../redux/actions";
-import Header from "../../header.component";
+import Header from "../../header/header.component";
 import Loader from "../../../uikit/components/loader";
 import Footer from "../../../uikit/components/footer/footer.component";
 
@@ -26,12 +26,6 @@ class CustomerDashboard extends Component {
   };
 
   onCustomerSelected = customer => () => {
-    if (customer.id === 4) {
-      MessageBox.error(
-        `No Applications are available for customer ${customer.company_name}`
-      );
-      return;
-    }
     this.props.actions.setSelectedCustomer(customer);
     this.props.history.push("/applications");
   };
@@ -60,10 +54,15 @@ class CustomerDashboard extends Component {
             <div
               className={`maindashboard__header__icon maindashboard__header__icon-lists ${viewBy ===
                 "lists" && "maindashboard__header__icon-selected"}`}
-              onClick={this.changeView("lists")}
+              style={{ cursor: "not-allowed" }}
+              // onClick={this.changeView("lists")}
             >
               <img
-                src={viewBy === "lists" ? '/images/list-view-active.svg' : '/images/list-view.svg'}
+                src={
+                  viewBy === "lists"
+                    ? "/images/list-view-active.svg"
+                    : "/images/list-view.svg"
+                }
               />
             </div>
             {/* <div className="maindashboard__header__icon maindashboard__header__icon-filter">
@@ -74,8 +73,11 @@ class CustomerDashboard extends Component {
             </span> */}
             <div className="maindashboard__header__search">
               <Input
+                disabled
                 className="maindashboard__header__search-box"
-                prefix={<img src='/images/search.svg' style={{ marginLeft: "5px" }} />}
+                prefix={
+                  <img src="/images/search.svg" style={{ marginLeft: "5px" }} />
+                }
                 placeholder="Search Customers..."
               />
             </div>
@@ -85,8 +87,8 @@ class CustomerDashboard extends Component {
               <span className="maindashboard__content__header-customers">
                 Customers ({customers.length})
               </span>
-              <span className="maindashboard__content__header-addcustomer">
-                <img src='/images/plus.svg' />
+              <span className="maindashboard__content__header-addcustomer global__disabled-box">
+                <img src="/images/plus.svg" />
                 <span className="maindashboard__content__header-addcustomer--text">
                   Add New Customer{" "}
                 </span>

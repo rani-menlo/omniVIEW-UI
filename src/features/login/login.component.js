@@ -96,8 +96,8 @@ class Login extends Component {
                 <span className="global__field-label">Password</span>
                 <a
                   className="login__pwdsection-forgot-pwd"
-                  href=""
                   tabIndex="3"
+                  style={{cursor: 'not-allowed', opacity: 0.5}}
                 >
                   Forgot your password?
                 </a>
@@ -114,7 +114,7 @@ class Login extends Component {
               {password.error && (
                 <p className="login-fieldError">{password.error}</p>
               )}
-              <Checkbox className="login-rememberpwd">
+              <Checkbox disabled className="login-rememberpwd">
                 Remember Password?
               </Checkbox>
               <FormItem>

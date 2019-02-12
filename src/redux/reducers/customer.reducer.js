@@ -10,7 +10,7 @@ export default (state = initialState, action) => {
     case CustomerActionTypes.FETCH_CUSTOMERS: {
       return {
         ...state,
-        customers: action.data.customers
+        customers: action.data.data
       };
     }
     case CustomerActionTypes.SET_SELECTED_CUSTOMER: {
