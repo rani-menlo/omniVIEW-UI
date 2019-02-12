@@ -1,18 +1,15 @@
 import React, { Component } from "react";
+import { Redirect } from "react-router-dom";
 import _ from "lodash";
 import { Icon, Input } from "antd";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import ListViewIcon from "../../../../assets/images/list-view.svg";
-import ListViewIconActive from "../../../../assets/images/list-view-active.svg";
-import FilterIcon from "../../../../assets/images/filter.svg";
-import PlusIcon from "../../../../assets/images/plus.svg";
-import SearchIcon from "../../../../assets/images/search.svg";
 import SubmissionCard from "../submissionCard.component";
 import { ApplicationActions } from "../../../redux/actions";
 import Loader from "../../../uikit/components/loader";
-import Header from "../../header.component";
+import Header from "../../header/header.component";
 import Footer from "../../../uikit/components/footer/footer.component";
+import { getSubmissionsByCustomer } from "../../../redux/selectors/applicationDashboard.selector";
 // import { Customers } from "./sampleCustomers";
 
 class ApplicationDashboard extends Component {
@@ -45,6 +42,9 @@ class ApplicationDashboard extends Component {
   render() {
     const { viewBy } = this.state;
     const { submissions, loading, selectedCustomer } = this.props;
+    if (!selectedCustomer) {
+      return <Redirect to="/customers" />;
+    }
     return (
       <React.Fragment>
         <Loader loading={loading} />
@@ -66,10 +66,15 @@ class ApplicationDashboard extends Component {
             <div
               className={`maindashboard__header__icon maindashboard__header__icon-lists ${viewBy ===
                 "lists" && "maindashboard__header__icon-selected"}`}
-              onClick={this.changeView("lists")}
+              style={{ cursor: "not-allowed" }}
+              // onClick={this.changeView("lists")}
             >
               <img
-                src={viewBy === "lists" ? ListViewIconActive : ListViewIcon}
+                src={
+                  viewBy === "lists"
+                    ? "/images/list-view-active.svg"
+                    : "/images/list-view.svg"
+                }
               />
             </div>
             {/* <div className="maindashboard__header__icon maindashboard__header__icon-filter">
@@ -80,8 +85,11 @@ class ApplicationDashboard extends Component {
             </span> */}
             <div className="maindashboard__header__search">
               <Input
+                disabled
                 className="maindashboard__header__search-box"
-                prefix={<img src={SearchIcon} style={{ marginLeft: "5px" }} />}
+                prefix={
+                  <img src="/images/search.svg" style={{ marginLeft: "5px" }} />
+                }
                 placeholder="Search Applications..."
               />
             </div>
@@ -96,7 +104,7 @@ class ApplicationDashboard extends Component {
             <span style={{ margin: "0px 5px" }}>></span>
             <span
               className="maindashboard__content-breadcrum"
-              style={{ opacity: 0.4, cursor: "default" }}
+              style={{ opacity: 0.4, cursor: "not-allowed" }}
             >
               Applications
             </span>
@@ -105,12 +113,15 @@ class ApplicationDashboard extends Component {
                 <span className="maindashboard__content__header-customers">
                   {_.get(selectedCustomer, "company_name", "")}
                 </span>
-                <div className="maindashboard__content__header__addEdit">
+                <div
+                  className="maindashboard__content__header__addEdit"
+                  style={{ opacity: 0.2, cursor: "not-allowed" }}
+                >
                   Add/Edit Users
                 </div>
               </div>
-              <span className="maindashboard__content__header-addcustomer">
-                <img src={PlusIcon} />
+              <span className="maindashboard__content__header-addcustomer global__disabled-box">
+                <img src="/images/plus.svg" />
                 <span className="maindashboard__content__header-addcustomer--text">
                   Add New Application{" "}
                 </span>
@@ -136,7 +147,7 @@ class ApplicationDashboard extends Component {
 function mapStateToProps(state) {
   return {
     loading: state.Api.loading,
-    submissions: state.Application.submissions,
+    submissions: getSubmissionsByCustomer(state),
     selectedCustomer: state.Customer.selectedCustomer
   };
 }

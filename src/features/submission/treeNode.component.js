@@ -3,11 +3,7 @@ import { Icon } from "antd";
 import PropTypes from "prop-types";
 import _ from "lodash";
 import uuidv4 from "uuid/v4";
-import FileNew from "../../../assets/images/file-new.svg";
-import FileAppend from "../../../assets/images/file-append.svg";
-import FileReplace from "../../../assets/images/file-replace.svg";
-import FileDelete from "../../../assets/images/file-delete.svg";
-import { SERVER_URL, URI } from "../../constants";
+import { withRouter } from "react-router-dom";
 
 class TreeNode extends Component {
   constructor(props) {
@@ -22,8 +18,7 @@ class TreeNode extends Component {
   }
 
   static propTypes = {
-    content: PropTypes.oneOfType([PropTypes.object, PropTypes.array])
-      .isRequired,
+    content: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
     label: PropTypes.string.isRequired,
     paddingLeft: PropTypes.number,
     defaultPaddingLeft: PropTypes.number,
@@ -33,7 +28,10 @@ class TreeNode extends Component {
     mode: PropTypes.oneOf(["standard", "qc"]),
     view: PropTypes.oneOf(["current", "lifeCycle"]),
     defaultExpand: PropTypes.bool,
-    leafParent: PropTypes.object | PropTypes.arrayOf(PropTypes.object)
+    leafParent: PropTypes.oneOfType([
+      PropTypes.object,
+      PropTypes.arrayOf(PropTypes.object)
+    ])
   };
 
   static defaultProps = {
@@ -52,9 +50,30 @@ class TreeNode extends Component {
   }
 
   componentDidMount() {
-    let { content, view } = this.props;
+    let { content, view, mode } = this.props;
     const properties = {};
     const nodes = [];
+    content = _.get(content, "ectd:ectd", content);
+    const version = _.get(content, "version", "");
+    if (version && version.includes("STF")) {
+      if (mode === "qc") {
+        const keys = [];
+        _.map(content, (value, key) => {
+          if (typeof value === "object") {
+            keys.push(key);
+          }
+        });
+        let leaf = [];
+        _.map(keys, key => {
+          leaf = [...leaf];
+          if (content[key].leaf) {
+            leaf = [...leaf, ...content[key].leaf];
+          }
+        });
+        content = _.omit(content, keys);
+        content.leaf = leaf;
+      }
+    }
     content = _.get(content, "ectd:ectd", content);
     _.map(content, (value, key) => {
       if (typeof value === "string" || typeof value === "boolean") {
@@ -113,28 +132,59 @@ class TreeNode extends Component {
     let icon = (
       <Icon type="folder" theme="filled" className="global__file-folder" />
     );
+    const { properties } = this.state;
+    const style = { width: "18px", height: "21px" };
+    const version = _.get(properties, "version", "");
+    if (properties.title === "US Regional") {
+      icon = (
+        <img
+          src="/images/folder-us.svg"
+          className="global__file-folder"
+          style={style}
+        />
+      );
+    }
+    if (version && version.includes("STF")) {
+      icon = (
+        <img
+          src="/images/file-stf.svg"
+          className="global__file-folder"
+          style={style}
+        />
+      );
+    }
     if (this.props.label === "leaf") {
-      const { properties } = this.state;
-      const style = { width: "18px", height: "21px" };
       if (properties.operation === "new") {
         icon = (
-          <img src={FileNew} className="global__file-folder" style={style} />
+          <img
+            src="/images/file-new.svg"
+            className="global__file-folder"
+            style={style}
+          />
         );
       } else if (properties.operation === "append") {
         icon = (
-          <img src={FileAppend} className="global__file-folder" style={style} />
+          <img
+            src="/images/file-append.svg"
+            className="global__file-folder"
+            style={style}
+          />
         );
       } else if (properties.operation === "replace") {
         icon = (
           <img
-            src={FileReplace}
+            src="/images/file-replace.svg"
             className="global__file-folder"
             style={style}
           />
         );
       } else {
         icon = (
-          <img src={FileDelete} className="global__file-folder" style={style} />
+          <img
+            src="/images/file-delete.svg"
+            className="global__file-folder"
+            style={style}
+          />
         );
       }
     }
@@ -158,29 +208,27 @@ class TreeNode extends Component {
     if (label === "leaf" || mode === "standard") {
       name = _.get(properties, "title", label);
     }
-    const append = [];
-    if (properties["product-name"]) {
-      append.push(properties["product-name"]);
-    }
-    if (properties.substance) {
-      append.push(properties.substance);
-    }
-    if (properties.manufacturer) {
-      append.push(properties.manufacturer);
-    }
-    if (properties.dosageform) {
-      append.push(properties.dosageform);
-    }
-    return `${name} ${append.length > 0 ? `(${append.join(", ")})` : ""}`;
+
+    return name;
   };
 
   openFile = () => {
     const { properties } = this.state;
-    properties.fileID &&
+    const fileHref = properties["xlink:href"];
+    const types = fileHref && fileHref.split(".");
+    const type = _.get(types, "[1]", "pdf");
+    if (type.includes("pdf") && properties.fileID) {
       window.open(
-        `${SERVER_URL}${URI.GET_RESOURCE_FILE}/${properties.fileID}`,
+        `${process.env.PUBLIC_URL}/viewer/pdf/${properties.fileID}`,
         "_blank"
       );
+    } else {
+      properties.fileID &&
+        window.open(
+          `${process.env.PUBLIC_URL}/viewer/${type}/${properties.fileID}`,
+          "_blank"
+        );
+    }
   };
 
   render() {
@@ -190,8 +238,7 @@ class TreeNode extends Component {
       selectedNodeId,
       onNodeSelected,
       mode,
-      view,
-      defaultExpand
+      view
     } = this.props;
     const paddingLeft = this.props.paddingLeft + defaultPaddingLeft;
     return (
@@ -202,10 +249,13 @@ class TreeNode extends Component {
           style={{ paddingLeft }}
           onClick={this.selectNode}
           onDoubleClick={this.openFile}
+          title={this.getLabel()}
         >
           {this.getCaretIcon()}
           {this.getLeafIcon()}
-          <span className="global__node-text">{this.getLabel()}</span>
+          <span className="global__node-text" style={{ overflow: "hidden" }}>
+            {this.getLabel()}
+          </span>
         </div>
         {expand &&
           _.map(nodes, (node, idx) => (
@@ -227,4 +277,4 @@ class TreeNode extends Component {
   }
 }
 
-export default TreeNode;
+export default withRouter(TreeNode);

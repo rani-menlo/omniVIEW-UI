@@ -13,7 +13,8 @@ class NodeSequenceTree extends Component {
 
   static propTypes = {
     paddingLeft: PropTypes.number,
-    sequence: PropTypes.object
+    sequence: PropTypes.object,
+    submissionLabel: PropTypes.string
   };
 
   static defaultProps = {
@@ -46,8 +47,21 @@ class NodeSequenceTree extends Component {
     );
   };
 
+  getLabel = () => {
+    const { sequence, submissionLabel } = this.props;
+    return `${submissionLabel}\\${sequence.name} (${sequence.submission_type}-${
+      sequence.submission_sub_type
+    })`;
+  };
+
   render() {
-    const { sequence, paddingLeft, onSelected, selected } = this.props;
+    const {
+      sequence,
+      paddingLeft,
+      onSelected,
+      selected,
+      submissionLabel
+    } = this.props;
     return (
       <React.Fragment>
         <div
@@ -55,20 +69,23 @@ class NodeSequenceTree extends Component {
             "global__node-selected"}`}
           style={{ paddingLeft }}
           onClick={onSelected(sequence)}
+          title={this.getLabel()}
         >
           {this.getCaretIcon()}
           <Icon type="folder" theme="filled" className="global__file-folder" />
           <span className="global__node-text global__cursor-pointer">
-            {sequence.name}
+            {this.getLabel()}
           </span>
         </div>
         {this.state.expand &&
           _.map(sequence.childs, seq => (
             <NodeSequenceTree
+              key={seq.id}
               sequence={seq}
               paddingLeft={paddingLeft + 35}
               onSelected={onSelected}
               selected={selected}
+              submissionLabel={submissionLabel}
             />
           ))}
       </React.Fragment>

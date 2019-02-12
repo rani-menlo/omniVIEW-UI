@@ -3,15 +3,10 @@ import PropTypes from "prop-types";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { Icon, Button } from "antd";
-import ValidateIcon from "../../../assets/images/folder-validate.svg";
-import AlertHighIcon from "../../../assets/images/alert-high.svg";
-import AlertMediumIcon from "../../../assets/images/alert-medium.svg";
-import AlertLowIcon from "../../../assets/images/alert-low.svg";
-import FileNew from "../../../assets/images/file-new.svg";
-import SortResultIcon from "../../../assets/images/sort-result.svg";
 import { SubmissionActions } from "../../redux/actions";
 import Loader from "../../uikit/components/loader";
 import _ from "lodash";
+import { getValidationsBySequence } from "../../redux/selectors/validationResults.selector";
 
 class ValidationResults extends Component {
   constructor(props) {
@@ -33,25 +28,43 @@ class ValidationResults extends Component {
     sequence && this.props.actions.validateSequence(sequence.id);
   }
 
-  componentDidUpdate() {
-    if (this.props.validations.length && !this.state.validationResults.length) {
-      this.setState({ validationResults: this.props.validations });
+  static getDerivedStateFromProps(props, state) {
+    const newState = {};
+    if (!state.validationResults.length) {
+      newState.validationResults = props.validations;
     }
+    return _.size(newState) ? { ...newState } : null;
   }
 
   getAlertIcon = severity => {
     if (severity === "Low") {
-      return AlertLowIcon;
+      return "/images/alert-low.svg";
     } else if (severity === "Medium") {
-      return AlertMediumIcon;
+      return "/images/alert-medium.svg";
     } else {
-      return AlertHighIcon;
+      return "/images/alert-high.svg";
     }
   };
 
   sortColumn = key => () => {
-    const { validationResults, sort } = this.state;
-    const sortBy = sort === "asc" ? "desc" : "asc";
+    const { validationResults } = this.state;
+    const sortBy = this.state.sort === "asc" ? "desc" : "asc";
+    /* if (key === "severity") {
+      validationResults.sort((result1, result2) => {
+        if (result1.severity === "High") {
+          return sortBy === "asc" ? 1 : -1;
+        } else if (result1.severity === "Low") {
+          return sortBy === "asc" ? -1 : 1;
+        } else {
+          return 0;
+        }
+      });
+      this.setState({
+        sort: sortBy,
+        validationResults
+      });
+      return;
+    } */
     const data = _.orderBy(validationResults, key, sortBy);
     this.setState({
       sort: sortBy,
@@ -61,13 +74,17 @@ class ValidationResults extends Component {
 
   render() {
     const { onClose, loading, label, sequence } = this.props;
+    const { validationResults, sort } = this.state;
     return (
       <React.Fragment>
         <Loader loading={loading} />
         <div className="validationResults">
           <div className="validationResults__header">
             <div className="validationResults__header__title global__center-horiz-vert">
-              <img src={ValidateIcon} style={{ marginRight: "5px" }} />
+              <img
+                src="/images/folder-validate.svg"
+                style={{ marginRight: "5px" }}
+              />
               <span className="validationResults__header__title-text">
                 {" "}
                 eCTD Sequence Validation [{label}\{_.get(sequence, "name", "")}]
@@ -89,28 +106,40 @@ class ValidationResults extends Component {
                       onClick={this.sortColumn("node")}
                     >
                       Node{" "}
-                      <img className="col-node-icon" src={SortResultIcon} />
+                      <img
+                        className="col-node-icon"
+                        src="/images/sort-result.svg"
+                      />
                     </th>
                     <th
                       className="validationResults__table-col col-error global__cursor-pointer"
                       onClick={this.sortColumn("error_no")}
                     >
                       Error{" "}
-                      <img className="col-node-icon" src={SortResultIcon} />
+                      <img
+                        className="col-node-icon"
+                        src="/images/sort-result.svg"
+                      />
                     </th>
                     <th
                       className="validationResults__table-col col-severity global__cursor-pointer"
                       onClick={this.sortColumn("severity")}
                     >
                       Severity{" "}
-                      <img className="col-node-icon" src={SortResultIcon} />
+                      <img
+                        className="col-node-icon"
+                        src="/images/sort-result.svg"
+                      />
                     </th>
                     <th
                       className="validationResults__table-col col-description global__cursor-pointer"
                       onClick={this.sortColumn("description")}
                     >
                       Description{" "}
-                      <img className="col-node-icon" src={SortResultIcon} />
+                      <img
+                        className="col-node-icon"
+                        src="/images/sort-result.svg"
+                      />
                     </th>
                   </tr>
                 </thead>
@@ -118,10 +147,10 @@ class ValidationResults extends Component {
             </div>
             <div className="validationResults__table__body">
               <table>
-                <tbody>
-                  {_.map(this.state.validationResults, validation => {
+                <tbody key={sort}>
+                  {_.map(validationResults, validation => {
                     return (
-                      <tr>
+                      <tr key={validation.error_no}>
                         <td className="col-node">
                           <div
                             style={{ display: "flex", alignItems: "center" }}
@@ -129,7 +158,7 @@ class ValidationResults extends Component {
                             <span>
                               {validation.is_file ? (
                                 <img
-                                  src={FileNew}
+                                  src="/images/file-new.svg"
                                   className="global__file-folder"
                                   style={{ width: "18px", height: "22px" }}
                                 />
@@ -166,7 +195,7 @@ class ValidationResults extends Component {
             <div className="validationResults__footer__viewreport global__disabled-box">
               View Report
             </div>
-            <Button type="primary" onClick={onClose}>
+            <Button type="primary" onClick={onClose} style={{ color: "white" }}>
               Close
             </Button>
           </div>
@@ -176,10 +205,10 @@ class ValidationResults extends Component {
   }
 }
 
-function mapStateToProps(state) {
+function mapStateToProps(state, props) {
   return {
     loading: state.Api.loading,
-    validations: state.Submission.validations
+    validations: getValidationsBySequence(state, props)
   };
 }
 

@@ -19,7 +19,7 @@ export default (state = initialState, action) => {
   switch (action.type) {
     case LoginActionTypes.LOGIN: {
       const { error, message, data } = action.data;
-      localStorage.setItem('token', _.get(data, 'token', ''));
+      localStorage.setItem('omniview_user_token', _.get(data, 'token', ''));
       if (error) {
         return {
           ...state,
@@ -71,7 +71,7 @@ export default (state = initialState, action) => {
           }
         };
       }
-      localStorage.setItem('token', data.token);
+      localStorage.setItem('omniview_user_token', data.token);
       return {
         ...state,
         user: data.userData,

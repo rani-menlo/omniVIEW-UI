@@ -3,7 +3,6 @@ import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { Form, Input, Button, Checkbox } from "antd";
 import PropTypes from "prop-types";
-import OmniciaLogo from "../../../assets/images/omnicia-logo.svg";
 import _ from "lodash";
 import { LoginActions } from "../../redux/actions";
 import Loader from "../../uikit/components/loader";
@@ -76,7 +75,7 @@ class Login extends Component {
         <Loader loading={loading} />
         <div className="global__container">
           <div className="login">
-            <img src={OmniciaLogo} className="login-logo" />
+            <img src="/images/omnicia-logo.svg" className="login-logo" />
             <p className="login-text">Login</p>
             <div className="login__hr-line global__hr-line" />
             {error && <p className="login-error">{error}</p>}
@@ -97,8 +96,8 @@ class Login extends Component {
                 <span className="global__field-label">Password</span>
                 <a
                   className="login__pwdsection-forgot-pwd"
-                  href=""
                   tabIndex="3"
+                  style={{cursor: 'not-allowed', opacity: 0.5}}
                 >
                   Forgot your password?
                 </a>
@@ -115,7 +114,7 @@ class Login extends Component {
               {password.error && (
                 <p className="login-fieldError">{password.error}</p>
               )}
-              <Checkbox className="login-rememberpwd">
+              <Checkbox disabled className="login-rememberpwd">
                 Remember Password?
               </Checkbox>
               <FormItem>

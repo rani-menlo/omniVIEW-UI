@@ -30,5 +30,6 @@ _ReSharper*/
 #Nuget packages folder
 packages/
 node_modules/
+build/
 yarn-error.log
 

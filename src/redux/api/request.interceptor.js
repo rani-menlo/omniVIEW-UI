@@ -1,6 +1,6 @@
 const requestInterceptor = reqConfig => {
   try {
-    let token = localStorage.getItem('token');
+    let token = localStorage.getItem('omniview_user_token');
     reqConfig.headers = {
       ...reqConfig.headers,
       'x-auth-token': token

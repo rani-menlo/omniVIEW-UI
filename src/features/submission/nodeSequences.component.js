@@ -1,8 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { Icon } from "antd";
-import FilterIcon from "../../../assets/images/filter-blue.svg";
-import SortIcon from "../../../assets/images/sort.svg";
 import _ from "lodash";
 import NodeSequenceTree from "./nodeSequenceTree";
 
@@ -10,7 +8,6 @@ class NodeSequences extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      sortBy: "submission",
       order: "desc"
     };
   }
@@ -18,18 +15,25 @@ class NodeSequences extends Component {
   static propTypes = {
     sequences: PropTypes.arrayOf(PropTypes.object),
     selected: PropTypes.object,
-    onSelectedSequence: PropTypes.func
+    onSelectedSequence: PropTypes.func,
+    sortBy: PropTypes.oneOf(["submission, sequence"]),
+    onSortByChanged: PropTypes.func,
+    submissionLabel: PropTypes.string
   };
 
   static defaultProps = {
-    sequences: []
+    sequences: [],
+    sortBy: "submission"
   };
 
   sortBy = sortBy => () => {
-    this.setState({
-      sortBy,
-      order: this.state.order === "desc" ? "asc" : "desc"
-    });
+    const { onSortByChanged } = this.props;
+    this.setState(
+      {
+        order: this.state.order === "desc" ? "asc" : "desc"
+      },
+      () => onSortByChanged && onSortByChanged(sortBy)
+    );
   };
 
   onSelected = sequence => () => {
@@ -38,12 +42,14 @@ class NodeSequences extends Component {
   };
 
   getTree = () => {
-    const { sequences, selected } = this.props;
+    const { sequences, selected, submissionLabel } = this.props;
     return _.map(sequences, sequence => (
       <NodeSequenceTree
+        key={sequence.id}
         sequence={sequence}
         onSelected={this.onSelected}
         selected={selected}
+        submissionLabel={submissionLabel}
       />
     ));
   };
@@ -69,8 +75,7 @@ class NodeSequences extends Component {
   };
 
   render() {
-    const { sortBy } = this.state;
-    const { selected } = this.props;
+    const { selected, sortBy, submissionLabel } = this.props;
     return (
       <React.Fragment>
         <div className="sortheader">
@@ -80,7 +85,7 @@ class NodeSequences extends Component {
               "selected-sortby"}`}
             onClick={this.sortBy("submission")}
           >
-            <img src={FilterIcon} />
+            <img src="/images/filter-blue.svg" />
             <span className="label">Submission Type</span>
           </div>
           <div
@@ -88,7 +93,7 @@ class NodeSequences extends Component {
               "selected-sortby"}`}
             onClick={this.sortBy("sequence")}
           >
-            <img src={SortIcon} />
+            <img src="/images/sort.svg" />
             <span className="label">Sequence</span>
           </div>
         </div>
@@ -108,7 +113,7 @@ class NodeSequences extends Component {
                     className="global__file-folder"
                   />
                   <span className="global__node-text global__cursor-pointer">
-                    {sequence.name}
+                    {`${submissionLabel}\\${sequence.name}`}
                   </span>
                 </div>
               ))}

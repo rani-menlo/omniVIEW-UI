@@ -1,5 +1,6 @@
 import React, { Component } from "react";
-import { Icon, Tabs, Modal, Avatar } from "antd";
+import { Redirect } from "react-router-dom";
+import { Icon, Tabs, Modal, Menu } from "antd";
 import _ from "lodash";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
@@ -8,16 +9,16 @@ import TreeNode from "./treeNode.component";
 import NodeProperties from "./nodeProperties.component";
 import NodeSequences from "./nodeSequences.component";
 import Sidebar from "../../uikit/components/sidebar/sidebar.component";
-import LeftArrowHide from "../../../assets/images/left-arrow-hide.svg";
-import RightArrowHide from "../../../assets/images/right-arrow-hide.svg";
-import ValidateIcon from "../../../assets/images/folder-validate.svg";
-import ListIcon from "../../../assets/images/list.svg";
-import OpenFolderIcon from "../../../assets/images/open-folder.svg";
 import { SubmissionActions } from "../../redux/actions";
 import Loader from "../../uikit/components/loader";
-import Header from "../header.component";
 import ValidationResults from "./validationResults.component";
 import Footer from "../../uikit/components/footer/footer.component";
+import {
+  getSequenceJson,
+  getLifeCycleJson,
+  getSequences
+} from "../../redux/selectors/submissionView.selector";
+import ProfileMenu from "../header/profileMenu.component";
 
 const TabPane = Tabs.TabPane;
 
@@ -31,6 +32,7 @@ class SubmissionView extends Component {
       selectedNodeId: "",
       selectedView: "current",
       selectedMode: "standard",
+      sequenceSortBy: "submission",
       nodeProperties: null,
       treePanelWidth: 50,
       openValidationModal: false,
@@ -41,9 +43,11 @@ class SubmissionView extends Component {
 
   componentDidMount() {
     const { selectedSubmission } = this.props;
-    const parentHeaderHeight =
-      this.parentHeaderRef.current.clientHeight + 4 + 28;
-    this.setState({ parentHeaderHeight });
+    if (this.parentHeaderRef.current) {
+      const parentHeaderHeight =
+        this.parentHeaderRef.current.clientHeight + 4 + 28;
+      this.setState({ parentHeaderHeight });
+    }
     if (selectedSubmission) {
       this.props.actions.fetchSequences(selectedSubmission.id);
       this.props.actions.fetchLifeCycleJson(selectedSubmission);
@@ -58,26 +62,81 @@ class SubmissionView extends Component {
     if (leafParent) {
       let lifeCycles = [];
       if (_.isArray(leafParent)) {
-        lifeCycles = _.filter(
+        /* let propertyId = properties.ID;
+        _.map(leafParent, leaf => {
+          if (leaf.ID === propertyId) {
+            lifeCycles.push(leaf);
+            return;
+          }
+          const modified = _.get(leaf, "[modified-file]", "");
+          if (modified) {
+            const hashId = modified.substring(
+              modified.lastIndexOf("#") + 1,
+              modified.length
+            );
+            if (propertyId === hashId) {
+              lifeCycles.push(leaf);
+              propertyId = leaf.ID;
+            }
+          }
+        }); */
+
+        const href = properties["xlink:href"];
+        const fileName = href.substring(href.lastIndexOf("/") + 1, href.length);
+        lifeCycles = _.filter(leafParent, leaf => {
+          const name = leaf["xlink:href"].substring(
+            leaf["xlink:href"].lastIndexOf("/") + 1,
+            leaf["xlink:href"].length
+          );
+          return name === fileName;
+        });
+        const deletedLeafs = _.filter(
           leafParent,
-          leaf => leaf.title === properties.title
+          leaf => leaf.operation === "delete"
         );
+        _.forEach(deletedLeafs, deletedLeaf => {
+          const modified = _.get(deletedLeaf, "[modified-file]", "");
+          const hashId = modified.substring(
+            modified.lastIndexOf("#") + 1,
+            modified.length
+          );
+          const leaf = _.find(lifeCycles, life => life.ID === hashId);
+          if (leaf) {
+            lifeCycles.push(deletedLeaf);
+            return false;
+          }
+        });
       } else {
         lifeCycles.push(leafParent);
       }
+
+      /* if (properties.operation === "new") {
+        lifeCycles = _.filter(
+          lifeCycles,
+          leaf => leaf.operation === "new" || leaf.operation === "replace"
+        );
+      } else if (properties.operation === "replace") {
+        lifeCycles = _.filter(
+          lifeCycles,
+          leaf =>
+            leaf.operation === "new" ||
+            leaf.operation === "replace" ||
+            leaf.operation === "append"
+        );
+      } */
       properties.lifeCycles = lifeCycles;
     }
     this.setState({ selectedNodeId: id, nodeProperties: properties });
   };
 
   onSelectedSequence = sequence => {
-    this.setState(
-      { treeExpand: false, selectedView: "", nodeProperties: null },
-      () => {
-        this.props.actions.setSelectedSequence(sequence);
-        this.props.actions.fetchSequenceJson(sequence);
-      }
-    );
+    this.props.actions.setSelectedSequence(sequence);
+    this.props.actions.fetchSequenceJson(sequence);
+    this.setState({
+      treeExpand: false,
+      selectedView: "",
+      nodeProperties: null
+    });
   };
 
   togglePropertiesPane = () => {
@@ -110,6 +169,8 @@ class SubmissionView extends Component {
       return "Submission Properties";
     } else if (nodeProperties.name === "m1-regional") {
       return "M1 Regional Properties";
+    } else if (_.get(nodeProperties, "version", "").includes("STF")) {
+      return "STF Properties";
     } else if (nodeProperties.fileID) {
       return "Document Properties";
     } else {
@@ -139,12 +200,23 @@ class SubmissionView extends Component {
   };
 
   openApplicationsScreen = () => {
+    this.props.actions.setSelectedSequence(null);
     this.props.history.goBack();
   };
 
-  getTreeLabel = jsonData => {
-    const { selectedSubmission, selectedSequence } = this.props;
-    const label = _.get(jsonData, "ectd:ectd.label", "");
+  getTreeLabel = () => {
+    const {
+      selectedSubmission,
+      selectedSequence,
+      sequenceJson,
+      lifeCycleJson
+    } = this.props;
+    const jsonData = selectedSequence ? sequenceJson : lifeCycleJson;
+    const label = _.get(
+      jsonData,
+      "[fda-regional:fda-regional][admin][application-set][application][application-information][application-number][$t]",
+      ""
+    );
     if (this.state.selectedView) {
       const selectedView =
         this.state.selectedView === "current"
@@ -156,8 +228,53 @@ class SubmissionView extends Component {
         selectedSequence,
         "name",
         ""
-      )}`;
+      )} (${_.get(selectedSequence, "submission_type", "")}-${_.get(
+        selectedSequence,
+        "submission_sub_type",
+        ""
+      )})`;
     }
+  };
+
+  onModeTabChange = mode => {
+    this.setState({ selectedMode: mode });
+  };
+
+  validate = () => {
+    this.setState({ openValidationModal: true });
+  };
+
+  closeValidationModal = () => {
+    this.setState({ openValidationModal: false });
+  };
+
+  createKey = () => {
+    const { sequenceJson, lifeCycleJson, selectedSequence } = this.props;
+    const { selectedView, selectedMode } = this.state;
+    let key = `${selectedView}_${selectedMode}_`;
+    if (selectedSequence) {
+      key = key + _.get(sequenceJson, "ectd:ectd.sequence", "");
+    } else {
+      key = key + _.get(lifeCycleJson, "ectd:ectd.sequence", "");
+    }
+    return key;
+  };
+
+  onSequenceSortByChanged = sortBy => {
+    this.setState({ sequenceSortBy: sortBy });
+  };
+
+  getMenu = () => {
+    return (
+      <Menu>
+        <Menu.Item>
+          <span>Edit Profile</span>
+        </Menu.Item>
+        <Menu.Item>
+          <span>Sign Out</span>
+        </Menu.Item>
+      </Menu>
+    );
   };
 
   render() {
@@ -165,13 +282,16 @@ class SubmissionView extends Component {
       loading,
       sequences,
       selectedSequence,
-      jsonData,
+      sequenceJson,
+      lifeCycleJson,
       selectedSubmission
     } = this.props;
-    const { selectedView, selectedMode } = this.state;
-    const key =
-      _.get(jsonData, "ectd:ectd.sequence", "") + selectedMode + selectedView;
-    console.log("key:", key);
+    const { selectedView, selectedMode, sequenceSortBy } = this.state;
+
+    if (!selectedSubmission) {
+      return <Redirect to="/applications" />;
+    }
+
     return (
       <React.Fragment>
         <Loader loading={loading} />
@@ -187,25 +307,22 @@ class SubmissionView extends Component {
               </div>
               <div className="submissionview__profilebar__title">omniVIEW</div>
               <div className="submissionview__profilebar__section">
-                <Avatar
-                  size="small"
-                  icon="user"
-                  style={{ width: "20px", height: "20px" }}
-                />
-                <span className="submissionview__profilebar__section-username">
-                  John Smith
-                </span>
-                <Icon type="down" />
+                <ProfileMenu />
               </div>
             </div>
             <div className="submissionview__header">
-              <div className="icon_text_border">
+              <div
+                className="icon_text_border"
+                style={{ border: 0, cursor: "not-allowed" }}
+              >
                 <img
-                  src={OpenFolderIcon}
+                  src="/images/open-folder.svg"
                   className="global__icon"
-                  style={{ marginLeft: "0px" }}
+                  style={{ opacity: 0.2 }}
                 />
-                <span className="text">Open</span>
+                <span className="text" style={{ opacity: 0.2 }}>
+                  Open
+                </span>
               </div>
               {/* <Icon type="close-circle" theme="filled" className="global__icon" /> */}
               {/* <Icon type="interation" theme="filled" className="global__icon" /> */}
@@ -251,7 +368,7 @@ class SubmissionView extends Component {
                   {this.state.treeExpand ? "Collapse All" : "Expand All"}
                 </span>
               </FlexBox>
-              <FlexBox>
+              <FlexBox style={{ opacity: 0.2, cursor: "not-allowed" }}>
                 <Icon type="search" className="global__icon" />
                 <span className="icon-label">Find</span>
               </FlexBox>
@@ -262,10 +379,10 @@ class SubmissionView extends Component {
                 onClick={selectedSequence && this.validate}
               >
                 <img
-                  src={ValidateIcon}
+                  src="/images/folder-validate.svg"
                   className="global__icon"
                   style={{
-                    marginLeft: "0px",
+                    marginLeft: 0,
                     opacity: !selectedSequence ? 0.2 : 1
                   }}
                 />
@@ -276,9 +393,22 @@ class SubmissionView extends Component {
                   Validate Sequence
                 </span>
               </div>
-              <FlexBox>
-                <img src={ListIcon} className="global__icon" />
-                <span className="icon-label">Show Amendment List</span>
+              <FlexBox style={{ cursor: "not-allowed" }}>
+                <img
+                  src="/images/list.svg"
+                  className="global__icon"
+                  style={{
+                    opacity: 0.2
+                  }}
+                />
+                <span
+                  className="icon-label"
+                  style={{
+                    opacity: 0.2
+                  }}
+                >
+                  Show Amendment List
+                </span>
               </FlexBox>
             </div>
             <div className="submissionview__siders">
@@ -286,7 +416,9 @@ class SubmissionView extends Component {
                 <img
                   className="global__cursor-pointer"
                   src={
-                    this.state.sequencesExpand ? LeftArrowHide : RightArrowHide
+                    this.state.sequencesExpand
+                      ? "/images/left-arrow-hide.svg"
+                      : "/images/right-arrow-hide.svg"
                   }
                   onClick={this.toggleSequencesPane}
                 />
@@ -303,7 +435,9 @@ class SubmissionView extends Component {
                 <img
                   className="global__cursor-pointer"
                   src={
-                    this.state.propertiesExpand ? RightArrowHide : LeftArrowHide
+                    this.state.propertiesExpand
+                      ? "/images/right-arrow-hide.svg"
+                      : "/images/left-arrow-hide.svg"
                   }
                   onClick={this.togglePropertiesPane}
                 />
@@ -317,15 +451,18 @@ class SubmissionView extends Component {
             }}
           >
             <Sidebar
-              containerStyle={{ width: "20%" }}
+              containerStyle={{ width: "20%", height: "100%" }}
               direction="ltr"
               expand={this.state.sequencesExpand}
             >
               <div className="panel panel-sequences">
                 <NodeSequences
+                  submissionLabel={_.get(selectedSubmission, "name", "")}
                   selected={selectedSequence}
                   sequences={sequences}
                   onSelectedSequence={this.onSelectedSequence}
+                  sortBy={sequenceSortBy}
+                  onSortByChanged={this.onSequenceSortByChanged}
                 />
               </div>
             </Sidebar>
@@ -334,13 +471,9 @@ class SubmissionView extends Component {
               style={{ width: `${this.state.treePanelWidth}%` }}
             >
               <TreeNode
-                key={
-                  _.get(jsonData, "ectd:ectd.sequence", "") +
-                  selectedMode +
-                  selectedView
-                }
-                label={this.getTreeLabel(jsonData)}
-                content={jsonData}
+                key={this.createKey()}
+                label={this.getTreeLabel()}
+                content={selectedSequence ? sequenceJson : lifeCycleJson}
                 expand={this.state.treeExpand}
                 onNodeSelected={this.onNodeSelected}
                 selectedNodeId={this.state.selectedNodeId}
@@ -350,12 +483,21 @@ class SubmissionView extends Component {
               />
             </div>
             <Sidebar
-              containerStyle={{ width: "30%" }}
+              containerStyle={{ width: "30%", height: "100%" }}
               direction="rtl"
               expand={this.state.propertiesExpand}
             >
               <div className="panel panel-properties">
-                <NodeProperties properties={this.state.nodeProperties} />
+                <NodeProperties
+                  properties={this.state.nodeProperties}
+                  m1Json={
+                    selectedSequence
+                      ? _.get(sequenceJson, "[fda-regional:fda-regional]", "")
+                      : _.get(lifeCycleJson, "[fda-regional:fda-regional]", "")
+                  }
+                  sequence={selectedSequence || _.get(sequences, "[0]", "")}
+                  submission={selectedSubmission}
+                />
               </div>
             </Sidebar>
           </div>
@@ -387,9 +529,10 @@ const FlexBox = styled.div`
 function mapStateToProps(state) {
   return {
     loading: state.Api.loading,
-    sequences: state.Submission.sequences,
+    sequences: getSequences(state),
     selectedSequence: state.Submission.selectedSequence,
-    jsonData: state.Submission.jsonData,
+    lifeCycleJson: getLifeCycleJson(state),
+    sequenceJson: getSequenceJson(state),
     selectedSubmission: state.Application.selectedSubmission
   };
 }
