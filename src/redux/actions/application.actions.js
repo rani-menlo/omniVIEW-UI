@@ -3,26 +3,48 @@ import { ApplicationApi } from "../api";
 import { ApiActions } from ".";
 
 export default {
-  fetchApplications: customerId => {
+  fetchApplicationsByList: (
+    customerId,
+    pageNo,
+    itemsPerPage,
+    sortBy,
+    order,
+    search
+  ) => {
     return async (dispatch, getState) => {
       ApiActions.request(dispatch);
       try {
-        let data = {data: []};
-        const submissions = getState().Application.submissions;
-        if (submissions[customerId]) {
-          data.data = submissions[customerId];
-        } else {
-          const res = await ApplicationApi.fetchApplications(customerId);
-          data = res.data;
-        }
+        const res = await ApplicationApi.fetchApplicationsByList(
+          customerId,
+          pageNo,
+          itemsPerPage,
+          sortBy,
+          order,
+          search
+        );
         dispatch({
           type: ApplicationActionTypes.FETCH_APPLICATIONS,
-          data,
+          data: res.data,
           customerId
         });
         ApiActions.success(dispatch);
       } catch (err) {
-        console.log(err);
+        ApiActions.failure(dispatch);
+      }
+    };
+  },
+  fetchApplications: (customerId, search) => {
+    return async (dispatch, getState) => {
+      ApiActions.request(dispatch);
+      try {
+        const res = await ApplicationApi.fetchApplications(customerId, search);
+        dispatch({
+          type: ApplicationActionTypes.FETCH_APPLICATIONS,
+          data: res.data,
+          customerId
+        });
+        ApiActions.success(dispatch);
+      } catch (err) {
         ApiActions.failure(dispatch);
       }
     };

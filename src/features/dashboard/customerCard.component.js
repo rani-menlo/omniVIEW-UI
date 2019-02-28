@@ -65,14 +65,14 @@ class CustomerCard extends Component {
           <div className="customercard__content__item">
             <img src="/images/users.svg" />
             <span className="customercard__content__item-text">
-              {_.get(customer, "users.length", "0")} users
+              {_.get(customer, "number_of_users", "0")} users
             </span>
           </div>
           <div className="global__hr-line" />
           <div className="customercard__content__item">
             <img src="/images/applications.svg" />
             <span className="customercard__content__item-text">
-              {_.get(customer, "submissions.length", "0")} applications
+              {_.get(customer, "number_of_submissions", "0")} applications
             </span>
           </div>
           <div className="global__hr-line" />

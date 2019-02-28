@@ -1,8 +1,23 @@
-import api from '.';
-import { URI } from '../../constants';
+import api from ".";
+import { URI } from "../../constants";
 
 export default {
-  fetchCustomers: () => {
-    return api.get(URI.GET_CUSTOMERS);
+  fetchCustomersByList: (pageNo, itemsPerPage, sortBy, order, search) => {
+    return api.get(URI.GET_CUSTOMERS, {
+      params: {
+        page: pageNo,
+        limit: itemsPerPage,
+        sortBy,
+        order,
+        search
+      }
+    });
+  },
+  fetchCustomers: search => {
+    return api.get(URI.GET_CUSTOMERS, {
+      params: {
+        search
+      }
+    });
   }
 };

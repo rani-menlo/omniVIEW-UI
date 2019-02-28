@@ -53,7 +53,18 @@ class TreeNode extends Component {
     let { content, view, mode } = this.props;
     const properties = {};
     const nodes = [];
+    // get object from the ectd:ectd
     content = _.get(content, "ectd:ectd", content);
+    // In standard mode, all STF files to consolidated into single based on name
+    if (mode === "standard") {
+      const { consolidatedFolder, omitKeys } = this.getStfFolders(content);
+      if (omitKeys.length) {
+        content = _.omit(content, omitKeys);
+      }
+      _.map(consolidatedFolder, (value, key) => {
+        content[key] = value;
+      });
+    }
     const version = _.get(content, "version", "");
     if (version && version.includes("STF")) {
       if (mode === "qc") {
@@ -65,7 +76,6 @@ class TreeNode extends Component {
         });
         let leaf = [];
         _.map(keys, key => {
-          leaf = [...leaf];
           if (content[key].leaf) {
             leaf = [...leaf, ...content[key].leaf];
           }
@@ -74,7 +84,6 @@ class TreeNode extends Component {
         content.leaf = leaf;
       }
     }
-    content = _.get(content, "ectd:ectd", content);
     _.map(content, (value, key) => {
       if (typeof value === "string" || typeof value === "boolean") {
         properties[key] = value;
@@ -89,6 +98,10 @@ class TreeNode extends Component {
             const newNode = { label: "leaf", value: val, leafParent: value };
             nodes.push(newNode);
           });
+        } else if (value.version && value.version.includes("STF")) {
+          const groups = _.groupBy(content, val => val.title);
+          node.leafParent = groups[value.title];
+          nodes.push(node);
         } else {
           if (key === "leaf") {
             node.leafParent = value;
@@ -99,6 +112,38 @@ class TreeNode extends Component {
     });
     this.setState({ properties, nodes });
   }
+
+  getStfFolders = rootFolder => {
+    const folders = [];
+    const omitKeys = [];
+    _.map(rootFolder, (value, key) => {
+      const version = _.get(value, "version", "");
+      if (typeof value === "object" && version.includes("STF")) {
+        omitKeys.push(key);
+        const k = key.substring(0, key.lastIndexOf("[")) || key;
+        folders.push({ ..._.cloneDeep(value), _objectKey: k });
+      }
+    });
+    const groupedFldrs = _.groupBy(folders, "_objectKey");
+    const consolidatedFolder = {};
+    _.map(groupedFldrs, (array, key) => {
+      const subFoldr = {};
+      _.map(array, item => {
+        subFoldr.title = item._objectKey;
+        _.map(item, (v, k) => {
+          if (typeof v === "object") {
+            if (subFoldr[k]) {
+              subFoldr[k].leaf = [...subFoldr[k].leaf, ...v.leaf];
+            } else {
+              subFoldr[k] = v;
+            }
+          }
+        });
+      });
+      consolidatedFolder[key] = subFoldr;
+    });
+    return { consolidatedFolder, omitKeys };
+  };
 
   setCurrentView = (obj, array) => {
     const itemsByTitle = _.groupBy(array, "title");
@@ -215,8 +260,9 @@ class TreeNode extends Component {
   openFile = () => {
     const { properties } = this.state;
     const fileHref = properties["xlink:href"];
-    const types = fileHref && fileHref.split(".");
-    const type = _.get(types, "[1]", "pdf");
+    /* const types = fileHref && fileHref.split(".");
+    const type = _.get(types, "[1]", "pdf"); */
+    const type = fileHref.substring(fileHref.lastIndexOf(".") + 1);
     if (type.includes("pdf") && properties.fileID) {
       window.open(
         `${process.env.PUBLIC_URL}/viewer/pdf/${properties.fileID}`,

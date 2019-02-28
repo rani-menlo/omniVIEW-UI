@@ -1,0 +1,37 @@
+.pagination {
+  > .ant-pagination {
+    opacity: 1;
+  }
+  display: flex;
+  background: $blue;
+  opacity: 0.81;
+  border-radius: 8px;
+  padding: 5px 10px !important;
+  align-items: center;
+  justify-content: space-between;
+
+  &__pagesize {
+    color: $white;
+    &__label {
+      margin-right: 16px;
+    }
+    &__container {
+      display: flex;
+      &-input {
+        width: 45px !important;
+        background-color: $norfolk-sky !important;
+        border: none !important;
+        color: white !important;
+      }
+      &-arrows {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        width: 32px;
+        background-color: $clear-chill;
+        border-top-right-radius: 6px;
+        border-bottom-right-radius: 6px;
+      }
+    }
+  }
+}

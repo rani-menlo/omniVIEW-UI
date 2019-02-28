@@ -1,8 +1,9 @@
 import React, { Component } from "react";
-import { SERVER_URL } from "../../constants";
+import { SERVER_URL, VIEWER } from "../../constants";
 import API from "../../redux/api";
 import { URI } from "../../constants";
 import _ from "lodash";
+import Loader from "../../uikit/components/loader";
 
 class PdfViewer extends Component {
   constructor(props) {
@@ -10,21 +11,39 @@ class PdfViewer extends Component {
     this.state = {
       loading: false,
       url: "",
-      type: ""
+      type: "",
+      largeFile: false
     };
   }
 
   async componentDidMount() {
     const { params } = this.props.match;
-    /* if (params.fileId) {
+    let largeFile = false;
+    this.setState({ loading: true });
+    if (params.fileId) {
       const res = await API.get(URI.GET_FILE_SIZE, {
         params: {
           fileId: params.fileId
         }
       });
-      console.log(res);
-    } */
+      const { data } = res.data;
+      const fileSize = Number(data);
+      if (
+        params.type === "doc" ||
+        params.type === "docx" ||
+        params.type === "ppt"
+      ) {
+        if (fileSize > VIEWER.OFFICE_VIEWER_MAX_SIZE) {
+          largeFile = true;
+        }
+      } else if (params.type === "xml") {
+        if (fileSize > VIEWER.GOOGLE_VIEWER_MAX_SIZE) {
+          largeFile = true;
+        }
+      }
+    }
     let reqParam = this.props.location.search;
+    const hash = this.props.location.hash || "";
     let url = `${SERVER_URL}/api/v1/getResourceFile/${params.fileId}`;
     if (reqParam) {
       reqParam = reqParam.substring(1);
@@ -38,17 +57,24 @@ class PdfViewer extends Component {
       const { data } = res.data;
       fileId = _.get(data, "fileID");
       if (fileId) {
-        url = `${SERVER_URL}/api/v1/getResourceFile/${fileId}`;
+        url = `${SERVER_URL}/api/v1/getResourceFile/${fileId}${hash}`;
       }
-      console.log(res);
     }
-    this.setState({ url, type: params.type });
+    this.setState({ url, type: params.type, loading: false, largeFile });
   }
 
   render() {
-    const mainFileUrl = this.state.url;
-    const type = this.state.type;
+    const { url: mainFileUrl, type, loading, largeFile } = this.state;
     let url = `${window.location.origin}/web/viewer.html?file=${mainFileUrl}`;
+
+    if (loading) {
+      return <Loader loading={loading} />;
+    }
+
+    if (largeFile) {
+      window.location = mainFileUrl;
+      return null;
+    }
 
     if (type === "pdf") {
       return <iframe width="100%" height="100%" src={url} />;

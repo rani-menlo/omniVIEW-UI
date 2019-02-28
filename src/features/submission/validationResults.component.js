@@ -156,7 +156,7 @@ class ValidationResults extends Component {
                             style={{ display: "flex", alignItems: "center" }}
                           >
                             <span>
-                              {validation.is_file ? (
+                              {validation.group === "File Checks" ? (
                                 <img
                                   src="/images/file-new.svg"
                                   className="global__file-folder"
