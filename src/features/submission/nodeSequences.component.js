@@ -61,8 +61,7 @@ class NodeSequences extends Component {
         this.getListSequence(seq, array);
       });
     }
-    const newArray = _.sortBy(array, s => Number(s.name));
-    return this.state.order === "desc" ? newArray : newArray.reverse();
+    return array;
   };
 
   getList = () => {
@@ -71,7 +70,8 @@ class NodeSequences extends Component {
     _.map(sequences, sequence => {
       array = array.concat(this.getListSequence(sequence));
     });
-    return array;
+    const newArray = _.sortBy(array, s => Number(s.name));
+    return this.state.order === "desc" ? newArray : newArray.reverse();
   };
 
   render() {

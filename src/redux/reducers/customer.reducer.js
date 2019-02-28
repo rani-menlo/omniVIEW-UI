@@ -1,7 +1,8 @@
-import { CustomerActionTypes } from '../actionTypes';
+import { CustomerActionTypes } from "../actionTypes";
 
 const initialState = {
   customers: [],
+  customerCount: 0,
   selectedCustomer: null
 };
 
@@ -10,7 +11,8 @@ export default (state = initialState, action) => {
     case CustomerActionTypes.FETCH_CUSTOMERS: {
       return {
         ...state,
-        customers: action.data.data
+        customers: action.data.data,
+        customerCount: action.data.customerCount
       };
     }
     case CustomerActionTypes.SET_SELECTED_CUSTOMER: {

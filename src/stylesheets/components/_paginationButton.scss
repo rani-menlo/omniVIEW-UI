@@ -1,0 +1,9 @@
+.paginationButton {
+  min-width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  background: $clear-chill;
+  padding: 0px 20px;
+  @include text-normal;
+  color: $white;
+}

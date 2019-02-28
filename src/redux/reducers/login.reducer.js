@@ -1,14 +1,15 @@
-import { LoginActionTypes } from '../actionTypes';
-import _ from 'lodash';
+import { LoginActionTypes } from "../actionTypes";
+import _ from "lodash";
 
 const initialState = {
   user: null,
+  role: null,
   login: {
     loggedIn: false,
-    error: ''
+    error: ""
   },
   otp: {
-    error: '',
+    error: "",
     otpReceived: false,
     verified: false,
     verifying: false
@@ -19,7 +20,7 @@ export default (state = initialState, action) => {
   switch (action.type) {
     case LoginActionTypes.LOGIN: {
       const { error, message, data } = action.data;
-      localStorage.setItem('omniview_user_token', _.get(data, 'token', ''));
+      localStorage.setItem("omniview_user_token", _.get(data, "token", ""));
       if (error) {
         return {
           ...state,
@@ -33,7 +34,7 @@ export default (state = initialState, action) => {
         ...state,
         login: {
           ...state.login,
-          error: '',
+          error: "",
           loggedIn: true
         },
         userId: data.userId,
@@ -71,10 +72,11 @@ export default (state = initialState, action) => {
           }
         };
       }
-      localStorage.setItem('omniview_user_token', data.token);
+      localStorage.setItem("omniview_user_token", data.token);
       return {
         ...state,
         user: data.userData,
+        role: data.role,
         otp: {
           ...state.otp,
           verifying: false,
@@ -96,7 +98,7 @@ export default (state = initialState, action) => {
         ...state,
         login: {
           ...state.login,
-          error: ''
+          error: ""
         }
       };
     }
@@ -133,7 +135,7 @@ export default (state = initialState, action) => {
         ...state,
         otp: {
           ...state.otp,
-          error: ''
+          error: ""
         }
       };
     }

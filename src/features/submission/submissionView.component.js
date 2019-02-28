@@ -277,6 +277,16 @@ class SubmissionView extends Component {
     );
   };
 
+  getContent = () => {
+    const {selectedSequence, sequenceJson, lifeCycleJson} = this.props;
+    if(selectedSequence) {
+      console.log("sequenceJson", sequenceJson);
+      return sequenceJson;
+    }
+    console.log("lifeCycleJson", lifeCycleJson);
+    return lifeCycleJson;
+  }
+
   render() {
     const {
       loading,
@@ -473,7 +483,7 @@ class SubmissionView extends Component {
               <TreeNode
                 key={this.createKey()}
                 label={this.getTreeLabel()}
-                content={selectedSequence ? sequenceJson : lifeCycleJson}
+                content={this.getContent()}
                 expand={this.state.treeExpand}
                 onNodeSelected={this.onNodeSelected}
                 selectedNodeId={this.state.selectedNodeId}

@@ -17,13 +17,14 @@ const Routes = () => {
   return (
     <Provider store={Redux.store}>
       <PersistGate loading={<Loader loading />} persistor={Redux.persistor}>
-        {/* <BrowserRouter basename={"/qa"}> */}
         <BrowserRouter>
           <Switch>
             <Route exact path="/" component={LoginContainer} />
-            <Route exact path="/qa" component={LoginContainer} />
-            <PrivateRoute exact path="/qa/viewer/:type/:fileId?" component={PdfViewer} />
-            <PrivateRoute exact path="/viewer/:type/:fileId?" component={PdfViewer} />
+            <PrivateRoute
+              exact
+              path="/viewer/:type/:fileId?"
+              component={PdfViewer}
+            />
             <PrivateRoute path="/auth" component={LoginAuth1} />
             <PrivateRoute path="/verify/:mode" component={AuthenticationCode} />
             <PrivateRoute

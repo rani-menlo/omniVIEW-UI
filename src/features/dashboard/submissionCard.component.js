@@ -73,7 +73,7 @@ class SubmissionCard extends Component {
               Sequences:{" "}
             </span>
             <span className="submissioncard__content__item-text">
-              {_.get(submission, "sequences", 5)}
+              {_.get(submission, "sequence_count", "")}
             </span>
           </div>
           <div className="submissioncard__content__item">

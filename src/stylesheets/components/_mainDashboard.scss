@@ -115,5 +115,33 @@
       flex-wrap: wrap;
       margin-top: 24px;
     }
+    &__list {
+      margin-top: 24px;
+      &__item {
+        cursor: pointer;
+        padding: 15px 10px;
+        &:nth-child(odd) {
+          background-color: $froasted-glass;
+        }
+        &-text {
+          @include text-normal(14px);
+          padding-left: 4px;
+          &-bold {
+            @include text-bold-active(14px);
+          }
+        }
+        &__row {
+          display: flex;
+          justify-content: space-between;
+        }
+      }
+    }
+    &__nodata {
+      @include text-bold-active(16px);
+      padding-top: 10%;
+      &-icon {
+        margin-right: 10px;
+      }
+    }
   }
 }

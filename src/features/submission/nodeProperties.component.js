@@ -4,6 +4,7 @@ import styled from "styled-components";
 import _ from "lodash";
 import { SERVER_URL, URI } from "../../constants";
 import { TypesJson } from "./types";
+import Row from "../../uikit/components/row/row.component";
 
 class NodeProperties extends Component {
   static propTypes = {
@@ -20,8 +21,9 @@ class NodeProperties extends Component {
   openFile = () => {
     const { properties } = this.props;
     const fileHref = properties["xlink:href"];
-    const types = fileHref && fileHref.split(".");
-    const type = _.get(types, "[1]", "pdf");
+    /* const types = fileHref && fileHref.split(".");
+    const type = _.get(types, "[1]", "pdf"); */
+    const type = fileHref.substring(fileHref.lastIndexOf(".") + 1);
     if (type.includes("pdf") && properties.fileID) {
       window.open(
         `${process.env.PUBLIC_URL}/viewer/pdf/${properties.fileID}`,
@@ -40,17 +42,17 @@ class NodeProperties extends Component {
     const { properties } = this.props;
     return (
       <React.Fragment>
-        <Row>
+        <RowItems>
           <div className="label">Study Title:</div>
           <div className="value">{properties.title || ""}</div>
-        </Row>
-        <Row>
+        </RowItems>
+        <RowItems>
           <div className="label">Study ID:</div>
           <div className="value">{properties.ID || ""}</div>
-        </Row>
-        <Row>
+        </RowItems>
+        <RowItems>
           <div className="label">Categories:</div>
-        </Row>
+        </RowItems>
       </React.Fragment>
     );
   };
@@ -66,65 +68,65 @@ class NodeProperties extends Component {
     }
     return (
       <React.Fragment>
-        <Row>
+        <RowItems>
           <div className="label">Title:</div>
           <div className="value">{properties.title || ""}</div>
-        </Row>
-        <Row>
+        </RowItems>
+        <RowItems>
           <div className="label">File Name:</div>
           <div className="value link">
             <a onClick={this.openFile}>
               {this.getFileName(properties["xlink:href"])}
             </a>
           </div>
-        </Row>
-        <Row>
+        </RowItems>
+        <RowItems>
           <div className="label">eCTD Operation:</div>
           <div className="value">{properties.operation || ""}</div>
-        </Row>
-        <Row>
+        </RowItems>
+        <RowItems>
           <div className="label">Leaf ID:</div>
           <div className="value">{properties.ID || ""}</div>
-        </Row>
-        <Row>
+        </RowItems>
+        <RowItems>
           <div className="label">File Link(Href):</div>
           <div className="value link">
             <a onClick={this.openFile}>{properties["xlink:href"] || ""}</a>
           </div>
-        </Row>
-        <Row>
+        </RowItems>
+        <RowItems>
           <div className="label">Checksum:</div>
           <div className="value">{properties.checksum || ""}</div>
-        </Row>
-        <Row>
+        </RowItems>
+        <RowItems>
           <div className="label">Checksum type:</div>
           <div className="value">{properties["checksum-type"] || ""}</div>
-        </Row>
+        </RowItems>
         {properties.version && (
-          <Row>
+          <RowItems>
             <div className="label">version:</div>
             <div className="value">{properties.version || ""}</div>
-          </Row>
+          </RowItems>
         )}
-        <Row>
+        <RowItems>
           <div className="label">Xlink Type:</div>
           <div className="value">{properties["xlink:type"]}</div>
-        </Row>
-        <Row>
+        </RowItems>
+        <RowItems>
           <div className="label">Containing Folder:</div>
           <div className="value">{properties.folder || ""}</div>
-        </Row>
+        </RowItems>
         {properties.manufacturer && (
-          <Row>
+          <RowItems>
             <div className="label">Manufacturer:</div>
             <div className="value">{properties.manufacturer || ""}</div>
-          </Row>
+          </RowItems>
         )}
         {properties.substance && (
-          <Row>
+          <RowItems>
             <div className="label">Substance:</div>
             <div className="value">{properties.substance || ""}</div>
-          </Row>
+          </RowItems>
         )}
       </React.Fragment>
     );
@@ -152,14 +154,14 @@ class NodeProperties extends Component {
     console.log("m1json", m1Json);
     return (
       <React.Fragment>
-        <Row>
+        <RowItems>
           <div className="label">Name:</div>
           <div className="value">{label || ""}</div>
-        </Row>
-        <Row>
+        </RowItems>
+        <RowItems>
           <div className="label">Company:</div>
           <div className="value">{companyName || ""}</div>
-        </Row>
+        </RowItems>
         {/* <Row>
           <div className="label">Containing Folder:</div>
           <div className="value">{properties.folder || ""}</div>
@@ -189,14 +191,14 @@ class NodeProperties extends Component {
     const { properties } = this.props;
     return (
       <React.Fragment>
-        <Row>
+        <RowItems>
           <div className="label">Title:</div>
           <div className="value">{properties.title || ""}</div>
-        </Row>
-        <Row>
+        </RowItems>
+        <RowItems>
           <div className="label">Xml Tag:</div>
           <div className="value">{properties.name || ""}</div>
-        </Row>
+        </RowItems>
       </React.Fragment>
     );
   };
@@ -261,86 +263,86 @@ class NodeProperties extends Component {
     ).display;
     return (
       <React.Fragment>
-        <Row>
+        <RowItems>
           <div className="label">Title:</div>
           <div className="value">{properties.title || ""}</div>
-        </Row>
-        <Row>
+        </RowItems>
+        <RowItems>
           <div className="label">Index Type:</div>
           <div className="value">{_.get(m1Properties, "title", "")}</div>
-        </Row>
-        <Row>
+        </RowItems>
+        <RowItems>
           <div className="label">Submission Description:</div>
           <div className="value">
             {_.get(applicantInfo, "[submission-description]", "")}
           </div>
-        </Row>
-        <Row>
+        </RowItems>
+        <RowItems>
           <div className="label">Company Name:</div>
           <div className="value">
             {_.get(applicantInfo, "[company-name]", "")}
           </div>
-        </Row>
-        <Row>
+        </RowItems>
+        <RowItems>
           <div className="label">Company ID:</div>
           <div className="value">{_.get(applicantInfo, "id", "")}</div>
-        </Row>
+        </RowItems>
         <div className="global__hr-line" style={{ background: "#bfc4c7" }} />
         {_.map(this.getContacts(applicantInfo), contact => {
           return (
-            <Row key={contact}>
+            <RowItems key={contact}>
               <div className="label">Applicant Contact:</div>
               <div className="value">{contact}</div>
-            </Row>
+            </RowItems>
           );
         })}
         <div className="global__hr-line" style={{ background: "#bfc4c7" }} />
-        <Row>
+        <RowItems>
           <div className="label">Application Number:</div>
           <div className="value">{_.get(applicationNumber, "[$t]", "")}</div>
-        </Row>
-        <Row>
+        </RowItems>
+        <RowItems>
           <div className="label">Application Type:</div>
           <div className="value">{applicationType}</div>
-        </Row>
-        <Row>
+        </RowItems>
+        <RowItems>
           <div className="label">Cross Reference Application Number(s): </div>
           <div className="value">{_.get(applicationNumber, "cr", "")}</div>
-        </Row>
-        <Row>
+        </RowItems>
+        <RowItems>
           <div className="label">Submission ID: </div>
           <div className="value">
             {_.get(submissionInfo, "[submission-id][$t]", "")}
           </div>
-        </Row>
-        <Row>
+        </RowItems>
+        <RowItems>
           <div className="label">Submission Type: </div>
           <div className="value">{submissionType}</div>
-        </Row>
-        <Row>
+        </RowItems>
+        <RowItems>
           <div className="label">Supplement Effective Date Type: </div>
           <div className="value">{_.get(submissionInfo, "date", "")}</div>
-        </Row>
-        <Row>
+        </RowItems>
+        <RowItems>
           <div className="label">Date Type: </div>
           <div className="value">{_.get(submissionInfo, "date", "")}</div>
-        </Row>
-        <Row>
+        </RowItems>
+        <RowItems>
           <div className="label">Sequence Number: </div>
           <div className="value">
             {_.get(submissionInfo, "[sequence-number][$t]", "")}
           </div>
-        </Row>
-        <Row>
+        </RowItems>
+        <RowItems>
           <div className="label">Submission Sub-Type: </div>
           <div className="value">
             {_.get(sequence, "[submission_sub_type]", "")}
           </div>
-        </Row>
-        <Row>
+        </RowItems>
+        <RowItems>
           <div className="label">Form: </div>
           <div className="value">{_.get(submissionInfo, "", "")}</div>
-        </Row>
+        </RowItems>
       </React.Fragment>
     );
   };
@@ -428,10 +430,11 @@ class NodeProperties extends Component {
   }
 }
 
-const Row = styled.div`
-  display: flex;
+const RowItems = styled(Row)`
   padding: 4px 0px;
   padding-left: 30px;
+  justify-content: normal;
+  align-items: normal;
 `;
 
 export default NodeProperties;

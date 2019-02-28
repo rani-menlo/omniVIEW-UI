@@ -14,14 +14,13 @@ const persistConfig = {
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 let _store = null;
-if (process.env.NODE_ENV === "production") {
-  _store = createStore(persistedReducer, applyMiddleware(thunk));
-} else {
+if (process.env.NODE_ENV === "development") {
   _store = createStore(persistedReducer, applyMiddleware(thunk, logger));
+} else {
+  _store = createStore(persistedReducer, applyMiddleware(thunk));
 }
 
 const store = _store;
 const persistor = persistStore(store);
-// persistor.purge();
 
 export default { store, persistor };
