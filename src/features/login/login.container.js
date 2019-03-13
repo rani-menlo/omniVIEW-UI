@@ -10,6 +10,7 @@ class LoginContainer extends Component {
   };
 
   render() {
+    console.log("Inside render...");
     const { loggedIn } = this.props;
     return loggedIn ? <Redirect to="/auth" /> : <LoginComponent />;
   }
