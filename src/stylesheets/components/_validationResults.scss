@@ -14,6 +14,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    cursor: move;
     &-close {
       font-size: 18px;
       color: $black;
@@ -33,13 +34,17 @@
     }
     border: 1px solid $shadowed-steel;
     border-radius: 4px;
-    margin-top: 12px;
+    margin-top: 10px;
     &__header {
       width: 100%;
     }
     &__body {
-      height: 87%;
-      overflow-y: auto;
+      height: 100%;
+      overflow: auto;
+      > table > tbody {
+        overflow: auto;
+        width: 100%;
+      }
     }
     .col {
       &-node {
@@ -97,6 +102,9 @@
       border-radius: 4px;
       border-color: $sky-of-margritte;
       color: $sky-of-margritte;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
   }
 }

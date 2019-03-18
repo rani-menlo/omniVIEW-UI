@@ -40,11 +40,11 @@ class ProfileMenu extends Component {
     const { user } = this.props;
     return (
       <div className="profile">
-        <img
+        {/* <img
           src="/images/help.svg"
           className="profile-help"
           onClick={this.help}
-        />
+        /> */}
         <Dropdown overlay={this.getMenu()} trigger={["click"]}>
           <div className="profile__menu">
             <Avatar size="small" icon="user" />

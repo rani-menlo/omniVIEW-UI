@@ -31,12 +31,16 @@ class Pagination extends Component {
   }
 
   componentDidMount() {
+    this.setPageSizeBasedOnTotal();
+  }
+
+  setPageSizeBasedOnTotal = () => {
     let { pageSize, total } = this.props;
     if (total < pageSize) {
       pageSize = total;
     }
     this.setState({ pageSize });
-  }
+  };
 
   getPaginationButtons = (current, type, orig) => {
     if (type === "prev") {
@@ -49,6 +53,10 @@ class Pagination extends Component {
   };
 
   increase = () => {
+    if (this.state.pageSize === "") {
+      this.setPageSizeBasedOnTotal();
+      return;
+    }
     let pageSize = Number(this.state.pageSize);
     if (pageSize === this.props.total) {
       return;
@@ -61,6 +69,10 @@ class Pagination extends Component {
   };
 
   decrease = () => {
+    if (this.state.pageSize === "") {
+      this.setPageSizeBasedOnTotal();
+      return;
+    }
     let pageSize = Number(this.state.pageSize);
     pageSize -= pageSize % this.defaultPageSize;
     if (pageSize > 0 && pageSize !== this.state.pageSize) {
@@ -73,12 +85,7 @@ class Pagination extends Component {
     if (!isNaN(value)) {
       if (value === "") {
         this.setState({ pageSize: value });
-        this.timeOutId = setTimeout(() => {
-          this.setState({ pageSize: 1 });
-          this.onPageSizeChange();
-        }, this.debounceTimeOut);
       } else {
-        clearTimeout(this.timeOutId);
         const num = Number(value);
         if (num <= 0 || num > this.props.total) {
           return;
@@ -102,6 +109,10 @@ class Pagination extends Component {
   };
 
   onPageChange = (pageNo, pageSize) => {
+    if (pageSize === "") {
+      this.setPageSizeBasedOnTotal();
+      return;
+    }
     this.props.onPageChange && this.props.onPageChange(pageNo);
   };
 
