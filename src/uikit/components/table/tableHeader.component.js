@@ -4,6 +4,7 @@ import styled from "styled-components";
 import Row from "../row/row.component";
 import PropTypes from "prop-types";
 import _ from "lodash";
+import PaginationCheckbox from "../pagination/paginationCheckbox.component";
 
 class TableHeader extends Component {
   static propTypes = {
@@ -62,7 +63,7 @@ class TableHeader extends Component {
             onClick={this.order(column)}
             style={column.style}
           >
-            {column.checkbox && <Checkbox />}
+            {column.checkbox && <PaginationCheckbox />}
             {column.name}
             {column.sort && this.getSortIcon(column)}
           </RowItems>

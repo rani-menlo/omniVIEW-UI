@@ -14,6 +14,7 @@ import Row from "../../../uikit/components/row/row.component";
 import Pagination from "../../../uikit/components/pagination";
 import { Redirect } from "react-router-dom";
 import { isLoggedInOmniciaRole } from "../../../utils";
+import PaginationCheckbox from "../../../uikit/components/pagination/paginationCheckbox.component";
 
 class CustomerDashboard extends Component {
   constructor(props) {
@@ -197,7 +198,7 @@ class CustomerDashboard extends Component {
                       className="maindashboard__content__list__item"
                     >
                       <Column width={getColumnWidth(TableColumnNames.CHECKBOX)}>
-                        <Checkbox />
+                        <PaginationCheckbox />
                       </Column>
                       <Column
                         width={getColumnWidth(TableColumnNames.CUSTOMER_NAME)}
@@ -241,7 +242,7 @@ class CustomerDashboard extends Component {
                         {_.get(
                           customer,
                           "subscription",
-                          "11 in use  | 3 unassigned"
+                          "12 in use  | 3 unassigned"
                         )}
                         <Dropdown
                           overlay={this.getMenu()}

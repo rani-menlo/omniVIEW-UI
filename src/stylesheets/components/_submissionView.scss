@@ -112,6 +112,7 @@
     }
     &__properties {
       width: 30%;
+      margin-left: 15px;
       @include text-bold-active(14px);
     }
   }

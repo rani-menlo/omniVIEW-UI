@@ -9,7 +9,6 @@ import { ApplicationActions } from "../../../redux/actions";
 import Loader from "../../../uikit/components/loader";
 import Header from "../../header/header.component";
 import Footer from "../../../uikit/components/footer/footer.component";
-import { getSubmissionsByCustomer } from "../../../redux/selectors/applicationDashboard.selector";
 import TableHeader from "../../../uikit/components/table/tableHeader.component";
 import Row from "../../../uikit/components/row/row.component";
 import Pagination from "../../../uikit/components/pagination";
@@ -17,6 +16,7 @@ import styled from "styled-components";
 import moment from "moment";
 import { DATE_FORMAT } from "../../../constants";
 import { isLoggedInOmniciaRole } from "../../../utils";
+import PaginationCheckbox from "../../../uikit/components/pagination/paginationCheckbox.component";
 // import { Customers } from "./sampleCustomers";
 
 class ApplicationDashboard extends Component {
@@ -240,7 +240,7 @@ class ApplicationDashboard extends Component {
                       className="maindashboard__content__list__item"
                     >
                       <Column width={getColumnWidth(TableColumnNames.CHECKBOX)}>
-                        <Checkbox />
+                        <PaginationCheckbox />
                       </Column>
                       <Column
                         width={getColumnWidth(
@@ -252,7 +252,6 @@ class ApplicationDashboard extends Component {
                         {_.get(submission, "name", "")}
                       </Column>
                       <Column
-                        style={{ textAlign: "center" }}
                         width={getColumnWidth(TableColumnNames.SEQUENCES)}
                         className="maindashboard__content__list__item-text"
                         onClick={this.onSubmissionSelected(submission)}

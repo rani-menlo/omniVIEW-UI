@@ -11,7 +11,8 @@ class NodeProperties extends Component {
     properties: PropTypes.object,
     sequence: PropTypes.object,
     submission: PropTypes.object,
-    m1Json: PropTypes.object
+    m1Json: PropTypes.object,
+    view: PropTypes.oneOf(["current", "lifeCycle"])
   };
 
   getFileName = fullName => {
@@ -24,17 +25,25 @@ class NodeProperties extends Component {
     /* const types = fileHref && fileHref.split(".");
     const type = _.get(types, "[1]", "pdf"); */
     const type = fileHref.substring(fileHref.lastIndexOf(".") + 1);
+    let newWindow = null;
     if (type.includes("pdf") && properties.fileID) {
-      window.open(
+      newWindow = window.open(
         `${process.env.PUBLIC_URL}/viewer/pdf/${properties.fileID}`,
         "_blank"
       );
     } else {
-      properties.fileID &&
-        window.open(
+      if (properties.fileID) {
+        newWindow = window.open(
           `${process.env.PUBLIC_URL}/viewer/${type}/${properties.fileID}`,
           "_blank"
         );
+      }
+    }
+
+    if (newWindow) {
+      newWindow.addEventListener("load", function() {
+        newWindow.document.title = _.get(properties, "title", "");
+      });
     }
   };
 
@@ -137,6 +146,11 @@ class NodeProperties extends Component {
     return _.get(properties, "[dtd-version]", "");
   };
 
+  isRootSequence = () => {
+    const { properties } = this.props;
+    return this.isRootSubmission() && properties.isSequence;
+  };
+
   getRootProperties = () => {
     const { properties, m1Json } = this.props;
     const label = _.get(
@@ -149,9 +163,6 @@ class NodeProperties extends Component {
       "[admin][applicant-info][company-name]",
       ""
     );
-    console.log("propserties", properties);
-    console.log("label", label);
-    console.log("m1json", m1Json);
     return (
       <React.Fragment>
         <RowItems>
@@ -187,18 +198,62 @@ class NodeProperties extends Component {
     );
   };
 
+  getTitle = (title = "") => {
+    const idx = title.indexOf("(");
+    if (idx === -1) {
+      return title;
+    }
+    return title.substring(0, idx);
+  };
+
   getFolderProperties = () => {
     const { properties } = this.props;
     return (
       <React.Fragment>
         <RowItems>
           <div className="label">Title:</div>
-          <div className="value">{properties.title || ""}</div>
+          <div className="value">{this.getTitle(properties.title)}</div>
         </RowItems>
         <RowItems>
           <div className="label">Xml Tag:</div>
           <div className="value">{properties.name || ""}</div>
         </RowItems>
+        {properties["formType"] && (
+          <RowItems>
+            <div className="label">Form Type:</div>
+            <div className="value">{properties.formType || ""}</div>
+          </RowItems>
+        )}
+        {properties.dosageform && (
+          <RowItems>
+            <div className="label">Dosage Form:</div>
+            <div className="value">{properties.dosageform || ""}</div>
+          </RowItems>
+        )}
+        {properties.manufacturer && (
+          <RowItems>
+            <div className="label">Manufacturer:</div>
+            <div className="value">{properties.manufacturer || ""}</div>
+          </RowItems>
+        )}
+        {properties["product-name"] && (
+          <RowItems>
+            <div className="label">Product Name:</div>
+            <div className="value">{properties["product-name"] || ""}</div>
+          </RowItems>
+        )}
+        {properties.substance && (
+          <RowItems>
+            <div className="label">Substance:</div>
+            <div className="value">{properties.substance || ""}</div>
+          </RowItems>
+        )}
+        {properties.excipient && (
+          <RowItems>
+            <div className="label">Excipient:</div>
+            <div className="value">{properties.excipient || ""}</div>
+          </RowItems>
+        )}
       </React.Fragment>
     );
   };
@@ -242,7 +297,7 @@ class NodeProperties extends Component {
   };
 
   getM1Properties = () => {
-    const { m1Json, properties, sequence } = this.props;
+    const { m1Json, properties, sequence, view } = this.props;
     const m1Properties = m1Json["m1-regional-properties"];
     const applicantInfo = _.get(m1Json, "[admin][applicant-info]");
     const application = _.get(m1Json, "[admin][application-set][application]");
@@ -263,14 +318,18 @@ class NodeProperties extends Component {
     ).display;
     return (
       <React.Fragment>
-        <RowItems>
-          <div className="label">Title:</div>
-          <div className="value">{properties.title || ""}</div>
-        </RowItems>
-        <RowItems>
-          <div className="label">Index Type:</div>
-          <div className="value">{_.get(m1Properties, "title", "")}</div>
-        </RowItems>
+        {!this.isRootSequence() && (
+          <RowItems>
+            <div className="label">Title:</div>
+            <div className="value">{properties.title || ""}</div>
+          </RowItems>
+        )}
+        {!this.isRootSequence() && (
+          <RowItems>
+            <div className="label">Index Type:</div>
+            <div className="value">{_.get(m1Properties, "title", "")}</div>
+          </RowItems>
+        )}
         <RowItems>
           <div className="label">Submission Description:</div>
           <div className="value">
@@ -330,7 +389,9 @@ class NodeProperties extends Component {
         <RowItems>
           <div className="label">Sequence Number: </div>
           <div className="value">
-            {_.get(submissionInfo, "[sequence-number][$t]", "")}
+            {view === ""
+              ? _.get(submissionInfo, "[sequence-number][$t]", "")
+              : _.get(submissionInfo, "[submission-id][$t]", "")}
           </div>
         </RowItems>
         <RowItems>
@@ -375,6 +436,12 @@ class NodeProperties extends Component {
         <div className="properties">
           <div className="properties__table">
             {this.isRootSubmission() && this.getRootProperties()}
+            {this.isRootSequence() && (
+              <React.Fragment>
+                <div className="section-title">M1 Properties</div>
+                {this.getM1Properties()}
+              </React.Fragment>
+            )}
             {this.isFolder() && this.getFolderProperties()}
             {this.isSTF() && this.getStfProperties()}
             {this.isM1() && this.getM1Properties()}
@@ -402,8 +469,8 @@ class NodeProperties extends Component {
                     </tr>
                   </thead>
                   <tbody>
-                    {_.map(properties.lifeCycles, lifeCycle => (
-                      <tr>
+                    {_.map(properties.lifeCycles, (lifeCycle, idx) => (
+                      <tr key={idx}>
                         <td className="properties__life-cycle-table-link">
                           {this.getLifeCycleId(lifeCycle)}
                         </td>

@@ -19,6 +19,7 @@ import {
   getSequences
 } from "../../redux/selectors/submissionView.selector";
 import ProfileMenu from "../header/profileMenu.component";
+import DraggableModal from "../../uikit/components/modal/draggableModal.component";
 
 const TabPane = Tabs.TabPane;
 
@@ -39,6 +40,9 @@ class SubmissionView extends Component {
       parentHeaderHeight: 0
     };
     this.parentHeaderRef = React.createRef();
+    this.treeContainerRef = React.createRef();
+    this.treeRef = React.createRef();
+    this.treeNodesMap = new Map();
   }
 
   componentDidMount() {
@@ -54,33 +58,19 @@ class SubmissionView extends Component {
     }
   }
 
-  toggle = () => {
-    this.setState({ treeExpand: !this.state.treeExpand });
+  toggle = callback => {
+    this.clearTreeNodesMap();
+    this.setState({ treeExpand: !this.state.treeExpand }, () => {
+      if (typeof callback === "function") {
+        callback();
+      }
+    });
   };
 
-  onNodeSelected = (id, properties, leafParent) => {
+  onNodeSelected = (id, properties, leafParent, extraProperties) => {
     if (leafParent) {
       let lifeCycles = [];
       if (_.isArray(leafParent)) {
-        /* let propertyId = properties.ID;
-        _.map(leafParent, leaf => {
-          if (leaf.ID === propertyId) {
-            lifeCycles.push(leaf);
-            return;
-          }
-          const modified = _.get(leaf, "[modified-file]", "");
-          if (modified) {
-            const hashId = modified.substring(
-              modified.lastIndexOf("#") + 1,
-              modified.length
-            );
-            if (propertyId === hashId) {
-              lifeCycles.push(leaf);
-              propertyId = leaf.ID;
-            }
-          }
-        }); */
-
         const href = properties["xlink:href"];
         const fileName = href.substring(href.lastIndexOf("/") + 1, href.length);
         lifeCycles = _.filter(leafParent, leaf => {
@@ -109,27 +99,19 @@ class SubmissionView extends Component {
       } else {
         lifeCycles.push(leafParent);
       }
-
-      /* if (properties.operation === "new") {
-        lifeCycles = _.filter(
-          lifeCycles,
-          leaf => leaf.operation === "new" || leaf.operation === "replace"
-        );
-      } else if (properties.operation === "replace") {
-        lifeCycles = _.filter(
-          lifeCycles,
-          leaf =>
-            leaf.operation === "new" ||
-            leaf.operation === "replace" ||
-            leaf.operation === "append"
-        );
-      } */
       properties.lifeCycles = lifeCycles;
+    }
+    if (this.props.selectedSequence) {
+      properties.isSequence = true;
+    }
+    if (extraProperties) {
+      properties = { ...properties, ...extraProperties };
     }
     this.setState({ selectedNodeId: id, nodeProperties: properties });
   };
 
   onSelectedSequence = sequence => {
+    this.treeNodesMap.clear();
     this.props.actions.setSelectedSequence(sequence);
     this.props.actions.fetchSequenceJson(sequence);
     this.setState({
@@ -137,6 +119,7 @@ class SubmissionView extends Component {
       selectedView: "",
       nodeProperties: null
     });
+    this.closeValidationModal();
   };
 
   togglePropertiesPane = () => {
@@ -166,6 +149,9 @@ class SubmissionView extends Component {
     if (!_.size(nodeProperties)) {
       return "Properties";
     } else if (nodeProperties["dtd-version"]) {
+      if (this.props.selectedSequence) {
+        return "Sequence Properties";
+      }
       return "Submission Properties";
     } else if (nodeProperties.name === "m1-regional") {
       return "M1 Regional Properties";
@@ -185,18 +171,12 @@ class SubmissionView extends Component {
       const { selectedSubmission } = this.props;
       this.props.actions.fetchLifeCycleJson(selectedSubmission);
     }
+    this.closeValidationModal();
   };
 
   onModeTabChange = mode => {
+    this.clearTreeNodesMap();
     this.setState({ selectedMode: mode });
-  };
-
-  validate = () => {
-    this.setState({ openValidationModal: true });
-  };
-
-  closeValidationModal = () => {
-    this.setState({ openValidationModal: false });
   };
 
   openApplicationsScreen = () => {
@@ -236,12 +216,16 @@ class SubmissionView extends Component {
     }
   };
 
-  onModeTabChange = mode => {
-    this.setState({ selectedMode: mode });
+  validate = () => {
+    if (this.state.openValidationModal) {
+      return;
+    }
+    this.clearTreeNodesMap();
+    this.setState({ openValidationModal: true });
   };
 
-  validate = () => {
-    this.setState({ openValidationModal: true });
+  clearTreeNodesMap = () => {
+    this.treeNodesMap.clear();
   };
 
   closeValidationModal = () => {
@@ -278,14 +262,60 @@ class SubmissionView extends Component {
   };
 
   getContent = () => {
-    const {selectedSequence, sequenceJson, lifeCycleJson} = this.props;
-    if(selectedSequence) {
-      console.log("sequenceJson", sequenceJson);
+    const { selectedSequence, sequenceJson, lifeCycleJson } = this.props;
+    if (selectedSequence) {
       return sequenceJson;
     }
-    console.log("lifeCycleJson", lifeCycleJson);
     return lifeCycleJson;
-  }
+  };
+
+  onValidationResultItemClick = item => {
+    // item.ID = "n03098";
+    // item.name = "m5-3-2-3-reports-of-studies-using-other-human-biomaterials";
+    // item.title = "5.3.2.3 Reports of Studies Using Other Human Biomaterials";
+    if (!this.state.treeExpand) {
+      this.toggle(() => setTimeout(() => this.selectChildNode(item), 2000));
+      return;
+    }
+    this.selectChildNode(item);
+  };
+
+  selectChildNode = item => {
+    if (!this.treeNodesMap.size) {
+      this.searchNode(this.treeRef.current, item);
+    }
+    let selectedNode = null;
+    if (item.ID) {
+      selectedNode = this.treeNodesMap.get(item.ID);
+    } else {
+      selectedNode = this.treeNodesMap.get(`${item.name}_${item.title}`);
+    }
+    if (selectedNode) {
+      selectedNode.selectNode();
+      const elem = _.get(selectedNode, "nodeElementRef.current", null);
+      elem &&
+        elem.scrollIntoView({
+          behavior: "smooth"
+        });
+    }
+  };
+
+  searchNode = (node, item) => {
+    if (!node) {
+      return;
+    }
+    const id = _.get(node, "state.properties.ID");
+    if (id) {
+      this.treeNodesMap.set(id, node);
+    } else {
+      const name = _.get(node, "state.properties.name", "");
+      const title = _.get(node, "state.properties.title", "");
+      this.treeNodesMap.set(`${name}_${title}`, node);
+    }
+    _.forEach(node.nodeRefs, nodeRef => {
+      this.searchNode(_.get(nodeRef, "current"), item);
+    });
+  };
 
   render() {
     const {
@@ -477,10 +507,12 @@ class SubmissionView extends Component {
               </div>
             </Sidebar>
             <div
+              ref={this.treeContainerRef}
               className="panels__tree"
               style={{ width: `${this.state.treePanelWidth}%` }}
             >
               <TreeNode
+                ref={this.treeRef}
                 key={this.createKey()}
                 label={this.getTreeLabel()}
                 content={this.getContent()}
@@ -489,6 +521,7 @@ class SubmissionView extends Component {
                 selectedNodeId={this.state.selectedNodeId}
                 mode={selectedMode}
                 view={selectedView}
+                submission={selectedSubmission}
                 defaultExpand
               />
             </div>
@@ -507,12 +540,24 @@ class SubmissionView extends Component {
                   }
                   sequence={selectedSequence || _.get(sequences, "[0]", "")}
                   submission={selectedSubmission}
+                  view={selectedView}
                 />
               </div>
             </Sidebar>
           </div>
+          <DraggableModal
+            visible={this.state.openValidationModal}
+            draggableAreaClass=".validationResults__header"
+          >
+            <ValidationResults
+              sequence={selectedSequence}
+              label={_.get(selectedSubmission, "name", "")}
+              onClose={this.closeValidationModal}
+              onItemSelected={this.onValidationResultItemClick}
+            />
+          </DraggableModal>
         </div>
-        <Modal
+        {/*  <Modal
           visible={this.state.openValidationModal}
           closable={false}
           footer={null}
@@ -524,7 +569,7 @@ class SubmissionView extends Component {
             label={_.get(selectedSubmission, "name", "")}
             onClose={this.closeValidationModal}
           />
-        </Modal>
+        </Modal> */}
         <Footer alignToBottom />
       </React.Fragment>
     );

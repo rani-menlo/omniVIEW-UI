@@ -13,14 +13,16 @@ class ValidationResults extends Component {
     super(props);
     this.state = {
       sort: "asc",
-      validationResults: []
+      validationResults: [],
+      selected: ""
     };
   }
 
   static propTypes = {
     onClose: PropTypes.func,
     sequence: PropTypes.object,
-    label: PropTypes.string
+    label: PropTypes.string,
+    onItemSelected: PropTypes.func
   };
 
   componentDidMount() {
@@ -72,9 +74,15 @@ class ValidationResults extends Component {
     });
   };
 
+  onItemSelected = item => () => {
+    const { onItemSelected } = this.props;
+    this.setState({ selected: item.node });
+    onItemSelected && onItemSelected(item);
+  };
+
   render() {
     const { onClose, loading, label, sequence } = this.props;
-    const { validationResults, sort } = this.state;
+    const { validationResults, sort, selected } = this.state;
     return (
       <React.Fragment>
         <Loader loading={loading} />
@@ -97,7 +105,7 @@ class ValidationResults extends Component {
             />
           </div>
           <div className="validationResults__table">
-            <div className="validationResults__table__header">
+            <div className="validationResults__table__body">
               <table>
                 <thead>
                   <tr>
@@ -143,20 +151,22 @@ class ValidationResults extends Component {
                     </th>
                   </tr>
                 </thead>
-              </table>
-            </div>
-            <div className="validationResults__table__body">
-              <table>
                 <tbody key={sort}>
                   {_.map(validationResults, validation => {
                     return (
-                      <tr key={validation.error_no}>
+                      <tr
+                        key={validation.node}
+                        onClick={this.onItemSelected(validation)}
+                        className={`global__cursor-pointer ${selected ===
+                          validation.node && "global__node-selected"}`}
+                      >
                         <td className="col-node">
                           <div
                             style={{ display: "flex", alignItems: "center" }}
                           >
                             <span>
-                              {validation.group === "File Checks" ? (
+                              {validation.group === "File Checks" ||
+                              validation.group === "PDF" ? (
                                 <img
                                   src="/images/file-new.svg"
                                   className="global__file-folder"
@@ -195,7 +205,11 @@ class ValidationResults extends Component {
             <div className="validationResults__footer__viewreport global__disabled-box">
               View Report
             </div>
-            <Button type="primary" onClick={onClose} style={{ color: "white" }}>
+            <Button
+              type="primary"
+              onClick={onClose}
+              style={{ color: "white", fontWeight: 800, fontSize: '12px' }}
+            >
               Close
             </Button>
           </div>

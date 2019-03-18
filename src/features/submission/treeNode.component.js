@@ -3,7 +3,6 @@ import { Icon } from "antd";
 import PropTypes from "prop-types";
 import _ from "lodash";
 import uuidv4 from "uuid/v4";
-import { withRouter } from "react-router-dom";
 
 class TreeNode extends Component {
   constructor(props) {
@@ -15,10 +14,13 @@ class TreeNode extends Component {
       expand: this.props.defaultExpand || this.props.expand,
       prevProps: this.props
     };
+    this.nodeRefs = [];
+    this.nodeElementRef = React.createRef();
   }
 
   static propTypes = {
     content: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
+    submission: PropTypes.object,
     label: PropTypes.string.isRequired,
     paddingLeft: PropTypes.number,
     defaultPaddingLeft: PropTypes.number,
@@ -52,36 +54,96 @@ class TreeNode extends Component {
   componentDidMount() {
     let { content, view, mode } = this.props;
     const properties = {};
-    const nodes = [];
+    let nodes = [];
     // get object from the ectd:ectd
     content = _.get(content, "ectd:ectd", content);
-    // In standard mode, all STF files to consolidated into single based on name
-    if (mode === "standard") {
-      const { consolidatedFolder, omitKeys } = this.getStfFolders(content);
-      if (omitKeys.length) {
-        content = _.omit(content, omitKeys);
+    // checking if the content has stf folders, bcoz based on mode need to do some operations
+    let stfFolders = this.getStfFoldersIfExist(content);
+    if (stfFolders.length) {
+      if (mode === "standard") {
+        const omitKeys = _.map(stfFolders, "_omitKey");
+        // In this mode, all stf folders are consolidated into one based on title
+        // consolidated folder may have subfolders which inturn has leaf array
+        // leaf array items are based on selected view i.e. in current view only latest
+        // files are shown and in lifecycle view all files are shown.
+        const consolidatedFolder = this.getConsolidatedStfFolders(stfFolders);
+        // remove the keys from the main object
+        if (omitKeys.length) {
+          content = _.omit(content, omitKeys);
+        }
+        // set consolidatedFolder object properties to main object.
+        _.map(consolidatedFolder, (value, key) => {
+          content[key] = value;
+        });
+      } else {
+        if (view === "current") {
+          const omitKeys = _.map(stfFolders, "_omitKey");
+          // removing subfolder leaf and appending to parent folder(stfFolder) as leaf
+          stfFolders = _.map(stfFolders, stfFolder => {
+            const keys = [];
+            let leaf = [];
+            _.map(stfFolder, (value, key) => {
+              if (typeof value === "object") {
+                keys.push(key);
+                if (value.leaf) {
+                  leaf = [...leaf, ...value.leaf];
+                }
+              }
+            });
+            leaf = _.sortBy(leaf, "ID");
+            stfFolder = _.omit(stfFolder, keys);
+            stfFolder.leaf = leaf;
+            return stfFolder;
+            // return this.removeSubfoldersAndAppendLeafToParent(stfFolder);
+          });
+          // grouping stf based on title
+          const stfFoldersByTitle = _.groupBy(stfFolders, "title");
+          // all leaf items of each stfFolder is combined and then modifying the
+          // stfFolders array based on latest files.
+          _.map(stfFoldersByTitle, array => {
+            let foldrs = [];
+            _.map(array, item => {
+              foldrs = [...foldrs, ...item.leaf];
+            });
+            // foldrs are iterated to get an array which has only latest files.
+            foldrs = this.setLatestFiles(foldrs);
+            // after the array(foldrs) has latest files, then group it by sequence.
+            const latestSequences = _.keys(_.groupBy(foldrs, "sequence"));
+            // group old array(array) by seqence to get difference
+            const allSequences = _.keys(_.groupBy(array, "sequence"));
+            const diff = _.difference(allSequences, latestSequences);
+            // remove diff items from stfFolders
+            _.map(diff, df => {
+              _.remove(stfFolders, { sequence: df });
+            });
+          });
+          content = _.omit(content, omitKeys);
+          // set the stfFolder to main object.
+          _.map(stfFolders, stfFolder => {
+            content[stfFolder["_omitKey"]] = stfFolder;
+          });
+        }
       }
-      _.map(consolidatedFolder, (value, key) => {
-        content[key] = value;
-      });
     }
-    const version = _.get(content, "version", "");
-    if (version && version.includes("STF")) {
-      if (mode === "qc") {
+
+    if ((view === "" || view === "lifeCycle") && mode === "qc") {
+      const version = _.get(content, "version", "");
+      if (version && version.includes("STF")) {
         const keys = [];
+        let leaf = [];
+        // removing subfolder leaf and appending to parent folder(value) as leaf
         _.map(content, (value, key) => {
           if (typeof value === "object") {
             keys.push(key);
+            if (value.leaf) {
+              leaf = [...leaf, ...value.leaf];
+            }
           }
         });
-        let leaf = [];
-        _.map(keys, key => {
-          if (content[key].leaf) {
-            leaf = [...leaf, ...content[key].leaf];
-          }
-        });
+        leaf = _.sortBy(leaf, "ID");
         content = _.omit(content, keys);
         content.leaf = leaf;
+        // this.removeSubfoldersAndAppendLeafToParent(content);
       }
     }
     _.map(content, (value, key) => {
@@ -110,11 +172,59 @@ class TreeNode extends Component {
         }
       }
     });
+    if (properties["_stfKey"] && mode === "standard") {
+      nodes = this.sortByTitle(nodes);
+    }
     this.setState({ properties, nodes });
+    this.nodeRefs = _.map(nodes, node => React.createRef());
   }
 
-  getStfFolders = rootFolder => {
-    const folders = [];
+  removeSubfoldersAndAppendLeafToParent = folder => {
+    const keys = [];
+    let leaf = [];
+    _.map(folder, (value, key) => {
+      if (typeof value === "object") {
+        keys.push(key);
+        if (value.leaf) {
+          leaf = [...leaf, ...value.leaf];
+        }
+      }
+    });
+    folder = _.omit(folder, keys);
+    folder.leaf = leaf;
+    return folder;
+  };
+
+  sortByTitle = nodes => {
+    const collator = new Intl.Collator(undefined, {
+      numeric: true,
+      sensitivity: "base"
+    });
+    const nodesByTitle = _.groupBy(nodes, node => node.value.title);
+    let titles = _.map(nodes, node => node.value.title);
+    titles = titles.sort(collator.compare);
+    let lastItem = titles[titles.length - 1];
+    if (lastItem && lastItem.includes("Synopsis")) {
+      _.remove(titles, item => item === lastItem);
+      titles = [lastItem, ...titles];
+    }
+    return _.map(titles, title => nodesByTitle[title][0]);
+  };
+
+  getStfFoldersIfExist = rootFolder => {
+    const stfFolders = [];
+    _.map(rootFolder, (value, key) => {
+      const version = _.get(value, "version", "");
+      if (typeof value === "object" && version.includes("STF")) {
+        const k = key.substring(0, key.lastIndexOf("[")) || key;
+        stfFolders.push({ ..._.cloneDeep(value), _stfKey: k, _omitKey: key });
+      }
+    });
+    return stfFolders;
+  };
+
+  getConsolidatedStfFolders = stfFolders => {
+    /* const folders = [];
     const omitKeys = [];
     _.map(rootFolder, (value, key) => {
       const version = _.get(value, "version", "");
@@ -123,17 +233,24 @@ class TreeNode extends Component {
         const k = key.substring(0, key.lastIndexOf("[")) || key;
         folders.push({ ..._.cloneDeep(value), _objectKey: k });
       }
-    });
-    const groupedFldrs = _.groupBy(folders, "_objectKey");
+    }); */
+    const { view } = this.props;
+    const groupedFldrs = _.groupBy(stfFolders, "_stfKey");
     const consolidatedFolder = {};
     _.map(groupedFldrs, (array, key) => {
       const subFoldr = {};
       _.map(array, item => {
-        subFoldr.title = item._objectKey;
+        subFoldr.title = item.title;
+        subFoldr["_stfKey"] = item["_stfKey"];
+        subFoldr["_omitKey"] = item["_omitKey"];
         _.map(item, (v, k) => {
           if (typeof v === "object") {
             if (subFoldr[k]) {
-              subFoldr[k].leaf = [...subFoldr[k].leaf, ...v.leaf];
+              let leaf = [...subFoldr[k].leaf, ...v.leaf];
+              if (view === "current") {
+                leaf = this.setLatestFiles(leaf);
+              }
+              subFoldr[k].leaf = leaf;
             } else {
               subFoldr[k] = v;
             }
@@ -142,7 +259,30 @@ class TreeNode extends Component {
       });
       consolidatedFolder[key] = subFoldr;
     });
-    return { consolidatedFolder, omitKeys };
+    return consolidatedFolder;
+  };
+
+  setLatestFiles = array => {
+    const newArray = [...array];
+    _.map(array, item => {
+      if (!item) {
+        return;
+      }
+      let itemId = item.ID;
+      _.map(array, leaf => {
+        if (!leaf || leaf.ID === itemId) {
+          return;
+        }
+        let modifiedFile = leaf["modified-file"];
+        modifiedFile =
+          modifiedFile &&
+          modifiedFile.substring(modifiedFile.lastIndexOf("#") + 1);
+        if (modifiedFile === itemId) {
+          _.remove(newArray, { ID: itemId });
+        }
+      });
+    });
+    return newArray;
   };
 
   setCurrentView = (obj, array) => {
@@ -180,6 +320,7 @@ class TreeNode extends Component {
     const { properties } = this.state;
     const style = { width: "18px", height: "21px" };
     const version = _.get(properties, "version", "");
+    const stfKey = _.get(properties, "_stfKey", "");
     if (properties.title === "US Regional") {
       icon = (
         <img
@@ -189,7 +330,7 @@ class TreeNode extends Component {
         />
       );
     }
-    if (version && version.includes("STF")) {
+    if (version.includes("STF") || stfKey) {
       icon = (
         <img
           src="/images/file-stf.svg"
@@ -237,9 +378,22 @@ class TreeNode extends Component {
   };
 
   selectNode = () => {
-    const { onNodeSelected, leafParent } = this.props;
+    const { onNodeSelected, leafParent, label } = this.props;
+    let extraProperties = null;
+    if (label.includes("FDA")) {
+      extraProperties = {
+        title: "form",
+        name: "form",
+        formType: label
+      };
+    }
     onNodeSelected &&
-      onNodeSelected(this.state.nodeId, this.state.properties, leafParent);
+      onNodeSelected(
+        this.state.nodeId,
+        this.state.properties,
+        leafParent,
+        extraProperties
+      );
   };
 
   deSelectNode = () => {
@@ -247,11 +401,16 @@ class TreeNode extends Component {
   };
 
   getLabel = () => {
-    const { label, mode } = this.props;
+    const { label, view, mode, submission } = this.props;
     const { properties } = this.state;
     let name = label;
     if (label === "leaf" || mode === "standard") {
       name = _.get(properties, "title", label);
+      if (label === "leaf" && view) {
+        name = `${name} [${_.get(submission, "name", "")}\\${
+          properties.sequence
+        }]`;
+      }
     }
 
     return name;
@@ -263,17 +422,25 @@ class TreeNode extends Component {
     /* const types = fileHref && fileHref.split(".");
     const type = _.get(types, "[1]", "pdf"); */
     const type = fileHref.substring(fileHref.lastIndexOf(".") + 1);
+    let newWindow = null;
     if (type.includes("pdf") && properties.fileID) {
-      window.open(
+      newWindow = window.open(
         `${process.env.PUBLIC_URL}/viewer/pdf/${properties.fileID}`,
         "_blank"
       );
     } else {
-      properties.fileID &&
-        window.open(
+      if (properties.fileID) {
+        newWindow = window.open(
           `${process.env.PUBLIC_URL}/viewer/${type}/${properties.fileID}`,
           "_blank"
         );
+      }
+    }
+
+    if (newWindow) {
+      newWindow.addEventListener("load", function() {
+        newWindow.document.title = _.get(properties, "title", "");
+      });
     }
   };
 
@@ -284,12 +451,14 @@ class TreeNode extends Component {
       selectedNodeId,
       onNodeSelected,
       mode,
-      view
+      view,
+      submission
     } = this.props;
     const paddingLeft = this.props.paddingLeft + defaultPaddingLeft;
     return (
       <React.Fragment>
         <div
+          ref={this.nodeElementRef}
           className={`node ${selectedNodeId === this.state.nodeId &&
             "global__node-selected"}`}
           style={{ paddingLeft }}
@@ -306,6 +475,7 @@ class TreeNode extends Component {
         {expand &&
           _.map(nodes, (node, idx) => (
             <TreeNode
+              ref={this.nodeRefs[idx]}
               expand={this.props.expand}
               paddingLeft={paddingLeft}
               key={node.label + idx + mode}
@@ -316,6 +486,7 @@ class TreeNode extends Component {
               mode={mode}
               view={view}
               leafParent={node.leafParent}
+              submission={submission}
             />
           ))}
       </React.Fragment>
@@ -323,4 +494,4 @@ class TreeNode extends Component {
   }
 }
 
-export default withRouter(TreeNode);
+export default TreeNode;

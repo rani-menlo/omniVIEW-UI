@@ -1,0 +1,13 @@
+.paginationCheckbox {
+  > .ant-checkbox {
+    > .ant-checkbox-inner {
+      border: 1.5px solid #bfbebe;
+      background-color: transparent;
+    }
+  }
+  > .ant-checkbox-checked > .ant-checkbox-inner {
+    background-color: $black;
+    opacity: 0.5;
+    border-width: 1px;
+  }
+}
