@@ -4,6 +4,7 @@ import Login from "./login.reducer";
 import Customer from "./customer.reducer";
 import Application from "./application.reducer";
 import Submission from "./submission.reducer";
+import Usermanagement from "./usermanagement.reducer";
 import { LoginActionTypes } from "../actionTypes";
 
 const appReducer = combineReducers({
@@ -11,7 +12,8 @@ const appReducer = combineReducers({
   Login,
   Customer,
   Application,
-  Submission
+  Submission,
+  Usermanagement
 });
 
 const RootReducer = (state, action) => {

@@ -1,9 +1,10 @@
 .headerbar {
-  position: absolute;
   height: 64px;
+  margin-bottom: 5px;
+  border-bottom: 0.5px solid;
   width: 100%;
   top: 0px;
-  box-shadow: 0 4px 8px 0 $shadowed-steel;
+  box-shadow: 0 2px 4px 0px rgba(0, 0, 0, 0.25);
   background-color: $white;
   display: flex;
   justify-content: space-between;
@@ -12,6 +13,7 @@
   &-logo {
     width: 176px;
     height: 36px;
+    cursor: pointer;
   }
   &-username {
     margin: 0px 10px;

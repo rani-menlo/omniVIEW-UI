@@ -30,8 +30,8 @@ class DraggableModal extends Component {
               width: "70%",
               height: "70%"
             }}
-            minWidth="34%"
-            minHeight="58%"
+            minWidth="29%"
+            minHeight="26%"
             bounds="parent"
           >
             {this.props.children}

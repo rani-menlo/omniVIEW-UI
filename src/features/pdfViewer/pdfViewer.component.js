@@ -44,12 +44,16 @@ class PdfViewer extends Component {
     }
     let reqParam = this.props.location.search;
     const hash = this.props.location.hash || "";
-    let url = `${SERVER_URL}/api/v1/getResourceFile/${params.fileId}`;
+    let url = `${SERVER_URL}${URI.GET_RESOURCE_FILE}/${params.fileId}`;
     if (reqParam) {
       reqParam = reqParam.substring(1);
       const paths = reqParam.split("&");
       let fileId = paths[0].split("=")[1];
       let path = paths[1].split("=")[1];
+      const fileName = path.substring(path.lastIndexOf("/") + 1);
+      if (fileName) {
+        window.document.title = fileName;
+      }
       path = path.split("/").join("$$$@@@$$$");
 
       url = `${SERVER_URL}${URI.GET_NEW_PATH}/${fileId}$$$***$$$${path}`;
@@ -57,7 +61,7 @@ class PdfViewer extends Component {
       const { data } = res.data;
       fileId = _.get(data, "fileID");
       if (fileId) {
-        url = `${SERVER_URL}/api/v1/getResourceFile/${fileId}${hash}`;
+        url = `${SERVER_URL}${URI.GET_RESOURCE_FILE}/${fileId}${hash}`;
       }
     }
     this.setState({ url, type: params.type, loading: false, largeFile });

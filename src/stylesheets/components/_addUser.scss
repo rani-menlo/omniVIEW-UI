@@ -1,0 +1,173 @@
+.addUser {
+  padding: 40px 10%;
+  &-title {
+    @include text-bold-active(24px);
+  }
+  &-heading {
+    @include text-normal(16px);
+    margin-top: 15px;
+    margin-bottom: 12px !important;
+  }
+  &-subtitle {
+    @include text-normal(16px);
+    opacity: 0.5;
+    margin-bottom: 15px !important;
+  }
+  &__profile {
+    display: flex;
+    align-items: center;
+    &__links {
+      margin-left: 20px;
+      &-link {
+        @include text-normal(12px);
+        color: $blue;
+        cursor: pointer;
+      }
+    }
+  }
+  &__account {
+    display: flex;
+    align-items: center;
+    margin-top: 14px;
+    &__status {
+      display: flex;
+      align-items: center;
+      &-active {
+        margin-left: 10px;
+        @include text-bold-active(14px);
+        color: $caribbean-green;
+      }
+      &-inactive {
+        margin-left: 10px;
+        @include text-bold-active(14px);
+        color: $red;
+      }
+      > .ant-switch {
+        background-color: $coral-red;
+      }
+      > .ant-switch-checked {
+        background-color: $caribbean-green;
+      }
+    }
+    &-created {
+      @include text-normal(14px);
+      margin-left: 10px;
+    }
+  }
+  &__fields {
+    justify-content: normal !important;
+    align-items: normal !important;
+    &-field {
+      width: 30%;
+    }
+    &-numeric {
+      width: 18%;
+    }
+  }
+  &__section {
+    margin-top: 24px;
+    &-label {
+      @include text-normal(14px);
+      margin-bottom: 18px !important;
+      &-inactive {
+        @include text-normal-inactive(14px);
+      }
+    }
+    &-checkbox {
+      @include text-normal;
+      font-size: 12px !important;
+      color: $black !important;
+      > .ant-checkbox {
+        > .ant-checkbox-inner {
+          border: 1.2px solid #bfbebe;
+        }
+      }
+    }
+    &__licences {
+      display: flex;
+      flex-wrap: wrap;
+    }
+    &__radiogroup {
+      display: flex !important;
+      flex-wrap: wrap;
+      &-radio {
+        width: 40%;
+      }
+    }
+  }
+  &__dropdown {
+    > .ant-select-selection {
+      width: 230px;
+      border-color: $black;
+      color: $black;
+    }
+    &-error {
+      > .ant-select-selection {
+        border-color: $red;
+      }
+    }
+  }
+  &__buttons {
+    margin-top: 50px;
+    &-btn {
+      min-height: 40px;
+      padding: 0 40px !important;
+    }
+  }
+  &__deactivate {
+    &-title {
+      @include text-bold-active(16px);
+    }
+    &-close {
+      width: 24px;
+      height: 24px;
+      float: right;
+      cursor: pointer;
+    }
+    &-content {
+      @include text-normal-inactive(14px);
+      margin-top: 8px;
+    }
+    &-buttons {
+      text-align: right;
+      margin-top: 48px;
+      &-deactivate {
+        border: none !important;
+        background-color: $red !important;
+      }
+    }
+  }
+  &__licences {
+    margin-top: 16px;
+    &__error {
+      &-icon {
+        font-size: 20px;
+        color: $red;
+        margin-right: 15px;
+      }
+      &-text {
+        @include text-bold-active(14px);
+      }
+      &-desc {
+        width: 60%;
+        margin-top: 16px;
+        @include text-normal-inactive(14px);
+        text-align: justify;
+      }
+    }
+    &__box {
+      width: 50%;
+      height: 220px;
+      overflow: auto;
+      border: solid 1px black;
+      border-radius: 4px;
+      &-item {
+        height: 60px;
+        padding: 8px;
+        &:nth-child(even) {
+          background-color: $froasted-glass;
+        }
+      }
+    }
+  }
+}

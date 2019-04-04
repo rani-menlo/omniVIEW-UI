@@ -1,0 +1,30 @@
+.omniField {
+  &-phone {
+    > .react-phone-number-input__row {
+      > .react-phone-number-input__input {
+        border-bottom: none;
+      }
+      > .react-phone-number-input__country {
+          overflow: hidden;
+        > .react-phone-number-input__icon {
+          width: 28px;
+          height: 25px;
+          border: none;
+          padding: 4px;
+        }
+        > .react-phone-number-input__country-select-arrow {
+            color: $black;
+        }
+      }
+    }
+    display: flex;
+    height: 32px;
+    border: 1px solid $black;
+    padding: 1px;
+    border-radius: 4px;
+
+    &-label {
+        margin-bottom: 4px !important
+    }
+  }
+}

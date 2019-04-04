@@ -1,4 +1,5 @@
 @mixin text-bold-active($fontSize: 12px) {
+  font-family: Heebo-Bold;
   font-weight: 800;
   font-size: $fontSize;
   color: $black;
@@ -8,23 +9,59 @@
   color: rgba($black, 0.5);
   font-size: $fontSize;
 }
+@mixin text-meduim-bold-active($fontSize: 12px) {
+  @include text-bold-active;
+  font-family: Heebo-Medium;
+  font-size: $fontSize;
+}
+@mixin text-meduim-bold-inactive($fontSize: 12px) {
+  @include text-meduim-bold-active;
+  color: rgba($black, 0.5);
+  font-size: $fontSize;
+}
 
 @mixin text-normal($fontSize: 12px) {
   @include text-bold-active;
+  font-family: Heebo-Regular;
   font-weight: normal;
   font-size: $fontSize;
 }
 
 @mixin text-normal-inactive($fontSize: 12px) {
   @include text-bold-inactive;
+  font-family: Heebo-Regular;
   font-weight: normal;
   font-size: $fontSize;
 }
 
-/* body {
-  font-family: "Heebo";
+@font-face {
+  font-family: "Heebo-Black";
+  src: url("/fonts/Heebo-Black.ttf");
 }
 @font-face {
-  font-family: "Heebo";
-  src: url("/fonts/heebo_regular.ttf") format("truetype");
-} */
+  font-family: "Heebo-Bold";
+  src: url("/fonts/Heebo-Bold.ttf");
+}
+@font-face {
+  font-family: "Heebo-ExtraBold";
+  src: url("/fonts/Heebo-ExtraBold.ttf");
+}
+@font-face {
+  font-family: "Heebo-Light";
+  src: url("/fonts/Heebo-Light.ttf");
+}
+@font-face {
+  font-family: "Heebo-Medium";
+  src: url("/fonts/Heebo-Medium.ttf");
+}
+@font-face {
+  font-family: "Heebo-Regular";
+  src: url("/fonts/Heebo-Regular.ttf");
+}
+@font-face {
+  font-family: "Heebo-Thin";
+  src: url("/fonts/Heebo-Thin.ttf");
+}
+body {
+  font-family: "Heebo-Regular" !important;
+}

@@ -278,8 +278,8 @@ class NodeProperties extends Component {
       contactType = _.find(
         _.get(TypesJson, "[applicant-contact-type]", ""),
         type => type.code === contactType
-      ).display;
-      text = `${text}(${contactType}), `;
+      );
+      text = `${text}(${_.get(contactType, "display", "")}), `;
       text = `${text}${_.get(contact, "[telephones][telephone][$t]", "")}`;
       let phoneType = _.get(
         contact,
@@ -289,8 +289,8 @@ class NodeProperties extends Component {
       phoneType = _.find(
         _.get(TypesJson, "[telephone-number-type]", ""),
         type => type.code === phoneType
-      ).display;
-      text = `${text}(${phoneType}), `;
+      );
+      text = `${text}(${_.get(phoneType, "display", "")}), `;
       text = `${text}${_.get(contact, "[emails][email]", "")}`;
       return text;
     });

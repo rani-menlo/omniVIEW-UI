@@ -4,6 +4,13 @@ import { Dropdown, Menu } from "antd";
 import _ from "lodash";
 
 class CustomerCard extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      overflowIconClicked: false
+    };
+  }
+
   static propTypes = {
     customer: PropTypes.object,
     onSelect: PropTypes.func
@@ -36,6 +43,10 @@ class CustomerCard extends Component {
     return name.length > 32 ? `${name.substring(0, 33)} ...` : name;
   };
 
+  onDropdownClick = visible => {
+    this.setState({ overflowIconClicked: visible });
+  };
+
   render() {
     const { customer, onSelect } = this.props;
     return (
@@ -51,9 +62,12 @@ class CustomerCard extends Component {
             overlay={this.getMenu()}
             trigger={["click"]}
             overlayClassName="customercard__heading-dropdown"
+            onVisibleChange={this.onDropdownClick}
           >
             <img
-              src="/images/overflow.svg"
+              src={`/images/overflow${
+                this.state.overflowIconClicked ? "-selected" : ""
+              }.svg`}
               className="customercard__heading-more"
             />
           </Dropdown>

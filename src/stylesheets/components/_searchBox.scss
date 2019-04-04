@@ -1,0 +1,10 @@
+.searchBox {
+  > input {
+    min-height: 0 !important;
+    border-radius: 22px;
+    margin-left: 6px;
+    height: 44px;
+    font-size: 16px;
+    padding-left: 35px !important;
+  }
+}

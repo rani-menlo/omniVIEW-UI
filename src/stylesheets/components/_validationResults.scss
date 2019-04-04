@@ -28,7 +28,7 @@
     }
   }
   &__table {
-    height: 80%;
+    height: calc(100% - 65px);
     table {
       width: 100%;
     }
@@ -91,9 +91,13 @@
     }
   }
   &__footer {
+    position: absolute;
+    bottom: 5px;
+    width: 100%;
     display: flex;
     justify-content: space-between;
     margin-top: 12px;
+    padding-right: 20px;
     &__viewreport {
       @include text-bold-active;
       cursor: pointer;

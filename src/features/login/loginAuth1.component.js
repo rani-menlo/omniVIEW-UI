@@ -46,10 +46,10 @@ class LoginAuth1 extends Component {
       phone via SMS."
         >
           <RadioGroup onChange={this.onSelect} value={this.state.selected}>
-            <Radio value="email" className="auth1-radio">
+            <Radio value="email" className="global__radio">
               Email Address
             </Radio>
-            <Radio value="phone" className="auth1-radio">
+            <Radio value="phone" className="global__radio">
               SMS
             </Radio>
           </RadioGroup>

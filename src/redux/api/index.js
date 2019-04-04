@@ -4,6 +4,7 @@ import { default as LoginApi } from "./login.api";
 import { default as CustomerApi } from "./customer.api";
 import { default as ApplicationApi } from "./application.api";
 import { default as SubmissionApi } from "./submission.api";
+import { default as UsermanagementApi } from "./usermanagement.api";
 import { SERVER_URL } from "../../constants";
 import { responseInterceptor } from "./response.interceptor";
 
@@ -15,4 +16,10 @@ api.interceptors.request.use(requestInterceptor);
 api.interceptors.response.use(null, responseInterceptor);
 
 export default api;
-export { LoginApi, CustomerApi, ApplicationApi, SubmissionApi };
+export {
+  LoginApi,
+  CustomerApi,
+  ApplicationApi,
+  SubmissionApi,
+  UsermanagementApi
+};
