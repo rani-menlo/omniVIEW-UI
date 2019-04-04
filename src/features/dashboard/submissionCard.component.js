@@ -8,12 +8,18 @@ import { DATE_FORMAT } from "../../constants";
 class SubmissionCard extends Component {
   static propTypes = {
     submission: PropTypes.object,
-    onSelect: PropTypes.func
+    onSelect: PropTypes.func,
+    onMenuItemClick: PropTypes.func
+  };
+
+  onMenuItemClick = ({ key }) => {
+    const { onMenuItemClick, submission } = this.props;
+    onMenuItemClick && onMenuItemClick(key, submission);
   };
 
   getMenu = () => {
     return (
-      <Menu>
+      <Menu onClick={this.onMenuItemClick}>
         <Menu.Item disabled>
           <span className="submissioncard__heading-dropdown--item">
             Edit User Permissions
@@ -22,6 +28,11 @@ class SubmissionCard extends Component {
         <Menu.Item disabled>
           <span className="submissioncard__heading-dropdown--item red-text">
             Remove Application
+          </span>
+        </Menu.Item>
+        <Menu.Item key="window">
+          <span className="submissioncard__heading-dropdown--item">
+            Open in new Window
           </span>
         </Menu.Item>
       </Menu>

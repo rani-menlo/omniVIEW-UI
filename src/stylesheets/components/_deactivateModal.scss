@@ -1,0 +1,23 @@
+.deactivate-modal {
+  &-title {
+    @include text-bold-active(16px);
+  }
+  &-close {
+    width: 24px;
+    height: 24px;
+    float: right;
+    cursor: pointer;
+  }
+  &-content {
+    @include text-normal-inactive(14px);
+    margin-top: 8px;
+  }
+  &-buttons {
+    text-align: right;
+    margin-top: 48px;
+    &-deactivate {
+      border: none !important;
+      background-color: $red !important;
+    }
+  }
+}

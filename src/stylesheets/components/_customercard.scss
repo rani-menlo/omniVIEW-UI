@@ -1,5 +1,4 @@
 .customercard {
-  background: $blue;
   width: 230px;
   height: 230px;
   display: flex;
@@ -16,6 +15,9 @@
     align-items: center;
     height: 22%; //60px;
     overflow: hidden;
+    background: $blue;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
     &-text {
       @include text-bold-active(16px);
       margin-top: 5px;

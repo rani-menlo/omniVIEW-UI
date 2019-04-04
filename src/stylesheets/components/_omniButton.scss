@@ -1,0 +1,27 @@
+.omniButton {
+  &-add {
+    display: flex;
+    cursor: pointer;
+    background: $blue;
+    border-radius: 4px;
+    padding: 8px;
+    align-items: center;
+    &-text {
+      @include text-bold-active(16px);
+      color: $white;
+      margin-left: 4px;
+    }
+  }
+  &-primary {
+    > span {
+      @include text-bold-active(12px);
+      color: $white;
+    }
+  }
+  &-secondary {
+    border-color: $black !important;
+    > span {
+      @include text-bold-active(12px);
+    }
+  }
+}

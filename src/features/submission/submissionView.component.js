@@ -8,18 +8,20 @@ import styled from "styled-components";
 import TreeNode from "./treeNode.component";
 import NodeProperties from "./nodeProperties.component";
 import NodeSequences from "./nodeSequences.component";
-import Sidebar from "../../uikit/components/sidebar/sidebar.component";
 import { SubmissionActions } from "../../redux/actions";
-import Loader from "../../uikit/components/loader";
 import ValidationResults from "./validationResults.component";
-import Footer from "../../uikit/components/footer/footer.component";
+import {
+  Sidebar,
+  Loader,
+  Footer,
+  DraggableModal
+} from "../../uikit/components";
 import {
   getSequenceJson,
   getLifeCycleJson,
   getSequences
 } from "../../redux/selectors/submissionView.selector";
 import ProfileMenu from "../header/profileMenu.component";
-import DraggableModal from "../../uikit/components/modal/draggableModal.component";
 
 const TabPane = Tabs.TabPane;
 
@@ -181,7 +183,12 @@ class SubmissionView extends Component {
 
   openApplicationsScreen = () => {
     this.props.actions.setSelectedSequence(null);
-    this.props.history.goBack();
+    console.log(this.props.history);
+    if(this.props.history.action === 'POP') {
+      window.close();
+    } else {
+      this.props.history.goBack();
+    }
   };
 
   getTreeLabel = () => {

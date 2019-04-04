@@ -71,3 +71,25 @@
   color: $white !important;
   cursor: not-allowed !important;
 }
+
+.global__field__error {
+  &-box {
+    border-color: $red !important;
+  }
+  &-text {
+    @include text-normal;
+    margin-bottom: 15px;
+    margin-top: -25px;
+    color: $red;
+  }
+}
+
+.global__radio {
+  span > span {
+    border-color: $black;
+  }
+}
+
+p {
+  margin-bottom: 1px !important;
+}

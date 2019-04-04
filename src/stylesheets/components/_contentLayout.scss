@@ -1,0 +1,14 @@
+.maincontent {
+  background: $blue-gradient;
+  min-height: 100%;
+  &__children {
+    margin-left: 12%;
+    margin-right: 12%;
+    background: $white;
+    min-height: 100vh;
+    box-shadow: 0 6px 8px 0 rgba(0, 0, 0, 0.5);
+    padding: 12px 36px;
+    border-top: 0.2px solid;
+    // overflow-y: auto;
+  }
+}

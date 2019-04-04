@@ -1,20 +1,27 @@
 import React, { Component } from "react";
 import _ from "lodash";
-import { Icon, Input, Checkbox, Dropdown, Menu } from "antd";
+import { Icon, Dropdown, Menu } from "antd";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import styled from "styled-components";
 import CustomerCard from "../customerCard.component";
 import { CustomerActions } from "../../../redux/actions";
 import Header from "../../header/header.component";
-import Loader from "../../../uikit/components/loader";
-import Footer from "../../../uikit/components/footer/footer.component";
-import TableHeader from "../../../uikit/components/table/tableHeader.component";
-import Row from "../../../uikit/components/row/row.component";
-import Pagination from "../../../uikit/components/pagination";
-import { Redirect } from "react-router-dom";
 import { isLoggedInOmniciaRole } from "../../../utils";
-import PaginationCheckbox from "../../../uikit/components/pagination/paginationCheckbox.component";
+import {
+  Loader,
+  Footer,
+  TableHeader,
+  Row,
+  Pagination,
+  PaginationCheckbox,
+  OmniButton,
+  SearchBox,
+  ListViewGridView,
+  SubHeader,
+  ContentLayout
+} from "../../../uikit/components";
+import { DEBOUNCE_TIME } from "../../../constants";
 
 class CustomerDashboard extends Component {
   constructor(props) {
@@ -25,7 +32,7 @@ class CustomerDashboard extends Component {
       itemsPerPage: 5,
       searchText: ""
     };
-    this.searchCustomers = _.debounce(this.searchCustomers, 700);
+    this.searchCustomers = _.debounce(this.searchCustomers, DEBOUNCE_TIME);
   }
 
   componentDidMount() {
@@ -52,7 +59,7 @@ class CustomerDashboard extends Component {
     }
   };
 
-  changeView = type => () => {
+  changeView = type => {
     this.setState({ viewBy: type }, () => this.fetchCustomers());
   };
 
@@ -106,6 +113,10 @@ class CustomerDashboard extends Component {
     this.searchCustomers();
   };
 
+  addCustomer = () => {
+    this.props.history.push("/usermanagement/customer/add");
+  };
+
   render() {
     const { viewBy, searchText } = this.state;
     const { customers, loading, customerCount } = this.props;
@@ -113,204 +124,154 @@ class CustomerDashboard extends Component {
       <React.Fragment>
         <Loader loading={loading} />
         <Header />
-        <div className="maindashboard">
-          <div className="maindashboard__header">
-            <div
-              className={`maindashboard__header__icon maindashboard__header__icon-cards ${viewBy ===
-                "cards" && "maindashboard__header__icon-selected"}`}
-              onClick={this.changeView("cards")}
-            >
-              <Icon
-                type="appstore"
-                theme="filled"
-                className={`card-icon ${viewBy === "cards" &&
-                  "card-icon-colored"}`}
-              />
-            </div>
-            <div
-              className={`maindashboard__header__icon maindashboard__header__icon-lists ${viewBy ===
-                "lists" && "maindashboard__header__icon-selected"}`}
-              onClick={this.changeView("lists")}
-            >
-              <img
-                src={
-                  viewBy === "lists"
-                    ? "/images/list-view-active.svg"
-                    : "/images/list-view.svg"
-                }
-              />
-            </div>
-            {/* <div className="maindashboard__header__icon maindashboard__header__icon-filter">
+        <SubHeader>
+          <ListViewGridView viewBy={viewBy} changeView={this.changeView} />
+          {/* <div className="maindashboard__header__icon maindashboard__header__icon-filter">
               <img src={FilterIcon} />
             </div>
             <span className="maindashboard__header-filter-text">
               Filters: Off
             </span> */}
-            <div className="maindashboard__header__search">
-              <Input
-                value={searchText}
-                className="maindashboard__header__search-box"
-                prefix={
-                  <img src="/images/search.svg" style={{ marginLeft: "5px" }} />
-                }
-                suffix={
-                  searchText ? (
-                    <img
-                      src="/images/close.svg"
-                      style={{
-                        width: "20px",
-                        height: "20px",
-                        cursor: "pointer"
-                      }}
-                      onClick={this.clearSearch}
-                    />
-                  ) : (
-                    ""
-                  )
-                }
-                placeholder="Search Customers..."
-                onChange={this.handleSearch}
-              />
-            </div>
+          <div style={{ marginLeft: "auto" }}>
+            <SearchBox
+              placeholder="Search Customers..."
+              searchText={searchText}
+              clearSearch={this.clearSearch}
+              onChange={this.handleSearch}
+            />
           </div>
-          <div className="maindashboard__content">
-            <div className="maindashboard__content__header">
-              <span className="maindashboard__content__header-customers">
-                Customers ({customerCount})
-              </span>
-              <span className="maindashboard__content__header-addcustomer global__disabled-box">
-                <img src="/images/plus.svg" />
-                <span className="maindashboard__content__header-addcustomer--text">
-                  Add New Customer{" "}
-                </span>
-              </span>
+        </SubHeader>
+        <ContentLayout className="maindashboard">
+          <div className="maindashboard__header">
+            <div>
+              <span className="maindashboard__header-customers">Customers</span>
             </div>
-            {viewBy === "lists" && (
-              <React.Fragment>
-                <div className="maindashboard__content__list">
-                  <TableHeader
-                    columns={TableColumns}
-                    sortColumn={this.sortColumn}
-                  />
-                  {_.map(customers, customer => (
-                    <Row
-                      key={customer.id}
-                      className="maindashboard__content__list__item"
-                    >
-                      <Column width={getColumnWidth(TableColumnNames.CHECKBOX)}>
-                        <PaginationCheckbox />
-                      </Column>
-                      <Column
-                        width={getColumnWidth(TableColumnNames.CUSTOMER_NAME)}
-                        className="maindashboard__content__list__item-text-bold"
-                        onClick={this.onCustomerSelected(customer)}
-                      >
-                        {_.get(customer, "company_name", "")}
-                      </Column>
-                      <Column
-                        width={getColumnWidth(TableColumnNames.USERS)}
-                        className="maindashboard__content__list__item-text"
-                        onClick={this.onCustomerSelected(customer)}
-                      >
-                        {_.get(customer, "number_of_users", "")}
-                      </Column>
-                      <Column
-                        width={getColumnWidth(TableColumnNames.APPLICATIONS)}
-                        className="maindashboard__content__list__item-text"
-                        onClick={this.onCustomerSelected(customer)}
-                      >
-                        {_.get(customer, "number_of_submissions", "")}
-                      </Column>
-                      <Column
-                        width={getColumnWidth(TableColumnNames.STORAGE)}
-                        className="maindashboard__content__list__item-text"
-                        onClick={this.onCustomerSelected(customer)}
-                      >
-                        {_.get(customer, "max_space") || "0"} TB
-                      </Column>
-                      <Column
-                        width={getColumnWidth(TableColumnNames.COMPANY_ADMIN)}
-                        className="maindashboard__content__list__item-text"
-                        onClick={this.onCustomerSelected(customer)}
-                      >
-                        {_.get(customer, "admin_name", "")}
-                      </Column>
-                      <Column
-                        width={getColumnWidth(TableColumnNames.SUBSCRIPTION)}
-                        className="maindashboard__content__list__item__row maindashboard__content__list__item-text"
-                      >
-                        {_.get(
-                          customer,
-                          "subscription",
-                          "12 in use  | 3 unassigned"
-                        )}
-                        <Dropdown
-                          overlay={this.getMenu()}
-                          trigger={["click"]}
-                          overlayClassName="maindashboard__content__list__item-dropdown"
-                        >
-                          <img
-                            src="/images/overflow-blue.svg"
-                            style={{ width: "20px", height: "20px" }}
-                          />
-                        </Dropdown>
-                      </Column>
-                    </Row>
-                  ))}
-                </div>
-                {searchText && !customers.length && (
-                  <Row className="maindashboard__content__nodata">
-                    <Icon
-                      style={{ fontSize: "20px" }}
-                      type="exclamation-circle"
-                      className="maindashboard__content__nodata-icon"
-                    />
-                    No Customers found
-                  </Row>
-                )}
-                <Pagination
-                  containerStyle={
-                    customerCount > 4
-                      ? { marginTop: "5%" }
-                      : { marginTop: "20%" }
-                  }
-                  total={customerCount}
-                  showTotal={(total, range) =>
-                    `Showing - ${range[0]}-${range[1]} of ${total} Customers`
-                  }
-                  pageSize={this.state.itemsPerPage}
-                  current={this.state.pageNo}
-                  onPageChange={this.onPageChange}
-                  onPageSizeChange={this.onPageSizeChange}
+            <OmniButton
+              type="add"
+              label="Add New Customer"
+              onClick={this.addCustomer}
+              // className="global__disabled-box"
+            />
+          </div>
+          {viewBy === "lists" && (
+            <React.Fragment>
+              <div className="maindashboard__list">
+                <TableHeader
+                  columns={TableColumns}
+                  sortColumn={this.sortColumn}
                 />
-              </React.Fragment>
-            )}
-            {viewBy === "cards" && (
-              <React.Fragment>
-                <div className="maindashboard__content__cards">
-                  {_.map(customers, customer => (
-                    <CustomerCard
-                      key={customer.id}
-                      customer={customer}
-                      onSelect={this.onCustomerSelected}
-                    />
-                  ))}
-                </div>
-                {searchText && !customers.length && (
-                  <Row className="maindashboard__content__nodata">
-                    <Icon
-                      style={{ fontSize: "20px" }}
-                      type="exclamation-circle"
-                      className="maindashboard__content__nodata-icon"
-                    />
-                    No Customers found
+                {_.map(customers, customer => (
+                  <Row key={customer.id} className="maindashboard__list__item">
+                    <Column width={getColumnWidth(TableColumnNames.CHECKBOX)}>
+                      <PaginationCheckbox />
+                    </Column>
+                    <Column
+                      width={getColumnWidth(TableColumnNames.CUSTOMER_NAME)}
+                      className="maindashboard__list__item-text-bold"
+                      onClick={this.onCustomerSelected(customer)}
+                    >
+                      {_.get(customer, "company_name", "")}
+                    </Column>
+                    <Column
+                      width={getColumnWidth(TableColumnNames.USERS)}
+                      className="maindashboard__list__item-text"
+                      onClick={this.onCustomerSelected(customer)}
+                    >
+                      {_.get(customer, "number_of_users", "")}
+                    </Column>
+                    <Column
+                      width={getColumnWidth(TableColumnNames.APPLICATIONS)}
+                      className="maindashboard__list__item-text"
+                      onClick={this.onCustomerSelected(customer)}
+                    >
+                      {_.get(customer, "number_of_submissions", "")}
+                    </Column>
+                    <Column
+                      width={getColumnWidth(TableColumnNames.STORAGE)}
+                      className="maindashboard__list__item-text"
+                      onClick={this.onCustomerSelected(customer)}
+                    >
+                      {_.get(customer, "max_space") || "0"} TB
+                    </Column>
+                    <Column
+                      width={getColumnWidth(TableColumnNames.COMPANY_ADMIN)}
+                      className="maindashboard__list__item-text"
+                      onClick={this.onCustomerSelected(customer)}
+                    >
+                      {_.get(customer, "admin_name", "")}
+                    </Column>
+                    <Column
+                      width={getColumnWidth(TableColumnNames.SUBSCRIPTION)}
+                      className="maindashboard__list__item__row maindashboard__list__item-text"
+                    >
+                      {_.get(
+                        customer,
+                        "subscription",
+                        "12 in use  | 3 unassigned"
+                      )}
+                      <Dropdown
+                        overlay={this.getMenu()}
+                        trigger={["click"]}
+                        overlayClassName="maindashboard__list__item-dropdown"
+                      >
+                        <img
+                          src="/images/overflow-black.svg"
+                          style={{ width: "18px", height: "18px" }}
+                        />
+                      </Dropdown>
+                    </Column>
                   </Row>
-                )}
-              </React.Fragment>
-            )}
-          </div>
-          <Footer />
-        </div>
+                ))}
+              </div>
+              {searchText && !customers.length && (
+                <Row className="maindashboard__nodata">
+                  <Icon
+                    style={{ fontSize: "20px" }}
+                    type="exclamation-circle"
+                    className="maindashboard__nodata-icon"
+                  />
+                  No Customers found
+                </Row>
+              )}
+              <Pagination
+                containerStyle={
+                  customerCount > 4 ? { marginTop: "5%" } : { marginTop: "20%" }
+                }
+                total={customerCount}
+                showTotal={(total, range) =>
+                  `Showing - ${range[0]}-${range[1]} of ${total} Customers`
+                }
+                pageSize={this.state.itemsPerPage}
+                current={this.state.pageNo}
+                onPageChange={this.onPageChange}
+                onPageSizeChange={this.onPageSizeChange}
+              />
+            </React.Fragment>
+          )}
+          {viewBy === "cards" && (
+            <React.Fragment>
+              <div className="maindashboard__cards">
+                {_.map(customers, customer => (
+                  <CustomerCard
+                    key={customer.id}
+                    customer={customer}
+                    onSelect={this.onCustomerSelected}
+                  />
+                ))}
+              </div>
+              {searchText && !customers.length && (
+                <Row className="maindashboard__nodata">
+                  <Icon
+                    style={{ fontSize: "20px" }}
+                    type="exclamation-circle"
+                    className="maindashboard__nodata-icon"
+                  />
+                  No Customers found
+                </Row>
+              )}
+            </React.Fragment>
+          )}
+        </ContentLayout>
       </React.Fragment>
     );
   }

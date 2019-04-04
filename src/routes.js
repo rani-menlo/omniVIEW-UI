@@ -12,6 +12,9 @@ import CustomerDashboardContainer from "./features/dashboard/customer/customerDa
 import PrivateRoute from "./privateRoute";
 import PdfViewer from "./features/pdfViewer/pdfViewer.component";
 import Loader from "./uikit/components/loader";
+import UserManagementContainer from "./features/usermanagement/userManagement.container";
+import AddUser from "./features/usermanagement/adduser.component";
+import AddCustomer from "./features/usermanagement/addCustomer.component";
 
 const Routes = () => {
   return (
@@ -36,6 +39,17 @@ const Routes = () => {
               component={ApplicationDashboardContainer}
             />
             <PrivateRoute path="/submission" component={SubmissionView} />
+            <PrivateRoute
+              exact
+              path="/usermanagement"
+              component={UserManagementContainer}
+            />
+            <PrivateRoute path="/usermanagement/add" component={AddUser} />
+            <PrivateRoute path="/usermanagement/edit" component={AddUser} />
+            <PrivateRoute
+              path="/usermanagement/customer/add"
+              component={AddCustomer}
+            />
             {/* <Redirect to="/" /> */}
           </Switch>
         </BrowserRouter>
