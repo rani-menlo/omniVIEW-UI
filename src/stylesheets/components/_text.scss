@@ -1,0 +1,14 @@
+.heebo_text {
+  &-regular {
+    @include text-normal;
+  }
+  &-medium {
+    @include text-medium;
+  }
+  &-bold {
+    @include text-bold;
+  }
+  &-extra_bold {
+    @include text-extra-bold;
+  }
+}

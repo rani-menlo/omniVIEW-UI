@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import _ from "lodash";
+import moment from "moment";
 import "react-phone-number-input/style.css";
 import {
   InputField,
@@ -9,13 +10,15 @@ import {
   OmniButton,
   PhoneField,
   Loader,
-  DeactivateModal
+  DeactivateModal,
+  Text
 } from "../../uikit/components";
-import { Radio, Select, Icon, Avatar, Switch, Modal } from "antd";
+import { Radio, Select, Icon, Avatar, Switch, Modal, Checkbox } from "antd";
 import Header from "../header/header.component";
 import { UsermanagementActions } from "../../redux/actions";
 import { isEmail, isPhone, isLoggedInOmniciaRole } from "../../utils";
-import { ROLES } from "../../constants";
+import { ROLES, DATE_FORMAT } from "../../constants";
+import { translate } from "../../translations/translator";
 
 const RadioGroup = Radio.Group;
 const Option = Select.Option;
@@ -132,31 +135,43 @@ class AddUser extends Component {
     let error = false;
     if (!state.fname.value) {
       error = true;
-      state.fname.error = "First Name is required";
+      state.fname.error = translate("error.form.required", {
+        type: translate("label.form.fname")
+      });
     }
     if (!state.lname.value) {
       error = true;
-      state.lname.error = "Last Name is required";
+      state.lname.error = translate("error.form.required", {
+        type: translate("label.form.lname")
+      });
     }
     if (state.email.value) {
       const valid = isEmail(state.email.value);
       if (!valid) {
         error = true;
-        state.email.error = "Enter valid email";
+        state.email.error = translate("error.form.invalid", {
+          type: translate("label.form.email")
+        });
       }
     } else {
       error = true;
-      state.email.error = "Email is required";
+      state.email.error = translate("error.form.required", {
+        type: translate("label.form.email")
+      });
     }
     if (state.phone.value) {
       const valid = isPhone(state.phone.value);
       if (!valid) {
         error = true;
-        state.phone.error = "Enter valid Phone";
+        state.phone.error = translate("error.form.invalid", {
+          type: translate("label.form.phone")
+        });
       }
     } else {
       error = true;
-      state.phone.error = "Phone is required";
+      state.phone.error = translate("error.form.required", {
+        type: translate("label.form.phone")
+      });
     }
     // licence check only in add user
     if (
@@ -165,7 +180,7 @@ class AddUser extends Component {
       !state.selectedLicence.value
     ) {
       error = true;
-      state.selectedLicence.error = "Choose licence";
+      state.selectedLicence.error = translate("label.user.chooselicence");
     }
 
     if (error) {
@@ -218,6 +233,10 @@ class AddUser extends Component {
     this.props.history.goBack();
   };
 
+  getLicenceAppName = appName => {
+    return _.includes(appName, "view") ? "omniVIEW" : "omniFILE";
+  };
+
   render() {
     const { departments, licences, loading } = this.props;
     const {
@@ -238,39 +257,46 @@ class AddUser extends Component {
         <ContentLayout className="addUser">
           <div style={{ marginBottom: "15px" }}>
             <span className="maindashboard-breadcrum" onClick={this.goBack}>
-              User Management
+              {translate("label.usermgmt.title")}
             </span>
             <span style={{ margin: "0px 5px" }}>></span>
             <span
               className="maindashboard-breadcrum"
               style={{ opacity: 0.4, cursor: "not-allowed" }}
             >
-              Add User
+              {`${translate("label.usermgmt.add")} ${translate(
+                "label.dashboard.user"
+              )}`}
             </span>
           </div>
-          <p className="addUser-title">{editUser ? "Edit" : "Add"} User</p>
+          <p className="addUser-title">
+            {editUser
+              ? translate("label.usermgmt.edit")
+              : translate("label.usermgmt.add")}{" "}
+            {translate("label.dashboard.user")}
+          </p>
           <p className="addUser-subtitle">
             {editUser
-              ? "Make edits to this user profile below"
-              : "Complete the form below to add a new user. Fields with an * are mandatory."}
+              ? translate("text.user.editmsg")
+              : translate("text.user.addmsg")}
           </p>
           <div className="global__hr-line" />
-          <p className="addUser-heading">User Details</p>
+          <p className="addUser-heading">{translate("label.user.details")}</p>
           <Row className="addUser__fields">
             <InputField
               className="addUser__fields-field"
               style={{ marginRight: "14px" }}
-              label="First Name*"
+              label={`${translate("label.form.fname")}*`}
               value={fname.value}
-              placeholder="First Name"
+              placeholder={translate("label.form.fname")}
               error={fname.error}
               onChange={this.onInputChange("fname")}
             />
             <InputField
               className="addUser__fields-field"
-              label="Last Name*"
+              label={`${translate("label.form.lname")}*`}
               value={lname.value}
-              placeholder="Last Name"
+              placeholder={translate("label.form.lname")}
               error={lname.error}
               onChange={this.onInputChange("lname")}
             />
@@ -279,23 +305,23 @@ class AddUser extends Component {
             <InputField
               className="addUser__fields-field"
               style={{ marginRight: "14px" }}
-              label="Email Address*"
+              label={`${translate("label.form.email")}*`}
               value={email.value}
-              placeholder="Email"
+              placeholder={translate("placeholder.form.email")}
               error={email.error}
               onChange={this.onInputChange("email")}
             />
             <PhoneField
               className="addUser__fields-field"
               error={phone.error}
-              label="Phone Number*"
+              label={`${translate("label.form.phone")}*`}
               value={phone.value}
               onChange={this.onPhoneChange}
             />
           </Row>
           <div className="addUser__section">
             <p className="addUser__section-label">
-              Select the role that this user will be assigned*
+              {translate("text.user.rolemsg")}
             </p>
             <RadioGroup value={selectedRole} onChange={this.onRoleChange}>
               {_.map(this.roles, role => (
@@ -312,7 +338,7 @@ class AddUser extends Component {
           </div>
           <div className="addUser__section">
             <p className="addUser__section-label">
-              Select the department this user is a part of*
+              {translate("text.user.selectdeptmsg")}
             </p>
             <RadioGroup
               value={selectedDept}
@@ -363,7 +389,9 @@ class AddUser extends Component {
                       statusActive ? "active" : "inactive"
                     }`}
                   >
-                    {statusActive ? "Active" : "Inactive"}
+                    {statusActive
+                      ? translate("label.user.active")
+                      : translate("label.user.inactive")}
                   </p>
                 </div>
                 <p className="addUser__account-created">
@@ -375,15 +403,18 @@ class AddUser extends Component {
           {!editUser && (
             <React.Fragment>
               <p className="addUser__section addUser__section-label">
-                Choose a subscription license to apply to this user's account.
+                {translate("text.user.choosesubscriptionmsg")}
               </p>
               <div className="addUser__licences">
                 {(_.get(licences, "length") || "") && (
                   <div>
-                    <p className="global__field-label">Available Licenses</p>
+                    <p className="global__field-label">
+                      {translate("label.user.availablelicences")}
+                    </p>
                     <Select
                       value={
-                        _.get(selectedLicence, "value") || "Choose Licence"
+                        _.get(selectedLicence, "value") ||
+                        translate("label.user.chooselicence")
                       }
                       className={`addUser__dropdown ${selectedLicence.error &&
                         "addUser__dropdown-error"}`}
@@ -411,22 +442,39 @@ class AddUser extends Component {
                     )}
                   </div>
                 )}
-                {/* {
+                {
                   <div className="addUser__licences__box">
-                    {_.map(licences, licence => (
-                      <div
-                        className="addUser__licences__box-item global__center-vert"
-                        key={licence.id}
-                        value={licence.id}
-                      >
-                        <div>
-                          <p>6 - month license</p>
-                          <p>omniVIEW - Purchased on 1/3/2019</p>
+                    <div className="addUser__licences__box__scroll">
+                      {_.map(licences, licence => (
+                        <div
+                          className="addUser__licences__box__scroll-item"
+                          key={licence.id}
+                          value={licence.id}
+                        >
+                          <div>
+                            <Text type="bold" text={licence.name} />
+                            <Text
+                              type="regular"
+                              size="14px"
+                              opacity={0.75}
+                              text={`${this.getLicenceAppName(
+                                licence.app_name
+                              )} - Purchased on ${moment(
+                                licence.purchase_date
+                              ).format(DATE_FORMAT)}`}
+                            />
+                          </div>
+                          <Checkbox />
                         </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
+                    <Text
+                      className="addUser__licences__box__warning"
+                      size="12px"
+                      text={translate("error.user.licenceassigned")}
+                    />
                   </div>
-                } */}
+                }
                 {!_.get(licences, "length") && (
                   <div className="addUser__licences__error">
                     <div className="global__center-vert">
@@ -436,14 +484,11 @@ class AddUser extends Component {
                         className="addUser__licences__error-icon"
                       />
                       <p className="addUser__licences__error-text">
-                        You’re out of licenses!
+                        {translate("text.user.outoflicence")}
                       </p>
                     </div>
                     <p className="addUser__licences__error-desc">
-                      You can still add this user, but they won’t be able to
-                      login and access the platform until they’re assigned a
-                      subscription license. Contact an Omnicia Admin to purchase
-                      more licenses for your account.
+                      {translate("text.user.addevennolicence")}
                     </p>
                   </div>
                 )}
@@ -453,13 +498,17 @@ class AddUser extends Component {
           <div className="addUser__buttons">
             <OmniButton
               type="secondary"
-              label="Cancel"
+              label={translate("label.button.cancel")}
               className="addUser__buttons-btn"
               onClick={this.goBack}
             />
             <OmniButton
               type="primary"
-              label={editUser ? "Save Changes" : "Save & Submit"}
+              label={
+                editUser
+                  ? translate("label.user.savechanges")
+                  : translate("label.user.saveandsubmit")
+              }
               className="addUser__buttons-btn"
               buttonStyle={{ marginLeft: "16px" }}
               onClick={this.save}
@@ -467,11 +516,8 @@ class AddUser extends Component {
           </div>
           <DeactivateModal
             visible={this.state.showDeactivateModal}
-            title="Deactivate Account?"
-            content="This user will no longer be able to access the system until an
-            Omnicia administrator enables their account again. Any remaining
-            time from the assigned subscription license can be applied to
-            another user within 30 days."
+            title={translate("label.usermgmt.deactivateacc")}
+            content={translate("text.usermgmt.deactivatemsg")}
             closeModal={this.closeModal}
             deactivate={this.deactivate}
           />

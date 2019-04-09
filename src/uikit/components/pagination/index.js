@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 import Row from "../row/row.component";
 import PaginationButton from "./paginationButton.component";
 import _ from "lodash";
+import { translate } from "../../../translations/translator";
 
 class Pagination extends Component {
   static propTypes = {
@@ -44,10 +45,10 @@ class Pagination extends Component {
 
   getPaginationButtons = (current, type, orig) => {
     if (type === "prev") {
-      return <PaginationButton label="Back" />;
+      return <PaginationButton label={translate("label.pagination.back")} />;
     }
     if (type === "next") {
-      return <PaginationButton label="Next" />;
+      return <PaginationButton label={translate("label.pagination.next")} />;
     }
     return orig;
   };
@@ -129,7 +130,9 @@ class Pagination extends Component {
           onChange={this.onPageChange}
         />
         <Row className="pagination__pagesize">
-          <div className="pagination__pagesize__label">Number of Items: </div>
+          <div className="pagination__pagesize__label">
+            {translate("text.pagination.noofitems")}{" "}
+          </div>
           <div className="pagination__pagesize__container">
             <Input
               className="pagination__pagesize__container-input"

@@ -4,6 +4,7 @@ import { Dropdown, Menu, Avatar } from "antd";
 import _ from "lodash";
 import moment from "moment";
 import { DATE_FORMAT } from "../../constants";
+import { translate } from "../../translations/translator";
 
 class SubmissionCard extends Component {
   static propTypes = {
@@ -67,7 +68,7 @@ class SubmissionCard extends Component {
         >
           <div className="submissioncard__content__item">
             <span className="submissioncard__content__item-label">
-              Added by:
+              {translate("label.dashboard.addedby")}
             </span>
             <div style={{ whiteSpace: "nowrap" }}>
               <Avatar size="small" icon="user" />
@@ -81,7 +82,7 @@ class SubmissionCard extends Component {
           </div>
           <div className="submissioncard__content__item">
             <span className="submissioncard__content__item-label">
-              Sequences:{" "}
+              {translate("label.dashboard.sequences")}:
             </span>
             <span className="submissioncard__content__item-text">
               {_.get(submission, "sequence_count", "")}
@@ -89,7 +90,7 @@ class SubmissionCard extends Component {
           </div>
           <div className="submissioncard__content__item">
             <span className="submissioncard__content__item-label">
-              Added On:{" "}
+              {translate("label.dashboard.addedon")}:
             </span>
             <span className="submissioncard__content__item-text">
               {moment(_.get(submission, "created_at", "12/01/2018")).format(
@@ -99,7 +100,7 @@ class SubmissionCard extends Component {
           </div>
           <div className="submissioncard__content__item">
             <span className="submissioncard__content__item-label">
-              Last Updated:{" "}
+              {translate("label.dashboard.lastupdated")}:
             </span>
             <span className="submissioncard__content__item-text">
               {moment(_.get(submission, "updated_at", "12/01/2018")).format(
@@ -109,7 +110,9 @@ class SubmissionCard extends Component {
           </div>
           <div className="global__hr-line" style={{ marginTop: "20px" }} />
           <div className="submissioncard__content__item">
-            <span className="submissioncard__content__item-label">Users:</span>
+            <span className="submissioncard__content__item-label">
+              {translate("label.dashboard.users")}:
+            </span>
             <div>
               <Avatar size="small" icon="user" />
               <Avatar size="small" icon="user" />

@@ -14,6 +14,7 @@ import {
 import { DEBOUNCE_TIME } from "../../constants";
 import { UsermanagementActions } from "../../redux/actions";
 import { Avatar } from "antd";
+import { translate } from "../../translations/translator";
 
 class UserManagementContainer extends Component {
   constructor(props) {
@@ -111,7 +112,9 @@ class UserManagementContainer extends Component {
         <SubHeader>
           <div style={{ marginLeft: "auto" }}>
             <SearchBox
-              placeholder="Search Users..."
+              placeholder={translate("text.header.search", {
+                type: translate("label.dashboard.users")
+              })}
               searchText={searchText}
               clearSearch={this.clearSearch}
               onChange={this.handleSearch}
@@ -120,10 +123,12 @@ class UserManagementContainer extends Component {
         </SubHeader>
         <ContentLayout className="userManagement">
           <div className="userManagement__header">
-            User Management
+            {translate("label.usermgmt.title")}
             <OmniButton
               type="add"
-              label="Add New User"
+              label={translate("label.button.add", {
+                type: translate("label.dashboard.user")
+              })}
               className="userManagement__header-addButton"
               onClick={this.openAdduser}
             />
@@ -150,10 +155,11 @@ class UserManagementContainer extends Component {
                             ""
                           )} ${_.get(usr, "last_name", "")}`}</p>
                           <p className="userManagement__group__users__user__info-text">
-                            Department: {_.get(usr, "department_name", "")}
+                            {translate("label.usermgmt.department")}:{" "}
+                            {_.get(usr, "department_name", "")}
                           </p>
                           <p className="userManagement__group__users__user__info-text">
-                            Subscription Status:
+                            {translate("label.usermgmt.subscriptionstatus")}:
                             <span
                               className={`userManagement__group__users__user__info-text-${
                                 isActive ? "active" : "inactive"
@@ -174,18 +180,20 @@ class UserManagementContainer extends Component {
                               className="userManagement__group__users__user__info-link"
                               onClick={this.editUser(usr)}
                             >
-                              Edit
+                              {translate("label.usermgmt.edit")}
                             </p>
                             <div className="userManagement__group__users__user__info-dot" />
                             <p className="userManagement__group__users__user__info-link">
-                              Assign License
+                              {translate("label.usermgmt.assignlicence")}
                             </p>
                             <div className="userManagement__group__users__user__info-dot" />
                             <p
                               className="userManagement__group__users__user__info-link"
                               onClick={this.openModal(usr)}
                             >
-                              {isActive ? "Deactivate" : "Activate"}
+                              {isActive
+                                ? translate("label.usermgmt.deactivate")
+                                : translate("label.usermgmt.activate")}
                             </p>
                           </div>
                         </div>
@@ -198,11 +206,8 @@ class UserManagementContainer extends Component {
           })}
           <DeactivateModal
             visible={this.state.showDeactivateModal}
-            title="Deactivate Account?"
-            content="This user will no longer be able to access the system until an
-            Omnicia administrator enables their account again. Any remaining
-            time from the assigned subscription license can be applied to
-            another user within 30 days."
+            title={translate("label.usermgmt.deactivateacc")}
+            content={translate("text.usermgmt.deactivatemsg")}
             closeModal={this.closeModal}
             deactivate={this.deactivate}
           />

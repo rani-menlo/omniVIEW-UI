@@ -1,5 +1,5 @@
 import { UsermanagementActionTypes } from "../actionTypes";
-import _ from 'lodash';
+import _ from "lodash";
 import ApiActions from "./api.actions";
 import { UsermanagementApi } from "../api";
 
@@ -33,14 +33,33 @@ export default {
       try {
         const res = await UsermanagementApi.fetchLicences(customerId);
         let licences = _.get(res, "data.licences", {});
-        if (licences["omni-view"]) {
+        const licencesByApp = _.groupBy(licences, "app_name");
+        let newLicences = [];
+        _.map(licencesByApp, appLicences => {
+          const licencesByName = _.groupBy(appLicences, "name");
+          _.map(licencesByName, (licences, name) => {
+            const revokedLicences = _.filter(licences, "revoked_date");
+            if (revokedLicences.length) {
+              newLicences = [...newLicences, ...revokedLicences];
+              licences = _.filter(
+                licences,
+                li => !revokedLicences.includes(li)
+              );
+            }
+            const licencesByDate = _.groupBy(licences, "purchase_date");
+            _.map(licencesByDate, licences => {
+              newLicences.push(licences[0]);
+            });
+          });
+        });
+        /*  if (licences["omni-view"]) {
           licences = _.spread(_.union)(_.values(licences["omni-view"]));
         } else {
           licences = _.spread(_.union)(_.values(licences["omni-file"]));
-        }
+        } */
         dispatch({
           type: UsermanagementActionTypes.FETCH_LICENCES,
-          data: licences
+          data: newLicences
         });
         ApiActions.success(dispatch);
       } catch (err) {

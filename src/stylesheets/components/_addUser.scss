@@ -157,15 +157,21 @@
     }
     &__box {
       width: 50%;
-      height: 220px;
-      overflow: auto;
+      min-height: 220px;
       border: solid 1px black;
       border-radius: 4px;
-      &-item {
-        height: 60px;
-        padding: 8px;
-        &:nth-child(even) {
-          background-color: $froasted-glass;
+      &__scroll {
+        overflow: auto;
+        height: 220px;
+        &-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          height: 60px;
+          padding: 8px;
+          &:nth-child(even) {
+            background-color: $froasted-glass;
+          }
         }
       }
     }

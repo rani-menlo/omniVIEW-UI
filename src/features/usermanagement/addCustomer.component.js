@@ -14,6 +14,7 @@ import Header from "../header/header.component";
 import { Checkbox } from "antd";
 import { UsermanagementActions } from "../../redux/actions";
 import { isPhone, isEmail } from "../../utils";
+import { translate } from "../../translations/translator";
 
 class AddCustomer extends Component {
   constructor(props) {
@@ -137,36 +138,48 @@ class AddCustomer extends Component {
     }
     if (!state.fname.value) {
       error = true;
-      state.fname.error = "First Name is required";
+      state.fname.error = translate("error.form.required", {
+        type: translate("label.form.fname")
+      });
       window.scrollTo(0, 0);
     }
     if (!state.lname.value) {
       error = true;
-      state.lname.error = "Last Name is required";
+      state.lname.error = translate("error.form.required", {
+        type: translate("label.form.lname")
+      });
       window.scrollTo(0, 0);
     }
     if (state.email.value) {
       const valid = isEmail(state.email.value);
       if (!valid) {
         error = true;
-        state.email.error = "Enter valid email";
+        state.email.error = translate("error.form.invalid", {
+          type: translate("label.form.email")
+        });
         window.scrollTo(0, 0);
       }
     } else {
       error = true;
-      state.email.error = "Email is required";
+      state.email.error = translate("error.form.required", {
+        type: translate("label.form.email")
+      });
       window.scrollTo(0, 0);
     }
     if (state.phone.value) {
       const valid = isPhone(state.phone.value);
       if (!valid) {
         error = true;
-        state.phone.error = "Enter valid Phone";
+        state.phone.error = translate("error.form.invalid", {
+          type: translate("label.form.phone")
+        });
         window.scrollTo(0, 0);
       }
     } else {
       error = true;
-      state.phone.error = "Phone is required";
+      state.phone.error = translate("error.form.required", {
+        type: translate("label.form.phone")
+      });
     }
     const storage = Number(state.storageTB) + Number(state.storageGB);
     if (storage === 0) {

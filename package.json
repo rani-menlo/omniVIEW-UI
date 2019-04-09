@@ -53,6 +53,7 @@
     "react-dev-utils": "^7.0.1",
     "react-dom": "^16.7.0",
     "react-draggable": "^3.2.1",
+    "react-intl": "^2.8.0",
     "react-phone-number-input": "^2.3.10",
     "react-redux": "^6.0.0",
     "react-resizable": "^1.7.5",
@@ -142,7 +143,17 @@
           "libraryName": "antd",
           "style": "css"
         }
+      ],
+      [
+        "react-intl",
+        {
+          "messagesDir": "./build/messages",
+          "enforceDescriptions": false
+        }
       ]
     ]
+  },
+  "devDependencies": {
+    "babel-plugin-react-intl": "^3.0.1"
   }
 }

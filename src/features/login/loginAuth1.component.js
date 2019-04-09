@@ -1,12 +1,13 @@
-import React, { Component } from 'react';
-import { Radio, Button } from 'antd';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import { Redirect } from 'react-router-dom';
-import AuthLayout from './authLayout.component';
-import { LoginActions } from '../../redux/actions';
-import Loader from '../../uikit/components/loader';
-import Footer from '../../uikit/components/footer/footer.component';
+import React, { Component } from "react";
+import { Radio, Button } from "antd";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
+import { Redirect } from "react-router-dom";
+import AuthLayout from "./authLayout.component";
+import { LoginActions } from "../../redux/actions";
+import Loader from "../../uikit/components/loader";
+import Footer from "../../uikit/components/footer/footer.component";
+import { translate } from "../../translations/translator";
 
 const RadioGroup = Radio.Group;
 
@@ -14,19 +15,19 @@ class LoginAuth1 extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      selected: 'email'
+      selected: "email"
     };
   }
   sendCode = () => {
     const data = {
-      isEmail: this.state.selected === 'email'
+      isEmail: this.state.selected === "email"
     };
     this.props.actions.sendOtp(data);
   };
 
   goBack = () => {
     this.props.actions.setLoggedInStatus(false);
-    this.props.history.push('/');
+    this.props.history.push("/");
   };
 
   onSelect = e => {
@@ -40,36 +41,28 @@ class LoginAuth1 extends Component {
     ) : (
       <React.Fragment>
         <Loader loading={loading} />
-        <AuthLayout
-          heading="Before we can sign you in, we need to verify you are the account
-      owner. Choose to send an authentication code to your email or to your
-      phone via SMS."
-        >
+        <AuthLayout heading={translate("text.loginauth.title")}>
           <RadioGroup onChange={this.onSelect} value={this.state.selected}>
             <Radio value="email" className="global__radio">
-              Email Address
+              {translate("label.form.email")}
             </Radio>
             <Radio value="phone" className="global__radio">
-              SMS
+              {translate("label.loginauth.sms")}
             </Radio>
           </RadioGroup>
-          {/* <form>
-          <input type="radio" name="gender" value="male" checked />
-          <input type="radio" name="gender" value="female" checked />
-        </form> */}
           <div className="common_authbuttons">
             <Button
               className="common_authbuttons-btn common_authbuttons-btn-cancel"
               onClick={this.goBack}
             >
-              Cancel
+              {translate("label.button.cancel")}
             </Button>
             <Button
               type="primary"
               className="common_authbuttons-btn common_authbuttons-btn-send"
               onClick={this.sendCode}
             >
-              Send Code
+              {translate("label.loginauth.sendcode")}
             </Button>
           </div>
         </AuthLayout>

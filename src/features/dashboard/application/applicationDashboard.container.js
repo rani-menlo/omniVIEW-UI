@@ -24,6 +24,7 @@ import {
   SubHeader,
   ContentLayout
 } from "../../../uikit/components";
+import { translate } from "../../../translations/translator";
 // import { Customers } from "./sampleCustomers";
 
 class ApplicationDashboard extends Component {
@@ -165,7 +166,9 @@ class ApplicationDashboard extends Component {
             </span> */}
           <div style={{ marginLeft: "auto" }}>
             <SearchBox
-              placeholder="Search Applications..."
+              placeholder={translate("text.header.search", {
+                type: translate("label.dashboard.applications")
+              })}
               searchText={searchText}
               clearSearch={this.clearSearch}
               onChange={this.handleSearch}
@@ -179,14 +182,14 @@ class ApplicationDashboard extends Component {
                 className="maindashboard-breadcrum"
                 onClick={this.openCustomersScreen}
               >
-                Customers
+                {translate("label.dashboard.customers")}
               </span>
               <span style={{ margin: "0px 5px" }}>></span>
               <span
                 className="maindashboard-breadcrum"
                 style={{ opacity: 0.4, cursor: "not-allowed" }}
               >
-                Applications
+                {translate("label.dashboard.applications")}
               </span>
             </div>
           )}
@@ -201,13 +204,15 @@ class ApplicationDashboard extends Component {
                   className="maindashboard__header__addEdit"
                   onClick={this.openUserManagement}
                 >
-                  User Management
+                  {translate("label.usermgmt.title")}
                 </div>
               )}
             </div>
             <OmniButton
               type="add"
-              label="Add New Application"
+              label={translate("label.button.add", {
+                type: translate("label.dashboard.application")
+              })}
               className="global__disabled-box"
             />
           </div>
@@ -301,7 +306,9 @@ class ApplicationDashboard extends Component {
                     type="exclamation-circle"
                     className="maindashboard__nodata-icon"
                   />
-                  No Applications found
+                  {translate("error.dashboard.notfound", {
+                    type: translate("label.dashboard.applications")
+                  })}
                 </Row>
               )}
               <Pagination
@@ -312,7 +319,12 @@ class ApplicationDashboard extends Component {
                 }
                 total={submissionCount}
                 showTotal={(total, range) =>
-                  `Showing - ${range[0]}-${range[1]} of ${total} Applications`
+                  translate("text.pagination", {
+                    top: range[0],
+                    bottom: range[1],
+                    total,
+                    type: translate("label.dashboard.applications")
+                  })
                 }
                 pageSize={this.state.itemsPerPage}
                 current={this.state.pageNo}
@@ -340,7 +352,9 @@ class ApplicationDashboard extends Component {
                     type="exclamation-circle"
                     className="maindashboard__nodata-icon"
                   />
-                  No Applications found
+                  {translate("error.dashboard.notfound", {
+                    type: translate("label.dashboard.applications")
+                  })}
                 </Row>
               )}
             </React.Fragment>
@@ -353,12 +367,12 @@ class ApplicationDashboard extends Component {
 
 const TableColumnNames = {
   CHECKBOX: "",
-  APPLICATION_NAME: "Application Name",
-  SEQUENCES: "Sequences",
-  ADDEDBY: "Added By",
-  ADDEDON: "Added On",
-  LAST_UPDATED: "Last Updated",
-  USERS: "Users"
+  APPLICATION_NAME: translate("label.dashboard.applicationname"),
+  SEQUENCES: translate("label.dashboard.sequences"),
+  ADDEDBY: translate("label.dashboard.addedby"),
+  ADDEDON: translate("label.dashboard.addedon"),
+  LAST_UPDATED: translate("label.dashboard.lastupdated"),
+  USERS: translate("label.dashboard.users")
 };
 
 const TableColumns = [

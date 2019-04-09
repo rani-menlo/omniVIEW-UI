@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { Dropdown, Menu } from "antd";
 import _ from "lodash";
+import { translate } from "../../translations/translator";
 
 class CustomerCard extends Component {
   constructor(props) {
@@ -79,21 +80,27 @@ class CustomerCard extends Component {
           <div className="customercard__content__item">
             <img src="/images/users.svg" />
             <span className="customercard__content__item-text">
-              {_.get(customer, "number_of_users", "0")} users
+              {`${_.get(customer, "number_of_users", "0")} ${_.toLower(
+                translate("label.dashboard.users")
+              )}`}
             </span>
           </div>
           <div className="global__hr-line" />
           <div className="customercard__content__item">
             <img src="/images/applications.svg" />
             <span className="customercard__content__item-text">
-              {_.get(customer, "number_of_submissions", "0")} applications
+              {`${_.get(customer, "number_of_submissions", "0")} ${_.toLower(
+                translate("label.dashboard.applications")
+              )}`}
             </span>
           </div>
           <div className="global__hr-line" />
           <div className="customercard__content__item">
             <img src="/images/database.svg" />
             <span className="customercard__content__item-text">
-              {_.get(customer, "max_space") || "0"} TB
+              {`${_.get(customer, "max_space") || "0"} ${translate(
+                "label.dashboard.tb"
+              )}`}
             </span>
           </div>
           <div className="global__hr-line" />

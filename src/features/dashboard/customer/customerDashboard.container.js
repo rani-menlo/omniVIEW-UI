@@ -10,7 +10,6 @@ import Header from "../../header/header.component";
 import { isLoggedInOmniciaRole } from "../../../utils";
 import {
   Loader,
-  Footer,
   TableHeader,
   Row,
   Pagination,
@@ -22,6 +21,7 @@ import {
   ContentLayout
 } from "../../../uikit/components";
 import { DEBOUNCE_TIME } from "../../../constants";
+import { translate } from "../../../translations/translator";
 
 class CustomerDashboard extends Component {
   constructor(props) {
@@ -134,7 +134,9 @@ class CustomerDashboard extends Component {
             </span> */}
           <div style={{ marginLeft: "auto" }}>
             <SearchBox
-              placeholder="Search Customers..."
+              placeholder={translate("text.header.search", {
+                type: translate("label.dashboard.customers")
+              })}
               searchText={searchText}
               clearSearch={this.clearSearch}
               onChange={this.handleSearch}
@@ -144,11 +146,15 @@ class CustomerDashboard extends Component {
         <ContentLayout className="maindashboard">
           <div className="maindashboard__header">
             <div>
-              <span className="maindashboard__header-customers">Customers</span>
+              <span className="maindashboard__header-customers">
+                {translate("label.dashboard.customers")}
+              </span>
             </div>
             <OmniButton
               type="add"
-              label="Add New Customer"
+              label={translate("label.button.add", {
+                type: translate("label.dashboard.customer")
+              })}
               onClick={this.addCustomer}
               // className="global__disabled-box"
             />
@@ -230,7 +236,9 @@ class CustomerDashboard extends Component {
                     type="exclamation-circle"
                     className="maindashboard__nodata-icon"
                   />
-                  No Customers found
+                  {translate("error.dashboard.notfound", {
+                    type: translate("label.dashboard.customers")
+                  })}
                 </Row>
               )}
               <Pagination
@@ -239,7 +247,12 @@ class CustomerDashboard extends Component {
                 }
                 total={customerCount}
                 showTotal={(total, range) =>
-                  `Showing - ${range[0]}-${range[1]} of ${total} Customers`
+                  translate("text.pagination", {
+                    top: range[0],
+                    bottom: range[1],
+                    total,
+                    type: translate("label.dashboard.customers")
+                  })
                 }
                 pageSize={this.state.itemsPerPage}
                 current={this.state.pageNo}
@@ -266,7 +279,7 @@ class CustomerDashboard extends Component {
                     type="exclamation-circle"
                     className="maindashboard__nodata-icon"
                   />
-                  No Customers found
+                  {translate("error.dashboard.customers.notfound")}
                 </Row>
               )}
             </React.Fragment>
@@ -279,12 +292,12 @@ class CustomerDashboard extends Component {
 
 const TableColumnNames = {
   CHECKBOX: "",
-  CUSTOMER_NAME: "Customer Name",
-  USERS: "Users",
-  APPLICATIONS: "Applications",
-  STORAGE: "Storage",
-  COMPANY_ADMIN: "Company Admin",
-  SUBSCRIPTION: "Subscription Licences"
+  CUSTOMER_NAME: translate("label.dashboard.customername"),
+  USERS: translate("label.dashboard.users"),
+  APPLICATIONS: translate("label.dashboard.applications"),
+  STORAGE: translate("label.dashboard.storage"),
+  COMPANY_ADMIN: translate("label.dashboard.companyadmin"),
+  SUBSCRIPTION: translate("label.dashboard.subscription")
 };
 
 const TableColumns = [
