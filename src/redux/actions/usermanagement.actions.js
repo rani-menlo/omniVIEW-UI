@@ -1,5 +1,5 @@
 import { UsermanagementActionTypes } from "../actionTypes";
-import _ from 'lodash';
+import _ from "lodash";
 import ApiActions from "./api.actions";
 import { UsermanagementApi } from "../api";
 
@@ -143,7 +143,7 @@ export default {
           data: res.data
         });
         ApiActions.success(dispatch);
-        history.goBack();
+        !res.data.error && history.goBack();
       } catch (err) {
         ApiActions.failure(dispatch);
       }
