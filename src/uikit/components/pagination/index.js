@@ -75,7 +75,7 @@ class Pagination extends Component {
       return;
     }
     let pageSize = Number(this.state.pageSize);
-    pageSize -= pageSize % this.defaultPageSize;
+    pageSize -= this.defaultPageSize;
     if (pageSize > 0 && pageSize !== this.state.pageSize) {
       this.setPageSize(pageSize);
     }

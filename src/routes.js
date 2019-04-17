@@ -50,6 +50,10 @@ const Routes = () => {
               path="/usermanagement/customer/add"
               component={AddCustomer}
             />
+            <PrivateRoute
+              path="/usermanagement/customer/edit"
+              component={AddCustomer}
+            />
             {/* <Redirect to="/" /> */}
           </Switch>
         </BrowserRouter>

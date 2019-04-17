@@ -7,7 +7,7 @@ import styled from "styled-components";
 import CustomerCard from "../customerCard.component";
 import { CustomerActions } from "../../../redux/actions";
 import Header from "../../header/header.component";
-import { isLoggedInOmniciaRole } from "../../../utils";
+import { isLoggedInOmniciaRole, isLoggedInOmniciaAdmin } from "../../../utils";
 import {
   Loader,
   TableHeader,
@@ -68,17 +68,45 @@ class CustomerDashboard extends Component {
     this.props.history.push("/applications");
   };
 
-  getMenu = () => {
+  editCustomer = customer => () => {
+    this.props.actions.setSelectedCustomer(customer);
+    this.props.history.push("/usermanagement/customer/edit");
+  };
+
+  getMenu = customer => () => {
     return (
-      <Menu>
-        <Menu.Item disabled>
-          <span>Edit Customer</span>
+      <Menu className="maindashboard__list__item-dropdown-menu">
+        <Menu.Item
+          className="maindashboard__list__item-dropdown-menu-item"
+          onClick={this.editCustomer(customer)}
+        >
+          <p>
+            <img src="/images/edit.svg" />
+            <span>{`${translate("label.usermgmt.edit")} ${translate(
+              "label.dashboard.customer"
+            )}`}</span>
+          </p>
         </Menu.Item>
-        <Menu.Item disabled>
-          <span>Add/Edit Users</span>
+        <Menu.Item
+          disabled
+          className="maindashboard__list__item-dropdown-menu-item"
+          onClick={this.openUserMgmt(customer)}
+        >
+          <p>
+            <img src="/images/user-management.svg" />
+            <span>{translate("label.usermgmt.title")}</span>
+          </p>
         </Menu.Item>
-        <Menu.Item disabled>
-          <span>Deactivate Customer</span>
+        <Menu.Item
+          disabled
+          className="maindashboard__list__item-dropdown-menu-item"
+        >
+          <p style={{ color: "red" }}>
+            <img src="/images/deactivate.svg" />
+            <span>{`${translate("label.usermgmt.deactivate")} ${translate(
+              "label.dashboard.customer"
+            )}`}</span>
+          </p>
         </Menu.Item>
       </Menu>
     );
@@ -117,9 +145,24 @@ class CustomerDashboard extends Component {
     this.props.history.push("/usermanagement/customer/add");
   };
 
+  openOadminUserManagement = () => {
+    const oAdminCustomer = _.find(
+      this.props.customers,
+      customer => customer.is_omnicia
+    );
+    if (oAdminCustomer) {
+      this.openUserMgmt(oAdminCustomer)();
+    }
+  };
+
+  openUserMgmt = customer => () => {
+    this.props.actions.setSelectedCustomer(customer);
+    this.props.history.push("/usermanagement");
+  };
+
   render() {
     const { viewBy, searchText } = this.state;
-    const { customers, loading, customerCount } = this.props;
+    const { customers, loading, customerCount, role } = this.props;
     return (
       <React.Fragment>
         <Loader loading={loading} />
@@ -145,10 +188,18 @@ class CustomerDashboard extends Component {
         </SubHeader>
         <ContentLayout className="maindashboard">
           <div className="maindashboard__header">
-            <div>
+            <div className="global__center-vert">
               <span className="maindashboard__header-customers">
                 {translate("label.dashboard.customers")}
               </span>
+              {isLoggedInOmniciaAdmin(role) && (
+                <div
+                  className="maindashboard__header__addEdit"
+                  onClick={this.openOadminUserManagement}
+                >
+                  {translate("label.usermgmt.title")}
+                </div>
+              )}
             </div>
             <OmniButton
               type="add"
@@ -216,7 +267,7 @@ class CustomerDashboard extends Component {
                         "12 in use  | 3 unassigned"
                       )}
                       <Dropdown
-                        overlay={this.getMenu()}
+                        overlay={this.getMenu(customer)()}
                         trigger={["click"]}
                         overlayClassName="maindashboard__list__item-dropdown"
                       >
@@ -269,6 +320,7 @@ class CustomerDashboard extends Component {
                     key={customer.id}
                     customer={customer}
                     onSelect={this.onCustomerSelected}
+                    getMenu={this.getMenu(customer)}
                   />
                 ))}
               </div>

@@ -30,12 +30,6 @@
       padding: 0px 10px;
       cursor: pointer;
     }
-    &-dropdown {
-      width: 148px;
-      &--item {
-        @include text-normal;
-      }
-    }
   }
   &__content {
     cursor: pointer;

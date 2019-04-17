@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import _ from "lodash";
-import moment from "moment";
 import "react-phone-number-input/style.css";
 import {
   InputField,
@@ -16,8 +15,13 @@ import {
 import { Radio, Select, Icon, Avatar, Switch, Modal, Checkbox } from "antd";
 import Header from "../header/header.component";
 import { UsermanagementActions } from "../../redux/actions";
-import { isEmail, isPhone, isLoggedInOmniciaRole } from "../../utils";
-import { ROLES, DATE_FORMAT } from "../../constants";
+import {
+  isEmail,
+  isPhone,
+  isLoggedInOmniciaRole,
+  getFormattedDate
+} from "../../utils";
+import { ROLES } from "../../constants";
 import { translate } from "../../translations/translator";
 
 const RadioGroup = Radio.Group;
@@ -55,13 +59,24 @@ class AddUser extends Component {
       },
       selectedRole: this.roles[0].id,
       selectedDept: "",
-      selectedLicence: {
-        value: "",
-        error: ""
-      },
+      selectedLicences: [],
       showDeactivateModal: false,
-      statusActive: true
+      statusActive: true,
+      licences: []
     };
+  }
+
+  static getDerivedStateFromProps(props, state) {
+    let newState = null;
+    if (props.departments.length && !state.selectedDept) {
+      newState = {
+        selectedDept: props.departments[0].id
+      };
+    }
+    if (!state.licences.length && props.licences.length) {
+      newState = { ...newState, licences: props.licences };
+    }
+    return newState;
   }
 
   componentDidMount() {
@@ -92,15 +107,6 @@ class AddUser extends Component {
     state.statusActive = selectedUser.is_active;
     return state;
   };
-
-  static getDerivedStateFromProps(props, state) {
-    if (props.departments.length && !state.selectedDept) {
-      return {
-        selectedDept: props.departments[0].id
-      };
-    }
-    return null;
-  }
 
   onPhoneChange = value => {
     this.setState({ phone: { ...this.state.phone, value, error: "" } });
@@ -174,14 +180,14 @@ class AddUser extends Component {
       });
     }
     // licence check only in add user
-    if (
+    /* if (
       !state.editUser &&
       this.props.licences.length &&
       !state.selectedLicence.value
     ) {
       error = true;
       state.selectedLicence.error = translate("label.user.chooselicence");
-    }
+    } */
 
     if (error) {
       this.setState(state);
@@ -237,18 +243,46 @@ class AddUser extends Component {
     return _.includes(appName, "view") ? "omniVIEW" : "omniFILE";
   };
 
+  onLicenceChecked = licence => e => {
+    const checked = e.target.checked;
+    let newLicences = [...this.state.licences];
+    const idx = _.findIndex(newLicences, li => li.id === licence.id);
+    if (!checked) {
+      newLicences[idx].checked = checked;
+      const newSelectedLicences = [...this.state.selectedLicences];
+      _.remove(newSelectedLicences, li => li.id === licence.id);
+      this.setState({
+        licences: newLicences,
+        selectedLicences: newSelectedLicences
+      });
+    } else {
+      const checkedLicecnce = _.map(
+        this.state.selectedLicences,
+        licence.app_name
+      );
+      if (!checkedLicecnce.length) {
+        newLicences[idx].checked = checked;
+        this.setState({
+          licences: newLicences,
+          selectedLicences: [...this.state.selectedLicences, newLicences[idx]]
+        });
+      }
+    }
+  };
+
   render() {
-    const { departments, licences, loading } = this.props;
+    const { departments, loading } = this.props;
     const {
       fname,
       lname,
       email,
       phone,
-      selectedLicence,
+      licences,
       selectedRole,
       selectedDept,
       statusActive,
-      editUser
+      editUser,
+      selectedLicences
     } = this.state;
     return (
       <React.Fragment>
@@ -277,11 +311,19 @@ class AddUser extends Component {
           </p>
           <p className="addUser-subtitle">
             {editUser
-              ? translate("text.user.editmsg")
-              : translate("text.user.addmsg")}
+              ? translate("text.user.editmsg", {
+                  type: _.toLower(translate("label.dashboard.user"))
+                })
+              : translate("text.user.addmsg", {
+                  type: _.toLower(translate("label.dashboard.user"))
+                })}
           </p>
           <div className="global__hr-line" />
-          <p className="addUser-heading">{translate("label.user.details")}</p>
+          <p className="addUser-heading">
+            {translate("label.user.details", {
+              type: translate("label.dashboard.user")
+            })}
+          </p>
           <Row className="addUser__fields">
             <InputField
               className="addUser__fields-field"
@@ -376,7 +418,9 @@ class AddUser extends Component {
                 </div>
               </div> */}
               {/* <p className="addUser-heading">Subscription Details</p> */}
-              <p className="addUser-heading">Account Status</p>
+              <p className="addUser-heading">
+                {translate("label.user.accstatus")}
+              </p>
               <div className="addUser__account">
                 <div className="addUser__account__status">
                   <Switch
@@ -406,43 +450,7 @@ class AddUser extends Component {
                 {translate("text.user.choosesubscriptionmsg")}
               </p>
               <div className="addUser__licences">
-                {(_.get(licences, "length") || "") && (
-                  <div>
-                    <p className="global__field-label">
-                      {translate("label.user.availablelicences")}
-                    </p>
-                    <Select
-                      value={
-                        _.get(selectedLicence, "value") ||
-                        translate("label.user.chooselicence")
-                      }
-                      className={`addUser__dropdown ${selectedLicence.error &&
-                        "addUser__dropdown-error"}`}
-                      suffixIcon={
-                        <Icon
-                          type="down"
-                          style={{ fontSize: "15px", color: "black" }}
-                        />
-                      }
-                      onChange={this.onLicenceSelect}
-                    >
-                      {_.map(licences, licence => (
-                        <Option key={licence.id} value={licence.id}>
-                          {licence.name}
-                        </Option>
-                      ))}
-                    </Select>
-                    {selectedLicence.error && (
-                      <p
-                        className="global__field__error-text"
-                        style={{ marginTop: "0px" }}
-                      >
-                        {selectedLicence.error}
-                      </p>
-                    )}
-                  </div>
-                )}
-                {
+                {(licences.length || "") && (
                   <div className="addUser__licences__box">
                     <div className="addUser__licences__box__scroll">
                       {_.map(licences, licence => (
@@ -452,29 +460,69 @@ class AddUser extends Component {
                           value={licence.id}
                         >
                           <div>
-                            <Text type="bold" text={licence.name} />
+                            <div
+                              className="global__center-vert"
+                              style={{ justifyContent: "space-between" }}
+                            >
+                              <Text type="bold" text={licence.name} />
+                              <Text
+                                type="regular"
+                                size="14px"
+                                opacity={0.75}
+                                text={this.getLicenceAppName(licence.app_name)}
+                              />
+                            </div>
                             <Text
                               type="regular"
                               size="14px"
                               opacity={0.75}
-                              text={`${this.getLicenceAppName(
-                                licence.app_name
-                              )} - Purchased on ${moment(
-                                licence.purchase_date
-                              ).format(DATE_FORMAT)}`}
+                              text={`Purchased on ${getFormattedDate(
+                                _.get(licence, "purchase_date")
+                              )}`}
+                            />
+                            <Text
+                              type="regular"
+                              size="14px"
+                              opacity={0.75}
+                              text={`Expires on ${getFormattedDate(
+                                _.get(licence, "expired_date")
+                              )}`}
+                            />
+                            <Text
+                              type="regular"
+                              size="14px"
+                              opacity={0.75}
+                              text={`${translate(
+                                "label.user.available"
+                              )}  ${licence.remaining || 0}`}
                             />
                           </div>
-                          <Checkbox />
+                          <Checkbox
+                            checked={licence.checked}
+                            onChange={this.onLicenceChecked(licence)}
+                          />
                         </div>
                       ))}
                     </div>
-                    <Text
-                      className="addUser__licences__box__warning"
-                      size="12px"
-                      text={translate("error.user.licenceassigned")}
-                    />
+
+                    {_.map(selectedLicences, licence => {
+                      if (licence.revoked_date) {
+                        return (
+                          <Text
+                            key={licence.id}
+                            className="addUser__licences__box-warning"
+                            size="12px"
+                            text={translate("error.user.licenceassigned", {
+                              product: this.getLicenceAppName(licence.app_name),
+                              remain: licence.validDays,
+                              expire: licence.unassignValidity
+                            })}
+                          />
+                        );
+                      }
+                    })}
                   </div>
-                }
+                )}
                 {!_.get(licences, "length") && (
                   <div className="addUser__licences__error">
                     <div className="global__center-vert">
@@ -506,8 +554,8 @@ class AddUser extends Component {
               type="primary"
               label={
                 editUser
-                  ? translate("label.user.savechanges")
-                  : translate("label.user.saveandsubmit")
+                  ? translate("label.button.savechanges")
+                  : translate("label.button.savesubmit")
               }
               className="addUser__buttons-btn"
               buttonStyle={{ marginLeft: "16px" }}

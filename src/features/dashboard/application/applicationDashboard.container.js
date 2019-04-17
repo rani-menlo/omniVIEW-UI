@@ -1,16 +1,19 @@
 import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
 import _ from "lodash";
-import { Icon, Input, Checkbox, Dropdown, Menu, Avatar } from "antd";
+import { Icon, Dropdown, Menu, Avatar } from "antd";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import SubmissionCard from "../submissionCard.component";
 import { ApplicationActions } from "../../../redux/actions";
 import Header from "../../header/header.component";
 import styled from "styled-components";
-import moment from "moment";
-import { DATE_FORMAT, DEBOUNCE_TIME } from "../../../constants";
-import { isLoggedInOmniciaRole, isLoggedInCustomerAdmin } from "../../../utils";
+import { DEBOUNCE_TIME } from "../../../constants";
+import {
+  isLoggedInOmniciaRole,
+  isLoggedInCustomerAdmin,
+  getFormattedDate
+} from "../../../utils";
 import {
   Loader,
   Footer,
@@ -198,8 +201,7 @@ class ApplicationDashboard extends Component {
               <span className="maindashboard__header-customers">
                 {_.get(selectedCustomer, "company_name", "")}
               </span>
-              {(isLoggedInCustomerAdmin(this.props.role) ||
-                selectedCustomer.is_omnicia) && (
+              {isLoggedInCustomerAdmin(this.props.role) && (
                 <div
                   className="maindashboard__header__addEdit"
                   onClick={this.openUserManagement}
@@ -262,18 +264,14 @@ class ApplicationDashboard extends Component {
                       className="maindashboard__list__item-text"
                       onClick={this.onSubmissionSelected(submission)}
                     >
-                      {moment(_.get(submission, "created_at", "")).format(
-                        DATE_FORMAT
-                      )}
+                      {getFormattedDate(_.get(submission, "created_at"))}
                     </Column>
                     <Column
                       width={getColumnWidth(TableColumnNames.LAST_UPDATED)}
                       className="maindashboard__list__item-text"
                       onClick={this.onSubmissionSelected(submission)}
                     >
-                      {moment(_.get(submission, "updated_at", "")).format(
-                        DATE_FORMAT
-                      )}
+                      {getFormattedDate(_.get(submission, "updated_at"))}
                     </Column>
                     <Column
                       width={getColumnWidth(TableColumnNames.USERS)}

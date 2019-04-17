@@ -3,6 +3,7 @@ import { UsermanagementActionTypes } from "../actionTypes";
 
 const initialState = {
   users: {},
+  usersCount: 0,
   departments: [],
   licences: [],
   allLicences: [],
@@ -32,7 +33,8 @@ export default (state = initialState, action) => {
     case UsermanagementActionTypes.FETCH_USERS: {
       return {
         ...state,
-        users: { ...action.data.data }
+        users: { ...action.data.data },
+        usersCount: action.data.usercount
       };
     }
     case UsermanagementActionTypes.SET_SELECTED_USER: {
@@ -43,6 +45,7 @@ export default (state = initialState, action) => {
     }
     case UsermanagementActionTypes.ADD_USER:
     case UsermanagementActionTypes.ADD_CUSTOMER:
+    case UsermanagementActionTypes.EDIT_CUSTOMER:
     case UsermanagementActionTypes.UPDATE_USER: {
       return {
         ...state,

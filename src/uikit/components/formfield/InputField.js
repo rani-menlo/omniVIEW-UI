@@ -18,13 +18,15 @@ const InputField = ({
   placeholder,
   error,
   style,
-  className
+  className,
+  disabled
 }) => {
   return (
     <div style={style} className={className}>
       {label && <p className="global__field-label">{label}</p>}
       <FormItem>
         <Input
+          disabled={disabled}
           placeholder={placeholder}
           onChange={onInputText(onChange)}
           value={value}
@@ -43,7 +45,8 @@ InputField.propTypes = {
   placeholder: PropTypes.string,
   error: PropTypes.string,
   style: PropTypes.object,
-  className: PropTypes.string
+  className: PropTypes.string,
+  disabled: PropTypes.bool
 };
 
 InputField.defaultProps = {

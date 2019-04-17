@@ -2,9 +2,8 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { Dropdown, Menu, Avatar } from "antd";
 import _ from "lodash";
-import moment from "moment";
-import { DATE_FORMAT } from "../../constants";
 import { translate } from "../../translations/translator";
+import { getFormattedDate } from "../../utils";
 
 class SubmissionCard extends Component {
   static propTypes = {
@@ -93,9 +92,8 @@ class SubmissionCard extends Component {
               {translate("label.dashboard.addedon")}:
             </span>
             <span className="submissioncard__content__item-text">
-              {moment(_.get(submission, "created_at", "12/01/2018")).format(
-                DATE_FORMAT
-              )}
+              {getFormattedDate(_.get(submission, "created_at")) ||
+                "12/01/2018"}
             </span>
           </div>
           <div className="submissioncard__content__item">
@@ -103,9 +101,8 @@ class SubmissionCard extends Component {
               {translate("label.dashboard.lastupdated")}:
             </span>
             <span className="submissioncard__content__item-text">
-              {moment(_.get(submission, "updated_at", "12/01/2018")).format(
-                DATE_FORMAT
-              )}
+              {getFormattedDate(_.get(submission, "updated_at")) ||
+                "12/01/2018"}
             </span>
           </div>
           <div className="global__hr-line" style={{ marginTop: "20px" }} />

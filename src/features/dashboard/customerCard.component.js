@@ -14,29 +14,8 @@ class CustomerCard extends Component {
 
   static propTypes = {
     customer: PropTypes.object,
+    getMenu: PropTypes.func,
     onSelect: PropTypes.func
-  };
-
-  getMenu = () => {
-    return (
-      <Menu>
-        <Menu.Item disabled>
-          <span className="customercard__heading-dropdown--item">
-            Edit Customer
-          </span>
-        </Menu.Item>
-        <Menu.Item disabled>
-          <span className="customercard__heading-dropdown--item">
-            Add/Edit Users
-          </span>
-        </Menu.Item>
-        <Menu.Item disabled>
-          <span className="customercard__heading-dropdown--item red-text">
-            Deactivate Customer
-          </span>
-        </Menu.Item>
-      </Menu>
-    );
   };
 
   getName = customer => {
@@ -49,7 +28,7 @@ class CustomerCard extends Component {
   };
 
   render() {
-    const { customer, onSelect } = this.props;
+    const { customer, onSelect, getMenu } = this.props;
     return (
       <div className="customercard">
         <div className="customercard__heading">
@@ -60,7 +39,7 @@ class CustomerCard extends Component {
             {this.getName(customer)}
           </span>
           <Dropdown
-            overlay={this.getMenu()}
+            overlay={getMenu && getMenu()}
             trigger={["click"]}
             overlayClassName="customercard__heading-dropdown"
             onVisibleChange={this.onDropdownClick}
@@ -99,7 +78,7 @@ class CustomerCard extends Component {
             <img src="/images/database.svg" />
             <span className="customercard__content__item-text">
               {`${_.get(customer, "max_space") || "0"} ${translate(
-                "label.dashboard.tb"
+                "label.storage.tb"
               )}`}
             </span>
           </div>

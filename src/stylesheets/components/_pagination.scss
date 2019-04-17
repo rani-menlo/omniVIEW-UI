@@ -19,9 +19,10 @@
       display: flex;
       &-input {
         width: 45px !important;
-        background-color: $norfolk-sky !important;
         border: none !important;
-        color: white !important;
+        border-radius: 0px !important;
+        border-top-left-radius: 4px !important;
+        border-bottom-left-radius: 4px !important; 
       }
       &-arrows {
         display: flex;

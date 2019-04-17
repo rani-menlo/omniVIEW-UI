@@ -48,6 +48,7 @@ export default {
             }
             const licencesByDate = _.groupBy(licences, "purchase_date");
             _.map(licencesByDate, licences => {
+              licences[0].remaining = licences.length;
               newLicences.push(licences[0]);
             });
           });
@@ -89,11 +90,18 @@ export default {
       }
     };
   },
-  fetchUsers: (customerId, search) => {
+  fetchUsers: (customerId, search, pageNo, itemsPerPage, sortBy, order) => {
     return async dispatch => {
       ApiActions.request(dispatch);
       try {
-        const res = await UsermanagementApi.fetchUsers(customerId, search);
+        const res = await UsermanagementApi.fetchUsers(
+          customerId,
+          search,
+          pageNo,
+          itemsPerPage,
+          sortBy,
+          order
+        );
         dispatch({
           type: UsermanagementActionTypes.FETCH_USERS,
           data: res.data
@@ -104,6 +112,7 @@ export default {
       }
     };
   },
+
   addUser: (user, history) => {
     return async dispatch => {
       ApiActions.request(dispatch);
@@ -159,6 +168,22 @@ export default {
         const res = await UsermanagementApi.addCustomer(customer);
         dispatch({
           type: UsermanagementActionTypes.ADD_CUSTOMER,
+          data: res.data
+        });
+        ApiActions.success(dispatch);
+        history.goBack();
+      } catch (err) {
+        ApiActions.failure(dispatch);
+      }
+    };
+  },
+  editCustomer: (customer, history) => {
+    return async dispatch => {
+      ApiActions.request(dispatch);
+      try {
+        const res = await UsermanagementApi.editCustomer(customer);
+        dispatch({
+          type: UsermanagementActionTypes.EDIT_CUSTOMER,
           data: res.data
         });
         ApiActions.success(dispatch);

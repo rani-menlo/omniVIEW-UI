@@ -157,8 +157,9 @@
     }
     &__box {
       width: 50%;
+      padding: 1px;
       min-height: 220px;
-      border: solid 1px black;
+      border: solid 1px rgba(74, 74, 74, 0.25);
       border-radius: 4px;
       &__scroll {
         overflow: auto;
@@ -167,12 +168,14 @@
           display: flex;
           justify-content: space-between;
           align-items: center;
-          height: 60px;
           padding: 8px;
           &:nth-child(even) {
             background-color: $froasted-glass;
           }
         }
+      }
+      &-warning {
+        color: $red;
       }
     }
   }
