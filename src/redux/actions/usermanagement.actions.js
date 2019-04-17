@@ -171,7 +171,7 @@ export default {
           data: res.data
         });
         ApiActions.success(dispatch);
-        history.goBack();
+        !res.data.error && history.goBack();
       } catch (err) {
         ApiActions.failure(dispatch);
       }

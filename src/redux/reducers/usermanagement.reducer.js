@@ -1,4 +1,5 @@
 import _ from "lodash";
+import { message } from "antd";
 import { UsermanagementActionTypes } from "../actionTypes";
 
 const initialState = {
@@ -47,6 +48,10 @@ export default (state = initialState, action) => {
     case UsermanagementActionTypes.ADD_CUSTOMER:
     case UsermanagementActionTypes.EDIT_CUSTOMER:
     case UsermanagementActionTypes.UPDATE_USER: {
+      if (action.data.error) {
+        message.error(action.data.message);
+        return state;
+      }
       return {
         ...state,
         selectedUser: null
