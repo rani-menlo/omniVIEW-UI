@@ -4,8 +4,8 @@
   display: flex;
   flex-direction: column;
   border-radius: 8px;
-  margin-right: 40px;
-  margin-bottom: 20px;
+  margin-right: 42px;
+  margin-bottom: 42px;
   box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.75);
   &-more {
     float: right;
@@ -29,12 +29,6 @@
     &-more {
       padding: 0px 10px;
       cursor: pointer;
-    }
-    &-dropdown {
-      width: 148px;
-      &--item {
-        @include text-normal;
-      }
     }
   }
   &__content {

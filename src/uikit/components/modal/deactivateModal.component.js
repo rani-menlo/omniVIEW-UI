@@ -2,8 +2,10 @@ import React from "react";
 import PropTypes from "prop-types";
 import { Modal } from "antd";
 import { OmniButton } from "..";
+import { translate } from "../../../translations/translator";
 
 const DeactivateModal = ({
+  isActive,
   visible,
   title,
   content,
@@ -28,14 +30,18 @@ const DeactivateModal = ({
         <div className="deactivate-modal-buttons">
           <OmniButton
             type="secondary"
-            label="Cancel"
+            label={translate("label.button.cancel")}
             className=""
             onClick={closeModal}
           />
           <OmniButton
             type="primary"
-            label="Deactivate"
-            className="deactivate-modal-buttons-deactivate"
+            label={translate(
+              `label.usermgmt.${isActive ? "deactivate" : "activate"}`
+            )}
+            className={`deactivate-modal-buttons-${
+              isActive ? "deactivate" : "activate"
+            }`}
             buttonStyle={{ marginLeft: "16px" }}
             onClick={deactivate}
           />

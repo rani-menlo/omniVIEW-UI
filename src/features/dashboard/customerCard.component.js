@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { Dropdown, Menu } from "antd";
 import _ from "lodash";
+import { translate } from "../../translations/translator";
 
 class CustomerCard extends Component {
   constructor(props) {
@@ -13,29 +14,8 @@ class CustomerCard extends Component {
 
   static propTypes = {
     customer: PropTypes.object,
+    getMenu: PropTypes.func,
     onSelect: PropTypes.func
-  };
-
-  getMenu = () => {
-    return (
-      <Menu>
-        <Menu.Item disabled>
-          <span className="customercard__heading-dropdown--item">
-            Edit Customer
-          </span>
-        </Menu.Item>
-        <Menu.Item disabled>
-          <span className="customercard__heading-dropdown--item">
-            Add/Edit Users
-          </span>
-        </Menu.Item>
-        <Menu.Item disabled>
-          <span className="customercard__heading-dropdown--item red-text">
-            Deactivate Customer
-          </span>
-        </Menu.Item>
-      </Menu>
-    );
   };
 
   getName = customer => {
@@ -48,7 +28,7 @@ class CustomerCard extends Component {
   };
 
   render() {
-    const { customer, onSelect } = this.props;
+    const { customer, onSelect, getMenu } = this.props;
     return (
       <div className="customercard">
         <div className="customercard__heading">
@@ -59,7 +39,7 @@ class CustomerCard extends Component {
             {this.getName(customer)}
           </span>
           <Dropdown
-            overlay={this.getMenu()}
+            overlay={getMenu && getMenu()}
             trigger={["click"]}
             overlayClassName="customercard__heading-dropdown"
             onVisibleChange={this.onDropdownClick}
@@ -79,21 +59,27 @@ class CustomerCard extends Component {
           <div className="customercard__content__item">
             <img src="/images/users.svg" />
             <span className="customercard__content__item-text">
-              {_.get(customer, "number_of_users", "0")} users
+              {`${_.get(customer, "number_of_users", "0")} ${_.toLower(
+                translate("label.dashboard.users")
+              )}`}
             </span>
           </div>
           <div className="global__hr-line" />
           <div className="customercard__content__item">
             <img src="/images/applications.svg" />
             <span className="customercard__content__item-text">
-              {_.get(customer, "number_of_submissions", "0")} applications
+              {`${_.get(customer, "number_of_submissions", "0")} ${_.toLower(
+                translate("label.dashboard.applications")
+              )}`}
             </span>
           </div>
           <div className="global__hr-line" />
           <div className="customercard__content__item">
             <img src="/images/database.svg" />
             <span className="customercard__content__item-text">
-              {_.get(customer, "max_space") || "0"} TB
+              {`${_.get(customer, "max_space") || "0"} ${translate(
+                "label.storage.tb"
+              )}`}
             </span>
           </div>
           <div className="global__hr-line" />

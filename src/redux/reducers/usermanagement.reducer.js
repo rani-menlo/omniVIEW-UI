@@ -3,7 +3,8 @@ import { message } from "antd";
 import { UsermanagementActionTypes } from "../actionTypes";
 
 const initialState = {
-  users: {},
+  users: [],
+  usersCount: 0,
   departments: [],
   licences: [],
   allLicences: [],
@@ -15,7 +16,7 @@ export default (state = initialState, action) => {
     case UsermanagementActionTypes.FETCH_DEPARTMENTS: {
       return {
         ...state,
-        departments: action.data
+        departments: _.sortBy(action.data, "name") || []
       };
     }
     case UsermanagementActionTypes.FETCH_LICENCES: {
@@ -31,10 +32,13 @@ export default (state = initialState, action) => {
       };
     }
     case UsermanagementActionTypes.FETCH_USERS: {
-      return {
-        ...state,
-        users: { ...action.data.data }
-      };
+      if (!action.data.error) {
+        return {
+          ...state,
+          users: action.data.data,
+          usersCount: action.data.usercount
+        };
+      }
     }
     case UsermanagementActionTypes.SET_SELECTED_USER: {
       return {
@@ -42,8 +46,19 @@ export default (state = initialState, action) => {
         selectedUser: action.user
       };
     }
-    case UsermanagementActionTypes.ADD_USER:
+    case UsermanagementActionTypes.ADD_USER: {
+      if (action.data.error) {
+        message.error(action.data.message);
+        return state;
+      }
+      return {
+        ...state,
+        selectedUser: null,
+        licences: []
+      };
+    }
     case UsermanagementActionTypes.ADD_CUSTOMER:
+    case UsermanagementActionTypes.EDIT_CUSTOMER:
     case UsermanagementActionTypes.UPDATE_USER: {
       if (action.data.error) {
         message.error(action.data.message);

@@ -60,12 +60,16 @@ class TableHeader extends Component {
             key={column.name}
             width={column.width}
             className="tableHeader__item"
-            onClick={this.order(column)}
             style={column.style}
           >
-            {column.checkbox && <PaginationCheckbox />}
-            {column.name}
-            {column.sort && this.getSortIcon(column)}
+            <div
+              className="global__cursor-pointer"
+              onClick={this.order(column)}
+            >
+              {column.checkbox && <PaginationCheckbox />}
+              {column.name}
+              {column.sort && this.getSortIcon(column)}
+            </div>
           </RowItems>
         ))}
       </div>
@@ -76,7 +80,6 @@ class TableHeader extends Component {
 const RowItems = styled(Row)`
   width: ${props => props.width};
   justify-content: normal;
-  cursor: pointer;
 `;
 
 const IconCustom = styled(Icon)`

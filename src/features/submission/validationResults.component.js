@@ -74,9 +74,9 @@ class ValidationResults extends Component {
     });
   };
 
-  onItemSelected = item => () => {
+  onItemSelected = (item, index) => () => {
     const { onItemSelected } = this.props;
-    this.setState({ selected: item.node });
+    this.setState({ selected: index });
     onItemSelected && onItemSelected(item);
   };
 
@@ -111,7 +111,7 @@ class ValidationResults extends Component {
                   <tr>
                     <th
                       className="validationResults__table-col col-node global__cursor-pointer"
-                      onClick={this.sortColumn("node")}
+                      onClick={this.sortColumn("title")}
                     >
                       Node{" "}
                       <img
@@ -152,13 +152,13 @@ class ValidationResults extends Component {
                   </tr>
                 </thead>
                 <tbody key={sort}>
-                  {_.map(validationResults, validation => {
+                  {_.map(validationResults, (validation, idx) => {
                     return (
                       <tr
-                        key={validation.node}
-                        onClick={this.onItemSelected(validation)}
+                        key={idx}
+                        onClick={this.onItemSelected(validation, idx)}
                         className={`global__cursor-pointer ${selected ===
-                          validation.node && "global__node-selected"}`}
+                          idx && "global__node-selected"}`}
                       >
                         <td className="col-node">
                           <div
@@ -180,7 +180,7 @@ class ValidationResults extends Component {
                                 />
                               )}
                             </span>
-                            <span>{validation.node}</span>
+                            <span>{validation.title}</span>
                           </div>
                         </td>
                         <td className="col-error">{validation.error_no}</td>

@@ -16,6 +16,7 @@ import { default as ContentLayout } from "./layout/contentLayout.component";
 import { default as InputField } from "./formfield/InputField";
 import { default as NumericInput } from "./formfield/numericInput";
 import { default as PhoneField } from "./formfield/phoneField";
+import { default as Text } from "./text/text.component";
 
 export {
   OmniButton,
@@ -35,5 +36,6 @@ export {
   ContentLayout,
   InputField,
   PhoneField,
-  NumericInput
+  NumericInput,
+  Text
 };

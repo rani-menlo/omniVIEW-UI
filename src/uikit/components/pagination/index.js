@@ -4,6 +4,8 @@ import PropTypes from "prop-types";
 import Row from "../row/row.component";
 import PaginationButton from "./paginationButton.component";
 import _ from "lodash";
+import { translate } from "../../../translations/translator";
+import { DEBOUNCE_TIME } from "../../../constants";
 
 class Pagination extends Component {
   static propTypes = {
@@ -19,15 +21,11 @@ class Pagination extends Component {
   constructor(props) {
     super(props);
     this.defaultPageSize = 5;
-    this.debounceTimeOut = 700;
     this.timeOutId = "";
     this.state = {
       pageSize: this.defaultPageSize
     };
-    this.onPageSizeChange = _.debounce(
-      this.onPageSizeChange,
-      this.debounceTimeOut
-    );
+    this.onPageSizeChange = _.debounce(this.onPageSizeChange, DEBOUNCE_TIME);
   }
 
   componentDidMount() {
@@ -44,10 +42,10 @@ class Pagination extends Component {
 
   getPaginationButtons = (current, type, orig) => {
     if (type === "prev") {
-      return <PaginationButton label="Back" />;
+      return <PaginationButton label={translate("label.pagination.back")} />;
     }
     if (type === "next") {
-      return <PaginationButton label="Next" />;
+      return <PaginationButton label={translate("label.pagination.next")} />;
     }
     return orig;
   };
@@ -58,7 +56,7 @@ class Pagination extends Component {
       return;
     }
     let pageSize = Number(this.state.pageSize);
-    if (pageSize === this.props.total) {
+    if (pageSize === this.props.total || this.props.total === 0) {
       return;
     }
     pageSize += this.defaultPageSize;
@@ -74,7 +72,7 @@ class Pagination extends Component {
       return;
     }
     let pageSize = Number(this.state.pageSize);
-    pageSize -= pageSize % this.defaultPageSize;
+    pageSize -= this.defaultPageSize;
     if (pageSize > 0 && pageSize !== this.state.pageSize) {
       this.setPageSize(pageSize);
     }
@@ -93,6 +91,14 @@ class Pagination extends Component {
         this.setState({ pageSize: value });
         this.onPageSizeChange();
       }
+    }
+  };
+
+  onInputBlur = () => {
+    const { pageSize } = this.state;
+    if (!pageSize) {
+      this.setState({ pageSize: this.defaultPageSize });
+      this.onPageSizeChange();
     }
   };
 
@@ -123,18 +129,21 @@ class Pagination extends Component {
         <PaginationLib
           total={total}
           showTotal={showTotal}
-          pageSize={this.state.pageSize}
+          pageSize={this.state.pageSize || 1}
           current={current}
           itemRender={this.getPaginationButtons}
           onChange={this.onPageChange}
         />
         <Row className="pagination__pagesize">
-          <div className="pagination__pagesize__label">Number of Items: </div>
+          <div className="pagination__pagesize__label">
+            {translate("text.pagination.noofitems")}{" "}
+          </div>
           <div className="pagination__pagesize__container">
             <Input
               className="pagination__pagesize__container-input"
               onChange={this.handlePageSizeChange}
               value={this.state.pageSize}
+              onBlur={this.onInputBlur}
             />
             <div className="pagination__pagesize__container-arrows">
               <Icon

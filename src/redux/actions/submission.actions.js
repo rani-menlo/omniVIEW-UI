@@ -2,6 +2,7 @@ import _ from "lodash";
 import { SubmissionActionTypes } from "../actionTypes";
 import { SubmissionApi } from "../api";
 import { ApiActions } from ".";
+// import lifecyclejson from "./life.json";
 
 export default {
   fetchSequences: submissionId => {
@@ -97,7 +98,6 @@ export default {
     return async (dispatch, getState) => {
       ApiActions.request(dispatch);
       try {
-        let data = { data: {} };
         const selectedCustomer = getState().Customer.selectedCustomer;
         const selectedSubmission = getState().Application.selectedSubmission;
         const id = `${_.get(selectedCustomer, "id", "")}_${_.get(
@@ -113,10 +113,10 @@ export default {
           data = res.data;
         } */
         const res = await SubmissionApi.validateSquence({ id: sequenceId });
-        data = res.data;
+        debugger;
         dispatch({
           type: SubmissionActionTypes.VALIDATE_SEQUENCE,
-          data,
+          data: res.data,
           id
         });
         ApiActions.success(dispatch);

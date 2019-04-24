@@ -1,3 +1,38 @@
+@mixin text-regular($fontSize: 12px) {
+  font-family: Heebo-Regular;
+  font-weight: normal;
+  font-size: $fontSize;
+  color: $black;
+}
+
+@mixin text-medium($fontSize: 12px) {
+  font-family: Heebo-Medium;
+  font-weight: 500;
+  font-size: $fontSize;
+  color: $black;
+}
+
+@mixin text-bold($fontSize: 14px) {
+  font-family: Heebo-Bold;
+  font-weight: bold;
+  font-size: $fontSize;
+  color: $black;
+}
+
+@mixin text-extra-bold($fontSize: 36px) {
+  font-family: Heebo-ExtraBold;
+  font-weight: 800;
+  font-size: $fontSize;
+  color: $black;
+}
+
+@mixin text-medium($fontSize: 12px) {
+  font-family: Heebo-Medium;
+  font-weight: 500;
+  font-size: $fontSize;
+  color: $black;
+}
+
 @mixin text-bold-active($fontSize: 12px) {
   font-family: Heebo-Bold;
   font-weight: 800;

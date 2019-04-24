@@ -9,16 +9,17 @@ import {
   OmniButton,
   PhoneField,
   Loader,
-  DeactivateModal
+  DeactivateModal,
+  Text
 } from "../../uikit/components";
-import { Radio, Select, Icon, Avatar, Switch, Modal } from "antd";
+import { Radio, Icon, Switch, Checkbox } from "antd";
 import Header from "../header/header.component";
 import { UsermanagementActions } from "../../redux/actions";
-import { isEmail, isPhone, isLoggedInOmniciaRole } from "../../utils";
+import { isEmail, isPhone, getFormattedDate } from "../../utils";
+import { translate } from "../../translations/translator";
 import { ROLES } from "../../constants";
 
 const RadioGroup = Radio.Group;
-const Option = Select.Option;
 
 const radioStyle = {
   display: "block",
@@ -26,12 +27,11 @@ const radioStyle = {
 };
 
 class AddUser extends Component {
-  roles = isLoggedInOmniciaRole(this.props.role)
-    ? ROLES.OMNICIA
-    : ROLES.CUSTOMER;
-
   constructor(props) {
     super(props);
+    this.roles = _.get(this.props, "selectedCustomer.is_omnicia", false)
+      ? ROLES.OMNICIA
+      : ROLES.CUSTOMER;
     this.state = {
       editUser: false,
       fname: {
@@ -52,13 +52,24 @@ class AddUser extends Component {
       },
       selectedRole: this.roles[0].id,
       selectedDept: "",
-      selectedLicence: {
-        value: "",
-        error: ""
-      },
+      selectedLicences: [],
       showDeactivateModal: false,
-      statusActive: true
+      statusActive: true,
+      licences: []
     };
+  }
+
+  static getDerivedStateFromProps(props, state) {
+    let newState = null;
+    if (props.departments.length && !state.selectedDept) {
+      newState = {
+        selectedDept: props.departments[0].id
+      };
+    }
+    if (!state.licences.length && props.licences.length) {
+      newState = { ...newState, licences: props.licences };
+    }
+    return newState;
   }
 
   componentDidMount() {
@@ -90,15 +101,6 @@ class AddUser extends Component {
     return state;
   };
 
-  static getDerivedStateFromProps(props, state) {
-    if (props.departments.length && !state.selectedDept) {
-      return {
-        selectedDept: props.departments[0].id
-      };
-    }
-    return null;
-  }
-
   onPhoneChange = value => {
     this.setState({ phone: { ...this.state.phone, value, error: "" } });
   };
@@ -127,48 +129,65 @@ class AddUser extends Component {
     });
   };
 
+  scrollToTop = () => {
+    window.scrollTo(0, 0);
+  };
+
   save = () => {
     const state = { ...this.state };
     let error = false;
     if (!state.fname.value) {
       error = true;
-      state.fname.error = "First Name is required";
+      state.fname.error = translate("error.form.required", {
+        type: translate("label.form.fname")
+      });
     }
     if (!state.lname.value) {
       error = true;
-      state.lname.error = "Last Name is required";
+      state.lname.error = translate("error.form.required", {
+        type: translate("label.form.lname")
+      });
     }
     if (state.email.value) {
       const valid = isEmail(state.email.value);
       if (!valid) {
         error = true;
-        state.email.error = "Enter valid email";
+        state.email.error = translate("error.form.invalid", {
+          type: translate("label.form.email")
+        });
       }
     } else {
       error = true;
-      state.email.error = "Email is required";
+      state.email.error = translate("error.form.required", {
+        type: translate("label.form.email")
+      });
     }
     if (state.phone.value) {
       const valid = isPhone(state.phone.value);
       if (!valid) {
         error = true;
-        state.phone.error = "Enter valid Phone";
+        state.phone.error = translate("error.form.invalid", {
+          type: translate("label.form.phone")
+        });
       }
     } else {
       error = true;
-      state.phone.error = "Phone is required";
+      state.phone.error = translate("error.form.required", {
+        type: translate("label.form.phone")
+      });
     }
     // licence check only in add user
-    if (
+    /* if (
       !state.editUser &&
       this.props.licences.length &&
       !state.selectedLicence.value
     ) {
       error = true;
-      state.selectedLicence.error = "Choose licence";
-    }
+      state.selectedLicence.error = translate("label.user.chooselicence");
+    } */
 
     if (error) {
+      this.scrollToTop();
       this.setState(state);
       return;
     }
@@ -180,18 +199,30 @@ class AddUser extends Component {
       phonenumber: state.phone.value,
       roleid: state.selectedRole,
       department_id: state.selectedDept,
-      subscription_id: state.selectedLicence.value,
       customer_id: this.props.selectedCustomer.id
     };
 
     if (state.editUser) {
       reqObject.userid = this.props.selectedUser.user_id;
-      reqObject = _.omit(reqObject, ["subscription_id"]);
       reqObject.is_active = state.statusActive ? 1 : 0;
       this.props.dispatch(
         UsermanagementActions.updateUser(reqObject, this.props.history)
       );
     } else {
+      _.map(state.selectedLicences, licence => {
+        if (licence.app_name === "omni-view") {
+          reqObject["subscriptions"] = {
+            ...reqObject["subscriptions"],
+            "omni-view": licence.id
+          };
+        }
+        if (licence.app_name === "omni-file") {
+          reqObject["subscriptions"] = {
+            ...reqObject["subscriptions"],
+            "omni-file": licence.id
+          };
+        }
+      });
       this.props.dispatch(
         UsermanagementActions.addUser(reqObject, this.props.history)
       );
@@ -218,18 +249,50 @@ class AddUser extends Component {
     this.props.history.goBack();
   };
 
+  getLicenceAppName = appName => {
+    return _.includes(appName, "view") ? "omniVIEW" : "omniFILE";
+  };
+
+  onLicenceChecked = licence => e => {
+    const checked = e.target.checked;
+    let newLicences = [...this.state.licences];
+    const idx = _.findIndex(newLicences, li => li.id === licence.id);
+    if (!checked) {
+      newLicences[idx].checked = checked;
+      const newSelectedLicences = [...this.state.selectedLicences];
+      _.remove(newSelectedLicences, li => li.id === licence.id);
+      this.setState({
+        licences: newLicences,
+        selectedLicences: newSelectedLicences
+      });
+    } else {
+      const checkedLicecnce = _.map(
+        this.state.selectedLicences,
+        licence.app_name
+      );
+      if (!checkedLicecnce.length) {
+        newLicences[idx].checked = checked;
+        this.setState({
+          licences: newLicences,
+          selectedLicences: [...this.state.selectedLicences, newLicences[idx]]
+        });
+      }
+    }
+  };
+
   render() {
-    const { departments, licences, loading } = this.props;
+    const { departments, loading, selectedUser } = this.props;
     const {
       fname,
       lname,
       email,
       phone,
-      selectedLicence,
+      licences,
       selectedRole,
       selectedDept,
       statusActive,
-      editUser
+      editUser,
+      selectedLicences
     } = this.state;
     return (
       <React.Fragment>
@@ -238,39 +301,54 @@ class AddUser extends Component {
         <ContentLayout className="addUser">
           <div style={{ marginBottom: "15px" }}>
             <span className="maindashboard-breadcrum" onClick={this.goBack}>
-              User Management
+              {translate("label.usermgmt.title")}
             </span>
             <span style={{ margin: "0px 5px" }}>></span>
             <span
               className="maindashboard-breadcrum"
               style={{ opacity: 0.4, cursor: "not-allowed" }}
             >
-              Add User
+              {`${translate("label.usermgmt.add")} ${translate(
+                "label.dashboard.user"
+              )}`}
             </span>
           </div>
-          <p className="addUser-title">{editUser ? "Edit" : "Add"} User</p>
+          <p className="addUser-title">
+            {editUser
+              ? translate("label.usermgmt.edit")
+              : translate("label.usermgmt.add")}{" "}
+            {translate("label.dashboard.user")}
+          </p>
           <p className="addUser-subtitle">
             {editUser
-              ? "Make edits to this user profile below"
-              : "Complete the form below to add a new user. Fields with an * are mandatory."}
+              ? translate("text.user.editmsg", {
+                  type: _.toLower(translate("label.dashboard.user"))
+                })
+              : translate("text.user.addmsg", {
+                  type: _.toLower(translate("label.dashboard.user"))
+                })}
           </p>
           <div className="global__hr-line" />
-          <p className="addUser-heading">User Details</p>
+          <p className="addUser-heading">
+            {translate("label.user.details", {
+              type: translate("label.dashboard.user")
+            })}
+          </p>
           <Row className="addUser__fields">
             <InputField
               className="addUser__fields-field"
               style={{ marginRight: "14px" }}
-              label="First Name*"
+              label={`${translate("label.form.fname")}*`}
               value={fname.value}
-              placeholder="First Name"
+              placeholder={translate("label.form.fname")}
               error={fname.error}
               onChange={this.onInputChange("fname")}
             />
             <InputField
               className="addUser__fields-field"
-              label="Last Name*"
+              label={`${translate("label.form.lname")}*`}
               value={lname.value}
-              placeholder="Last Name"
+              placeholder={translate("label.form.lname")}
               error={lname.error}
               onChange={this.onInputChange("lname")}
             />
@@ -279,23 +357,23 @@ class AddUser extends Component {
             <InputField
               className="addUser__fields-field"
               style={{ marginRight: "14px" }}
-              label="Email Address*"
+              label={`${translate("label.form.email")}*`}
               value={email.value}
-              placeholder="Email"
+              placeholder={translate("placeholder.form.email")}
               error={email.error}
               onChange={this.onInputChange("email")}
             />
             <PhoneField
               className="addUser__fields-field"
               error={phone.error}
-              label="Phone Number*"
+              label={`${translate("label.form.phone")}*`}
               value={phone.value}
               onChange={this.onPhoneChange}
             />
           </Row>
           <div className="addUser__section">
             <p className="addUser__section-label">
-              Select the role that this user will be assigned*
+              {translate("text.user.selectrolemsg")}
             </p>
             <RadioGroup value={selectedRole} onChange={this.onRoleChange}>
               {_.map(this.roles, role => (
@@ -312,7 +390,7 @@ class AddUser extends Component {
           </div>
           <div className="addUser__section">
             <p className="addUser__section-label">
-              Select the department this user is a part of*
+              {translate("text.user.selectdeptmsg")}
             </p>
             <RadioGroup
               value={selectedDept}
@@ -350,7 +428,9 @@ class AddUser extends Component {
                 </div>
               </div> */}
               {/* <p className="addUser-heading">Subscription Details</p> */}
-              <p className="addUser-heading">Account Status</p>
+              <p className="addUser-heading">
+                {translate("label.user.accstatus")}
+              </p>
               <div className="addUser__account">
                 <div className="addUser__account__status">
                   <Switch
@@ -363,11 +443,15 @@ class AddUser extends Component {
                       statusActive ? "active" : "inactive"
                     }`}
                   >
-                    {statusActive ? "Active" : "Inactive"}
+                    {statusActive
+                      ? translate("label.user.active")
+                      : translate("label.user.inactive")}
                   </p>
                 </div>
                 <p className="addUser__account-created">
-                  Account created on 12/12/2017
+                  {`${translate("text.user.createdon")} ${getFormattedDate(
+                    _.get(selectedUser, "created_at", "")
+                  )}`}
                 </p>
               </div>
             </React.Fragment>
@@ -375,58 +459,86 @@ class AddUser extends Component {
           {!editUser && (
             <React.Fragment>
               <p className="addUser__section addUser__section-label">
-                Choose a subscription license to apply to this user's account.
+                {translate("text.user.choosesubscriptionmsg")}
               </p>
               <div className="addUser__licences">
-                {(_.get(licences, "length") || "") && (
-                  <div>
-                    <p className="global__field-label">Available Licenses</p>
-                    <Select
-                      value={
-                        _.get(selectedLicence, "value") || "Choose Licence"
-                      }
-                      className={`addUser__dropdown ${selectedLicence.error &&
-                        "addUser__dropdown-error"}`}
-                      suffixIcon={
-                        <Icon
-                          type="down"
-                          style={{ fontSize: "15px", color: "black" }}
-                        />
-                      }
-                      onChange={this.onLicenceSelect}
-                    >
+                {(licences.length || "") && (
+                  <div className="addUser__licences__box">
+                    <div className="addUser__licences__box__scroll">
                       {_.map(licences, licence => (
-                        <Option key={licence.id} value={licence.id}>
-                          {licence.name}
-                        </Option>
+                        <div
+                          className="addUser__licences__box__scroll-item"
+                          key={licence.id}
+                          value={licence.id}
+                        >
+                          <div style={{ width: "70%" }}>
+                            <div className="global__center-vert">
+                              <Text
+                                type="bold"
+                                text={licence.name}
+                                textStyle={{ marginRight: "10px" }}
+                              />
+                              <Text
+                                type="regular"
+                                size="12px"
+                                opacity={0.75}
+                                text={`${translate(
+                                  "label.user.available"
+                                )}  ${licence.remaining || 0}`}
+                              />
+                            </div>
+                            <div className="global__center-vert">
+                              <Text
+                                type="bold"
+                                size="12px"
+                                opacity={0.75}
+                                text={this.getLicenceAppName(licence.app_name)}
+                                textStyle={{ marginRight: "5px" }}
+                              />
+                              <Text
+                                type="regular"
+                                size="12px"
+                                opacity={0.75}
+                                text={` - Purchased on ${getFormattedDate(
+                                  _.get(licence, "purchase_date")
+                                )}`}
+                              />
+                            </div>
+                            {/* <Text
+                              type="regular"
+                              size="14px"
+                              opacity={0.75}
+                              text={`Expires on ${getFormattedDate(
+                                _.get(licence, "expired_date")
+                              )}`}
+                            /> */}
+                          </div>
+                          <Checkbox
+                            checked={licence.checked}
+                            onChange={this.onLicenceChecked(licence)}
+                          />
+                        </div>
                       ))}
-                    </Select>
-                    {selectedLicence.error && (
-                      <p
-                        className="global__field__error-text"
-                        style={{ marginTop: "0px" }}
-                      >
-                        {selectedLicence.error}
-                      </p>
-                    )}
+                    </div>
+
+                    {_.map(selectedLicences, licence => {
+                      if (licence.revoked_date) {
+                        return (
+                          <Text
+                            key={licence.id}
+                            className="addUser__licences__box-warning"
+                            size="12px"
+                            text={translate("error.user.licenceassigned", {
+                              product: this.getLicenceAppName(licence.app_name),
+                              remain: licence.validDays,
+                              expire: licence.unassignValidity
+                            })}
+                          />
+                        );
+                      }
+                    })}
                   </div>
                 )}
-                {/* {
-                  <div className="addUser__licences__box">
-                    {_.map(licences, licence => (
-                      <div
-                        className="addUser__licences__box-item global__center-vert"
-                        key={licence.id}
-                        value={licence.id}
-                      >
-                        <div>
-                          <p>6 - month license</p>
-                          <p>omniVIEW - Purchased on 1/3/2019</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                } */}
                 {!_.get(licences, "length") && (
                   <div className="addUser__licences__error">
                     <div className="global__center-vert">
@@ -436,14 +548,11 @@ class AddUser extends Component {
                         className="addUser__licences__error-icon"
                       />
                       <p className="addUser__licences__error-text">
-                        You’re out of licenses!
+                        {translate("text.user.outoflicence")}
                       </p>
                     </div>
                     <p className="addUser__licences__error-desc">
-                      You can still add this user, but they won’t be able to
-                      login and access the platform until they’re assigned a
-                      subscription license. Contact an Omnicia Admin to purchase
-                      more licenses for your account.
+                      {translate("text.user.addevennolicence")}
                     </p>
                   </div>
                 )}
@@ -453,25 +562,27 @@ class AddUser extends Component {
           <div className="addUser__buttons">
             <OmniButton
               type="secondary"
-              label="Cancel"
+              label={translate("label.button.cancel")}
               className="addUser__buttons-btn"
               onClick={this.goBack}
             />
             <OmniButton
               type="primary"
-              label={editUser ? "Save Changes" : "Save & Submit"}
+              label={
+                editUser
+                  ? translate("label.button.savechanges")
+                  : translate("label.button.savesubmit")
+              }
               className="addUser__buttons-btn"
               buttonStyle={{ marginLeft: "16px" }}
               onClick={this.save}
             />
           </div>
           <DeactivateModal
+            isActive={this.state.statusActive}
             visible={this.state.showDeactivateModal}
-            title="Deactivate Account?"
-            content="This user will no longer be able to access the system until an
-            Omnicia administrator enables their account again. Any remaining
-            time from the assigned subscription license can be applied to
-            another user within 30 days."
+            title={translate("label.usermgmt.deactivateacc")}
+            content={translate("text.usermgmt.deactivatemsg")}
             closeModal={this.closeModal}
             deactivate={this.deactivate}
           />

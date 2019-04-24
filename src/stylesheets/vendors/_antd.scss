@@ -37,7 +37,10 @@
     }
 
     &-active {
-      background: $clear-chill !important;
+      background: $white !important;
+      > a {
+        color: $black !important;
+      }
     }
   }
 }

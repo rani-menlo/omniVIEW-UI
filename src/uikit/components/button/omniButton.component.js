@@ -2,7 +2,14 @@ import React from "react";
 import PropTypes from "prop-types";
 import { Button } from "antd";
 
-const OmniButton = ({ label, onClick, className, type, buttonStyle }) => {
+const OmniButton = ({
+  label,
+  onClick,
+  className,
+  type,
+  buttonStyle,
+  disabled
+}) => {
   if (type === "add") {
     return (
       <span
@@ -17,7 +24,8 @@ const OmniButton = ({ label, onClick, className, type, buttonStyle }) => {
   }
   return (
     <Button
-      style={buttonStyle}
+      style={{ ...buttonStyle, opacity: disabled ? 0.2 : 1 }}
+      disabled={disabled}
       type={type}
       className={`omniButton-${type} ${className}`}
       onClick={onClick}
@@ -32,7 +40,8 @@ OmniButton.propTypes = {
   label: PropTypes.string.isRequired,
   onClick: PropTypes.func,
   className: PropTypes.string,
-  buttonStyle: PropTypes.object
+  buttonStyle: PropTypes.object,
+  disabled: PropTypes.bool
 };
 
 OmniButton.defaultProps = {

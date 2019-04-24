@@ -1,0 +1,19 @@
+.createProfile {
+  padding: 40px 10%;
+  &__fields {
+    display: flex;
+    &-field {
+      width: 30%;
+    }
+    &-numeric {
+      width: 18%;
+    }
+  }
+  &__buttons {
+    margin-top: 50px;
+    &-btn {
+      min-height: 40px;
+      padding: 0 40px !important;
+    }
+  }
+}

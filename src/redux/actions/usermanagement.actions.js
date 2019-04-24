@@ -33,14 +33,29 @@ export default {
       try {
         const res = await UsermanagementApi.fetchLicences(customerId);
         let licences = _.get(res, "data.licences", {});
-        if (licences["omni-view"]) {
-          licences = _.spread(_.union)(_.values(licences["omni-view"]));
-        } else {
-          licences = _.spread(_.union)(_.values(licences["omni-file"]));
-        }
+        const licencesByApp = _.groupBy(licences, "app_name");
+        let newLicences = [];
+        _.map(licencesByApp, appLicences => {
+          const licencesByName = _.groupBy(appLicences, "name");
+          _.map(licencesByName, (licences, name) => {
+            const revokedLicences = _.filter(licences, "revoked_date");
+            if (revokedLicences.length) {
+              newLicences = [...newLicences, ...revokedLicences];
+              licences = _.filter(
+                licences,
+                li => !revokedLicences.includes(li)
+              );
+            }
+            const licencesByDate = _.groupBy(licences, "purchase_date");
+            _.map(licencesByDate, licences => {
+              licences[0].remaining = licences.length;
+              newLicences.push(licences[0]);
+            });
+          });
+        });
         dispatch({
           type: UsermanagementActionTypes.FETCH_LICENCES,
-          data: licences
+          data: newLicences
         });
         ApiActions.success(dispatch);
       } catch (err) {
@@ -70,11 +85,11 @@ export default {
       }
     };
   },
-  fetchUsers: (customerId, search) => {
+  fetchUsers: data => {
     return async dispatch => {
       ApiActions.request(dispatch);
       try {
-        const res = await UsermanagementApi.fetchUsers(customerId, search);
+        const res = await UsermanagementApi.fetchUsers(data);
         dispatch({
           type: UsermanagementActionTypes.FETCH_USERS,
           data: res.data
@@ -85,6 +100,7 @@ export default {
       }
     };
   },
+
   addUser: (user, history) => {
     return async dispatch => {
       ApiActions.request(dispatch);
@@ -95,7 +111,7 @@ export default {
           data: res.data
         });
         ApiActions.success(dispatch);
-        history.goBack();
+        !res.data.error && history.goBack();
       } catch (err) {
         ApiActions.failure(dispatch);
       }
@@ -111,18 +127,18 @@ export default {
           data: res.data
         });
         ApiActions.success(dispatch);
-        history.goBack();
+        !res.data.error && history.goBack();
       } catch (err) {
         ApiActions.failure(dispatch);
       }
     };
   },
-  deactivateUser: (usr, customerId, search) => {
+  activateDeactivateUser: (usr, customerId) => {
     return async dispatch => {
       ApiActions.request(dispatch);
       try {
-        await UsermanagementApi.deactivateUser(usr);
-        const res = await UsermanagementApi.fetchUsers(customerId, search);
+        await UsermanagementApi.activateDeactivateUser(usr);
+        const res = await UsermanagementApi.fetchUsers({ customerId });
         dispatch({
           type: UsermanagementActionTypes.FETCH_USERS,
           data: res.data
@@ -140,6 +156,22 @@ export default {
         const res = await UsermanagementApi.addCustomer(customer);
         dispatch({
           type: UsermanagementActionTypes.ADD_CUSTOMER,
+          data: res.data
+        });
+        ApiActions.success(dispatch);
+        !res.data.error && history.goBack();
+      } catch (err) {
+        ApiActions.failure(dispatch);
+      }
+    };
+  },
+  editCustomer: (customer, history) => {
+    return async dispatch => {
+      ApiActions.request(dispatch);
+      try {
+        const res = await UsermanagementApi.editCustomer(customer);
+        dispatch({
+          type: UsermanagementActionTypes.EDIT_CUSTOMER,
           data: res.data
         });
         ApiActions.success(dispatch);

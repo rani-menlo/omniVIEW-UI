@@ -12,24 +12,37 @@ const onInputText = onChange => e => {
 };
 
 const InputField = ({
+  type,
   label,
   value,
   onChange,
   placeholder,
   error,
   style,
-  className
+  className,
+  disabled
 }) => {
   return (
     <div style={style} className={className}>
       {label && <p className="global__field-label">{label}</p>}
       <FormItem>
-        <Input
-          placeholder={placeholder}
-          onChange={onInputText(onChange)}
-          value={value}
-          className={error && "global__field__error-box"}
-        />
+        {type === "password" ? (
+          <Input.Password
+            disabled={disabled}
+            placeholder={placeholder}
+            onChange={onInputText(onChange)}
+            value={value}
+            className={error && "global__field__error-box"}
+          />
+        ) : (
+          <Input
+            disabled={disabled}
+            placeholder={placeholder}
+            onChange={onInputText(onChange)}
+            value={value}
+            className={error && "global__field__error-box"}
+          />
+        )}
       </FormItem>
       {error && <p className="global__field__error-text">{error}</p>}
     </div>
@@ -37,16 +50,19 @@ const InputField = ({
 };
 
 InputField.propTypes = {
+  type: PropTypes.oneOf(["password", ""]),
   label: PropTypes.string,
   value: PropTypes.string,
   onChange: PropTypes.func,
   placeholder: PropTypes.string,
   error: PropTypes.string,
   style: PropTypes.object,
-  className: PropTypes.string
+  className: PropTypes.string,
+  disabled: PropTypes.bool
 };
 
 InputField.defaultProps = {
+  type: "",
   className: ""
 };
 

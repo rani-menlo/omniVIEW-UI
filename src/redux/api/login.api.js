@@ -1,5 +1,5 @@
-import api from '.';
-import { URI } from '../../constants';
+import api from ".";
+import { URI } from "../../constants";
 
 export default {
   login: data => {
@@ -10,5 +10,8 @@ export default {
   },
   verifyOtp: data => {
     return api.post(URI.OTP_VERIFY, data);
+  },
+  createOrUpdateProfile: data => {
+    return api.post(URI.CREATE_UPDATE_PROFILE, data);
   }
 };

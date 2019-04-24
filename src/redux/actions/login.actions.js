@@ -19,6 +19,23 @@ export default {
       }
     };
   },
+  createOrUpdateProfile: (data, history) => {
+    return async dispatch => {
+      ApiActions.request(dispatch);
+      try {
+        const res = await LoginApi.createOrUpdateProfile(data);
+        dispatch({
+          type: LoginActionTypes.CREATE_UPDATE_PROFILE,
+          data: res.data
+        });
+        ApiActions.success(dispatch);
+        !res.data.error && history.push("/customers");
+      } catch (err) {
+        console.log(err);
+        ApiActions.failure(dispatch);
+      }
+    };
+  },
   sendOtp: data => {
     return async dispatch => {
       ApiActions.request(dispatch);

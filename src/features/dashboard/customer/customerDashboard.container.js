@@ -7,10 +7,9 @@ import styled from "styled-components";
 import CustomerCard from "../customerCard.component";
 import { CustomerActions } from "../../../redux/actions";
 import Header from "../../header/header.component";
-import { isLoggedInOmniciaRole } from "../../../utils";
+import { isLoggedInOmniciaRole, isLoggedInOmniciaAdmin } from "../../../utils";
 import {
   Loader,
-  Footer,
   TableHeader,
   Row,
   Pagination,
@@ -22,6 +21,7 @@ import {
   ContentLayout
 } from "../../../uikit/components";
 import { DEBOUNCE_TIME } from "../../../constants";
+import { translate } from "../../../translations/translator";
 
 class CustomerDashboard extends Component {
   constructor(props) {
@@ -40,7 +40,7 @@ class CustomerDashboard extends Component {
       this.fetchCustomers();
     } else {
       const { user } = this.props;
-      this.onCustomerSelected({ id: user.customer_id })();
+      this.onCustomerSelected({ ...user.customer })();
     }
   }
 
@@ -68,17 +68,45 @@ class CustomerDashboard extends Component {
     this.props.history.push("/applications");
   };
 
-  getMenu = () => {
+  editCustomer = customer => () => {
+    this.props.actions.setSelectedCustomer(customer);
+    this.props.history.push("/usermanagement/customer/edit");
+  };
+
+  getMenu = customer => () => {
     return (
-      <Menu>
-        <Menu.Item disabled>
-          <span>Edit Customer</span>
+      <Menu className="maindashboard__list__item-dropdown-menu">
+        <Menu.Item
+          className="maindashboard__list__item-dropdown-menu-item"
+          onClick={this.editCustomer(customer)}
+        >
+          <p>
+            <img src="/images/edit.svg" />
+            <span>{`${translate("label.usermgmt.edit")} ${translate(
+              "label.dashboard.customer"
+            )}`}</span>
+          </p>
         </Menu.Item>
-        <Menu.Item disabled>
-          <span>Add/Edit Users</span>
+        <Menu.Item
+          disabled
+          className="maindashboard__list__item-dropdown-menu-item"
+          onClick={this.openUserMgmt(customer)}
+        >
+          <p>
+            <img src="/images/user-management.svg" />
+            <span>{translate("label.usermgmt.title")}</span>
+          </p>
         </Menu.Item>
-        <Menu.Item disabled>
-          <span>Deactivate Customer</span>
+        <Menu.Item
+          disabled
+          className="maindashboard__list__item-dropdown-menu-item"
+        >
+          <p style={{ color: "red" }}>
+            <img src="/images/deactivate.svg" />
+            <span>{`${translate("label.usermgmt.deactivate")} ${translate(
+              "label.dashboard.customer"
+            )}`}</span>
+          </p>
         </Menu.Item>
       </Menu>
     );
@@ -117,9 +145,21 @@ class CustomerDashboard extends Component {
     this.props.history.push("/usermanagement/customer/add");
   };
 
+  openOadminUserManagement = () => {
+    const { oAdminCustomer } = this.props;
+    if (oAdminCustomer) {
+      this.openUserMgmt(oAdminCustomer)();
+    }
+  };
+
+  openUserMgmt = customer => () => {
+    this.props.actions.setSelectedCustomer(customer);
+    this.props.history.push("/usermanagement");
+  };
+
   render() {
     const { viewBy, searchText } = this.state;
-    const { customers, loading, customerCount } = this.props;
+    const { customers, loading, customerCount, role } = this.props;
     return (
       <React.Fragment>
         <Loader loading={loading} />
@@ -134,7 +174,9 @@ class CustomerDashboard extends Component {
             </span> */}
           <div style={{ marginLeft: "auto" }}>
             <SearchBox
-              placeholder="Search Customers..."
+              placeholder={translate("text.header.search", {
+                type: translate("label.dashboard.customers")
+              })}
               searchText={searchText}
               clearSearch={this.clearSearch}
               onChange={this.handleSearch}
@@ -143,12 +185,24 @@ class CustomerDashboard extends Component {
         </SubHeader>
         <ContentLayout className="maindashboard">
           <div className="maindashboard__header">
-            <div>
-              <span className="maindashboard__header-customers">Customers</span>
+            <div className="global__center-vert">
+              <span className="maindashboard__header-customers">
+                {translate("label.dashboard.customers")}
+              </span>
+              {isLoggedInOmniciaAdmin(role) && (
+                <div
+                  className="maindashboard__header__addEdit"
+                  onClick={this.openOadminUserManagement}
+                >
+                  {translate("label.usermgmt.title")}
+                </div>
+              )}
             </div>
             <OmniButton
               type="add"
-              label="Add New Customer"
+              label={translate("label.button.add", {
+                type: translate("label.dashboard.customer")
+              })}
               onClick={this.addCustomer}
               // className="global__disabled-box"
             />
@@ -210,7 +264,7 @@ class CustomerDashboard extends Component {
                         "12 in use  | 3 unassigned"
                       )}
                       <Dropdown
-                        overlay={this.getMenu()}
+                        overlay={this.getMenu(customer)()}
                         trigger={["click"]}
                         overlayClassName="maindashboard__list__item-dropdown"
                       >
@@ -230,16 +284,23 @@ class CustomerDashboard extends Component {
                     type="exclamation-circle"
                     className="maindashboard__nodata-icon"
                   />
-                  No Customers found
+                  {translate("error.dashboard.notfound", {
+                    type: translate("label.dashboard.customers")
+                  })}
                 </Row>
               )}
               <Pagination
                 containerStyle={
-                  customerCount > 4 ? { marginTop: "5%" } : { marginTop: "20%" }
+                  customerCount > 4 ? { marginTop: "1%" } : { marginTop: "20%" }
                 }
                 total={customerCount}
                 showTotal={(total, range) =>
-                  `Showing - ${range[0]}-${range[1]} of ${total} Customers`
+                  translate("text.pagination", {
+                    top: range[0],
+                    bottom: range[1],
+                    total,
+                    type: translate("label.dashboard.customers")
+                  })
                 }
                 pageSize={this.state.itemsPerPage}
                 current={this.state.pageNo}
@@ -256,6 +317,7 @@ class CustomerDashboard extends Component {
                     key={customer.id}
                     customer={customer}
                     onSelect={this.onCustomerSelected}
+                    getMenu={this.getMenu(customer)}
                   />
                 ))}
               </div>
@@ -266,7 +328,9 @@ class CustomerDashboard extends Component {
                     type="exclamation-circle"
                     className="maindashboard__nodata-icon"
                   />
-                  No Customers found
+                  {translate("error.dashboard.notfound", {
+                    type: translate("label.dashboard.customers")
+                  })}
                 </Row>
               )}
             </React.Fragment>
@@ -279,12 +343,12 @@ class CustomerDashboard extends Component {
 
 const TableColumnNames = {
   CHECKBOX: "",
-  CUSTOMER_NAME: "Customer Name",
-  USERS: "Users",
-  APPLICATIONS: "Applications",
-  STORAGE: "Storage",
-  COMPANY_ADMIN: "Company Admin",
-  SUBSCRIPTION: "Subscription Licences"
+  CUSTOMER_NAME: translate("label.dashboard.customername"),
+  USERS: translate("label.dashboard.users"),
+  APPLICATIONS: translate("label.dashboard.applications"),
+  STORAGE: translate("label.dashboard.storage"),
+  COMPANY_ADMIN: translate("label.dashboard.companyadmin"),
+  SUBSCRIPTION: translate("label.dashboard.subscription")
 };
 
 const TableColumns = [
@@ -351,6 +415,7 @@ function mapStateToProps(state) {
     role: state.Login.role,
     user: state.Login.user,
     customers: state.Customer.customers,
+    oAdminCustomer: state.Customer.oAdminCustomer,
     customerCount: state.Customer.customerCount
   };
 }

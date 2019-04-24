@@ -183,12 +183,8 @@ class SubmissionView extends Component {
 
   openApplicationsScreen = () => {
     this.props.actions.setSelectedSequence(null);
-    console.log(this.props.history);
-    if(this.props.history.action === 'POP') {
-      window.close();
-    } else {
-      this.props.history.goBack();
-    }
+    window.close();
+    this.props.history.push("/applications");
   };
 
   getTreeLabel = () => {
@@ -240,13 +236,24 @@ class SubmissionView extends Component {
   };
 
   createKey = () => {
-    const { sequenceJson, lifeCycleJson, selectedSequence } = this.props;
+    const {
+      selectedSequence,
+      selectedSubmission,
+      sequenceJson,
+      lifeCycleJson
+    } = this.props;
     const { selectedView, selectedMode } = this.state;
     let key = `${selectedView}_${selectedMode}_`;
     if (selectedSequence) {
-      key = key + _.get(sequenceJson, "ectd:ectd.sequence", "");
+      key = `${key}${_.get(selectedSequence, "json_path", "")}#${_.size(
+        sequenceJson
+      )}`;
     } else {
-      key = key + _.get(lifeCycleJson, "ectd:ectd.sequence", "");
+      key = `${key}${_.get(
+        selectedSubmission,
+        "life_cycle_json_path",
+        ""
+      )}#${_.size(lifeCycleJson)}`;
     }
     return key;
   };

@@ -36,11 +36,31 @@
       &:nth-child(odd) {
         background-color: $froasted-glass;
       }
+      &-dropdown {
+        &-menu {
+          padding: 0px !important;
+          &-item {
+            border-bottom: 0.2px solid;
+            > p {
+              @include text-regular;
+              > img {
+                margin-right: 8px;
+              }
+            }
+          }
+        }
+      }
       &-text {
         @include text-normal(14px);
         padding-left: 4px;
         &-bold {
           @include text-bold-active(14px);
+        }
+        &-active {
+          color: $caribbean-green;
+        }
+        &-inactive {
+          color: $coral-red;
         }
       }
       &__row {

@@ -7,6 +7,7 @@ import _ from "lodash";
 import { LoginActions } from "../../redux/actions";
 import Loader from "../../uikit/components/loader";
 import Footer from "../../uikit/components/footer/footer.component";
+import { translate } from "../../translations/translator";
 
 const FormItem = Form.Item;
 
@@ -33,11 +34,21 @@ class Login extends Component {
     let { username, password } = this.state;
     if (!username.value) {
       this.setState({
-        username: { ...username, error: "Username is required" }
+        username: {
+          ...username,
+          error: translate("error.form.required", {
+            type: translate("label.form.username")
+          })
+        }
       });
     } else if (!password.value) {
       this.setState({
-        password: { ...password, error: "Password is required" }
+        password: {
+          ...password,
+          error: translate("error.form.required", {
+            type: translate("label.form.password")
+          })
+        }
       });
     } else {
       this.props.actions.login({
@@ -52,7 +63,9 @@ class Login extends Component {
     const text = e.target.value;
     let error = "";
     if (/\s/.test(text)) {
-      error = "Inavlid Username";
+      error = translate("error.form.invalid", {
+        type: translate("label.form.username")
+      });
     }
     this.setState({
       username: { ...this.state.username, value: text, error }
@@ -76,14 +89,16 @@ class Login extends Component {
         <div className="global__container">
           <div className="login">
             <img src="/images/omnicia-logo.svg" className="login-logo" />
-            <p className="login-text">Login</p>
+            <p className="login-text">{translate("text.login.title")}</p>
             <div className="login__hr-line global__hr-line" />
             {error && <p className="login-error">{error}</p>}
             <Form onSubmit={this.handleSubmit}>
-              <p className="global__field-label">Username</p>
+              <p className="global__field-label">
+                {translate("label.form.username")}
+              </p>
               <FormItem>
                 <Input
-                  placeholder="Username"
+                  placeholder={translate("label.form.username")}
                   onChange={this.onUsernameChange}
                   value={username.value}
                   className={username.error && "login-errorbox"}
@@ -93,19 +108,21 @@ class Login extends Component {
                 <p className="login-fieldError">{username.error}</p>
               )}
               <div className="login__pwdsection">
-                <span className="global__field-label">Password</span>
+                <span className="global__field-label">
+                  {translate("label.form.password")}
+                </span>
                 <a
                   className="login__pwdsection-forgot-pwd"
                   tabIndex="3"
-                  style={{cursor: 'not-allowed', opacity: 0.5}}
+                  style={{ cursor: "not-allowed", opacity: 0.5 }}
                 >
-                  Forgot your password?
+                  {translate("text.login.forgotpwd")}
                 </a>
               </div>
               <FormItem>
                 <Input
                   type="password"
-                  placeholder="Password"
+                  placeholder={translate("label.form.password")}
                   value={password.value}
                   onChange={this.onPasswordChange}
                   className={password.error && "login-errorbox"}
@@ -115,7 +132,7 @@ class Login extends Component {
                 <p className="login-fieldError">{password.error}</p>
               )}
               <Checkbox disabled className="login-rememberpwd">
-                Remember Password?
+                {translate("text.login.rememberpwd")}
               </Checkbox>
               <FormItem>
                 <Button
@@ -123,7 +140,7 @@ class Login extends Component {
                   htmlType="submit"
                   className="login-form-button"
                 >
-                  Sign In
+                  {translate("label.login.signin")}
                 </Button>
               </FormItem>
             </Form>

@@ -1,17 +1,19 @@
+import { translate } from "./translations/translator";
+
 const path = "/api/v1/";
 
 const SERVER_URL = process.env.REACT_APP_SERVER_URL;
 
 const ROLES = {
   OMNICIA: [
-    { name: "Admin", id: 1 },
-    { name: "Publisher", id: 2 },
-    { name: "Author", id: 3 }
+    { name: translate("label.role.admin"), id: 1 },
+    { name: translate("label.role.author"), id: 3 },
+    { name: translate("label.role.publisher"), id: 2 }
   ],
   CUSTOMER: [
-    { name: "Admin", id: 4 },
-    { name: "Publisher", id: 5 },
-    { name: "Author", id: 6 }
+    { name: translate("label.role.admin"), id: 4 },
+    { name: translate("label.role.author"), id: 6 },
+    { name: translate("label.role.publisher"), id: 5 }
   ]
 };
 
@@ -20,10 +22,9 @@ const URI = {
   LOGIN: `${path}auth/login`,
   OTP: `${path}auth/otpgeneration`,
   OTP_VERIFY: `${path}auth/otpverification`,
-  ADD_USER: `${path}auth/addUsers`,
-  UPDATE_USER: `${path}auth/updateUsers`,
   // Customer
   ADD_CUSTOMER: `${path}customer/createCustomer`,
+  EDIT_CUSTOMER: `${path}customer/editCustomer`,
   GET_CUSTOMERS: `${path}customer/getCustomers`,
   GET_DEPARTMENTS: `${path}customer/getDepartments`,
   GET_LICENCES: `${path}customer/getAvailableLicences`,
@@ -36,6 +37,9 @@ const URI = {
   VALIDATE_SEQUENCE: `${path}validation/sequenceValidation`,
   // User
   GET_USERS: `${path}user/getUsers`,
+  ADD_USER: `${path}user/addUsers`,
+  UPDATE_USER: `${path}user/updateUsers`,
+  CREATE_UPDATE_PROFILE: `${path}user/updateProfile`,
   ACTIVATE_DEACTIVATE: `${path}user/activateOrDeactivateUser`,
   // File
   GET_FILE_SIZE: `${path}file/getFileSize`,
