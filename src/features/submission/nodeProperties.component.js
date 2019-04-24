@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
 import _ from "lodash";
-import { SERVER_URL, URI } from "../../constants";
 import { TypesJson } from "./types";
 import Row from "../../uikit/components/row/row.component";
 
@@ -72,7 +71,7 @@ class NodeProperties extends Component {
   };
 
   getLeafProperties = properties => {
-    if (!properties.fileID) {
+    if (!_.get(properties, "fileID", "")) {
       return null;
     }
     return (

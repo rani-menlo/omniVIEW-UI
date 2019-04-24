@@ -2,10 +2,17 @@
   "label.product.omniview": "omniVIEW",
   "label.product.omnifile": "omniFILE",
 
-  "label.role.admin": "Administrator",
+  "label.generic.and": "and",
+  "label.generic.again": "Again",
+  "label.generic.manage": "Manage",
+  "label.generic.current": "Current",
+  "label.generic.new": "New",
+
+  "label.role.admin": "Admin",
+  "label.role.administrator": "Administrator",
   "label.role.publisher": "Publisher",
   "label.role.author": "Author",
-  "label.role.admins": "Administrators",
+  "label.role.administrators": "Administrators",
   "label.role.publishers": "Publishers",
   "label.role.authors": "Authors",
 
@@ -13,6 +20,8 @@
   "label.button.add": "Add New {type}",
   "label.button.savechanges": "Save Changes",
   "label.button.savesubmit": "Save & Submit",
+  "label.button.resetfilters": "Reset Filters",
+  "label.button.update": "Update",
   "text.pagination": "Showing - {top}-{bottom} of {total} {type}",
   "text.pagination.noofitems": "Number of Items:",
   "label.pagination.back": "Back",
@@ -32,6 +41,8 @@
   "placeholder.form.email": "Email",
   "error.form.required": "{type} is required",
   "error.form.invalid": "Invalid {type}",
+  "error.form.pwdmismatch": "Password mismatch",
+  "error.form.pwdreq": "Password does not meet requirements",
 
   "text.login.title": "Login",
   "text.login.forgotpwd": "Forgot your password?",
@@ -76,19 +87,32 @@
   "label.usermgmt.subscriptionstatus": "Subscription Status",
   "label.usermgmt.edit": "Edit",
   "label.usermgmt.add": "Add",
+  "label.usermgmt.expires": "Expires",
+  "label.usermgmt.expired": "Expired",
   "label.usermgmt.assignlicence": "Assign License",
   "label.usermgmt.activate": "Activate",
   "label.usermgmt.deactivate": "Deactivate",
   "label.usermgmt.deactivateacc": "Deactivate Account?",
+  "label.usermgmt.activateacc": "Activate Account?",
   "text.usermgmt.deactivatemsg": "This user will no longer be able to access the system until an Omnicia administrator enables their account again. Any remaining time from the assigned subscription license can be applied to another user within 30 days.",
+  "text.usermgmt.activatemsg": "This user will be now able to access the system.",
+
+  "lable.profile.profile": "Profile",
+  "lable.profile.signout": "Sign Out",
+  "label.profile.create": "Create Your Profile",
+  "label.profile.edit": "Edit Your Profile",
+  "text.profile.addmsg": "Complete the form below to create a profile. Fields with an * are mandatory.",
+  "text.profile.editmsg": "Make edits to your user profile below",
+  "text.profile.passwordmsg": "Create a unique username and password. Password must be minimum of 8 characters, include at least one uppercase letter, one lowercase letter, one number, and a special character(#?!@$%^&*-).",
 
   "text.user.editmsg": "Make edits to this {type} profile below",
   "text.user.addmsg": "Complete the form below to add a new {type}. Fields with an * are mandatory.",
-  "text.user.selectrolemsg": "Select the role that this user will be assigned*",
-  "text.user.selectdeptmsg": "Select the department this user is a part of*",
+  "text.user.selectrolemsg": "Select the role that this user will be assigned",
+  "text.user.selectdeptmsg": "Select the department this user is a part of",
   "text.user.choosesubscriptionmsg": "Choose a subscription license to apply to this user's account.",
   "text.user.outoflicence": "You’re out of licenses!",
   "text.user.addevennolicence": "You can still add this user, but they won’t be able to login and access the platform until they’re assigned a subscription license. Contact an Omnicia Admin to purchase more licenses for your account.",
+  "text.user.createdon": "Account created on",
   "label.user.details": "{type} Details",
   "label.user.accstatus": "Account Status",
   "label.user.active": "Active",
@@ -113,5 +137,11 @@
   "text.customer.applicationstolicence": "Select which applications this customer wants to license (Select all that apply) :",
   "text.customer.nooflicencetopurchase": "Enter the # of {type} subscription licenses this customer wants to purchase (Select at least one):",
 
-  "error.licence.atleastone": "Enter atleast one licence"
+  "error.licence.atleastone": "Enter atleast one licence",
+
+  "label.filter.sortnamesby": "SORT NAMES BY",
+  "label.filter.filters": "Filters",
+
+  "label.switch.on": "On",
+  "label.switch.off": "Off"
 }

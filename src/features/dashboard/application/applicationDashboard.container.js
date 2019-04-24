@@ -12,7 +12,8 @@ import { DEBOUNCE_TIME } from "../../../constants";
 import {
   isLoggedInOmniciaRole,
   isLoggedInCustomerAdmin,
-  getFormattedDate
+  getFormattedDate,
+  isLoggedInOmniciaAdmin
 } from "../../../utils";
 import {
   Loader,
@@ -49,17 +50,27 @@ class ApplicationDashboard extends Component {
     this.fetchApplications();
   }
 
-  getMenu = () => {
+  onMenuClick = submission => ({ key }) => {
+    this.onMenuItemClick(key, submission);
+  };
+
+  getMenu = submission => () => {
     return (
-      <Menu>
+      <Menu onClick={this.onMenuClick(submission)}>
         <Menu.Item disabled>
-          <span>Edit Customer</span>
+          <span className="submissioncard__heading-dropdown--item">
+            Edit User Permissions
+          </span>
         </Menu.Item>
         <Menu.Item disabled>
-          <span>Add/Edit Users</span>
+          <span className="submissioncard__heading-dropdown--item red-text">
+            Remove Application
+          </span>
         </Menu.Item>
-        <Menu.Item disabled>
-          <span>Deactivate Customer</span>
+        <Menu.Item key="window">
+          <span className="submissioncard__heading-dropdown--item">
+            Open in new Window
+          </span>
         </Menu.Item>
       </Menu>
     );
@@ -136,11 +147,14 @@ class ApplicationDashboard extends Component {
   onMenuItemClick = (key, submission) => {
     if (key === "window") {
       this.props.actions.setSelectedSubmission(submission);
-      window.open(
+      const newWindow = window.open(
         `${process.env.PUBLIC_URL}/submission`,
         "_blank",
         "height=0, width=0"
       );
+      newWindow.addEventListener("load", function() {
+        newWindow.document.title = submission.name;
+      });
     }
   };
 
@@ -201,7 +215,8 @@ class ApplicationDashboard extends Component {
               <span className="maindashboard__header-customers">
                 {_.get(selectedCustomer, "company_name", "")}
               </span>
-              {isLoggedInCustomerAdmin(this.props.role) && (
+              {(isLoggedInOmniciaAdmin(this.props.role) ||
+                isLoggedInCustomerAdmin(this.props.role)) && (
                 <div
                   className="maindashboard__header__addEdit"
                   onClick={this.openUserManagement}
@@ -284,12 +299,12 @@ class ApplicationDashboard extends Component {
                         <Avatar size="small" icon="user" />
                       </div>
                       <Dropdown
-                        overlay={this.getMenu()}
+                        overlay={this.getMenu(submission)}
                         trigger={["click"]}
                         overlayClassName="maindashboard__list__item-dropdown"
                       >
                         <img
-                          src="/images/overflow-blue.svg"
+                          src="/images/overflow-black.svg"
                           style={{ width: "20px", height: "20px" }}
                         />
                       </Dropdown>
@@ -297,7 +312,7 @@ class ApplicationDashboard extends Component {
                   </Row>
                 ))}
               </div>
-              {searchText && !_.get(submissions, "length") && (
+              {!_.get(submissions, "length") && (
                 <Row className="maindashboard__nodata">
                   <Icon
                     style={{ fontSize: "20px" }}
@@ -312,7 +327,7 @@ class ApplicationDashboard extends Component {
               <Pagination
                 containerStyle={
                   submissionCount > 4
-                    ? { marginTop: "5%" }
+                    ? { marginTop: "1%" }
                     : { marginTop: "20%" }
                 }
                 total={submissionCount}
@@ -339,11 +354,11 @@ class ApplicationDashboard extends Component {
                     key={submission.id}
                     submission={submission}
                     onSelect={this.onSubmissionSelected}
-                    onMenuItemClick={this.onMenuItemClick}
+                    getMenu={this.getMenu(submission)}
                   />
                 ))}
               </div>
-              {searchText && !_.get(submissions, "length") && (
+              {!_.get(submissions, "length") && (
                 <Row className="maindashboard__nodata">
                   <Icon
                     style={{ fontSize: "20px" }}

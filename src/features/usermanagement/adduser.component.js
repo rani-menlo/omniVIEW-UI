@@ -12,20 +12,14 @@ import {
   DeactivateModal,
   Text
 } from "../../uikit/components";
-import { Radio, Select, Icon, Avatar, Switch, Modal, Checkbox } from "antd";
+import { Radio, Icon, Switch, Checkbox } from "antd";
 import Header from "../header/header.component";
 import { UsermanagementActions } from "../../redux/actions";
-import {
-  isEmail,
-  isPhone,
-  isLoggedInOmniciaRole,
-  getFormattedDate
-} from "../../utils";
-import { ROLES } from "../../constants";
+import { isEmail, isPhone, getFormattedDate } from "../../utils";
 import { translate } from "../../translations/translator";
+import { ROLES } from "../../constants";
 
 const RadioGroup = Radio.Group;
-const Option = Select.Option;
 
 const radioStyle = {
   display: "block",
@@ -33,12 +27,11 @@ const radioStyle = {
 };
 
 class AddUser extends Component {
-  roles = isLoggedInOmniciaRole(this.props.role)
-    ? ROLES.OMNICIA
-    : ROLES.CUSTOMER;
-
   constructor(props) {
     super(props);
+    this.roles = _.get(this.props, "selectedCustomer.is_omnicia", false)
+      ? ROLES.OMNICIA
+      : ROLES.CUSTOMER;
     this.state = {
       editUser: false,
       fname: {
@@ -136,6 +129,10 @@ class AddUser extends Component {
     });
   };
 
+  scrollToTop = () => {
+    window.scrollTo(0, 0);
+  };
+
   save = () => {
     const state = { ...this.state };
     let error = false;
@@ -190,6 +187,7 @@ class AddUser extends Component {
     } */
 
     if (error) {
+      this.scrollToTop();
       this.setState(state);
       return;
     }
@@ -201,18 +199,30 @@ class AddUser extends Component {
       phonenumber: state.phone.value,
       roleid: state.selectedRole,
       department_id: state.selectedDept,
-      subscription_id: state.selectedLicence.value,
       customer_id: this.props.selectedCustomer.id
     };
 
     if (state.editUser) {
       reqObject.userid = this.props.selectedUser.user_id;
-      reqObject = _.omit(reqObject, ["subscription_id"]);
       reqObject.is_active = state.statusActive ? 1 : 0;
       this.props.dispatch(
         UsermanagementActions.updateUser(reqObject, this.props.history)
       );
     } else {
+      _.map(state.selectedLicences, licence => {
+        if (licence.app_name === "omni-view") {
+          reqObject["subscriptions"] = {
+            ...reqObject["subscriptions"],
+            "omni-view": licence.id
+          };
+        }
+        if (licence.app_name === "omni-file") {
+          reqObject["subscriptions"] = {
+            ...reqObject["subscriptions"],
+            "omni-file": licence.id
+          };
+        }
+      });
       this.props.dispatch(
         UsermanagementActions.addUser(reqObject, this.props.history)
       );
@@ -271,7 +281,7 @@ class AddUser extends Component {
   };
 
   render() {
-    const { departments, loading } = this.props;
+    const { departments, loading, selectedUser } = this.props;
     const {
       fname,
       lname,
@@ -363,7 +373,7 @@ class AddUser extends Component {
           </Row>
           <div className="addUser__section">
             <p className="addUser__section-label">
-              {translate("text.user.rolemsg")}
+              {translate("text.user.selectrolemsg")}
             </p>
             <RadioGroup value={selectedRole} onChange={this.onRoleChange}>
               {_.map(this.roles, role => (
@@ -439,7 +449,9 @@ class AddUser extends Component {
                   </p>
                 </div>
                 <p className="addUser__account-created">
-                  Account created on 12/12/2017
+                  {`${translate("text.user.createdon")} ${getFormattedDate(
+                    _.get(selectedUser, "created_at", "")
+                  )}`}
                 </p>
               </div>
             </React.Fragment>
@@ -459,43 +471,47 @@ class AddUser extends Component {
                           key={licence.id}
                           value={licence.id}
                         >
-                          <div>
-                            <div
-                              className="global__center-vert"
-                              style={{ justifyContent: "space-between" }}
-                            >
-                              <Text type="bold" text={licence.name} />
+                          <div style={{ width: "70%" }}>
+                            <div className="global__center-vert">
+                              <Text
+                                type="bold"
+                                text={licence.name}
+                                textStyle={{ marginRight: "10px" }}
+                              />
                               <Text
                                 type="regular"
-                                size="14px"
+                                size="12px"
                                 opacity={0.75}
-                                text={this.getLicenceAppName(licence.app_name)}
+                                text={`${translate(
+                                  "label.user.available"
+                                )}  ${licence.remaining || 0}`}
                               />
                             </div>
-                            <Text
-                              type="regular"
-                              size="14px"
-                              opacity={0.75}
-                              text={`Purchased on ${getFormattedDate(
-                                _.get(licence, "purchase_date")
-                              )}`}
-                            />
-                            <Text
+                            <div className="global__center-vert">
+                              <Text
+                                type="bold"
+                                size="12px"
+                                opacity={0.75}
+                                text={this.getLicenceAppName(licence.app_name)}
+                                textStyle={{ marginRight: "5px" }}
+                              />
+                              <Text
+                                type="regular"
+                                size="12px"
+                                opacity={0.75}
+                                text={` - Purchased on ${getFormattedDate(
+                                  _.get(licence, "purchase_date")
+                                )}`}
+                              />
+                            </div>
+                            {/* <Text
                               type="regular"
                               size="14px"
                               opacity={0.75}
                               text={`Expires on ${getFormattedDate(
                                 _.get(licence, "expired_date")
                               )}`}
-                            />
-                            <Text
-                              type="regular"
-                              size="14px"
-                              opacity={0.75}
-                              text={`${translate(
-                                "label.user.available"
-                              )}  ${licence.remaining || 0}`}
-                            />
+                            /> */}
                           </div>
                           <Checkbox
                             checked={licence.checked}
@@ -563,6 +579,7 @@ class AddUser extends Component {
             />
           </div>
           <DeactivateModal
+            isActive={this.state.statusActive}
             visible={this.state.showDeactivateModal}
             title={translate("label.usermgmt.deactivateacc")}
             content={translate("text.usermgmt.deactivatemsg")}

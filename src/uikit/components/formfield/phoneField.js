@@ -18,6 +18,7 @@ const PhoneField = ({
         <p className="global__field-label omniField-phone-label">{label}</p>
       )}
       <PhoneInput
+        country={"US"}
         value={value}
         onChange={onChange}
         placeholder={placeholder}

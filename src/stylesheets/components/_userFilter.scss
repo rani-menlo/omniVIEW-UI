@@ -1,0 +1,44 @@
+.userfilter {
+  &-title {
+    margin-top: 12px;
+    margin-bottom: 12px !important;
+  }
+  &__roles {
+    display: flex;
+    justify-content: space-around;
+    > .ant-checkbox-group-item {
+      @include text-regular;
+    }
+  }
+  &__depts {
+    display: flex;
+    flex-wrap: wrap;
+    > .ant-checkbox-group-item {
+      @include text-regular;
+      width: 46%;
+      margin-bottom: 8px;
+    }
+  }
+  &__sortbuttons {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    &-bordered {
+      cursor: pointer;
+      padding: 5px 10px;
+      border-radius: 4px;
+      border: solid 1px $black;
+      &-colored {
+        cursor: pointer;
+        padding: 5px 10px;
+        border-radius: 4px;
+        border: solid 1px $sky-of-margritte;
+        color: $sky-of-margritte;
+      }
+    }
+  }
+  &__actionbuttons {
+    justify-content: space-between;
+    margin-top: 18px;
+  }
+}

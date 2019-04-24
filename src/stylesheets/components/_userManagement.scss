@@ -1,5 +1,13 @@
 .userManagement {
   // overflow: unset !important;
+  &-subheader {
+    &-title {
+      color: $sky-of-margritte !important;
+      margin-left: auto;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+  }
   &__header {
     @include text-bold-active(36px);
     text-align: center;
@@ -19,6 +27,8 @@
       &__user {
         display: flex;
         margin-bottom: 40px;
+        margin-right: 8px;
+        width: 32.4%;
         &__info {
           margin-left: 6px;
           &-name {

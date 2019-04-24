@@ -1,11 +1,12 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-const Text = ({ text, type, size, opacity, className, textStyle }) => {
+const Text = ({ text, type, size, opacity, className, textStyle, onClick }) => {
   return (
     <p
       className={`heebo_text-${type} ${className}`}
       style={{ fontSize: size, opacity, ...textStyle }}
+      onClick={onClick}
     >
       {text}
     </p>
@@ -18,7 +19,8 @@ Text.propTypes = {
   size: PropTypes.string,
   opacity: PropTypes.number,
   className: PropTypes.string,
-  textStyle: PropTypes.object
+  textStyle: PropTypes.object,
+  onClick: PropTypes.func
 };
 
 Text.deafultProps = {

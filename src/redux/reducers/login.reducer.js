@@ -1,5 +1,6 @@
 import { LoginActionTypes } from "../actionTypes";
 import _ from "lodash";
+import { message } from "antd";
 
 const initialState = {
   user: null,
@@ -137,6 +138,16 @@ export default (state = initialState, action) => {
           ...state.otp,
           error: ""
         }
+      };
+    }
+    case LoginActionTypes.CREATE_UPDATE_PROFILE: {
+      if (action.data.error) {
+        message.error(action.data.message);
+        return state;
+      }
+      return {
+        ...state,
+        user: { ...state.user, ...action.data.data }
       };
     }
     default:

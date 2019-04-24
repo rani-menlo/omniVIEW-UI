@@ -5,6 +5,7 @@ import { OmniButton } from "..";
 import { translate } from "../../../translations/translator";
 
 const DeactivateModal = ({
+  isActive,
   visible,
   title,
   content,
@@ -35,8 +36,12 @@ const DeactivateModal = ({
           />
           <OmniButton
             type="primary"
-            label={translate("label.usermgmt.deactivate")}
-            className="deactivate-modal-buttons-deactivate"
+            label={translate(
+              `label.usermgmt.${isActive ? "deactivate" : "activate"}`
+            )}
+            className={`deactivate-modal-buttons-${
+              isActive ? "deactivate" : "activate"
+            }`}
             buttonStyle={{ marginLeft: "16px" }}
             onClick={deactivate}
           />

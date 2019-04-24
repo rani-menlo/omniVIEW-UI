@@ -15,6 +15,7 @@ import Loader from "./uikit/components/loader";
 import UserManagementContainer from "./features/usermanagement/userManagement.container";
 import AddUser from "./features/usermanagement/adduser.component";
 import AddCustomer from "./features/usermanagement/addCustomer.component";
+import CreateProfile from "./features/profile/createProfile.component";
 
 const Routes = () => {
   return (
@@ -53,6 +54,12 @@ const Routes = () => {
             <PrivateRoute
               path="/usermanagement/customer/edit"
               component={AddCustomer}
+            />
+            <PrivateRoute exact path="/profile" component={CreateProfile} />
+            <PrivateRoute
+              exact
+              path="/profile/edit"
+              component={CreateProfile}
             />
             {/* <Redirect to="/" /> */}
           </Switch>

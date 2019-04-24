@@ -14,17 +14,20 @@ import {
   ListViewGridView,
   TableHeader,
   Row,
-  Pagination
+  Pagination,
+  Text
 } from "../../uikit/components";
 import { DEBOUNCE_TIME } from "../../constants";
 import { UsermanagementActions } from "../../redux/actions";
-import { Avatar, Dropdown, Menu, Icon } from "antd";
+import { Avatar, Dropdown, Menu, Icon, Popover } from "antd";
 import { translate } from "../../translations/translator";
 import { getRoleName, getFormattedDate } from "../../utils";
+import PopoverUsersFilter from "./popoverUsersFilter";
 
 class UserManagementContainer extends Component {
   constructor(props) {
     super(props);
+    this.selectedFilters = {};
     this.state = {
       viewBy: "cards",
       searchText: "",
@@ -36,17 +39,45 @@ class UserManagementContainer extends Component {
     this.searchUsers = _.debounce(this.searchUsers, DEBOUNCE_TIME);
   }
 
-  getMenu = () => {
+  getMenu = usr => () => {
     return (
-      <Menu>
-        <Menu.Item disabled>
-          <span>Edit Customer</span>
+      <Menu className="maindashboard__list__item-dropdown-menu">
+        <Menu.Item
+          className="maindashboard__list__item-dropdown-menu-item"
+          onClick={this.editUser(usr)}
+        >
+          <p>
+            <img src="/images/user-management.svg" />
+            <span>{`${translate("label.usermgmt.edit")} ${translate(
+              "label.dashboard.user"
+            )}`}</span>
+          </p>
         </Menu.Item>
-        <Menu.Item disabled>
-          <span>Add/Edit Users</span>
+        <Menu.Item
+          disabled
+          className="maindashboard__list__item-dropdown-menu-item"
+        >
+          <p>
+            <img src="/images/key.svg" />
+            <span>{translate("label.usermgmt.assignlicence")}</span>
+          </p>
         </Menu.Item>
-        <Menu.Item disabled>
-          <span>Deactivate Customer</span>
+        <Menu.Item
+          className="maindashboard__list__item-dropdown-menu-item"
+          onClick={this.openModal(usr)}
+        >
+          <p
+            style={{
+              color: _.get(usr, "is_active", false) ? "red" : "#00d592"
+            }}
+          >
+            <img src="/images/deactivate.svg" />
+            <span>
+              {_.get(usr, "is_active", false)
+                ? translate("label.usermgmt.deactivate")
+                : translate("label.usermgmt.activate")}
+            </span>
+          </p>
         </Menu.Item>
       </Menu>
     );
@@ -60,24 +91,27 @@ class UserManagementContainer extends Component {
     this.fetchUsers();
   }
 
-  fetchUsers = (sortBy = "first_name", orderBy = "ASC") => {
+  fetchUsers = () => {
     const { selectedCustomer } = this.props;
     const { viewBy, pageNo, itemsPerPage, searchText } = this.state;
     if (selectedCustomer) {
       if (viewBy === "lists") {
         this.props.dispatch(
-          UsermanagementActions.fetchUsers(
-            selectedCustomer.id,
-            searchText,
-            pageNo,
-            itemsPerPage,
-            [sortBy],
-            orderBy
-          )
+          UsermanagementActions.fetchUsers({
+            customerId: selectedCustomer.id,
+            search: searchText,
+            page: pageNo,
+            limit: itemsPerPage,
+            ...this.selectedFilters
+          })
         );
       } else {
         this.props.dispatch(
-          UsermanagementActions.fetchUsers(selectedCustomer.id, searchText)
+          UsermanagementActions.fetchUsers({
+            customerId: selectedCustomer.id,
+            search: searchText,
+            ...this.selectedFilters
+          })
         );
       }
     }
@@ -92,7 +126,12 @@ class UserManagementContainer extends Component {
   };
 
   sortColumn = (sortBy, orderBy) => {
-    this.fetchUsers(sortBy, orderBy);
+    this.selectedFilters = {
+      ...this.selectedFilters,
+      sortBy: [sortBy],
+      order: orderBy
+    };
+    this.fetchUsers();
   };
 
   handleSearch = e => {
@@ -116,6 +155,10 @@ class UserManagementContainer extends Component {
     this.props.history.push("/usermanagement/add");
   };
 
+  goBack = () => {
+    this.props.history.goBack();
+  };
+
   editUser = usr => () => {
     this.props.dispatch(UsermanagementActions.setSelectedUser(usr));
     this.props.history.push("/usermanagement/edit");
@@ -125,35 +168,75 @@ class UserManagementContainer extends Component {
     this.setState({ showDeactivateModal: false });
   };
 
-  deactivate = () => {
+  activateDeactivate = () => {
     const { selectedCustomer } = this.props;
     this.props.dispatch(
-      UsermanagementActions.deactivateUser(
-        { userId: this.state.selectedUser.user_id, is_active: 0 },
-        selectedCustomer.id,
-        this.state.searchText
+      UsermanagementActions.activateDeactivateUser(
+        {
+          userId: this.state.selectedUser.user_id,
+          is_active: Number(!_.get(this.state.selectedUser, "is_active", false))
+        },
+        selectedCustomer.id
       )
     );
     this.closeModal();
   };
 
   openModal = usr => () => {
-    const isActive = _.get(usr, "is_active", false);
-    isActive && this.setState({ showDeactivateModal: true, selectedUser: usr });
+    this.setState({ showDeactivateModal: true, selectedUser: usr });
+  };
+
+  onFiltersUpdate = filters => {
+    this.selectedFilters = {
+      ...this.selectedFilters,
+      roles: filters.selectedRoles,
+      departments: filters.selectedDepts,
+      sortBy: filters.selectedSortBy && [filters.selectedSortBy]
+    };
+
+    this.fetchUsers();
   };
 
   render() {
     const { searchText, viewBy, pageNo, itemsPerPage } = this.state;
-    const { loading, users, selectedCustomer, usersCount } = this.props;
+    const { loading, selectedCustomer, usersCount } = this.props;
     if (!selectedCustomer) {
       return <Redirect to="/customers" />;
     }
+
+    let users = this.props.users;
+    if (viewBy === "cards") {
+      const usersByRole = _.groupBy(users, "role_name");
+      let mergedRoles = {};
+      _.map(usersByRole, (array, role) => {
+        const trimmedRole = role.substring(role.indexOf("_") + 1);
+        let newArray = mergedRoles[trimmedRole] || [];
+        newArray = [...newArray, ...usersByRole[role]];
+        mergedRoles[trimmedRole] = newArray;
+      });
+      users = {};
+      _(mergedRoles)
+        .keys()
+        .sort()
+        .each(key => {
+          users[key] = mergedRoles[key];
+        });
+    }
+
     return (
       <React.Fragment>
         <Loader loading={loading} />
         <Header />
         <SubHeader>
           <ListViewGridView viewBy={viewBy} changeView={this.changeView} />
+          <PopoverUsersFilter onFiltersUpdate={this.onFiltersUpdate} />
+          <Text
+            type="extra_bold"
+            size="20px"
+            className="userManagement-subheader-title"
+            text={selectedCustomer.company_name}
+            onClick={this.goBack}
+          />
           <div style={{ marginLeft: "auto" }}>
             <SearchBox
               placeholder={translate("text.header.search", {
@@ -177,78 +260,110 @@ class UserManagementContainer extends Component {
               onClick={this.openAdduser}
             />
           </div>
-          {viewBy === "cards" &&
-            _.map(users, (user, key) => {
-              return (
-                <div key={key} className="userManagement__group">
-                  <p className="userManagement__group-label">
-                    {getRoleName(key, true)}
-                  </p>
-                  <div className="userManagement__group__users">
-                    {_.map(user, usr => {
-                      const isActive = _.get(usr, "is_active", false);
-                      return (
-                        <div
-                          key={usr.user_id}
-                          className="userManagement__group__users__user"
-                        >
-                          <Avatar size={48} icon="user" />
-                          <div className="userManagement__group__users__user__info">
-                            <p className="userManagement__group__users__user__info-name">{`${_.get(
-                              usr,
-                              "first_name",
-                              ""
-                            )} ${_.get(usr, "last_name", "")}`}</p>
-                            <p className="userManagement__group__users__user__info-text">
-                              {translate("label.usermgmt.department")}:{" "}
-                              {_.get(usr, "department_name", "")}
-                            </p>
-                            <p className="userManagement__group__users__user__info-text">
-                              {translate("label.usermgmt.subscriptionstatus")}:
-                              <span
-                                className={`userManagement__group__users__user__info-text-${
-                                  isActive ? "active" : "inactive"
-                                }`}
-                              >
-                                {isActive ? " Active" : " Inactive"}
-                              </span>
-                            </p>
-                            <p className="userManagement__group__users__user__info-text">
-                              {isActive ? "Expires" : "Expired"}
-                              {_.get(usr, "expire")}
-                            </p>
-                            <p className="userManagement__group__users__user__info-text">
-                              {_.get(usr, "email", "")}
-                            </p>
-                            <div className="global__center-vert">
-                              <p
-                                className="userManagement__group__users__user__info-link"
-                                onClick={this.editUser(usr)}
-                              >
-                                {translate("label.usermgmt.edit")}
+          {viewBy === "cards" && (
+            <div>
+              {_.map(users, (user, key) => {
+                return (
+                  <div key={key} className="userManagement__group">
+                    <p className="userManagement__group-label">
+                      {getRoleName(key, true)}
+                    </p>
+                    <div className="userManagement__group__users">
+                      {_.map(user, usr => {
+                        const isActive = _.get(usr, "is_active", false);
+                        return (
+                          <div
+                            key={usr.user_id}
+                            className="userManagement__group__users__user"
+                          >
+                            <Avatar size={48} icon="user" />
+                            <div className="userManagement__group__users__user__info">
+                              <p className="userManagement__group__users__user__info-name">{`${_.get(
+                                usr,
+                                "first_name",
+                                ""
+                              )} ${_.get(usr, "last_name", "")}`}</p>
+                              <p className="userManagement__group__users__user__info-text">
+                                {translate("label.usermgmt.department")}:{" "}
+                                {_.get(usr, "department_name", "")}
                               </p>
-                              <div className="userManagement__group__users__user__info-dot" />
-                              <p className="userManagement__group__users__user__info-link">
-                                {translate("label.usermgmt.assignlicence")}
+                              <p className="userManagement__group__users__user__info-text">
+                                {translate("label.usermgmt.subscriptionstatus")}
+                                :
+                                <span
+                                  className={`userManagement__group__users__user__info-text-${
+                                    isActive ? "active" : "inactive"
+                                  }`}
+                                >
+                                  {isActive ? " Active" : " Inactive"}
+                                </span>
                               </p>
-                              <div className="userManagement__group__users__user__info-dot" />
-                              <p
-                                className="userManagement__group__users__user__info-link"
-                                onClick={this.openModal(usr)}
-                              >
-                                {isActive
-                                  ? translate("label.usermgmt.deactivate")
-                                  : translate("label.usermgmt.activate")}
+                              {usr.role_id !== 1 && (
+                                <p className="userManagement__group__users__user__info-text">
+                                  {isActive
+                                    ? `${translate("label.usermgmt.expires")}: `
+                                    : `${translate(
+                                        "label.usermgmt.expired"
+                                      )}: `}
+                                  {getFormattedDate(
+                                    _.get(usr, "expired_date")
+                                  ) || ""}
+                                </p>
+                              )}
+                              <p className="userManagement__group__users__user__info-text">
+                                {_.get(usr, "email", "")}
                               </p>
+                              <div className="global__center-vert">
+                                <p
+                                  className="userManagement__group__users__user__info-link"
+                                  onClick={this.editUser(usr)}
+                                >
+                                  {translate("label.usermgmt.edit")}
+                                </p>
+                                <div className="userManagement__group__users__user__info-dot" />
+                                {usr.role_id !== 1 ? (
+                                  <React.Fragment>
+                                    <p className="userManagement__group__users__user__info-link">
+                                      {translate(
+                                        "label.usermgmt.assignlicence"
+                                      )}
+                                    </p>
+                                    <div className="userManagement__group__users__user__info-dot" />
+                                  </React.Fragment>
+                                ) : (
+                                  ""
+                                )}
+                                <p
+                                  className="userManagement__group__users__user__info-link"
+                                  onClick={this.openModal(usr)}
+                                >
+                                  {isActive
+                                    ? translate("label.usermgmt.deactivate")
+                                    : translate("label.usermgmt.activate")}
+                                </p>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+              {!_.size(users) && (
+                <Row className="maindashboard__nodata">
+                  <Icon
+                    style={{ fontSize: "20px" }}
+                    type="exclamation-circle"
+                    className="maindashboard__nodata-icon"
+                  />
+                  {translate("error.dashboard.notfound", {
+                    type: translate("label.dashboard.users")
+                  })}
+                </Row>
+              )}
+            </div>
+          )}
           {viewBy === "lists" && (
             <React.Fragment>
               <div className="maindashboard__list">
@@ -256,77 +371,75 @@ class UserManagementContainer extends Component {
                   columns={TableColumns}
                   sortColumn={this.sortColumn}
                 />
-                {_.map(users, user =>
-                  _.map(user, usr => (
-                    <Row
-                      key={usr.id}
-                      className="maindashboard__list__item"
-                      style={{ justifyContent: "normal" }}
+                {_.map(users, usr => (
+                  <Row
+                    key={usr.id}
+                    className="maindashboard__list__item"
+                    style={{ justifyContent: "normal" }}
+                  >
+                    <Column
+                      width={getColumnWidth(TableColumnNames.NAME)}
+                      className="maindashboard__list__item-text-bold"
                     >
-                      <Column
-                        width={getColumnWidth(TableColumnNames.NAME)}
-                        className="maindashboard__list__item-text-bold"
+                      {`${_.get(usr, "first_name", "")} ${_.get(
+                        usr,
+                        "last_name",
+                        ""
+                      )}`}
+                    </Column>
+                    <Column
+                      width={getColumnWidth(TableColumnNames.USER_ROLE)}
+                      className="maindashboard__list__item-text"
+                    >
+                      {getRoleName(_.get(usr, "role_name", ""))}
+                    </Column>
+                    <Column
+                      width={getColumnWidth(TableColumnNames.DEPARTMENT)}
+                      className="maindashboard__list__item-text"
+                    >
+                      {_.get(usr, "department_name", "")}
+                    </Column>
+                    <Column
+                      width={getColumnWidth(TableColumnNames.EMAIl)}
+                      className="maindashboard__list__item-text"
+                    >
+                      {_.get(usr, "email", "")}
+                    </Column>
+                    <Column
+                      width={getColumnWidth(TableColumnNames.STATUS)}
+                      className="maindashboard__list__item-text"
+                    >
+                      {_.get(usr, "is_active", false) ? (
+                        <span className="maindashboard__list__item-text-active">
+                          {translate("label.user.active")}
+                        </span>
+                      ) : (
+                        <span className="maindashboard__list__item-text-inactive">
+                          {translate("label.user.inactive")}
+                        </span>
+                      )}
+                    </Column>
+                    <Column
+                      width={getColumnWidth(TableColumnNames.EXP_DATE)}
+                      className="maindashboard__list__item__row maindashboard__list__item-text"
+                    >
+                      {getFormattedDate(_.get(usr, "expired_date")) ||
+                        "__ /__ /____"}
+                      <Dropdown
+                        overlay={this.getMenu(usr)}
+                        trigger={["click"]}
+                        overlayClassName="maindashboard__list__item-dropdown"
                       >
-                        {`${_.get(usr, "first_name", "")} ${_.get(
-                          usr,
-                          "last_name",
-                          ""
-                        )}`}
-                      </Column>
-                      <Column
-                        width={getColumnWidth(TableColumnNames.USER_ROLE)}
-                        className="maindashboard__list__item-text"
-                      >
-                        {getRoleName(_.get(usr, "role_name", ""))}
-                      </Column>
-                      <Column
-                        width={getColumnWidth(TableColumnNames.DEPARTMENT)}
-                        className="maindashboard__list__item-text"
-                      >
-                        {_.get(usr, "department_name", "")}
-                      </Column>
-                      <Column
-                        width={getColumnWidth(TableColumnNames.EMAIl)}
-                        className="maindashboard__list__item-text"
-                      >
-                        {_.get(usr, "email", "")}
-                      </Column>
-                      <Column
-                        width={getColumnWidth(TableColumnNames.STATUS)}
-                        className="maindashboard__list__item-text"
-                      >
-                        {_.get(usr, "is_active", false) ? (
-                          <span className="maindashboard__list__item-text-active">
-                            Active
-                          </span>
-                        ) : (
-                          <span className="maindashboard__list__item-text-inactive">
-                            Inactive
-                          </span>
-                        )}
-                      </Column>
-                      <Column
-                        width={getColumnWidth(TableColumnNames.EXP_DATE)}
-                        className="maindashboard__list__item__row maindashboard__list__item-text"
-                      >
-                        {getFormattedDate(_.get(usr, "expired_date")) ||
-                          "11/19/2018"}
-                        <Dropdown
-                          overlay={this.getMenu()}
-                          trigger={["click"]}
-                          overlayClassName="maindashboard__list__item-dropdown"
-                        >
-                          <img
-                            src="/images/overflow-black.svg"
-                            style={{ width: "18px", height: "18px" }}
-                          />
-                        </Dropdown>
-                      </Column>
-                    </Row>
-                  ))
-                )}
+                        <img
+                          src="/images/overflow-black.svg"
+                          style={{ width: "18px", height: "18px" }}
+                        />
+                      </Dropdown>
+                    </Column>
+                  </Row>
+                ))}
               </div>
-              {searchText && !users.length && (
+              {!users.length && (
                 <Row className="maindashboard__nodata">
                   <Icon
                     style={{ fontSize: "20px" }}
@@ -340,7 +453,7 @@ class UserManagementContainer extends Component {
               )}
               <Pagination
                 containerStyle={
-                  usersCount > 4 ? { marginTop: "5%" } : { marginTop: "20%" }
+                  usersCount > 4 ? { marginTop: "1%" } : { marginTop: "20%" }
                 }
                 total={usersCount}
                 showTotal={(total, range) =>
@@ -359,11 +472,20 @@ class UserManagementContainer extends Component {
             </React.Fragment>
           )}
           <DeactivateModal
+            isActive={_.get(this.state, "selectedUser.is_active", false)}
             visible={this.state.showDeactivateModal}
-            title={translate("label.usermgmt.deactivateacc")}
-            content={translate("text.usermgmt.deactivatemsg")}
+            title={
+              _.get(this.state, "selectedUser.is_active", false)
+                ? translate("label.usermgmt.deactivateacc")
+                : translate("label.usermgmt.activateacc")
+            }
+            content={
+              _.get(this.state, "selectedUser.is_active", false)
+                ? translate("text.usermgmt.deactivatemsg")
+                : translate("text.usermgmt.activatemsg")
+            }
             closeModal={this.closeModal}
-            deactivate={this.deactivate}
+            deactivate={this.activateDeactivate}
           />
         </ContentLayout>
       </React.Fragment>
@@ -400,14 +522,14 @@ const TableColumns = [
     key: "department_name",
     checkbox: false,
     sort: true,
-    width: "15%"
+    width: "16%"
   },
   {
     name: TableColumnNames.EMAIl,
     key: "email",
     checkbox: false,
     sort: true,
-    width: "28%"
+    width: "27%"
   },
   {
     name: TableColumnNames.STATUS,
@@ -418,7 +540,9 @@ const TableColumns = [
   },
   {
     name: TableColumnNames.EXP_DATE,
+    key: "expired_date",
     checkbox: false,
+    sort: true,
     width: "15%"
   }
 ];

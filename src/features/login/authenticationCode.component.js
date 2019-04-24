@@ -28,6 +28,11 @@ class AuthenticationCode extends Component {
   };
 
   openDashboard = () => {
+    const { user } = this.props;
+    if (user.first_login) {
+      this.props.history.push("/profile");
+      return;
+    }
     this.props.history.push("/customers");
   };
 
@@ -49,8 +54,8 @@ class AuthenticationCode extends Component {
   getMode = () => {
     const { mode } = this.props.match.params;
     return mode === "email"
-      ? translate("label.loginauth.email")
-      : translate("label.loginauth.mobile");
+      ? translate("label.form.email")
+      : translate("label.form.phone");
   };
 
   render() {
@@ -121,6 +126,7 @@ class AuthenticationCode extends Component {
 function mapStateToProps(state) {
   return {
     loading: state.Api.loading,
+    user: state.Login.user,
     verified: state.Login.otp.verified,
     verifying: state.Login.otp.verifying,
     error: state.Login.otp.error

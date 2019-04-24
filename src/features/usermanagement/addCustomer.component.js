@@ -268,7 +268,6 @@ class AddCustomer extends Component {
     }
 
     let reqObject = {
-      customerId: _.get(this.props, "selectedCustomer.id", ""),
       customerName: state.cname.value,
       first_name: state.fname.value,
       last_name: state.lname.value,
@@ -300,6 +299,12 @@ class AddCustomer extends Component {
         UsermanagementActions.addCustomer(reqObject, this.props.history)
       );
     } else {
+      reqObject.customerId = _.get(this.props, "selectedCustomer.id", "");
+      reqObject.cAdminId = _.get(
+        this.props,
+        "selectedCustomer.primary_user_id",
+        ""
+      );
       reqObject.is_active = state.statusActive ? 1 : 0;
       this.props.dispatch(
         UsermanagementActions.editCustomer(reqObject, this.props.history)
@@ -418,7 +423,6 @@ class AddCustomer extends Component {
           </Row>
           <Row className="addUser__fields">
             <InputField
-              disabled={editCustomer}
               className="addUser__fields-field"
               style={{ marginRight: "14px" }}
               label={`${translate("label.form.email")}*`}
@@ -559,7 +563,7 @@ class AddCustomer extends Component {
                             key={licence.name}
                             className="addUser__fields-numeric"
                             style={{ marginRight: "40px" }}
-                            label={`${licence.name} Licenses`}
+                            label={`${licence.name}`}
                             value={_.get(
                               licences,
                               `omniFile[${licence.slug}]`,
@@ -628,6 +632,7 @@ class AddCustomer extends Component {
             />
           </div>
           <DeactivateModal
+            isActive={this.state.statusActive}
             visible={this.state.showDeactivateModal}
             title={translate("label.usermgmt.deactivateacc")}
             content={translate("text.customer.deactivate")}

@@ -5,6 +5,7 @@ import Row from "../row/row.component";
 import PaginationButton from "./paginationButton.component";
 import _ from "lodash";
 import { translate } from "../../../translations/translator";
+import { DEBOUNCE_TIME } from "../../../constants";
 
 class Pagination extends Component {
   static propTypes = {
@@ -20,15 +21,11 @@ class Pagination extends Component {
   constructor(props) {
     super(props);
     this.defaultPageSize = 5;
-    this.debounceTimeOut = 700;
     this.timeOutId = "";
     this.state = {
       pageSize: this.defaultPageSize
     };
-    this.onPageSizeChange = _.debounce(
-      this.onPageSizeChange,
-      this.debounceTimeOut
-    );
+    this.onPageSizeChange = _.debounce(this.onPageSizeChange, DEBOUNCE_TIME);
   }
 
   componentDidMount() {
@@ -59,7 +56,7 @@ class Pagination extends Component {
       return;
     }
     let pageSize = Number(this.state.pageSize);
-    if (pageSize === this.props.total) {
+    if (pageSize === this.props.total || this.props.total === 0) {
       return;
     }
     pageSize += this.defaultPageSize;
@@ -97,6 +94,14 @@ class Pagination extends Component {
     }
   };
 
+  onInputBlur = () => {
+    const { pageSize } = this.state;
+    if (!pageSize) {
+      this.setState({ pageSize: this.defaultPageSize });
+      this.onPageSizeChange();
+    }
+  };
+
   onPageSizeChange = () => {
     if (this.state.pageSize && this.props.onPageSizeChange) {
       this.props.onPageSizeChange(this.state.pageSize);
@@ -124,7 +129,7 @@ class Pagination extends Component {
         <PaginationLib
           total={total}
           showTotal={showTotal}
-          pageSize={this.state.pageSize}
+          pageSize={this.state.pageSize || 1}
           current={current}
           itemRender={this.getPaginationButtons}
           onChange={this.onPageChange}
@@ -138,6 +143,7 @@ class Pagination extends Component {
               className="pagination__pagesize__container-input"
               onChange={this.handlePageSizeChange}
               value={this.state.pageSize}
+              onBlur={this.onInputBlur}
             />
             <div className="pagination__pagesize__container-arrows">
               <Icon

@@ -12,35 +12,8 @@ class SubmissionCard extends Component {
     onMenuItemClick: PropTypes.func
   };
 
-  onMenuItemClick = ({ key }) => {
-    const { onMenuItemClick, submission } = this.props;
-    onMenuItemClick && onMenuItemClick(key, submission);
-  };
-
-  getMenu = () => {
-    return (
-      <Menu onClick={this.onMenuItemClick}>
-        <Menu.Item disabled>
-          <span className="submissioncard__heading-dropdown--item">
-            Edit User Permissions
-          </span>
-        </Menu.Item>
-        <Menu.Item disabled>
-          <span className="submissioncard__heading-dropdown--item red-text">
-            Remove Application
-          </span>
-        </Menu.Item>
-        <Menu.Item key="window">
-          <span className="submissioncard__heading-dropdown--item">
-            Open in new Window
-          </span>
-        </Menu.Item>
-      </Menu>
-    );
-  };
-
   render() {
-    const { submission, onSelect } = this.props;
+    const { submission, onSelect, getMenu } = this.props;
     return (
       <div className="submissioncard">
         <div className="submissioncard__heading">
@@ -51,7 +24,7 @@ class SubmissionCard extends Component {
             {_.get(submission, "name")}
           </span>
           <Dropdown
-            overlay={this.getMenu()}
+            overlay={getMenu && getMenu()}
             trigger={["click"]}
             overlayClassName="submissioncard__heading-dropdown"
           >

@@ -2,28 +2,62 @@ import React, { Component } from "react";
 import { Dropdown, Avatar, Icon, Menu } from "antd";
 import { connect } from "react-redux";
 import _ from "lodash";
-import { LoginActions } from "../../redux/actions";
+import { LoginActions, CustomerActions } from "../../redux/actions";
 import { withRouter } from "react-router-dom";
+import { translate } from "../../translations/translator";
 
 class ProfileMenu extends Component {
-  onMenuItemClick = e => {
-    if (e.key === "signOut") {
-      this.props.dispatch(LoginActions.logOut());
-      this.props.history.push("/");
+  signOut = () => {
+    this.props.dispatch(LoginActions.logOut());
+    this.props.history.push("/");
+  };
+
+  editProfile = () => {
+    this.props.history.push("/profile/edit");
+  };
+
+  manageUsers = () => {
+    if (this.props.oAdminCustomer) {
+      this.props.dispatch(
+        CustomerActions.setSelectedCustomer(this.props.oAdminCustomer)
+      );
     }
+    this.props.history.push("/usermanagement");
   };
 
   getMenu = () => {
     return (
-      <Menu onClick={this.onMenuItemClick}>
-        <Menu.Item key="edit" disabled>
-          <span className="profilemenu-dropdown-item">Edit Profile</span>
+      <Menu className="maindashboard__list__item-dropdown-menu">
+        <Menu.Item
+          className="maindashboard__list__item-dropdown-menu-item"
+          onClick={this.editProfile}
+        >
+          <p>
+            <img src="/images/edit.svg" />
+            <span>{`${translate("label.usermgmt.edit")} ${translate(
+              "lable.profile.profile"
+            )}`}</span>
+          </p>
         </Menu.Item>
-        <Menu.Item key="signOut">
-          <span className="profilemenu-dropdown-item">Sign Out</span>
+        <Menu.Item
+          className="maindashboard__list__item-dropdown-menu-item"
+          onClick={this.manageUsers}
+        >
+          <p>
+            <img src="/images/user-management.svg" />
+            <span>{`${translate("label.generic.manage")} ${translate(
+              "label.dashboard.users"
+            )}`}</span>
+          </p>
         </Menu.Item>
-        <Menu.Item key="manage" disabled>
-          <span className="profilemenu-dropdown-item">Manage Users</span>
+        <Menu.Item
+          className="maindashboard__list__item-dropdown-menu-item"
+          onClick={this.signOut}
+        >
+          <p>
+            <img src="/images/logout.svg" />
+            <span>{translate("lable.profile.signout")}</span>
+          </p>
         </Menu.Item>
       </Menu>
     );
@@ -49,7 +83,11 @@ class ProfileMenu extends Component {
           <div className="profile__menu">
             <Avatar size="small" icon="user" />
             <span className="profile__menu-username">
-              {_.get(user, "first_name", "")}
+              {`${_.get(user, "first_name", "")} ${_.get(
+                user,
+                "last_name",
+                ""
+              )}`}
             </span>
             <Icon type="down" />
           </div>
@@ -61,7 +99,8 @@ class ProfileMenu extends Component {
 
 function mapStateToProps(state) {
   return {
-    user: state.Login.user
+    user: state.Login.user,
+    oAdminCustomer: state.Customer.oAdminCustomer
   };
 }
 

@@ -53,11 +53,6 @@ export default {
             });
           });
         });
-        /*  if (licences["omni-view"]) {
-          licences = _.spread(_.union)(_.values(licences["omni-view"]));
-        } else {
-          licences = _.spread(_.union)(_.values(licences["omni-file"]));
-        } */
         dispatch({
           type: UsermanagementActionTypes.FETCH_LICENCES,
           data: newLicences
@@ -90,18 +85,11 @@ export default {
       }
     };
   },
-  fetchUsers: (customerId, search, pageNo, itemsPerPage, sortBy, order) => {
+  fetchUsers: data => {
     return async dispatch => {
       ApiActions.request(dispatch);
       try {
-        const res = await UsermanagementApi.fetchUsers(
-          customerId,
-          search,
-          pageNo,
-          itemsPerPage,
-          sortBy,
-          order
-        );
+        const res = await UsermanagementApi.fetchUsers(data);
         dispatch({
           type: UsermanagementActionTypes.FETCH_USERS,
           data: res.data
@@ -123,7 +111,7 @@ export default {
           data: res.data
         });
         ApiActions.success(dispatch);
-        history.goBack();
+        !res.data.error && history.goBack();
       } catch (err) {
         ApiActions.failure(dispatch);
       }
@@ -139,18 +127,18 @@ export default {
           data: res.data
         });
         ApiActions.success(dispatch);
-        history.goBack();
+        !res.data.error && history.goBack();
       } catch (err) {
         ApiActions.failure(dispatch);
       }
     };
   },
-  deactivateUser: (usr, customerId, search) => {
+  activateDeactivateUser: (usr, customerId) => {
     return async dispatch => {
       ApiActions.request(dispatch);
       try {
-        await UsermanagementApi.deactivateUser(usr);
-        const res = await UsermanagementApi.fetchUsers(customerId, search);
+        await UsermanagementApi.activateDeactivateUser(usr);
+        const res = await UsermanagementApi.fetchUsers({ customerId });
         dispatch({
           type: UsermanagementActionTypes.FETCH_USERS,
           data: res.data
@@ -187,7 +175,7 @@ export default {
           data: res.data
         });
         ApiActions.success(dispatch);
-        history.goBack();
+        !res.data.error && history.goBack();
       } catch (err) {
         ApiActions.failure(dispatch);
       }

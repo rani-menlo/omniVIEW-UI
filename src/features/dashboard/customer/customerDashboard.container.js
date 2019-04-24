@@ -40,7 +40,7 @@ class CustomerDashboard extends Component {
       this.fetchCustomers();
     } else {
       const { user } = this.props;
-      this.onCustomerSelected({ id: user.customer_id })();
+      this.onCustomerSelected({ ...user.customer })();
     }
   }
 
@@ -146,10 +146,7 @@ class CustomerDashboard extends Component {
   };
 
   openOadminUserManagement = () => {
-    const oAdminCustomer = _.find(
-      this.props.customers,
-      customer => customer.is_omnicia
-    );
+    const { oAdminCustomer } = this.props;
     if (oAdminCustomer) {
       this.openUserMgmt(oAdminCustomer)();
     }
@@ -294,7 +291,7 @@ class CustomerDashboard extends Component {
               )}
               <Pagination
                 containerStyle={
-                  customerCount > 4 ? { marginTop: "5%" } : { marginTop: "20%" }
+                  customerCount > 4 ? { marginTop: "1%" } : { marginTop: "20%" }
                 }
                 total={customerCount}
                 showTotal={(total, range) =>
@@ -331,7 +328,9 @@ class CustomerDashboard extends Component {
                     type="exclamation-circle"
                     className="maindashboard__nodata-icon"
                   />
-                  {translate("error.dashboard.customers.notfound")}
+                  {translate("error.dashboard.notfound", {
+                    type: translate("label.dashboard.customers")
+                  })}
                 </Row>
               )}
             </React.Fragment>
@@ -416,6 +415,7 @@ function mapStateToProps(state) {
     role: state.Login.role,
     user: state.Login.user,
     customers: state.Customer.customers,
+    oAdminCustomer: state.Customer.oAdminCustomer,
     customerCount: state.Customer.customerCount
   };
 }
