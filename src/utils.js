@@ -14,6 +14,7 @@ const isEmail = mail => REGEX_EMAIL.test(mail);
 const isValidPwd = pwd => REGEX_PWD.test(pwd);
 const isPhone = phone => isValidPhoneNumber(phone);
 const getRoleName = (role, plural) => {
+  role = _.toLower(role);
   if (!role) {
     return "";
   } else if (_.includes(role, "admin")) {

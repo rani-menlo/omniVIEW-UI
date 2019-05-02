@@ -8,13 +8,14 @@ import styled from "styled-components";
 import TreeNode from "./treeNode.component";
 import NodeProperties from "./nodeProperties.component";
 import NodeSequences from "./nodeSequences.component";
-import { SubmissionActions } from "../../redux/actions";
+import { SubmissionActions, UsermanagementActions } from "../../redux/actions";
 import ValidationResults from "./validationResults.component";
 import {
   Sidebar,
   Loader,
   Footer,
-  DraggableModal
+  DraggableModal,
+  Text
 } from "../../uikit/components";
 import {
   getSequenceJson,
@@ -22,6 +23,8 @@ import {
   getSequences
 } from "../../redux/selectors/submissionView.selector";
 import ProfileMenu from "../header/profileMenu.component";
+import SubmissionViewUsers from "./submissionViewUsers.component";
+import { translate } from "../../translations/translator";
 
 const TabPane = Tabs.TabPane;
 
@@ -39,7 +42,10 @@ class SubmissionView extends Component {
       nodeProperties: null,
       treePanelWidth: 50,
       openValidationModal: false,
-      parentHeaderHeight: 0
+      parentHeaderHeight: 0,
+      showUsersSection: false,
+      selectedUser: null,
+      showEditMessage: false
     };
     this.parentHeaderRef = React.createRef();
     this.treeContainerRef = React.createRef();
@@ -50,14 +56,14 @@ class SubmissionView extends Component {
   componentDidMount() {
     const { selectedSubmission } = this.props;
     if (this.parentHeaderRef.current) {
-      const parentHeaderHeight =
-        this.parentHeaderRef.current.clientHeight + 4 + 28;
+      const parentHeaderHeight = this.parentHeaderRef.current.clientHeight + 28;
       this.setState({ parentHeaderHeight });
     }
     if (selectedSubmission) {
       this.props.actions.fetchSequences(selectedSubmission.id);
       this.props.actions.fetchLifeCycleJson(selectedSubmission);
     }
+    this.fetchUsers();
   }
 
   toggle = callback => {
@@ -262,6 +268,17 @@ class SubmissionView extends Component {
     this.setState({ sequenceSortBy: sortBy });
   };
 
+  fetchUsers = (filters = "") => {
+    const { selectedCustomer } = this.props;
+    selectedCustomer &&
+      this.props.dispatch(
+        UsermanagementActions.fetchUsers({
+          customerId: selectedCustomer.id,
+          ...filters
+        })
+      );
+  };
+
   getMenu = () => {
     return (
       <Menu>
@@ -331,6 +348,18 @@ class SubmissionView extends Component {
     });
   };
 
+  openUsersSection = () => {
+    this.setState({ showUsersSection: !this.state.showUsersSection });
+  };
+
+  setSelectedUser = user => {
+    this.setState({ selectedUser: user, showEditMessage: true });
+  };
+
+  hideEditMessage = () => {
+    this.setState({ showEditMessage: false });
+  };
+
   render() {
     const {
       loading,
@@ -338,9 +367,17 @@ class SubmissionView extends Component {
       selectedSequence,
       sequenceJson,
       lifeCycleJson,
-      selectedSubmission
+      selectedSubmission,
+      users
     } = this.props;
-    const { selectedView, selectedMode, sequenceSortBy } = this.state;
+    const {
+      selectedView,
+      selectedMode,
+      sequenceSortBy,
+      showUsersSection,
+      selectedUser,
+      showEditMessage
+    } = this.state;
 
     if (!selectedSubmission) {
       return <Redirect to="/applications" />;
@@ -510,14 +547,38 @@ class SubmissionView extends Component {
               expand={this.state.sequencesExpand}
             >
               <div className="panel panel-sequences">
-                <NodeSequences
-                  submissionLabel={_.get(selectedSubmission, "name", "")}
-                  selected={selectedSequence}
-                  sequences={sequences}
-                  onSelectedSequence={this.onSelectedSequence}
-                  sortBy={sequenceSortBy}
-                  onSortByChanged={this.onSequenceSortByChanged}
-                />
+                <div style={{ height: showUsersSection ? "45%" : "93%" }}>
+                  <NodeSequences
+                    submissionLabel={_.get(selectedSubmission, "name", "")}
+                    selected={selectedSequence}
+                    sequences={sequences}
+                    onSelectedSequence={this.onSelectedSequence}
+                    sortBy={sequenceSortBy}
+                    onSortByChanged={this.onSequenceSortByChanged}
+                  />
+                </div>
+                {/* <div
+                  className="panel-sequences__users global__cursor-pointer"
+                  onClick={this.openUsersSection}
+                >
+                  <Text
+                    type="bold"
+                    opacity={0.7}
+                    text={translate("label.dashboard.users")}
+                  />
+                  <Icon
+                    type={showUsersSection ? "up" : "down"}
+                    className="global__cursor-pointer"
+                  />
+                </div> */}
+                {showUsersSection && (
+                  <SubmissionViewUsers
+                    searchUsers={this.fetchUsers}
+                    users={users}
+                    selectedUser={selectedUser}
+                    onUserSelected={this.setSelectedUser}
+                  />
+                )}
               </div>
             </Sidebar>
             <div
@@ -525,6 +586,23 @@ class SubmissionView extends Component {
               className="panels__tree"
               style={{ width: `${this.state.treePanelWidth}%` }}
             >
+              {showEditMessage && (
+                <div className="panels__tree__editblock">
+                  <Text
+                    className="panels__tree__editblock-text"
+                    type="medium"
+                    size="12px"
+                    text={translate("text.submission.editpermissions")}
+                  />
+                  <Text
+                    className="panels__tree__editblock-text global__cursor-pointer"
+                    onClick={this.hideEditMessage}
+                    type="bold"
+                    size="12px"
+                    text={translate("label.generic.ok")}
+                  />
+                </div>
+              )}
               <TreeNode
                 ref={this.treeRef}
                 key={this.createKey()}
@@ -536,6 +614,7 @@ class SubmissionView extends Component {
                 mode={selectedMode}
                 view={selectedView}
                 submission={selectedSubmission}
+                assignPermissions={selectedUser !== null}
                 defaultExpand
               />
             </div>
@@ -602,12 +681,15 @@ function mapStateToProps(state) {
     selectedSequence: state.Submission.selectedSequence,
     lifeCycleJson: getLifeCycleJson(state),
     sequenceJson: getSequenceJson(state),
-    selectedSubmission: state.Application.selectedSubmission
+    selectedSubmission: state.Application.selectedSubmission,
+    selectedCustomer: state.Customer.selectedCustomer,
+    users: state.Usermanagement.users
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
+    dispatch,
     actions: bindActionCreators({ ...SubmissionActions }, dispatch)
   };
 }

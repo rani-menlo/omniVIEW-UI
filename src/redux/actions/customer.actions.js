@@ -46,5 +46,21 @@ export default {
       type: CustomerActionTypes.SET_SELECTED_CUSTOMER,
       customer
     };
+  },
+  activateDeactivateCustomer: (customer, search) => {
+    return async dispatch => {
+      ApiActions.request(dispatch);
+      try {
+        await CustomerApi.activateDeactivateCustomer(customer);
+        const res = await CustomerApi.fetchCustomers(search);
+        dispatch({
+          type: CustomerActionTypes.FETCH_CUSTOMERS,
+          data: res.data
+        });
+        ApiActions.success(dispatch);
+      } catch (err) {
+        ApiActions.failure(dispatch);
+      }
+    };
   }
 };

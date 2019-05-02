@@ -19,10 +19,12 @@ import {
 } from "../../uikit/components";
 import { DEBOUNCE_TIME } from "../../constants";
 import { UsermanagementActions } from "../../redux/actions";
-import { Avatar, Dropdown, Menu, Icon, Popover } from "antd";
+import { Avatar, Dropdown, Menu, Icon, Popover, Modal } from "antd";
 import { translate } from "../../translations/translator";
 import { getRoleName, getFormattedDate } from "../../utils";
 import PopoverUsersFilter from "./popoverUsersFilter";
+import UserCard from "./userCard.component";
+import UserProfileCard from "./userProfileCard.component";
 
 class UserManagementContainer extends Component {
   constructor(props) {
@@ -32,6 +34,7 @@ class UserManagementContainer extends Component {
       viewBy: "cards",
       searchText: "",
       showDeactivateModal: false,
+      showUserCard: false,
       selectedUser: null,
       pageNo: 1,
       itemsPerPage: 5
@@ -64,7 +67,7 @@ class UserManagementContainer extends Component {
         </Menu.Item>
         <Menu.Item
           className="maindashboard__list__item-dropdown-menu-item"
-          onClick={this.openModal(usr)}
+          onClick={this.openActivateDeactivateModal(usr)}
         >
           <p
             style={{
@@ -164,7 +167,12 @@ class UserManagementContainer extends Component {
     this.props.history.push("/usermanagement/edit");
   };
 
-  closeModal = () => {
+  editUserFromUserCard = () => {
+    this.closeUserCard();
+    this.editUser(this.state.selectedUser)();
+  };
+
+  closeActivateDeactivateModal = () => {
     this.setState({ showDeactivateModal: false });
   };
 
@@ -179,22 +187,34 @@ class UserManagementContainer extends Component {
         selectedCustomer.id
       )
     );
-    this.closeModal();
+    this.closeActivateDeactivateModal();
+    this.closeUserCard();
   };
 
-  openModal = usr => () => {
+  openActivateDeactivateModal = usr => () => {
     this.setState({ showDeactivateModal: true, selectedUser: usr });
+  };
+
+  openStatusModal = () => {
+    this.openActivateDeactivateModal(this.state.selectedUser)();
   };
 
   onFiltersUpdate = filters => {
     this.selectedFilters = {
       ...this.selectedFilters,
-      roles: filters.selectedRoles,
-      departments: filters.selectedDepts,
-      sortBy: filters.selectedSortBy && [filters.selectedSortBy]
+      ...filters,
+      sortBy: filters.sortBy && [filters.sortBy]
     };
 
     this.fetchUsers();
+  };
+
+  openUserCard = usr => () => {
+    this.setState({ selectedUser: usr, showUserCard: true });
+  };
+
+  closeUserCard = () => {
+    this.setState({ showUserCard: false });
   };
 
   render() {
@@ -269,83 +289,15 @@ class UserManagementContainer extends Component {
                       {getRoleName(key, true)}
                     </p>
                     <div className="userManagement__group__users">
-                      {_.map(user, usr => {
-                        const isActive = _.get(usr, "is_active", false);
-                        return (
-                          <div
-                            key={usr.user_id}
-                            className="userManagement__group__users__user"
-                          >
-                            <Avatar size={48} icon="user" />
-                            <div className="userManagement__group__users__user__info">
-                              <p className="userManagement__group__users__user__info-name">{`${_.get(
-                                usr,
-                                "first_name",
-                                ""
-                              )} ${_.get(usr, "last_name", "")}`}</p>
-                              <p className="userManagement__group__users__user__info-text">
-                                {translate("label.usermgmt.department")}:{" "}
-                                {_.get(usr, "department_name", "")}
-                              </p>
-                              <p className="userManagement__group__users__user__info-text">
-                                {translate("label.usermgmt.subscriptionstatus")}
-                                :
-                                <span
-                                  className={`userManagement__group__users__user__info-text-${
-                                    isActive ? "active" : "inactive"
-                                  }`}
-                                >
-                                  {isActive ? " Active" : " Inactive"}
-                                </span>
-                              </p>
-                              {usr.role_id !== 1 && (
-                                <p className="userManagement__group__users__user__info-text">
-                                  {isActive
-                                    ? `${translate("label.usermgmt.expires")}: `
-                                    : `${translate(
-                                        "label.usermgmt.expired"
-                                      )}: `}
-                                  {getFormattedDate(
-                                    _.get(usr, "expired_date")
-                                  ) || ""}
-                                </p>
-                              )}
-                              <p className="userManagement__group__users__user__info-text">
-                                {_.get(usr, "email", "")}
-                              </p>
-                              <div className="global__center-vert">
-                                <p
-                                  className="userManagement__group__users__user__info-link"
-                                  onClick={this.editUser(usr)}
-                                >
-                                  {translate("label.usermgmt.edit")}
-                                </p>
-                                <div className="userManagement__group__users__user__info-dot" />
-                                {usr.role_id !== 1 ? (
-                                  <React.Fragment>
-                                    <p className="userManagement__group__users__user__info-link">
-                                      {translate(
-                                        "label.usermgmt.assignlicence"
-                                      )}
-                                    </p>
-                                    <div className="userManagement__group__users__user__info-dot" />
-                                  </React.Fragment>
-                                ) : (
-                                  ""
-                                )}
-                                <p
-                                  className="userManagement__group__users__user__info-link"
-                                  onClick={this.openModal(usr)}
-                                >
-                                  {isActive
-                                    ? translate("label.usermgmt.deactivate")
-                                    : translate("label.usermgmt.activate")}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
+                      {_.map(user, usr => (
+                        <UserCard
+                          key={usr.user_id}
+                          user={usr}
+                          onAvatarClick={this.openUserCard(usr)}
+                          onStatusClick={this.openActivateDeactivateModal(usr)}
+                          onEdit={this.editUser(usr)}
+                        />
+                      ))}
                     </div>
                   </div>
                 );
@@ -476,16 +428,23 @@ class UserManagementContainer extends Component {
             visible={this.state.showDeactivateModal}
             title={
               _.get(this.state, "selectedUser.is_active", false)
-                ? translate("label.usermgmt.deactivateacc")
-                : translate("label.usermgmt.activateacc")
+                ? `${translate("label.usermgmt.deactivateacc")}?`
+                : `${translate("label.usermgmt.activateacc")}?`
             }
             content={
               _.get(this.state, "selectedUser.is_active", false)
                 ? translate("text.usermgmt.deactivatemsg")
                 : translate("text.usermgmt.activatemsg")
             }
-            closeModal={this.closeModal}
+            closeModal={this.closeActivateDeactivateModal}
             deactivate={this.activateDeactivate}
+          />
+          <UserProfileCard
+            visible={this.state.showUserCard}
+            user={this.state.selectedUser}
+            onClose={this.closeUserCard}
+            onEdit={this.editUserFromUserCard}
+            onStatusClick={this.openStatusModal}
           />
         </ContentLayout>
       </React.Fragment>
@@ -515,14 +474,14 @@ const TableColumns = [
     key: "role_name",
     checkbox: false,
     sort: true,
-    width: "12%"
+    width: "11%"
   },
   {
     name: TableColumnNames.DEPARTMENT,
     key: "department_name",
     checkbox: false,
     sort: true,
-    width: "16%"
+    width: "17%"
   },
   {
     name: TableColumnNames.EMAIl,

@@ -30,7 +30,10 @@ class CustomerCard extends Component {
   render() {
     const { customer, onSelect, getMenu } = this.props;
     return (
-      <div className="customercard">
+      <div
+        className="customercard"
+        style={{ opacity: _.get(customer, "is_active", false) ? 1 : 0.5 }}
+      >
         <div className="customercard__heading">
           <span
             className="customercard__heading-text global__cursor-pointer"
@@ -92,7 +95,7 @@ class CustomerCard extends Component {
               Subscription Licences:
             </span>
             <span className="customercard__content__item-subtext">
-              12 in use | 3 unassigned
+              {_.get(customer, "number_of_users", "")} in use | 0 unassigned
             </span>
           </div>
         </div>

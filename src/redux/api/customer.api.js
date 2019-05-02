@@ -19,5 +19,7 @@ export default {
         search
       }
     });
-  }
+  },
+  activateDeactivateCustomer: customer =>
+    api.post(URI.ACTIVATE_DEACTIVATE_CUSTOMER, customer)
 };

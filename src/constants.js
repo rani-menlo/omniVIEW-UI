@@ -6,12 +6,12 @@ const SERVER_URL = process.env.REACT_APP_SERVER_URL;
 
 const ROLES = {
   OMNICIA: [
-    { name: translate("label.role.admin"), id: 1 },
+    { name: translate("label.role.administrator"), id: 1 },
     { name: translate("label.role.author"), id: 3 },
     { name: translate("label.role.publisher"), id: 2 }
   ],
   CUSTOMER: [
-    { name: translate("label.role.admin"), id: 4 },
+    { name: translate("label.role.administrator"), id: 4 },
     { name: translate("label.role.author"), id: 6 },
     { name: translate("label.role.publisher"), id: 5 }
   ]
@@ -25,6 +25,7 @@ const URI = {
   // Customer
   ADD_CUSTOMER: `${path}customer/createCustomer`,
   EDIT_CUSTOMER: `${path}customer/editCustomer`,
+  ACTIVATE_DEACTIVATE_CUSTOMER: `${path}customer/activateOrDeactivateCustomer`,
   GET_CUSTOMERS: `${path}customer/getCustomers`,
   GET_DEPARTMENTS: `${path}customer/getDepartments`,
   GET_LICENCES: `${path}customer/getAvailableLicences`,

@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Icon } from "antd";
+import { Icon, Checkbox } from "antd";
 import PropTypes from "prop-types";
 import _ from "lodash";
 import uuidv4 from "uuid/v4";
@@ -33,14 +33,16 @@ class TreeNode extends Component {
     leafParent: PropTypes.oneOfType([
       PropTypes.object,
       PropTypes.arrayOf(PropTypes.object)
-    ])
+    ]),
+    assignPermissions: PropTypes.bool
   };
 
   static defaultProps = {
     paddingLeft: 0, // px
     defaultPaddingLeft: 31, // px
     expand: false,
-    defaultExpand: false
+    defaultExpand: false,
+    assignPermissions: false
   };
 
   static getDerivedStateFromProps(props, state) {
@@ -452,7 +454,8 @@ class TreeNode extends Component {
       onNodeSelected,
       mode,
       view,
-      submission
+      submission,
+      assignPermissions
     } = this.props;
     const paddingLeft = this.props.paddingLeft + defaultPaddingLeft;
     return (
@@ -461,16 +464,21 @@ class TreeNode extends Component {
           ref={this.nodeElementRef}
           className={`node ${selectedNodeId === this.state.nodeId &&
             "global__node-selected"}`}
-          style={{ paddingLeft }}
+          style={{ display: "flex" }}
+          title={this.getLabel()}
           onClick={this.selectNode}
           onDoubleClick={this.openFile}
-          title={this.getLabel()}
         >
-          {this.getCaretIcon()}
-          {this.getLeafIcon()}
-          <span className="global__node-text" style={{ overflow: "hidden" }}>
-            {this.getLabel()}
-          </span>
+          {assignPermissions ? (
+            <Checkbox style={{ marginLeft: "10px" }} />
+          ) : null}
+          <div style={{ paddingLeft }}>
+            {this.getCaretIcon()}
+            {this.getLeafIcon()}
+            <span className="global__node-text" style={{ overflow: "hidden" }}>
+              {this.getLabel()}
+            </span>
+          </div>
         </div>
         {expand &&
           _.map(nodes, (node, idx) => (
@@ -487,6 +495,7 @@ class TreeNode extends Component {
               view={view}
               leafParent={node.leafParent}
               submission={submission}
+              assignPermissions={assignPermissions}
             />
           ))}
       </React.Fragment>

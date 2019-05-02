@@ -5,6 +5,7 @@ import _ from "lodash";
 import { LoginActions, CustomerActions } from "../../redux/actions";
 import { withRouter } from "react-router-dom";
 import { translate } from "../../translations/translator";
+import { isLoggedInOmniciaAdmin, isLoggedInCustomerAdmin } from "../../utils";
 
 class ProfileMenu extends Component {
   signOut = () => {
@@ -39,17 +40,20 @@ class ProfileMenu extends Component {
             )}`}</span>
           </p>
         </Menu.Item>
-        <Menu.Item
-          className="maindashboard__list__item-dropdown-menu-item"
-          onClick={this.manageUsers}
-        >
-          <p>
-            <img src="/images/user-management.svg" />
-            <span>{`${translate("label.generic.manage")} ${translate(
-              "label.dashboard.users"
-            )}`}</span>
-          </p>
-        </Menu.Item>
+        {(isLoggedInOmniciaAdmin(this.props.role) ||
+          isLoggedInCustomerAdmin(this.props.role)) && (
+          <Menu.Item
+            className="maindashboard__list__item-dropdown-menu-item"
+            onClick={this.manageUsers}
+          >
+            <p>
+              <img src="/images/user-management.svg" />
+              <span>{`${translate("label.generic.manage")} ${translate(
+                "label.dashboard.users"
+              )}`}</span>
+            </p>
+          </Menu.Item>
+        )}
         <Menu.Item
           className="maindashboard__list__item-dropdown-menu-item"
           onClick={this.signOut}
@@ -100,6 +104,7 @@ class ProfileMenu extends Component {
 function mapStateToProps(state) {
   return {
     user: state.Login.user,
+    role: state.Login.role,
     oAdminCustomer: state.Customer.oAdminCustomer
   };
 }

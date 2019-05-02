@@ -108,7 +108,7 @@ class ApplicationDashboard extends Component {
   };
 
   openCustomersScreen = () => {
-    this.props.history.goBack();
+    this.props.history.push("/");
   };
 
   onPageChange = pageNo => {
@@ -225,13 +225,16 @@ class ApplicationDashboard extends Component {
                 </div>
               )}
             </div>
-            <OmniButton
-              type="add"
-              label={translate("label.button.add", {
-                type: translate("label.dashboard.application")
-              })}
-              className="global__disabled-box"
-            />
+            {(isLoggedInOmniciaAdmin(this.props.role) ||
+              isLoggedInCustomerAdmin(this.props.role)) && (
+              <OmniButton
+                type="add"
+                label={translate("label.button.add", {
+                  type: translate("label.dashboard.application")
+                })}
+                className="global__disabled-box"
+              />
+            )}
           </div>
           {viewBy === "lists" && (
             <React.Fragment>

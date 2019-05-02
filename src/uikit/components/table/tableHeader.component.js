@@ -22,7 +22,7 @@ class TableHeader extends Component {
   }
 
   order = column => () => {
-    if (!column.name) {
+    if (!column.name || !column.sort) {
       return;
     }
     const state = { sortBy: column.key || "" };
@@ -63,7 +63,7 @@ class TableHeader extends Component {
             style={column.style}
           >
             <div
-              className="global__cursor-pointer"
+              className={column.sort && "global__cursor-pointer"}
               onClick={this.order(column)}
             >
               {column.checkbox && <PaginationCheckbox />}

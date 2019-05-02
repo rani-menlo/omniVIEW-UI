@@ -53,6 +53,7 @@ class AddUser extends Component {
       selectedRole: this.roles[0].id,
       selectedDept: "",
       selectedLicences: [],
+      selectedLicenceError: "",
       showDeactivateModal: false,
       statusActive: true,
       licences: []
@@ -67,7 +68,13 @@ class AddUser extends Component {
       };
     }
     if (!state.licences.length && props.licences.length) {
-      newState = { ...newState, licences: props.licences };
+      const selectedLicence = props.licences[0];
+      selectedLicence.checked = true;
+      newState = {
+        ...newState,
+        licences: props.licences,
+        selectedLicences: [selectedLicence]
+      };
     }
     return newState;
   }
@@ -177,14 +184,14 @@ class AddUser extends Component {
       });
     }
     // licence check only in add user
-    /* if (
+    if (
       !state.editUser &&
       this.props.licences.length &&
-      !state.selectedLicence.value
+      !state.selectedLicences.length
     ) {
       error = true;
-      state.selectedLicence.error = translate("label.user.chooselicence");
-    } */
+      state.selectedLicenceError = translate("label.user.chooselicence");
+    }
 
     if (error) {
       this.scrollToTop();
@@ -274,7 +281,8 @@ class AddUser extends Component {
         newLicences[idx].checked = checked;
         this.setState({
           licences: newLicences,
-          selectedLicences: [...this.state.selectedLicences, newLicences[idx]]
+          selectedLicences: [...this.state.selectedLicences, newLicences[idx]],
+          selectedLicenceError: ""
         });
       }
     }
@@ -292,7 +300,8 @@ class AddUser extends Component {
       selectedDept,
       statusActive,
       editUser,
-      selectedLicences
+      selectedLicences,
+      selectedLicenceError
     } = this.state;
     return (
       <React.Fragment>
@@ -537,6 +546,13 @@ class AddUser extends Component {
                         );
                       }
                     })}
+                    {selectedLicenceError && (
+                      <Text
+                        className="addUser__licences__box-warning"
+                        size="12px"
+                        text={selectedLicenceError}
+                      />
+                    )}
                   </div>
                 )}
                 {!_.get(licences, "length") && (
@@ -581,7 +597,7 @@ class AddUser extends Component {
           <DeactivateModal
             isActive={this.state.statusActive}
             visible={this.state.showDeactivateModal}
-            title={translate("label.usermgmt.deactivateacc")}
+            title={`${translate("label.usermgmt.deactivateacc")}?`}
             content={translate("text.usermgmt.deactivatemsg")}
             closeModal={this.closeModal}
             deactivate={this.deactivate}
