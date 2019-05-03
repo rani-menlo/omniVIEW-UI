@@ -289,7 +289,7 @@ class AddUser extends Component {
   };
 
   render() {
-    const { departments, loading, selectedUser } = this.props;
+    const { departments, loading, selectedUser, selectedCustomer } = this.props;
     const {
       fname,
       lname,
@@ -308,6 +308,13 @@ class AddUser extends Component {
         <Loader loading={loading} />
         <Header style={{ marginBottom: "0px" }} />
         <ContentLayout className="addUser">
+          <Text
+            type="extra_bold"
+            size="20px"
+            className="addUser-companyname"
+            text={_.get(selectedCustomer, "company_name", "")}
+            onClick={this.goBack}
+          />
           <div style={{ marginBottom: "15px" }}>
             <span className="maindashboard-breadcrum" onClick={this.goBack}>
               {translate("label.usermgmt.title")}
