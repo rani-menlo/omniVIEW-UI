@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
-import { Icon, Tabs, Modal, Menu } from "antd";
+import { Icon, Tabs, Modal, Menu, Avatar } from "antd";
 import _ from "lodash";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
@@ -15,7 +15,9 @@ import {
   Loader,
   Footer,
   DraggableModal,
-  Text
+  Text,
+  OmniButton,
+  Row
 } from "../../uikit/components";
 import {
   getSequenceJson,
@@ -557,7 +559,7 @@ class SubmissionView extends Component {
                     onSortByChanged={this.onSequenceSortByChanged}
                   />
                 </div>
-                {/* <div
+                <div
                   className="panel-sequences__users global__cursor-pointer"
                   onClick={this.openUsersSection}
                 >
@@ -570,7 +572,7 @@ class SubmissionView extends Component {
                     type={showUsersSection ? "up" : "down"}
                     className="global__cursor-pointer"
                   />
-                </div> */}
+                </div>
                 {showUsersSection && (
                   <SubmissionViewUsers
                     searchUsers={this.fetchUsers}
@@ -603,6 +605,31 @@ class SubmissionView extends Component {
                   />
                 </div>
               )}
+              <div className="panels__tree__permissions">
+                <Row>
+                  <Avatar
+                    size="small"
+                    icon="user"
+                    size={35}
+                    style={{ marginRight: "8px" }}
+                  />
+                  <Text
+                    type="medium"
+                    text="Editing Angela Walker’s permissions"
+                  />
+                </Row>
+                <Row>
+                  <OmniButton
+                    type="secondary"
+                    label={translate("label.button.cancel")}
+                    buttonStyle={{ marginRight: "8px" }}
+                  />
+                  <OmniButton
+                    type="primary"
+                    label={translate("label.button.savechanges")}
+                  />
+                </Row>
+              </div>
               <TreeNode
                 ref={this.treeRef}
                 key={this.createKey()}
