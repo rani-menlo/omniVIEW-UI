@@ -13,7 +13,7 @@ import {
   TableHeader,
   Row,
   Pagination,
-  PaginationCheckbox,
+  OmniCheckbox,
   OmniButton,
   SearchBox,
   ListViewGridView,
@@ -255,7 +255,7 @@ class CustomerDashboard extends Component {
                     }}
                   >
                     <Column width={getColumnWidth(TableColumnNames.CHECKBOX)}>
-                      <PaginationCheckbox />
+                      <OmniCheckbox />
                     </Column>
                     <Column
                       width={getColumnWidth(TableColumnNames.CUSTOMER_NAME)}

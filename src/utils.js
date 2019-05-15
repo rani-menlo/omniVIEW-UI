@@ -10,6 +10,7 @@ const REGEX_PWD = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}
 const isLoggedInOmniciaRole = role => _.get(role, "slug", "").includes("o_");
 const isLoggedInCustomerAdmin = role => _.get(role, "slug", "") === "c_admin";
 const isLoggedInOmniciaAdmin = role => _.get(role, "slug", "") === "o_admin";
+const isLoggedInAuthor = role => _.get(role, "slug", "").includes("_author");
 const isEmail = mail => REGEX_EMAIL.test(mail);
 const isValidPwd = pwd => REGEX_PWD.test(pwd);
 const isPhone = phone => isValidPhoneNumber(phone);
@@ -37,6 +38,7 @@ export {
   isLoggedInOmniciaRole,
   isLoggedInCustomerAdmin,
   isLoggedInOmniciaAdmin,
+  isLoggedInAuthor,
   isEmail,
   isValidPwd,
   isPhone,

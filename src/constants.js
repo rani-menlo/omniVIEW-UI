@@ -17,6 +17,13 @@ const ROLES = {
   ]
 };
 
+const CHECKBOX = {
+  SELECTED: 1,
+  DESELECTED: 0,
+  SELECTED_PARTIALLY: -1,
+  RESET_DEFAULT: 100
+};
+
 const URI = {
   // Auth
   LOGIN: `${path}auth/login`,
@@ -34,6 +41,7 @@ const URI = {
   GET_APPLICATIONS: `${path}submission/getSubmissions`,
   // Sequence
   GET_SEQUENCES: `${path}sequence/getSequences`,
+  GET_SEQUENCES_WITH_PERMISSIONS: `${path}file/getSequences`,
   // Validation
   VALIDATE_SEQUENCE: `${path}validation/sequenceValidation`,
   // User
@@ -45,8 +53,12 @@ const URI = {
   // File
   GET_FILE_SIZE: `${path}file/getFileSize`,
   GET_JSON: `${path}file/getFile`,
+  GET_JSON_WITH_PERMISSION: `${path}file/getSequenceJsonFile`,
   GET_NEW_PATH: `${path}file/getNewPath`,
-  GET_RESOURCE_FILE: `${path}file/getResourceFile`
+  GET_RESOURCE_FILE: `${path}file/getResourceFile`,
+  ASSIGN_FILE_PERMISSIONS: `${path}file/assignFilePermissions`,
+  ASSIGN_SUBMISSION_PERMISSIONS: `${path}file/assignSubmissionPermissions`,
+  ASSIGN_SEQUENCE_PERMISSIONS: `${path}file/assignSequencePermissions`,
 };
 
 const DATE_FORMAT = "MM/DD/YYYY";
@@ -57,4 +69,4 @@ const VIEWER = {
   OFFICE_VIEWER_MAX_SIZE: 10 * 1024 * 1024 // 10MB
 };
 
-export { URI, SERVER_URL, DATE_FORMAT, VIEWER, DEBOUNCE_TIME, ROLES };
+export { URI, SERVER_URL, DATE_FORMAT, VIEWER, DEBOUNCE_TIME, ROLES, CHECKBOX };

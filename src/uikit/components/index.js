@@ -5,7 +5,8 @@ import { default as DraggableModal } from "./modal/draggableModal.component";
 import { default as DeactivateModal } from "./modal/deactivateModal.component";
 import { default as Pagination } from "./pagination";
 import { default as PaginationButton } from "./pagination/paginationButton.component";
-import { default as PaginationCheckbox } from "./pagination/paginationCheckbox.component";
+import { default as OmniCheckbox } from "./checkbox/omniCheckbox.component";
+import { default as PermissionCheckbox } from "./checkbox/permissionCheckbox.component";
 import { default as Row } from "./row/row.component";
 import { default as Sidebar } from "./sidebar/sidebar.component";
 import { default as SubHeader } from "./subheader/subheader.component";
@@ -26,7 +27,8 @@ export {
   DeactivateModal,
   Pagination,
   PaginationButton,
-  PaginationCheckbox,
+  OmniCheckbox,
+  PermissionCheckbox,
   Row,
   Sidebar,
   SubHeader,

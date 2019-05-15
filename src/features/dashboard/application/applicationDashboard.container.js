@@ -21,7 +21,7 @@ import {
   TableHeader,
   Row,
   Pagination,
-  PaginationCheckbox,
+  OmniCheckbox,
   OmniButton,
   SearchBox,
   ListViewGridView,
@@ -249,7 +249,7 @@ class ApplicationDashboard extends Component {
                     className="maindashboard__list__item"
                   >
                     <Column width={getColumnWidth(TableColumnNames.CHECKBOX)}>
-                      <PaginationCheckbox />
+                      <OmniCheckbox />
                     </Column>
                     <Column
                       width={getColumnWidth(TableColumnNames.APPLICATION_NAME)}

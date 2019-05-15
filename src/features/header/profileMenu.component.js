@@ -23,6 +23,7 @@ class ProfileMenu extends Component {
         CustomerActions.setSelectedCustomer(this.props.oAdminCustomer)
       );
     }
+    console.log(this.props.history);
     this.props.history.push("/usermanagement");
   };
 

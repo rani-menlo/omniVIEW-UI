@@ -1,8 +1,13 @@
 import React, { Component } from "react";
-import { Icon, Checkbox } from "antd";
+import { connect } from "react-redux";
+import { Icon } from "antd";
 import PropTypes from "prop-types";
 import _ from "lodash";
 import uuidv4 from "uuid/v4";
+import { PermissionCheckbox } from "../../uikit/components";
+import { CHECKBOX } from "../../constants";
+import { Permissions } from "./permissions";
+import { isLoggedInAuthor } from "../../utils";
 
 class TreeNode extends Component {
   constructor(props) {
@@ -12,8 +17,10 @@ class TreeNode extends Component {
       properties: {},
       nodes: [],
       expand: this.props.defaultExpand || this.props.expand,
-      prevProps: this.props
+      prevProps: this.props,
+      checkboxValue: CHECKBOX.RESET_DEFAULT
     };
+    this.checkboxMutated = false;
     this.nodeRefs = [];
     this.nodeElementRef = React.createRef();
   }
@@ -34,7 +41,9 @@ class TreeNode extends Component {
       PropTypes.object,
       PropTypes.arrayOf(PropTypes.object)
     ]),
-    assignPermissions: PropTypes.bool
+    viewPermissions: PropTypes.bool,
+    editPermissions: PropTypes.bool,
+    propsCheckboxValue: PropTypes.number
   };
 
   static defaultProps = {
@@ -42,7 +51,8 @@ class TreeNode extends Component {
     defaultPaddingLeft: 31, // px
     expand: false,
     defaultExpand: false,
-    assignPermissions: false
+    viewPermissions: false,
+    editPermissions: false
   };
 
   static getDerivedStateFromProps(props, state) {
@@ -54,7 +64,7 @@ class TreeNode extends Component {
   }
 
   componentDidMount() {
-    let { content, view, mode } = this.props;
+    let { content, view, mode, propsCheckboxValue } = this.props;
     const properties = {};
     let nodes = [];
     // get object from the ectd:ectd
@@ -177,7 +187,13 @@ class TreeNode extends Component {
     if (properties["_stfKey"] && mode === "standard") {
       nodes = this.sortByTitle(nodes);
     }
-    this.setState({ properties, nodes });
+    this.setState({
+      properties,
+      nodes,
+      checkboxValue: properties.hasAccess
+        ? CHECKBOX.SELECTED
+        : CHECKBOX.DESELECTED
+    });
     this.nodeRefs = _.map(nodes, node => React.createRef());
   }
 
@@ -296,7 +312,22 @@ class TreeNode extends Component {
   };
 
   toggle = () => {
-    this.setState({ expand: !this.state.expand });
+    if (this.state.expand) {
+      this.collapse();
+    } else {
+      this.expand();
+      if (this.props.editPermissions) {
+        this.props.onExpandNode && this.props.onExpandNode(this);
+      }
+    }
+  };
+
+  expand = () => {
+    !this.state.expand && this.setState({ expand: true });
+  };
+
+  collapse = () => {
+    this.state.expand && this.setState({ expand: false });
   };
 
   getCaretIcon = () => {
@@ -420,10 +451,19 @@ class TreeNode extends Component {
 
   openFile = () => {
     const { properties } = this.state;
+    console.log(this.props);
+    console.log(isLoggedInAuthor(this.props.role));
+    if (
+      this.props.editPermissions ||
+      (isLoggedInAuthor(this.props.role) && !properties.hasAccess)
+    ) {
+      return;
+    }
     const fileHref = properties["xlink:href"];
-    /* const types = fileHref && fileHref.split(".");
-    const type = _.get(types, "[1]", "pdf"); */
-    const type = fileHref.substring(fileHref.lastIndexOf(".") + 1);
+    let type = "";
+    if (fileHref) {
+      type = fileHref.substring(fileHref.lastIndexOf(".") + 1);
+    }
     let newWindow = null;
     if (type.includes("pdf") && properties.fileID) {
       newWindow = window.open(
@@ -446,8 +486,30 @@ class TreeNode extends Component {
     }
   };
 
+  setCheckboxValue = checkboxValue => {
+    this.setState({
+      checkboxValue
+    });
+    const { properties } = this.state;
+
+    if (checkboxValue === CHECKBOX.SELECTED) {
+      properties.fileID && Permissions.GRANTED.file_ids.add(properties.fileID);
+      properties.fileID &&
+        Permissions.REVOKED.file_ids.delete(properties.fileID);
+    } else {
+      properties.fileID &&
+        Permissions.GRANTED.file_ids.delete(properties.fileID);
+      properties.fileID && Permissions.REVOKED.file_ids.add(properties.fileID);
+    }
+  };
+
+  onCheckboxChange = e => {
+    this.checkboxMutated = true;
+    this.props.onCheckChange && this.props.onCheckChange(this);
+  };
+
   render() {
-    const { nodes, expand } = this.state;
+    const { nodes, expand, checkboxValue } = this.state;
     const {
       defaultPaddingLeft,
       selectedNodeId,
@@ -455,7 +517,10 @@ class TreeNode extends Component {
       mode,
       view,
       submission,
-      assignPermissions
+      viewPermissions,
+      editPermissions,
+      onCheckChange,
+      onExpandNode
     } = this.props;
     const paddingLeft = this.props.paddingLeft + defaultPaddingLeft;
     return (
@@ -464,15 +529,27 @@ class TreeNode extends Component {
           ref={this.nodeElementRef}
           className={`node ${selectedNodeId === this.state.nodeId &&
             "global__node-selected"}`}
-          style={{ display: "flex" }}
+          style={{
+            display: "flex",
+            opacity:
+              viewPermissions || editPermissions
+                ? checkboxValue === CHECKBOX.DESELECTED
+                  ? 0.3
+                  : 1
+                : 1
+          }}
           title={this.getLabel()}
           onClick={this.selectNode}
           onDoubleClick={this.openFile}
         >
-          {assignPermissions ? (
-            <Checkbox style={{ marginLeft: "10px" }} />
-          ) : null}
-          <div style={{ paddingLeft }}>
+          {editPermissions && (
+            <PermissionCheckbox
+              style={{ marginLeft: "10px" }}
+              value={checkboxValue}
+              onChange={this.onCheckboxChange}
+            />
+          )}
+          <div style={{ paddingLeft }} className="global__center-vert">
             {this.getCaretIcon()}
             {this.getLeafIcon()}
             <span className="global__node-text" style={{ overflow: "hidden" }}>
@@ -484,6 +561,7 @@ class TreeNode extends Component {
           _.map(nodes, (node, idx) => (
             <TreeNode
               ref={this.nodeRefs[idx]}
+              parentNode={this}
               expand={this.props.expand}
               paddingLeft={paddingLeft}
               key={node.label + idx + mode}
@@ -495,7 +573,10 @@ class TreeNode extends Component {
               view={view}
               leafParent={node.leafParent}
               submission={submission}
-              assignPermissions={assignPermissions}
+              viewPermissions={viewPermissions}
+              editPermissions={editPermissions}
+              onCheckChange={onCheckChange}
+              onExpandNode={onExpandNode}
             />
           ))}
       </React.Fragment>
@@ -503,4 +584,10 @@ class TreeNode extends Component {
   }
 }
 
-export default TreeNode;
+function mapStateToProps(state) {
+  return {
+    role: state.Login.role
+  };
+}
+
+export default connect(mapStateToProps)(TreeNode);

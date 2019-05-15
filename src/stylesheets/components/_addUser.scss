@@ -1,5 +1,13 @@
 .addUser {
   padding: 40px 10%;
+  &-companyname {
+    color: $sky-of-margritte !important;
+    text-decoration: underline;
+    cursor: pointer;
+    text-align: center;
+    margin-top: -25px;
+    margin-bottom: 25px !important;
+  }
   &-title {
     @include text-bold-active(24px);
   }

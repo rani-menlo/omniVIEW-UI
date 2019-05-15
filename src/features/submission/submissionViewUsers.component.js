@@ -2,10 +2,11 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import _ from "lodash";
 import PopoverUsersFilter from "../usermanagement/popoverUsersFilter";
-import { Avatar } from "antd";
-import { Text, SearchBox } from "../../uikit/components";
+import { Avatar, Icon } from "antd";
+import { Text, SearchBox, Row } from "../../uikit/components";
 import { translate } from "../../translations/translator";
 import { getRoleName } from "../../utils";
+import { DEBOUNCE_TIME } from "../../constants";
 
 class SubmissionViewUsers extends Component {
   constructor(props) {
@@ -14,6 +15,7 @@ class SubmissionViewUsers extends Component {
     this.state = {
       serachText: ""
     };
+    this.searchUsers = _.debounce(this.searchUsers, DEBOUNCE_TIME);
   }
 
   static propTypes = {
@@ -41,10 +43,11 @@ class SubmissionViewUsers extends Component {
 
   handleSearch = e => {
     const searchText = e.target.value;
-    this.setState({ searchText });
-    if (searchText === "" || _.size(searchText) >= 3) {
-      this.searchUsers();
-    }
+    this.setState({ searchText }, () => {
+      if (searchText === "" || _.size(searchText) >= 3) {
+        this.searchUsers();
+      }
+    });
   };
 
   setSelectedUser = user => () => {
@@ -106,6 +109,18 @@ class SubmissionViewUsers extends Component {
               </div>
             </div>
           ))}
+          {!this.props.users.length && (
+            <Row className="maindashboard__nodata">
+              <Icon
+                style={{ fontSize: "20px" }}
+                type="exclamation-circle"
+                className="maindashboard__nodata-icon"
+              />
+              {translate("error.dashboard.notfound", {
+                type: translate("label.dashboard.users")
+              })}
+            </Row>
+          )}
         </div>
       </div>
     );

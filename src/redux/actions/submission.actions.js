@@ -11,14 +11,16 @@ export default {
       try {
         let data = { data: [] };
         const selectedCustomer = getState().Customer.selectedCustomer;
-        const sequences = getState().Submission.sequences;
         const id = `${_.get(selectedCustomer, "id", "")}_${submissionId}`;
+        /* const sequences = getState().Submission.sequences;
         if (sequences[id]) {
           data.data = sequences[id];
         } else {
           const res = await SubmissionApi.fetchSequences({ id: submissionId });
           data = res.data;
-        }
+        } */
+        const res = await SubmissionApi.fetchSequences({ id: submissionId });
+        data = res.data;
         dispatch({
           type: SubmissionActionTypes.FETCH_SEQUENCES,
           data,
@@ -30,14 +32,37 @@ export default {
       }
     };
   },
-  fetchLifeCycleJson: submission => {
+  fetchSequencesWithPermissions: (submissionId, user) => {
+    return async (dispatch, getState) => {
+      ApiActions.request(dispatch);
+      try {
+        let data = { data: [] };
+        const selectedCustomer = getState().Customer.selectedCustomer;
+        const id = `${_.get(selectedCustomer, "id", "")}_${submissionId}`;
+        const res = await SubmissionApi.fetchSequencesWithPermissions({
+          id: submissionId,
+          userId: user.user_id
+        });
+        data = res.data;
+        dispatch({
+          type: SubmissionActionTypes.FETCH_SEQUENCES,
+          data,
+          id
+        });
+        ApiActions.success(dispatch);
+      } catch (err) {
+        ApiActions.failure(dispatch);
+      }
+    };
+  },
+  fetchLifeCycleJson: (submission, user) => {
     return async (dispatch, getState) => {
       ApiActions.request(dispatch);
       try {
         let data = "";
         const selectedCustomer = getState().Customer.selectedCustomer;
         const id = `${_.get(selectedCustomer, "id", "")}_${submission.id}`;
-        const lifeCycleJson = getState().Submission.lifeCycleJson;
+        /*const lifeCycleJson = getState().Submission.lifeCycleJson;
         if (lifeCycleJson[id]) {
           data = lifeCycleJson[id];
         } else {
@@ -45,7 +70,37 @@ export default {
             id: submission.life_cycle_json_path
           });
           data = res.data;
-        }
+        } */
+        const res = await SubmissionApi.fetchJson({
+          fileId: submission.life_cycle_json_path,
+          userId: user.id ? user.id : user.user_id
+        });
+        data = res.data;
+        dispatch({
+          type: SubmissionActionTypes.FETCH_LIFE_CYCLE_JSON,
+          data,
+          // data: lifecyclejson,
+          id
+        });
+        ApiActions.success(dispatch);
+      } catch (err) {
+        console.log(err);
+        ApiActions.failure(dispatch);
+      }
+    };
+  },
+  /* fetchLifeCycleJsonWithPermissions: (submission, user) => {
+    return async (dispatch, getState) => {
+      ApiActions.request(dispatch);
+      try {
+        let data = "";
+        const selectedCustomer = getState().Customer.selectedCustomer;
+        const id = `${_.get(selectedCustomer, "id", "")}_${submission.id}`;
+        const res = await SubmissionApi.fetchJsonWithPermissions({
+          fileId: submission.life_cycle_json_path,
+          userId: user.user_id
+        });
+        data = res.data;
         dispatch({
           type: SubmissionActionTypes.FETCH_LIFE_CYCLE_JSON,
           data,
@@ -57,8 +112,8 @@ export default {
         ApiActions.failure(dispatch);
       }
     };
-  },
-  fetchSequenceJson: sequence => {
+  }, */
+  fetchSequenceJson: (sequence, user) => {
     return async (dispatch, getState) => {
       ApiActions.request(dispatch);
       try {
@@ -70,13 +125,18 @@ export default {
           "id",
           ""
         )}_${sequence.id}`;
-        const sequenceJson = getState().Submission.sequenceJson;
+        /* const sequenceJson = getState().Submission.sequenceJson;
         if (sequenceJson[id]) {
           data = sequenceJson[id];
         } else {
           const res = await SubmissionApi.fetchJson({ id: sequence.json_path });
           data = res.data;
-        }
+        } */
+        const res = await SubmissionApi.fetchJson({
+          fileId: sequence.json_path,
+          userId: user.id ? user.id : user.user_id
+        });
+        data = res.data;
         dispatch({
           type: SubmissionActionTypes.FETCH_SEQUENCE_JSON,
           data,
@@ -88,6 +148,34 @@ export default {
       }
     };
   },
+  /* fetchSequenceJsonWithPermissions: (sequence, user) => {
+    return async (dispatch, getState) => {
+      ApiActions.request(dispatch);
+      try {
+        let data = "";
+        const selectedCustomer = getState().Customer.selectedCustomer;
+        const selectedSubmission = getState().Application.selectedSubmission;
+        const id = `${_.get(selectedCustomer, "id", "")}_${_.get(
+          selectedSubmission,
+          "id",
+          ""
+        )}_${sequence.id}`;
+        const res = await SubmissionApi.fetchJsonWithPermissions({
+          fileId: sequence.json_path,
+          userId: user.user_id
+        });
+        data = res.data;
+        dispatch({
+          type: SubmissionActionTypes.FETCH_SEQUENCE_JSON,
+          data,
+          id
+        });
+        ApiActions.success(dispatch);
+      } catch (err) {
+        ApiActions.failure(dispatch);
+      }
+    };
+  }, */
   setSelectedSequence: sequence => {
     return {
       type: SubmissionActionTypes.SET_SELECTED_SEQUENCE,
@@ -119,6 +207,50 @@ export default {
           data: res.data,
           id
         });
+        ApiActions.success(dispatch);
+      } catch (err) {
+        ApiActions.failure(dispatch);
+      }
+    };
+  },
+  assignFilePermissions: (data, callback) => {
+    return async dispatch => {
+      ApiActions.request(dispatch);
+      try {
+        await SubmissionApi.assignFilePermissions(data);
+        dispatch({
+          type: SubmissionActionTypes.ASSIGN_PERMISSIONS
+        });
+        callback && callback();
+        ApiActions.success(dispatch);
+      } catch (err) {
+        ApiActions.failure(dispatch);
+      }
+    };
+  },
+  assignSubmissionPermissions: data => {
+    return async dispatch => {
+      ApiActions.request(dispatch);
+      try {
+        await SubmissionApi.assignSubmissionPermissions(data);
+        dispatch({
+          type: SubmissionActionTypes.ASSIGN_PERMISSIONS
+        });
+        ApiActions.success(dispatch);
+      } catch (err) {
+        ApiActions.failure(dispatch);
+      }
+    };
+  },
+  assignSequencePermissions: (data, callback) => {
+    return async dispatch => {
+      ApiActions.request(dispatch);
+      try {
+        await SubmissionApi.assignSequencePermissions(data);
+        dispatch({
+          type: SubmissionActionTypes.ASSIGN_PERMISSIONS
+        });
+        callback && callback();
         ApiActions.success(dispatch);
       } catch (err) {
         ApiActions.failure(dispatch);

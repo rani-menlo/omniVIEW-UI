@@ -8,6 +8,8 @@
   "label.generic.current": "Current",
   "label.generic.new": "New",
   "label.generic.ok": "OK",
+  "text.generic.editingpermissions": "Editing {user}’s permissions",
+  "text.generic.viewingpermissions": "Viewing {user}’s structure.",
 
   "label.role.administrator": "Administrator",
   "label.role.administrators": "Administrators",
@@ -22,6 +24,8 @@
   "label.button.savesubmit": "Save & Submit",
   "label.button.resetfilters": "Reset Filters",
   "label.button.update": "Update",
+  "label.button.continue": "Continue",
+  "label.button.editpermissions": "Edit Permissions",
   "text.pagination": "Showing - {top}-{bottom} of {total} {type}",
   "text.pagination.noofitems": "Number of Items:",
   "label.pagination.back": "Back",
@@ -140,6 +144,7 @@
   "text.customer.nooflicencetopurchase": "Enter the # of {type} subscription licenses this customer wants to purchase (Select at least one):",
 
   "text.submission.editpermissions": "You can edit the sequence, folders, and files this user can access by checking or unchecking them.",
+  "text.submission.unsaved": "You have unsaved changes. Are you sure you want to continue?",
 
   "error.licence.atleastone": "Enter atleast one license",
 

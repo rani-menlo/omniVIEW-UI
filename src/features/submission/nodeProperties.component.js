@@ -1,9 +1,11 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import styled from "styled-components";
 import _ from "lodash";
 import { TypesJson } from "./types";
 import Row from "../../uikit/components/row/row.component";
+import { isLoggedInAuthor } from "../../utils";
 
 class NodeProperties extends Component {
   static propTypes = {
@@ -338,7 +340,7 @@ class NodeProperties extends Component {
         <RowItems>
           <div className="label">Company Name:</div>
           <div className="value">
-            {_.get(applicantInfo, "[company-name]", "")}
+            {_.size(_.get(applicantInfo, "[company-name]", "")) || ""}
           </div>
         </RowItems>
         <RowItems>
@@ -429,69 +431,70 @@ class NodeProperties extends Component {
   };
 
   render() {
-    const { properties, m1Json } = this.props;
+    const { properties, m1Json, role } = this.props;
+    if (!properties || (isLoggedInAuthor(role) && !properties.hasAccess)) {
+      return null;
+    }
     return (
-      properties && (
-        <div className="properties">
-          <div className="properties__table">
-            {this.isRootSubmission() && this.getRootProperties()}
-            {this.isRootSequence() && (
-              <React.Fragment>
-                <div className="section-title">M1 Properties</div>
-                {this.getM1Properties()}
-              </React.Fragment>
-            )}
-            {this.isFolder() && this.getFolderProperties()}
-            {this.isSTF() && this.getStfProperties()}
-            {this.isM1() && this.getM1Properties()}
-            {(this.isSTF() || this.isM1()) && (
-              <div className="section-title">Leaf Properties</div>
-            )}
-            {this.getLeafProperties(
-              this.isM1() ? m1Json["m1-regional-properties"] : properties
-            )}
-          </div>
-          {_.get(properties, "lifeCycles.length", "") && (
+      <div className="properties">
+        <div className="properties__table">
+          {this.isRootSubmission() && this.getRootProperties()}
+          {this.isRootSequence() && (
             <React.Fragment>
-              <span className="properties-life-cycle-title">
-                {this.isSTF() ? "STF Life Cycle" : "Document Life Cycle"}
-              </span>
-              <div className="properties__life-cycle-table">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Leaf ID</th>
-                      <th>Operation</th>
-                      <th>Modified File</th>
-                      <th>File Name</th>
-                      <th>Title</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {_.map(properties.lifeCycles, (lifeCycle, idx) => (
-                      <tr key={idx}>
-                        <td className="properties__life-cycle-table-link">
-                          {this.getLifeCycleId(lifeCycle)}
-                        </td>
-                        <td>{lifeCycle.operation}</td>
-                        <td className="properties__life-cycle-table-link">
-                          {this.getModifiedFile(lifeCycle)}
-                        </td>
-                        <td className="properties__life-cycle-table-link link">
-                          <a onClick={this.openFile}>
-                            {this.getFileName(lifeCycle["xlink:href"])}
-                          </a>
-                        </td>
-                        <td>{properties.title}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              <div className="section-title">M1 Properties</div>
+              {this.getM1Properties()}
             </React.Fragment>
           )}
+          {this.isFolder() && this.getFolderProperties()}
+          {this.isSTF() && this.getStfProperties()}
+          {this.isM1() && this.getM1Properties()}
+          {(this.isSTF() || this.isM1()) && (
+            <div className="section-title">Leaf Properties</div>
+          )}
+          {this.getLeafProperties(
+            this.isM1() ? m1Json["m1-regional-properties"] : properties
+          )}
         </div>
-      )
+        {_.get(properties, "lifeCycles.length", "") && (
+          <React.Fragment>
+            <span className="properties-life-cycle-title">
+              {this.isSTF() ? "STF Life Cycle" : "Document Life Cycle"}
+            </span>
+            <div className="properties__life-cycle-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Leaf ID</th>
+                    <th>Operation</th>
+                    <th>Modified File</th>
+                    <th>File Name</th>
+                    <th>Title</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {_.map(properties.lifeCycles, (lifeCycle, idx) => (
+                    <tr key={idx}>
+                      <td className="properties__life-cycle-table-link">
+                        {this.getLifeCycleId(lifeCycle)}
+                      </td>
+                      <td>{lifeCycle.operation}</td>
+                      <td className="properties__life-cycle-table-link">
+                        {this.getModifiedFile(lifeCycle)}
+                      </td>
+                      <td className="properties__life-cycle-table-link link">
+                        <a onClick={this.openFile}>
+                          {this.getFileName(lifeCycle["xlink:href"])}
+                        </a>
+                      </td>
+                      <td>{properties.title}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </React.Fragment>
+        )}
+      </div>
     );
   }
 }
@@ -503,4 +506,10 @@ const RowItems = styled(Row)`
   align-items: normal;
 `;
 
-export default NodeProperties;
+function mapStateToProps(state) {
+  return {
+    role: state.Login.role
+  };
+}
+
+export default connect(mapStateToProps)(NodeProperties);
