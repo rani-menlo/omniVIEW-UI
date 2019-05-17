@@ -72,7 +72,6 @@ class SubmissionView extends Component {
       this.setState({ ...state });
     }
     this.initData();
-    this.fetchUsers();
   }
 
   initData = () => {
@@ -146,16 +145,60 @@ class SubmissionView extends Component {
         ? CHECKBOX.DESELECTED
         : CHECKBOX.SELECTED;
     node.setCheckboxValue(checkboxValue);
-    this.onExpandNode(node);
+    let content = node.props.content;
+    content = _.get(content, "[ectd:ectd]", content);
+    const bool = !content.hasAccess;
+    this.setAccess(content, bool);
+    this.modifyChildNodeAccess(node, bool);
+    this.iterateNodeParent(node);
+  };
+
+  modifyChildNodeAccess = (node, bool) => {
+    if (node.nodeRefs) {
+      _.forEach(node.nodeRefs, nodeRef => {
+        const currentNode = _.get(nodeRef, "current", null);
+        if (currentNode) {
+          this.setAccess(currentNode.props.content, bool);
+          currentNode.setCheckboxValue(+bool);
+          this.modifyChildNodeAccess(currentNode, bool);
+        } else {
+          this.modifyContentAccess(node, bool);
+        }
+      });
+    } else {
+      this.modifyContentAccess(node, bool);
+    }
+  };
+
+  modifyContentAccess = (node, bool) => {
+    node = _.get(node, "props.content") || node;
+    _.map(node, val => {
+      if (typeof val === "object") {
+        this.setAccess(val, bool);
+        this.modifyChildNodeAccess(val, bool);
+      }
+    });
+  };
+
+  setAccess = (obj, bool) => {
+    const fileId = obj.fileID;
+    obj.hasAccess = bool;
+    if (bool === !!CHECKBOX.SELECTED) {
+      fileId && Permissions.GRANTED.file_ids.add(fileId);
+      fileId && Permissions.REVOKED.file_ids.delete(fileId);
+    } else {
+      fileId && Permissions.GRANTED.file_ids.delete(fileId);
+      fileId && Permissions.REVOKED.file_ids.add(fileId);
+    }
+    console.log("GRANTED", Permissions.GRANTED, "REVOKED", Permissions.REVOKED);
   };
 
   onExpandNode = node => {
     node.expand();
-    node.checkboxMutated &&
-      setTimeout(() => {
-        this.iterateNodeRefs(node);
-        this.iterateNodeParent(node);
-      }, 1);
+    setTimeout(() => {
+      this.iterateNodeRefs(node);
+      this.iterateNodeParent(node);
+    }, 1);
   };
 
   iterateNodeRefs = node => {
@@ -176,14 +219,19 @@ class SubmissionView extends Component {
       if (parentNode.current) {
         return;
       }
-      if (node.state.checkboxValue === CHECKBOX.DESELECTED) {
+      const checkboxValue = +node.props.content.hasAccess;
+      if (checkboxValue === CHECKBOX.DESELECTED) {
         const selected = _.find(
           _.get(parentNode, "nodeRefs", []),
-          node => node.current.state.checkboxValue === CHECKBOX.SELECTED
+          node => node.current.props.content.hasAccess === !!CHECKBOX.SELECTED
         );
-        !selected && parentNode.setCheckboxValue(node.state.checkboxValue);
+        if (!selected) {
+          parentNode.props.content.hasAccess = !!checkboxValue;
+          parentNode.setCheckboxValue(checkboxValue);
+        }
       } else {
-        parentNode.setCheckboxValue(node.state.checkboxValue);
+        parentNode.props.content.hasAccess = !!checkboxValue;
+        parentNode.setCheckboxValue(checkboxValue);
       }
       this.iterateNodeParent(parentNode);
     }
@@ -361,7 +409,7 @@ class SubmissionView extends Component {
     } = this.props;
     const { selectedView, selectedMode } = this.state;
 
-    let key = `${selectedView}_${selectedMode}_`;
+    /* let key = `${selectedView}_${selectedMode}_`;
     if (selectedSequence) {
       key = `${key}${_.get(selectedSequence, "json_path", "")}#${_.size(
         sequenceJson
@@ -376,8 +424,11 @@ class SubmissionView extends Component {
         "[ectd:ectd][hash]",
         false
       )}`;
-    }
-    return key;
+    } */
+
+    return selectedSequence
+      ? _.get(sequenceJson, "[ectd:ectd][hash]", false)
+      : _.get(lifeCycleJson, "[ectd:ectd][hash]", false);
   };
 
   onSequenceSortByChanged = sortBy => {

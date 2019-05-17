@@ -197,10 +197,6 @@ class TreeNode extends Component {
     this.nodeRefs = _.map(nodes, node => React.createRef());
   }
 
-  componentWillUnmount() {
-    console.log(this.state.properties.title, this.state.properties.label);
-  }
-
   removeSubfoldersAndAppendLeafToParent = folder => {
     const keys = [];
     let leaf = [];
@@ -263,7 +259,6 @@ class TreeNode extends Component {
       const subFoldr = {};
       _.map(array, item => {
         subFoldr.title = item.title;
-        subFoldr.hasAccess = item.hasAccess;
         subFoldr["_stfKey"] = item["_stfKey"];
         subFoldr["_omitKey"] = item["_omitKey"];
         _.map(item, (v, k) => {
@@ -314,6 +309,25 @@ class TreeNode extends Component {
     const operation = _.get(items, `[${items.length - 1}].operation`, "");
     obj.showInCurrentView =
       operation !== "delete" && obj.operation === operation;
+  };
+
+  toggle = () => {
+    if (this.state.expand) {
+      this.collapse();
+    } else {
+      this.expand();
+      if (this.props.editPermissions) {
+        this.props.onExpandNode && this.props.onExpandNode(this);
+      }
+    }
+  };
+
+  expand = () => {
+    !this.state.expand && this.setState({ expand: true });
+  };
+
+  collapse = () => {
+    this.state.expand && this.setState({ expand: false });
   };
 
   getCaretIcon = () => {
@@ -472,30 +486,11 @@ class TreeNode extends Component {
     }
   };
 
-  toggle = () => {
-    if (this.state.expand) {
-      this.collapse();
-    } else {
-      this.expand();
-      /* if (this.props.editPermissions) {
-        this.props.onExpandNode && this.props.onExpandNode(this);
-      } */
-    }
-  };
-
-  expand = () => {
-    !this.state.expand && this.setState({ expand: true });
-  };
-
-  collapse = () => {
-    this.state.expand && this.setState({ expand: false });
-  };
-
   setCheckboxValue = checkboxValue => {
     this.setState({
       checkboxValue
     });
-    /* const { properties } = this.state;
+    const { properties } = this.state;
 
     if (checkboxValue === CHECKBOX.SELECTED) {
       properties.fileID && Permissions.GRANTED.file_ids.add(properties.fileID);
@@ -505,16 +500,12 @@ class TreeNode extends Component {
       properties.fileID &&
         Permissions.GRANTED.file_ids.delete(properties.fileID);
       properties.fileID && Permissions.REVOKED.file_ids.add(properties.fileID);
-    } */
+    }
   };
 
   onCheckboxChange = e => {
     this.checkboxMutated = true;
     this.props.onCheckChange && this.props.onCheckChange(this);
-  };
-
-  changeCheckboxMutation = () => {
-    this.checkboxMutated = false;
   };
 
   render() {
@@ -529,7 +520,9 @@ class TreeNode extends Component {
       viewPermissions,
       editPermissions,
       onCheckChange,
-      onExpandNode
+      onExpandNode,
+      visible,
+      visibleChilds
     } = this.props;
     const paddingLeft = this.props.paddingLeft + defaultPaddingLeft;
     return (
@@ -547,6 +540,7 @@ class TreeNode extends Component {
                   : 1
                 : 1
           }}
+          style={{ display: visible ? true : "flex" }}
           title={this.getLabel()}
           onClick={this.selectNode}
           onDoubleClick={this.openFile}

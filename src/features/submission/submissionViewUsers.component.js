@@ -61,6 +61,7 @@ class SubmissionViewUsers extends Component {
       <div className="submissionViewUsers">
         <div className="submissionViewUsers__filters">
           <PopoverUsersFilter
+            restrictedRoles={[1, 4]}
             placement="left"
             onFiltersUpdate={this.onFiltersUpdate}
             imageClassName="submissionViewUsers__filters-image"
