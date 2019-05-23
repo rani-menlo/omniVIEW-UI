@@ -41,8 +41,15 @@ const Routes = () => {
             />
             <PrivateRoute path="/submission" component={SubmissionView} />
             <PrivateRoute
+              key="usermanagement"
               exact
               path="/usermanagement"
+              component={UserManagementContainer}
+            />
+            <PrivateRoute
+              key="usermanagement/parent"
+              exact
+              path="/usermanagement/parent"
               component={UserManagementContainer}
             />
             <PrivateRoute path="/usermanagement/add" component={AddUser} />

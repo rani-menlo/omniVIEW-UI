@@ -11,8 +11,7 @@ class NodeSequences extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      order: "desc",
-      sequencesList: []
+      order: "desc"
     };
   }
 
@@ -35,54 +34,11 @@ class NodeSequences extends Component {
     editPermissions: false
   };
 
-  static getList = sequences => {
-    let array = [];
-    _.map(sequences, sequence => {
-      array = array.concat(NodeSequences.getListSequence(sequence));
-    });
-    const newArray = _.sortBy(array, s => Number(s.name));
-    return newArray;
-  };
-
-  static getListSequence = (sequence, array = []) => {
-    if (!_.has(sequence, "checkboxValue")) {
-      sequence.checkboxValue = sequence.hasAccess
-        ? CHECKBOX.SELECTED_PARTIALLY
-        : CHECKBOX.DESELECTED;
-    }
-    array.push(sequence);
-    if (_.get(sequence, "childs.length", 0)) {
-      _.map(sequence.childs, seq => {
-        NodeSequences.getListSequence(seq, array);
-      });
-    }
-    return array;
-  };
-
-  static getDerivedStateFromProps(props, state) {
-    if (
-      (props.sequences.length && !state.sequencesList.length) ||
-      props.viewPermissions
-    ) {
-      return { sequencesList: NodeSequences.getList(props.sequences) };
-    }
-    return null;
-  }
-
-  componentDidMount() {
-    this.setState({
-      sequencesList: NodeSequences.getList(this.props.sequences)
-    });
-  }
-
   sortBy = sortBy => () => {
     const { onSortByChanged } = this.props;
-    let newArray = [...this.state.sequencesList];
-    newArray = this.state.order === "desc" ? newArray.reverse() : newArray;
     this.setState(
       {
-        order: this.state.order === "desc" ? "asc" : "desc",
-        sequencesList: newArray
+        order: this.state.order === "desc" ? "asc" : "desc"
       },
       () => onSortByChanged && onSortByChanged(sortBy)
     );
@@ -95,28 +51,48 @@ class NodeSequences extends Component {
 
   getTree = () => {
     const {
+      sequences,
       selected,
       submissionLabel,
-      editPermissions,
       viewPermissions,
-      onCheckboxChange
+      editPermissions
     } = this.props;
-    return _.map(this.props.sequences, sequence => (
+    return _.map(sequences, sequence => (
       <NodeSequenceTree
-        key={`${sequence.id}_${_.get(sequence, "hasAccess")}`}
+        key={sequence.id}
         sequence={sequence}
         onSelected={this.onSelected}
         selected={selected}
         submissionLabel={submissionLabel}
-        editPermissions={editPermissions}
+        onCheckboxChange={this.onCheckboxChange}
         viewPermissions={viewPermissions}
-        onCheckboxChange={onCheckboxChange}
+        editPermissions={editPermissions}
       />
     ));
   };
 
+  getListSequence = (sequence, array = []) => {
+    array.push(sequence);
+    if (_.get(sequence, "childs.length", 0)) {
+      _.map(sequence.childs, seq => {
+        this.getListSequence(seq, array);
+      });
+    }
+    return array;
+  };
+
+  getList = () => {
+    const { sequences } = this.props;
+    let array = [];
+    _.map(sequences, sequence => {
+      array = array.concat(this.getListSequence(sequence));
+    });
+    const newArray = _.sortBy(array, s => Number(s.name));
+    return this.state.order === "desc" ? newArray : newArray.reverse();
+  };
+
   onCheckboxChange = sequence => () => {
-    const sequencesList = [...this.state.sequencesList];
+    /* const sequencesList = [...this.state.sequencesList];
     const idx = _.findIndex(sequencesList, seq => seq.id === sequence.id);
     const newSequence = { ...sequence };
     if (newSequence.checkboxValue === CHECKBOX.SELECTED_PARTIALLY) {
@@ -143,8 +119,9 @@ class NodeSequences extends Component {
     }
 
     sequencesList[idx] = newSequence;
-    this.setState({ sequencesList });
-    this.props.onCheckboxChange && this.props.onCheckboxChange();
+    this.setState({ sequencesList }); */
+    this.props.onSequenceCheckboxChange &&
+      this.props.onSequenceCheckboxChange(sequence);
   };
 
   render() {
@@ -178,7 +155,7 @@ class NodeSequences extends Component {
         <div className="sequenceslist">
           {sortBy === "submission"
             ? this.getTree()
-            : _.map(this.state.sequencesList, sequence => (
+            : _.map(this.getList(), sequence => (
                 <div
                   key={sequence.id}
                   className={`sequenceslist__sequence global__cursor-pointer ${selected ===

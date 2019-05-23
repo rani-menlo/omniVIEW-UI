@@ -5,7 +5,7 @@ import styled from "styled-components";
 import _ from "lodash";
 import { TypesJson } from "./types";
 import Row from "../../uikit/components/row/row.component";
-import { isLoggedInAuthor } from "../../utils";
+import { isLoggedInAuthor, isLoggedInOmniciaAdmin, isLoggedInCustomerAdmin } from "../../utils";
 
 class NodeProperties extends Component {
   static propTypes = {
@@ -432,7 +432,12 @@ class NodeProperties extends Component {
 
   render() {
     const { properties, m1Json, role } = this.props;
-    if (!properties || (isLoggedInAuthor(role) && !properties.hasAccess)) {
+    if (
+      !properties ||
+      (!isLoggedInCustomerAdmin(role) &&
+        !isLoggedInOmniciaAdmin(role) &&
+        !properties.hasAccess)
+    ) {
       return null;
     }
     return (

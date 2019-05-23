@@ -45,6 +45,7 @@ const URI = {
   // Validation
   VALIDATE_SEQUENCE: `${path}validation/sequenceValidation`,
   // User
+  PROFILE_IMAGE: `${path}user/getProfileImage`,
   GET_USERS: `${path}user/getUsers`,
   ADD_USER: `${path}user/addUsers`,
   UPDATE_USER: `${path}user/updateUsers`,
@@ -58,7 +59,7 @@ const URI = {
   GET_RESOURCE_FILE: `${path}file/getResourceFile`,
   ASSIGN_FILE_PERMISSIONS: `${path}file/assignFilePermissions`,
   ASSIGN_SUBMISSION_PERMISSIONS: `${path}file/assignSubmissionPermissions`,
-  ASSIGN_SEQUENCE_PERMISSIONS: `${path}file/assignSequencePermissions`,
+  ASSIGN_SEQUENCE_PERMISSIONS: `${path}file/assignSequencePermissions`
 };
 
 const DATE_FORMAT = "MM/DD/YYYY";
@@ -69,4 +70,15 @@ const VIEWER = {
   OFFICE_VIEWER_MAX_SIZE: 10 * 1024 * 1024 // 10MB
 };
 
-export { URI, SERVER_URL, DATE_FORMAT, VIEWER, DEBOUNCE_TIME, ROLES, CHECKBOX };
+const IMAGE_SUPPORT_TYPES = ".JPG, .JPEG, .PNG";
+
+export {
+  URI,
+  SERVER_URL,
+  DATE_FORMAT,
+  VIEWER,
+  DEBOUNCE_TIME,
+  ROLES,
+  CHECKBOX,
+  IMAGE_SUPPORT_TYPES
+};

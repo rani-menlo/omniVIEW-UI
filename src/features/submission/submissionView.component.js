@@ -8,7 +8,11 @@ import styled from "styled-components";
 import TreeNode from "./treeNode.component";
 import NodeProperties from "./nodeProperties.component";
 import NodeSequences from "./nodeSequences.component";
-import { SubmissionActions, UsermanagementActions } from "../../redux/actions";
+import {
+  SubmissionActions,
+  UsermanagementActions,
+  ApiActions
+} from "../../redux/actions";
 import ValidationResults from "./validationResults.component";
 import {
   Sidebar,
@@ -29,7 +33,11 @@ import SubmissionViewUsers from "./submissionViewUsers.component";
 import { translate } from "../../translations/translator";
 import { CHECKBOX } from "../../constants";
 import { Permissions } from "./permissions";
-import { isLoggedInAuthor } from "../../utils";
+import {
+  isLoggedInAuthor,
+  isLoggedInOmniciaAdmin,
+  isLoggedInCustomerAdmin
+} from "../../utils";
 
 const TabPane = Tabs.TabPane;
 
@@ -52,7 +60,8 @@ class SubmissionView extends Component {
       selectedUser: null,
       showEditMessage: false,
       viewPermissions: false,
-      editPermissions: false
+      editPermissions: false,
+      sequences: []
     };
     this.parentHeaderRef = React.createRef();
     this.treeContainerRef = React.createRef();
@@ -65,7 +74,10 @@ class SubmissionView extends Component {
     if (this.parentHeaderRef.current) {
       state.parentHeaderHeight = this.parentHeaderRef.current.clientHeight + 28;
     }
-    if (isLoggedInAuthor(this.props.role)) {
+    if (
+      !isLoggedInOmniciaAdmin(this.props.role) &&
+      !isLoggedInCustomerAdmin(this.props.role)
+    ) {
       state.viewPermissions = true;
     }
     if (_.size(state)) {
@@ -74,10 +86,40 @@ class SubmissionView extends Component {
     this.initData();
   }
 
+  static getDerivedStateFromProps(props, state) {
+    if (props.sequences.length && !state.sequences.length) {
+      return {
+        sequences: SubmissionView.setDefaultPermissionsToSequences(
+          props.sequences
+        )
+      };
+    }
+    return null;
+  }
+
+  static setDefaultPermissionsToSequences = sequences => {
+    return _.map(sequences, sequence => {
+      sequence.checkboxValue = sequence.hasAccess
+        ? CHECKBOX.SELECTED
+        : CHECKBOX.DESELECTED;
+      if (_.size(sequence.childs)) {
+        sequence.childs = SubmissionView.setDefaultPermissionsToSequences(
+          sequence.childs
+        );
+      }
+      return sequence;
+    });
+  };
+
   initData = () => {
-    const { selectedSubmission } = this.props;
+    const { selectedSubmission, user } = this.props;
     if (selectedSubmission) {
-      this.props.actions.fetchSequences(selectedSubmission.id);
+      this.props.dispatch(
+        SubmissionActions.fetchSequencesWithPermissions(
+          selectedSubmission.id,
+          user
+        )
+      );
       this.props.dispatch(
         SubmissionActions.fetchLifeCycleJson(
           selectedSubmission,
@@ -140,6 +182,7 @@ class SubmissionView extends Component {
   };
 
   onCheckChange = node => {
+    this.props.dispatch(ApiActions.requestOnDemand());
     const checkboxValue =
       node.state.checkboxValue === CHECKBOX.SELECTED
         ? CHECKBOX.DESELECTED
@@ -151,6 +194,7 @@ class SubmissionView extends Component {
     this.setAccess(content, bool);
     this.modifyChildNodeAccess(node, bool);
     this.iterateNodeParent(node);
+    this.props.dispatch(ApiActions.successOnDemand());
   };
 
   modifyChildNodeAccess = (node, bool) => {
@@ -190,27 +234,6 @@ class SubmissionView extends Component {
       fileId && Permissions.GRANTED.file_ids.delete(fileId);
       fileId && Permissions.REVOKED.file_ids.add(fileId);
     }
-    console.log("GRANTED", Permissions.GRANTED, "REVOKED", Permissions.REVOKED);
-  };
-
-  onExpandNode = node => {
-    node.expand();
-    setTimeout(() => {
-      this.iterateNodeRefs(node);
-      this.iterateNodeParent(node);
-    }, 1);
-  };
-
-  iterateNodeRefs = node => {
-    if (node) {
-      _.forEach(node.nodeRefs, nodeRef => {
-        const currentNode = _.get(nodeRef, "current", null);
-        if (currentNode) {
-          currentNode.setCheckboxValue(node.state.checkboxValue);
-          this.iterateNodeRefs(currentNode);
-        }
-      });
-    }
   };
 
   iterateNodeParent = node => {
@@ -230,7 +253,12 @@ class SubmissionView extends Component {
           parentNode.setCheckboxValue(checkboxValue);
         }
       } else {
-        parentNode.props.content.hasAccess = !!checkboxValue;
+        const content = _.get(
+          parentNode.props.content,
+          "[ectd:ectd]",
+          parentNode.props.content
+        );
+        content.hasAccess = !!checkboxValue;
         parentNode.setCheckboxValue(checkboxValue);
       }
       this.iterateNodeParent(parentNode);
@@ -241,15 +269,12 @@ class SubmissionView extends Component {
     Permissions.clear();
     this.treeNodesMap.clear();
     this.props.actions.setSelectedSequence(sequence);
-    if (this.state.editPermissions || this.state.viewPermissions) {
-      this.props.dispatch(
-        SubmissionActions.fetchSequenceJson(sequence, this.state.selectedUser)
-      );
-    } else {
-      this.props.dispatch(
-        SubmissionActions.fetchSequenceJson(sequence, this.props.user)
-      );
-    }
+    this.props.dispatch(
+      SubmissionActions.fetchSequenceJson(
+        sequence,
+        this.state.selectedUser || this.props.user
+      )
+    );
     this.setState({
       treeExpand: false,
       selectedView: "",
@@ -333,7 +358,7 @@ class SubmissionView extends Component {
   };
 
   onViewTabChange = view => {
-    if (Permissions.hasChanges()) {
+    if (this.state.editPermissions && Permissions.hasChanges()) {
       this.showConfirmDialog(() => this.changeView(view));
       return;
     }
@@ -446,9 +471,26 @@ class SubmissionView extends Component {
       );
   };
 
-  refreshState = () => {
-    console.log(Permissions.GRANTED, Permissions.REVOKED);
-    this.setState({ sequenceSortBy: this.state.sequenceSortBy });
+  onSequenceCheckboxChange = checkedSequence => {
+    const sequences = [...this.state.sequences];
+    checkedSequence.checkboxValue =
+      checkedSequence.checkboxValue === CHECKBOX.SELECTED
+        ? CHECKBOX.DESELECTED
+        : CHECKBOX.SELECTED;
+    if (checkedSequence.checkboxValue === CHECKBOX.SELECTED) {
+      if (checkedSequence.hasAccess) {
+        Permissions.REVOKED.sequence_ids.delete(checkedSequence.id);
+      } else {
+        Permissions.GRANTED.sequence_ids.add(checkedSequence.id);
+      }
+    } else {
+      if (!checkedSequence.hasAccess) {
+        Permissions.GRANTED.sequence_ids.delete(checkedSequence.id);
+      } else {
+        Permissions.REVOKED.sequence_ids.add(checkedSequence.id);
+      }
+    }
+    this.setState({ sequences });
   };
 
   getMenu = () => {
@@ -523,11 +565,19 @@ class SubmissionView extends Component {
 
   viewPermissions = (user = this.state.selectedUser) => {
     const { selectedSubmission } = this.props;
+    Permissions.clear();
     if (selectedSubmission) {
+      this.props.dispatch(
+        SubmissionActions.resetSequences(selectedSubmission.id)
+      );
+      this.setState({ sequences: [] });
       this.props.dispatch(
         SubmissionActions.fetchSequencesWithPermissions(
           selectedSubmission.id,
-          user
+          user,
+          () => {
+            this.props.dispatch(ApiActions.requestOnDemand());
+          }
         )
       );
       if (this.props.selectedSequence) {
@@ -593,14 +643,20 @@ class SubmissionView extends Component {
           this.viewPermissions
         )
       );
-    } else {
-      SubmissionActions.assignSequencePermissions(
-        {
-          user_ids: [this.state.selectedUser.user_id],
-          granted_file_ids: [...Permissions.GRANTED.sequence_ids],
-          revoked_file_ids: [...Permissions.REVOKED.sequence_ids]
-        },
-        this.viewPermissions
+    }
+    if (
+      Permissions.GRANTED.sequence_ids.size ||
+      Permissions.REVOKED.sequence_ids.size
+    ) {
+      this.props.dispatch(
+        SubmissionActions.assignSequencePermissions(
+          {
+            user_ids: [this.state.selectedUser.user_id],
+            granted_sequence_ids: [...Permissions.GRANTED.sequence_ids],
+            revoked_sequence_ids: [...Permissions.REVOKED.sequence_ids]
+          },
+          this.viewPermissions
+        )
       );
     }
   };
@@ -608,7 +664,6 @@ class SubmissionView extends Component {
   render() {
     const {
       loading,
-      sequences,
       selectedSequence,
       sequenceJson,
       lifeCycleJson,
@@ -617,6 +672,7 @@ class SubmissionView extends Component {
       role
     } = this.props;
     const {
+      sequences,
       selectedView,
       selectedMode,
       sequenceSortBy,
@@ -645,7 +701,10 @@ class SubmissionView extends Component {
                 <span className="text">Dashboard</span>
               </div>
               <div className="submissionview__profilebar__title">
-                <img src="/images/omniview-cloud.jpg" />
+                <img
+                  src="/images/omniview-cloud.svg"
+                  style={{ height: "25px", width: "106px" }}
+                />
               </div>
               <div className="submissionview__profilebar__section">
                 <ProfileMenu />
@@ -797,9 +856,9 @@ class SubmissionView extends Component {
               expand={this.state.sequencesExpand}
             >
               <div className="panel panel-sequences">
-                <div style={{ height: showUsersSection ? "45%" : "93%" }}>
+                <div style={{ height: showUsersSection ? "45%" : "94%" }}>
                   <NodeSequences
-                    onCheckboxChange={this.refreshState}
+                    onSequenceCheckboxChange={this.onSequenceCheckboxChange}
                     submissionLabel={_.get(selectedSubmission, "name", "")}
                     selected={_.get(selectedSequence, "id", 0)}
                     sequences={sequences}
@@ -810,7 +869,8 @@ class SubmissionView extends Component {
                     editPermissions={editPermissions}
                   />
                 </div>
-                {!isLoggedInAuthor(role) && (
+                {(isLoggedInOmniciaAdmin(role) ||
+                  isLoggedInCustomerAdmin(role)) && (
                   <div
                     className="panel-sequences__users global__cursor-pointer"
                     onClick={this.openUsersSection}
@@ -859,41 +919,43 @@ class SubmissionView extends Component {
                 </div>
               )}
 
-              {viewPermissions && !isLoggedInAuthor(role) && (
-                <div className="panels__tree__permissions">
-                  <Row>
-                    <Avatar
-                      size="small"
-                      icon="user"
-                      size={35}
-                      style={{ marginRight: "8px" }}
-                    />
-                    <Text
-                      type="medium"
-                      text={translate("text.generic.viewingpermissions", {
-                        user: `${_.get(
-                          this.state.selectedUser,
-                          "first_name",
-                          ""
-                        )} ${_.get(this.state.selectedUser, "last_name", "")}`
-                      })}
-                    />
-                  </Row>
-                  <Row>
-                    <OmniButton
-                      type="secondary"
-                      label={translate("label.button.cancel")}
-                      buttonStyle={{ marginRight: "8px" }}
-                      onClick={this.hidePermissions}
-                    />
-                    <OmniButton
-                      type="primary"
-                      label={translate("label.button.editpermissions")}
-                      onClick={this.enableEditingPermissions}
-                    />
-                  </Row>
-                </div>
-              )}
+              {viewPermissions &&
+                (isLoggedInOmniciaAdmin(role) ||
+                  isLoggedInCustomerAdmin(role)) && (
+                  <div className="panels__tree__permissions">
+                    <Row>
+                      <Avatar
+                        size="small"
+                        icon="user"
+                        size={35}
+                        style={{ marginRight: "8px" }}
+                      />
+                      <Text
+                        type="medium"
+                        text={translate("text.generic.viewingpermissions", {
+                          user: `${_.get(
+                            this.state.selectedUser,
+                            "first_name",
+                            ""
+                          )} ${_.get(this.state.selectedUser, "last_name", "")}`
+                        })}
+                      />
+                    </Row>
+                    <Row>
+                      <OmniButton
+                        type="secondary"
+                        label={translate("label.button.cancel")}
+                        buttonStyle={{ marginRight: "8px" }}
+                        onClick={this.hidePermissions}
+                      />
+                      <OmniButton
+                        type="primary"
+                        label={translate("label.button.editpermissions")}
+                        onClick={this.enableEditingPermissions}
+                      />
+                    </Row>
+                  </div>
+                )}
 
               {editPermissions && (
                 <div className="panels__tree__permissions">
@@ -934,6 +996,7 @@ class SubmissionView extends Component {
               <TreeNode
                 ref={this.treeRef}
                 parentNode={this.treeRef}
+                role={role}
                 key={this.createKey()}
                 label={this.getTreeLabel()}
                 content={this.getContent()}

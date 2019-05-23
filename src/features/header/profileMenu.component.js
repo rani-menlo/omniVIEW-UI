@@ -6,6 +6,7 @@ import { LoginActions, CustomerActions } from "../../redux/actions";
 import { withRouter } from "react-router-dom";
 import { translate } from "../../translations/translator";
 import { isLoggedInOmniciaAdmin, isLoggedInCustomerAdmin } from "../../utils";
+import { ImageLoader } from "../../uikit/components";
 
 class ProfileMenu extends Component {
   signOut = () => {
@@ -23,8 +24,11 @@ class ProfileMenu extends Component {
         CustomerActions.setSelectedCustomer(this.props.oAdminCustomer)
       );
     }
-    console.log(this.props.history);
-    this.props.history.push("/usermanagement");
+    if (this.props.location.pathname === "/usermanagement") {
+      this.props.history.push("/usermanagement/parent");
+    } else {
+      this.props.history.push("/usermanagement");
+    }
   };
 
   getMenu = () => {
@@ -87,6 +91,12 @@ class ProfileMenu extends Component {
         <Dropdown overlay={this.getMenu()} trigger={["click"]}>
           <div className="profile__menu">
             <Avatar size="small" icon="user" />
+            <ImageLoader
+              path={user.profile}
+              width="36px"
+              height="36px"
+              type="circle"
+            />
             <span className="profile__menu-username">
               {`${_.get(user, "first_name", "")} ${_.get(
                 user,

@@ -8,6 +8,34 @@
     &-numeric {
       width: 18%;
     }
+    &__vertical {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-evenly;
+      margin-left: 20px;
+    }
+    &-image {
+      width: 100px;
+      height: 100px;
+    }
+  }
+  &__upload {
+    > .ant-upload-drag {
+      width: 500px !important;
+      height: 80px !important;
+    }
+    &-inner {
+      &-image {
+        margin-right: 12px;
+      }
+      &-drag {
+        @include text-regular(14px);
+      }
+      &-choose {
+        @include text-regular(14px);
+        color: $blue;
+      }
+    }
   }
   &__buttons {
     margin-top: 50px;

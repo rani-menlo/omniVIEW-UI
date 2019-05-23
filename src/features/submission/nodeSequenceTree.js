@@ -4,23 +4,13 @@ import _ from "lodash";
 import PropTypes from "prop-types";
 import { PermissionCheckbox } from "../../uikit/components";
 import { CHECKBOX } from "../../constants";
-import { Permissions } from "./permissions";
 
 class NodeSequenceTree extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      expand: true,
-      checkboxValue: CHECKBOX.RESET_DEFAULT
+      expand: true
     };
-  }
-
-  componentDidMount() {
-    this.setState({
-      checkboxValue: this.props.sequence.hasAccess
-        ? CHECKBOX.SELECTED_PARTIALLY
-        : CHECKBOX.DESELECTED
-    });
   }
 
   static propTypes = {
@@ -71,33 +61,6 @@ class NodeSequenceTree extends Component {
     })`;
   };
 
-  onCheckboxChange = e => {
-    let checkboxValue = this.state.checkboxValue;
-    const { sequence } = this.props;
-    if (checkboxValue === CHECKBOX.SELECTED_PARTIALLY) {
-      checkboxValue = CHECKBOX.DESELECTED;
-      Permissions.REVOKED.sequence_ids.add(sequence.json_path);
-      Permissions.GRANTED.sequence_ids.delete(sequence.json_path);
-    } else if (checkboxValue === CHECKBOX.DESELECTED) {
-      if (sequence.hasAccess) {
-        checkboxValue = CHECKBOX.SELECTED_PARTIALLY;
-        Permissions.REVOKED.sequence_ids.delete(sequence.json_path);
-      } else {
-        checkboxValue = CHECKBOX.SELECTED;
-        Permissions.GRANTED.sequence_ids.add(sequence.json_path);
-      }
-    } else {
-      if (!sequence.hasAccess) {
-        checkboxValue = CHECKBOX.DESELECTED;
-      } else {
-        checkboxValue = CHECKBOX.SELECTED_PARTIALLY;
-      }
-      Permissions.GRANTED.sequence_ids.delete(sequence.json_path);
-    }
-    this.setState({ checkboxValue });
-    this.props.onCheckboxChange && this.props.onCheckboxChange();
-  };
-
   render() {
     const {
       sequence,
@@ -118,7 +81,7 @@ class NodeSequenceTree extends Component {
             paddingLeft,
             opacity:
               viewPermissions || editPermissions
-                ? this.state.checkboxValue === CHECKBOX.DESELECTED
+                ? sequence.checkboxValue === CHECKBOX.DESELECTED
                   ? 0.3
                   : 1
                 : 1
@@ -128,8 +91,8 @@ class NodeSequenceTree extends Component {
           {editPermissions && (
             <PermissionCheckbox
               style={{ marginRight: "10px" }}
-              value={this.state.checkboxValue}
-              onChange={this.onCheckboxChange}
+              value={sequence.checkboxValue}
+              onChange={onCheckboxChange(sequence)}
             />
           )}
           {this.getCaretIcon()}
@@ -158,6 +121,8 @@ class NodeSequenceTree extends Component {
               viewPermissions={viewPermissions}
               submissionLabel={submissionLabel}
               onCheckboxChange={onCheckboxChange}
+              viewPermissions={viewPermissions}
+              editPermissions={editPermissions}
             />
           ))}
       </React.Fragment>

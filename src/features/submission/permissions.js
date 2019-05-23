@@ -23,13 +23,18 @@ export class Permissions {
 
   static hasChanges() {
     let size = 0;
-    _.map(Permissions.GRANTED, (val, key) => {
+    /*_.map(Permissions.GRANTED, (val, key) => {
       size += val.size;
     });
     if (!size) {
       _.map(Permissions.REVOKED, (val, key) => {
         size += val.size;
       });
+    } */
+
+    size = Permissions.GRANTED.file_ids.size;
+    if (!size) {
+      size = Permissions.REVOKED.file_ids.size;
     }
     return size !== 0;
   }

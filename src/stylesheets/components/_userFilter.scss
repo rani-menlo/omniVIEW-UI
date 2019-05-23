@@ -6,8 +6,15 @@
   &__roles {
     display: flex;
     justify-content: space-around;
+    width: 100%;
     > .ant-checkbox-group-item {
       @include text-regular;
+    }
+    &-justify {
+      > .ant-checkbox-group-item {
+        @include text-regular;
+        width: 46%;
+      }
     }
   }
   &__depts {

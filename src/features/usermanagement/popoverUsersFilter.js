@@ -22,21 +22,35 @@ class PopoverUsersFilter extends Component {
     super(props);
     this.state = {
       visible: false,
-      filters: _.cloneDeep(initialFiltersState)
+      filters: _.cloneDeep(initialFiltersState),
+      checkboxRoles: [],
+      checkboxDepts: []
     };
-    this.checkboxRoles = [];
-    this.checkboxDepts = [];
   }
 
   static propTypes = {
     imageClassName: PropTypes.string,
     placement: PropTypes.string,
-    restrictedRoles: PropTypes.arrayOf(PropTypes.number)
+    restrictedRoles: PropTypes.arrayOf(PropTypes.number),
+    selectedCustomer: PropTypes.object
   };
 
   static defaultProps = {
     imageClassName: ""
   };
+
+  static getDerivedStateFromProps(props, state) {
+    if (props.departments.length && !state.checkboxDepts.length) {
+      return {
+        checkboxDepts: _.map(props.departments, dept => ({
+          ...dept,
+          label: dept.name,
+          value: dept.id
+        }))
+      };
+    }
+    return null;
+  }
 
   componentDidMount() {
     this.props.dispatch(UsermanagementActions.getDepartments());
@@ -58,9 +72,7 @@ class PopoverUsersFilter extends Component {
       label: dept.name,
       value: dept.id
     }));
-    this.checkboxDepts = checkboxDepts;
-    this.checkboxRoles = checkboxRoles;
-    this.update();
+    this.setState({ checkboxDepts, checkboxRoles }, () => this.update());
   }
 
   onRoleChange = checkedValues => {
@@ -108,7 +120,7 @@ class PopoverUsersFilter extends Component {
       if (!this.state.filters.roles.length) {
         this.props.onFiltersUpdate({
           ...this.state.filters,
-          roles: _.map(this.checkboxRoles, role => role.value)
+          roles: _.map(this.state.checkboxRoles, role => role.value)
         });
       } else {
         this.props.onFiltersUpdate(this.state.filters);
@@ -131,12 +143,12 @@ class PopoverUsersFilter extends Component {
         placement={placement}
         content={
           <UsersFilter
-            roles={this.checkboxRoles}
+            roles={this.state.checkboxRoles}
             selectedSortBy={sortBy}
             selectedRoles={roles}
             selectedDepts={departments}
             resetDisabled={resetDisabled}
-            departments={this.checkboxDepts}
+            departments={this.state.checkboxDepts}
             reset={this.reset}
             cancel={this.cancel}
             update={this.update}
@@ -177,8 +189,7 @@ const Image = styled.img`
 
 function mapStateToProps(state) {
   return {
-    departments: state.Usermanagement.departments,
-    selectedCustomer: state.Customer.selectedCustomer
+    departments: state.Usermanagement.departments
   };
 }
 

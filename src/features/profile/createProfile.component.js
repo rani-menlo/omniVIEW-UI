@@ -7,12 +7,15 @@ import {
   Text,
   InputField,
   PhoneField,
-  OmniButton
+  OmniButton,
+  CircularImage
 } from "../../uikit/components";
 import Header from "../header/header.component";
 import { translate } from "../../translations/translator";
 import { isEmail, isPhone, isValidPwd } from "../../utils";
 import { LoginActions } from "../../redux/actions";
+import { Upload, Avatar } from "antd";
+import { IMAGE_SUPPORT_TYPES } from "../../constants";
 
 class CreateProfile extends Component {
   constructor(props) {
@@ -51,8 +54,10 @@ class CreateProfile extends Component {
       phone: {
         value: "",
         error: ""
-      }
+      },
+      selectedFile: null
     };
+    this.uploadContainer = React.createRef();
   }
 
   componentDidMount() {
@@ -215,21 +220,37 @@ class CreateProfile extends Component {
       return;
     }
 
-    let reqObject = {
+    /* let reqObject = {
       user_name: state.username.value,
       password: state.password.value,
       firstname: state.fname.value,
       lastname: state.lname.value,
       emailaddress: state.email.value,
       phonenumber: state.phone.value
-    };
+    }; */
+    const reqObject = new FormData();
+    reqObject.append("user_name", state.username.value);
+    reqObject.append("firstname", state.fname.value);
+    reqObject.append("lastname", state.lname.value);
+    reqObject.append("emailaddress", state.email.value);
+    reqObject.append("phonenumber", state.phone.value);
+
+    if (this.state.selectedFile) {
+      const ext = this.state.selectedFile.name.substring(
+        this.state.selectedFile.name.lastIndexOf(".") + 1
+      );
+      reqObject.append("profileimage", this.state.selectedFile, {
+        header: { contentType: `image/${ext}; charset=UTF-8` }
+      });
+    }
 
     if (state.editProfile) {
       if (state.showChangePassword && state.oldPassword.value) {
-        reqObject.oldpassword = state.oldPassword.value;
-      } else {
-        reqObject = _.omit(reqObject, "password");
+        reqObject.append("oldpassword", state.oldPassword.value);
+        reqObject.append("password", state.password.value);
       }
+    } else {
+      reqObject.append("password", state.password.value);
     }
 
     this.props.dispatch(
@@ -239,6 +260,25 @@ class CreateProfile extends Component {
 
   showPasswordFields = () => {
     this.setState({ showChangePassword: true });
+  };
+
+  onFileSelected = info => {
+    const { file, target } = info;
+    if (target) {
+      this.setState({ selectedFile: target.files[0] });
+      return;
+    }
+    if (file.status === "uploading") {
+      this.setState({ selectedFile: file.originFileObj });
+    }
+  };
+
+  deletePhoto = () => {
+    this.setState({ selectedFile: null });
+  };
+
+  replacePhoto = () => {
+    this.uploadContainer.current.click();
   };
 
   render() {
@@ -433,6 +473,66 @@ class CreateProfile extends Component {
                 onChange={this.onPhoneChange}
               />
             </div>
+            <Text
+              textStyle={{ marginBottom: "12px" }}
+              type="regular"
+              size="16px"
+              text="Profile Picture"
+            />
+            {!this.state.selectedFile && (
+              <Upload.Dragger
+                className="createProfile__upload"
+                multiple={false}
+                showUploadList={false}
+                onChange={this.onFileSelected}
+                accept={IMAGE_SUPPORT_TYPES}
+              >
+                <p className="createProfile__upload-inner">
+                  <img
+                    src="/images/upload.svg"
+                    className="createProfile__upload-inner-image"
+                  />
+                  <span className="createProfile__upload-inner-drag">
+                    Drag & Drop or{" "}
+                  </span>
+                  <span className="createProfile__upload-inner-choose">
+                    Choose File
+                  </span>
+                </p>
+              </Upload.Dragger>
+            )}
+            <input
+              type="file"
+              accept={IMAGE_SUPPORT_TYPES}
+              ref={this.uploadContainer}
+              style={{ display: "none" }}
+              onChange={this.onFileSelected}
+            />
+            {this.state.selectedFile && (
+              <div className="createProfile__fields">
+                <CircularImage
+                  file={this.state.selectedFile}
+                  className="createProfile__fields-image"
+                />
+                <div className="createProfile__fields__vertical">
+                  <Text
+                    className="global__link"
+                    textStyle={{ marginBottom: "12px" }}
+                    type="regular"
+                    size="12px"
+                    text="Replace Photo"
+                    onClick={this.replacePhoto}
+                  />
+                  <Text
+                    className="global__link"
+                    type="regular"
+                    size="12px"
+                    text="Delete Photo"
+                    onClick={this.deletePhoto}
+                  />
+                </div>
+              </div>
+            )}
             <div className="createProfile__buttons">
               <OmniButton
                 className="createProfile__buttons-btn"

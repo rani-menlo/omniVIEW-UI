@@ -90,9 +90,9 @@ class UserManagementContainer extends Component {
     this.setState({ viewBy: type }, () => this.fetchUsers());
   };
 
-  componentDidMount() {
+  /* componentDidMount() {
     this.fetchUsers();
-  }
+  } */
 
   fetchUsers = () => {
     const { selectedCustomer } = this.props;
@@ -249,7 +249,10 @@ class UserManagementContainer extends Component {
         <Header />
         <SubHeader>
           <ListViewGridView viewBy={viewBy} changeView={this.changeView} />
-          <PopoverUsersFilter onFiltersUpdate={this.onFiltersUpdate} />
+          <PopoverUsersFilter
+            onFiltersUpdate={this.onFiltersUpdate}
+            selectedCustomer={selectedCustomer}
+          />
           <Text
             type="extra_bold"
             size="20px"

@@ -451,11 +451,11 @@ class TreeNode extends Component {
 
   openFile = () => {
     const { properties } = this.state;
-    console.log(this.props);
-    console.log(isLoggedInAuthor(this.props.role));
     if (
       this.props.editPermissions ||
-      (isLoggedInAuthor(this.props.role) && !properties.hasAccess)
+      (!isLoggedInCustomerAdmin(this.props.role) &&
+        !isLoggedInOmniciaAdmin(this.props.role) &&
+        !properties.hasAccess)
     ) {
       return;
     }

@@ -1,13 +1,11 @@
 import React, { Component } from "react";
-import { connect } from "react-redux";
 import { Icon } from "antd";
 import PropTypes from "prop-types";
 import _ from "lodash";
 import uuidv4 from "uuid/v4";
 import { PermissionCheckbox } from "../../uikit/components";
 import { CHECKBOX } from "../../constants";
-import { Permissions } from "./permissions";
-import { isLoggedInAuthor } from "../../utils";
+import { isLoggedInAuthor, isLoggedInCustomerAdmin, isLoggedInOmniciaAdmin } from "../../utils";
 
 class TreeNode extends Component {
   constructor(props) {
@@ -20,7 +18,6 @@ class TreeNode extends Component {
       prevProps: this.props,
       checkboxValue: CHECKBOX.RESET_DEFAULT
     };
-    this.checkboxMutated = false;
     this.nodeRefs = [];
     this.nodeElementRef = React.createRef();
   }
@@ -195,10 +192,6 @@ class TreeNode extends Component {
         : CHECKBOX.DESELECTED
     });
     this.nodeRefs = _.map(nodes, node => React.createRef());
-  }
-
-  componentWillUnmount() {
-    console.log(this.state.properties.title, this.state.properties.label);
   }
 
   removeSubfoldersAndAppendLeafToParent = folder => {
@@ -437,11 +430,11 @@ class TreeNode extends Component {
 
   openFile = () => {
     const { properties } = this.state;
-    console.log(this.props);
-    console.log(isLoggedInAuthor(this.props.role));
     if (
       this.props.editPermissions ||
-      (isLoggedInAuthor(this.props.role) && !properties.hasAccess)
+      (!isLoggedInCustomerAdmin(this.props.role) &&
+        !isLoggedInOmniciaAdmin(this.props.role) &&
+        !properties.hasAccess)
     ) {
       return;
     }
@@ -495,26 +488,11 @@ class TreeNode extends Component {
     this.setState({
       checkboxValue
     });
-    /* const { properties } = this.state;
-
-    if (checkboxValue === CHECKBOX.SELECTED) {
-      properties.fileID && Permissions.GRANTED.file_ids.add(properties.fileID);
-      properties.fileID &&
-        Permissions.REVOKED.file_ids.delete(properties.fileID);
-    } else {
-      properties.fileID &&
-        Permissions.GRANTED.file_ids.delete(properties.fileID);
-      properties.fileID && Permissions.REVOKED.file_ids.add(properties.fileID);
-    } */
   };
 
   onCheckboxChange = e => {
     this.checkboxMutated = true;
     this.props.onCheckChange && this.props.onCheckChange(this);
-  };
-
-  changeCheckboxMutation = () => {
-    this.checkboxMutated = false;
   };
 
   render() {
@@ -529,7 +507,8 @@ class TreeNode extends Component {
       viewPermissions,
       editPermissions,
       onCheckChange,
-      onExpandNode
+      onExpandNode,
+      role
     } = this.props;
     const paddingLeft = this.props.paddingLeft + defaultPaddingLeft;
     return (
@@ -571,6 +550,7 @@ class TreeNode extends Component {
             <TreeNode
               ref={this.nodeRefs[idx]}
               parentNode={this}
+              role={role}
               expand={this.props.expand}
               paddingLeft={paddingLeft}
               key={node.label + idx + mode}
@@ -593,10 +573,4 @@ class TreeNode extends Component {
   }
 }
 
-function mapStateToProps(state) {
-  return {
-    role: state.Login.role
-  };
-}
-
-export default connect(mapStateToProps)(TreeNode);
+export default TreeNode;

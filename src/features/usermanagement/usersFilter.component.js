@@ -33,25 +33,25 @@ const UsersFilter = ({
     <div className="userfilter__sortbuttons">
       <Text
         className={`userfilter__sortbuttons-bordered${
-          selectedSortBy === "first_name" ? "-colored" : ""
+          _.includes(selectedSortBy, "first_name") ? "-colored" : ""
         }`}
         text={`${translate("label.form.fname")}, ${translate(
           "label.form.lname"
         )}`}
         size="12px"
         type="regular"
-        onClick={sortChange("first_name", onSortChange)}
+        onClick={sortChange(["first_name"], onSortChange)}
       />
       <Text
         className={`userfilter__sortbuttons-bordered${
-          selectedSortBy === "last_name" ? "-colored" : ""
+          _.includes(selectedSortBy, "last_name") ? "-colored" : ""
         }`}
         text={`${translate("label.form.lname")}, ${translate(
           "label.form.fname"
         )}`}
         size="12px"
         type="regular"
-        onClick={sortChange("last_name", onSortChange)}
+        onClick={sortChange(["last_name"], onSortChange)}
       />
       {/* <OmniButton
         type="secondary"
@@ -77,7 +77,9 @@ const UsersFilter = ({
       value={selectedRoles}
       options={roles}
       onChange={onRoleChange}
-      className="userfilter__roles"
+      className={`userfilter__roles ${
+        _.get(roles, "length", 0) === 2 ? "userfilter__roles-justify" : ""
+      }`}
     />
     <Text
       type="medium"

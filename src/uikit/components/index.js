@@ -18,6 +18,8 @@ import { default as InputField } from "./formfield/InputField";
 import { default as NumericInput } from "./formfield/numericInput";
 import { default as PhoneField } from "./formfield/phoneField";
 import { default as Text } from "./text/text.component";
+import { default as CircularImage } from "./image/circularImage.component";
+import { default as ImageLoader } from "./image/imageLoader.component";
 
 export {
   OmniButton,
@@ -39,5 +41,7 @@ export {
   InputField,
   PhoneField,
   NumericInput,
-  Text
+  Text,
+  CircularImage,
+  ImageLoader
 };
