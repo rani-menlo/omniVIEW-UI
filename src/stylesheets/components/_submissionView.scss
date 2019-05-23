@@ -85,7 +85,16 @@
       height: 100%;
       &-sequences {
         border-right: solid 0.2px;
-        overflow: auto;
+        &__users {
+          padding: 10px;
+          display: flex;
+          align-items: center;
+          height: 33px;
+          justify-content: space-between;
+          box-shadow: inset 0 1px 0 0 $shadowed-steel,
+            inset 0 -1px 0 0 $shadowed-steel;
+          background-color: $shadowed-steel;
+        }
       }
       &-properties {
         border-left: solid 0.2px;
@@ -93,8 +102,27 @@
       }
     }
     .panels__tree {
-      overflow: auto;
+      overflow-y: auto;
+      overflow-x: hidden;
       height: 100%;
+      &__editblock {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 32px;
+        padding: 0px 10px;
+        background-color: $broken-blue;
+        &-text {
+          color: $grams-hair;
+        }
+      }
+      &__permissions {
+        display: flex;
+        justify-content: space-between;
+        height: 48px;
+        padding: 0px 10px;
+        border-bottom: 0.2px solid;
+      }
     }
   }
   &__siders {

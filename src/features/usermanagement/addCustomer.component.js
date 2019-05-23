@@ -500,6 +500,7 @@ class AddCustomer extends Component {
                     {translate("label.product.omniview")}
                   </Checkbox>
                   <Checkbox
+                    disabled
                     value="omniFile"
                     className="addUser__section-checkbox"
                     checked={omniFile}
@@ -634,7 +635,7 @@ class AddCustomer extends Component {
           <DeactivateModal
             isActive={this.state.statusActive}
             visible={this.state.showDeactivateModal}
-            title={translate("label.usermgmt.deactivateacc")}
+            title={`${translate("label.usermgmt.deactivateacc")}?`}
             content={translate("text.customer.deactivate")}
             closeModal={this.closeModal}
             deactivate={this.deactivate}

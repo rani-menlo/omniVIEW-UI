@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import { Icon } from "antd";
 import _ from "lodash";
 import PropTypes from "prop-types";
+import { PermissionCheckbox } from "../../uikit/components";
+import { CHECKBOX } from "../../constants";
 
 class NodeSequenceTree extends Component {
   constructor(props) {
@@ -14,11 +16,16 @@ class NodeSequenceTree extends Component {
   static propTypes = {
     paddingLeft: PropTypes.number,
     sequence: PropTypes.object,
-    submissionLabel: PropTypes.string
+    onCheckboxChange: PropTypes.func,
+    submissionLabel: PropTypes.string,
+    viewPermissions: PropTypes.bool,
+    editPermissions: PropTypes.bool
   };
 
   static defaultProps = {
-    paddingLeft: 0 // px
+    paddingLeft: 0, // px
+    viewPermissions: false,
+    editPermissions: false
   };
 
   toggle = () => {
@@ -60,20 +67,45 @@ class NodeSequenceTree extends Component {
       paddingLeft,
       onSelected,
       selected,
-      submissionLabel
+      submissionLabel,
+      editPermissions,
+      viewPermissions,
+      onCheckboxChange
     } = this.props;
     return (
       <React.Fragment>
         <div
-          className={`node global__cursor-pointer ${selected === sequence &&
+          className={`node global__cursor-pointer ${selected === sequence.id &&
             "global__node-selected"}`}
-          style={{ paddingLeft }}
-          onClick={onSelected(sequence)}
+          style={{
+            paddingLeft,
+            opacity:
+              viewPermissions || editPermissions
+                ? sequence.checkboxValue === CHECKBOX.DESELECTED
+                  ? 0.3
+                  : 1
+                : 1
+          }}
           title={this.getLabel()}
         >
+          {editPermissions && (
+            <PermissionCheckbox
+              style={{ marginRight: "10px" }}
+              value={sequence.checkboxValue}
+              onChange={onCheckboxChange(sequence)}
+            />
+          )}
           {this.getCaretIcon()}
-          <Icon type="folder" theme="filled" className="global__file-folder" />
-          <span className="global__node-text global__cursor-pointer">
+          <Icon
+            type="folder"
+            theme="filled"
+            className="global__file-folder"
+            onClick={onSelected(sequence)}
+          />
+          <span
+            className="global__node-text global__cursor-pointer"
+            onClick={onSelected(sequence)}
+          >
             {this.getLabel()}
           </span>
         </div>
@@ -85,7 +117,12 @@ class NodeSequenceTree extends Component {
               paddingLeft={paddingLeft + 35}
               onSelected={onSelected}
               selected={selected}
+              editPermissions={editPermissions}
+              viewPermissions={viewPermissions}
               submissionLabel={submissionLabel}
+              onCheckboxChange={onCheckboxChange}
+              viewPermissions={viewPermissions}
+              editPermissions={editPermissions}
             />
           ))}
       </React.Fragment>

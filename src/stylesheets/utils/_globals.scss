@@ -64,6 +64,11 @@
   justify-content: center;
 }
 
+.global__link {
+  color: $sky-of-margritte !important;
+  cursor: pointer;
+}
+
 .global__disabled-box {
   border: 0 !important;
   background: $black;

@@ -1,11 +1,13 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
 import { Icon } from "antd";
 import PropTypes from "prop-types";
 import _ from "lodash";
 import uuidv4 from "uuid/v4";
 import { PermissionCheckbox } from "../../uikit/components";
 import { CHECKBOX } from "../../constants";
-import { isLoggedInAuthor, isLoggedInCustomerAdmin, isLoggedInOmniciaAdmin } from "../../utils";
+import { Permissions } from "./permissions";
+import { isLoggedInAuthor } from "../../utils";
 
 class TreeNode extends Component {
   constructor(props) {
@@ -18,6 +20,7 @@ class TreeNode extends Component {
       prevProps: this.props,
       checkboxValue: CHECKBOX.RESET_DEFAULT
     };
+    this.checkboxMutated = false;
     this.nodeRefs = [];
     this.nodeElementRef = React.createRef();
   }
@@ -256,7 +259,6 @@ class TreeNode extends Component {
       const subFoldr = {};
       _.map(array, item => {
         subFoldr.title = item.title;
-        subFoldr.hasAccess = item.hasAccess;
         subFoldr["_stfKey"] = item["_stfKey"];
         subFoldr["_omitKey"] = item["_omitKey"];
         _.map(item, (v, k) => {
@@ -307,6 +309,25 @@ class TreeNode extends Component {
     const operation = _.get(items, `[${items.length - 1}].operation`, "");
     obj.showInCurrentView =
       operation !== "delete" && obj.operation === operation;
+  };
+
+  toggle = () => {
+    if (this.state.expand) {
+      this.collapse();
+    } else {
+      this.expand();
+      if (this.props.editPermissions) {
+        this.props.onExpandNode && this.props.onExpandNode(this);
+      }
+    }
+  };
+
+  expand = () => {
+    !this.state.expand && this.setState({ expand: true });
+  };
+
+  collapse = () => {
+    this.state.expand && this.setState({ expand: false });
   };
 
   getCaretIcon = () => {
@@ -465,29 +486,21 @@ class TreeNode extends Component {
     }
   };
 
-  toggle = () => {
-    if (this.state.expand) {
-      this.collapse();
-    } else {
-      this.expand();
-      /* if (this.props.editPermissions) {
-        this.props.onExpandNode && this.props.onExpandNode(this);
-      } */
-    }
-  };
-
-  expand = () => {
-    !this.state.expand && this.setState({ expand: true });
-  };
-
-  collapse = () => {
-    this.state.expand && this.setState({ expand: false });
-  };
-
   setCheckboxValue = checkboxValue => {
     this.setState({
       checkboxValue
     });
+    const { properties } = this.state;
+
+    if (checkboxValue === CHECKBOX.SELECTED) {
+      properties.fileID && Permissions.GRANTED.file_ids.add(properties.fileID);
+      properties.fileID &&
+        Permissions.REVOKED.file_ids.delete(properties.fileID);
+    } else {
+      properties.fileID &&
+        Permissions.GRANTED.file_ids.delete(properties.fileID);
+      properties.fileID && Permissions.REVOKED.file_ids.add(properties.fileID);
+    }
   };
 
   onCheckboxChange = e => {
@@ -508,7 +521,8 @@ class TreeNode extends Component {
       editPermissions,
       onCheckChange,
       onExpandNode,
-      role
+      visible,
+      visibleChilds
     } = this.props;
     const paddingLeft = this.props.paddingLeft + defaultPaddingLeft;
     return (
@@ -526,6 +540,7 @@ class TreeNode extends Component {
                   : 1
                 : 1
           }}
+          style={{ display: visible ? true : "flex" }}
           title={this.getLabel()}
           onClick={this.selectNode}
           onDoubleClick={this.openFile}
@@ -550,7 +565,6 @@ class TreeNode extends Component {
             <TreeNode
               ref={this.nodeRefs[idx]}
               parentNode={this}
-              role={role}
               expand={this.props.expand}
               paddingLeft={paddingLeft}
               key={node.label + idx + mode}
@@ -573,4 +587,10 @@ class TreeNode extends Component {
   }
 }
 
-export default TreeNode;
+function mapStateToProps(state) {
+  return {
+    role: state.Login.role
+  };
+}
+
+export default connect(mapStateToProps)(TreeNode);

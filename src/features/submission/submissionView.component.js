@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
-import { Icon, Tabs, Modal, Menu } from "antd";
+import { Icon, Tabs, Modal, Menu, Avatar } from "antd";
 import _ from "lodash";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
@@ -8,13 +8,20 @@ import styled from "styled-components";
 import TreeNode from "./treeNode.component";
 import NodeProperties from "./nodeProperties.component";
 import NodeSequences from "./nodeSequences.component";
-import { SubmissionActions } from "../../redux/actions";
+import {
+  SubmissionActions,
+  UsermanagementActions,
+  ApiActions
+} from "../../redux/actions";
 import ValidationResults from "./validationResults.component";
 import {
   Sidebar,
   Loader,
   Footer,
-  DraggableModal
+  DraggableModal,
+  Text,
+  OmniButton,
+  Row
 } from "../../uikit/components";
 import {
   getSequenceJson,
@@ -22,6 +29,15 @@ import {
   getSequences
 } from "../../redux/selectors/submissionView.selector";
 import ProfileMenu from "../header/profileMenu.component";
+import SubmissionViewUsers from "./submissionViewUsers.component";
+import { translate } from "../../translations/translator";
+import { CHECKBOX } from "../../constants";
+import { Permissions } from "./permissions";
+import {
+  isLoggedInAuthor,
+  isLoggedInOmniciaAdmin,
+  isLoggedInCustomerAdmin
+} from "../../utils";
 
 const TabPane = Tabs.TabPane;
 
@@ -39,7 +55,13 @@ class SubmissionView extends Component {
       nodeProperties: null,
       treePanelWidth: 50,
       openValidationModal: false,
-      parentHeaderHeight: 0
+      parentHeaderHeight: 0,
+      showUsersSection: false,
+      selectedUser: null,
+      showEditMessage: false,
+      viewPermissions: false,
+      editPermissions: false,
+      sequences: []
     };
     this.parentHeaderRef = React.createRef();
     this.treeContainerRef = React.createRef();
@@ -48,17 +70,64 @@ class SubmissionView extends Component {
   }
 
   componentDidMount() {
-    const { selectedSubmission } = this.props;
+    let state = {};
     if (this.parentHeaderRef.current) {
-      const parentHeaderHeight =
-        this.parentHeaderRef.current.clientHeight + 4 + 28;
-      this.setState({ parentHeaderHeight });
+      state.parentHeaderHeight = this.parentHeaderRef.current.clientHeight + 28;
     }
-    if (selectedSubmission) {
-      this.props.actions.fetchSequences(selectedSubmission.id);
-      this.props.actions.fetchLifeCycleJson(selectedSubmission);
+    if (
+      !isLoggedInOmniciaAdmin(this.props.role) &&
+      !isLoggedInCustomerAdmin(this.props.role)
+    ) {
+      state.viewPermissions = true;
     }
+    if (_.size(state)) {
+      this.setState({ ...state });
+    }
+    this.initData();
   }
+
+  static getDerivedStateFromProps(props, state) {
+    if (props.sequences.length && !state.sequences.length) {
+      return {
+        sequences: SubmissionView.setDefaultPermissionsToSequences(
+          props.sequences
+        )
+      };
+    }
+    return null;
+  }
+
+  static setDefaultPermissionsToSequences = sequences => {
+    return _.map(sequences, sequence => {
+      sequence.checkboxValue = sequence.hasAccess
+        ? CHECKBOX.SELECTED
+        : CHECKBOX.DESELECTED;
+      if (_.size(sequence.childs)) {
+        sequence.childs = SubmissionView.setDefaultPermissionsToSequences(
+          sequence.childs
+        );
+      }
+      return sequence;
+    });
+  };
+
+  initData = () => {
+    const { selectedSubmission, user } = this.props;
+    if (selectedSubmission) {
+      this.props.dispatch(
+        SubmissionActions.fetchSequencesWithPermissions(
+          selectedSubmission.id,
+          user
+        )
+      );
+      this.props.dispatch(
+        SubmissionActions.fetchLifeCycleJson(
+          selectedSubmission,
+          this.props.user
+        )
+      );
+    }
+  };
 
   toggle = callback => {
     this.clearTreeNodesMap();
@@ -112,16 +181,114 @@ class SubmissionView extends Component {
     this.setState({ selectedNodeId: id, nodeProperties: properties });
   };
 
-  onSelectedSequence = sequence => {
+  onCheckChange = node => {
+    this.props.dispatch(ApiActions.requestOnDemand());
+    const checkboxValue =
+      node.state.checkboxValue === CHECKBOX.SELECTED
+        ? CHECKBOX.DESELECTED
+        : CHECKBOX.SELECTED;
+    node.setCheckboxValue(checkboxValue);
+    let content = node.props.content;
+    content = _.get(content, "[ectd:ectd]", content);
+    const bool = !content.hasAccess;
+    this.setAccess(content, bool);
+    this.modifyChildNodeAccess(node, bool);
+    this.iterateNodeParent(node);
+    this.props.dispatch(ApiActions.successOnDemand());
+  };
+
+  modifyChildNodeAccess = (node, bool) => {
+    if (node.nodeRefs) {
+      _.forEach(node.nodeRefs, nodeRef => {
+        const currentNode = _.get(nodeRef, "current", null);
+        if (currentNode) {
+          this.setAccess(currentNode.props.content, bool);
+          currentNode.setCheckboxValue(+bool);
+          this.modifyChildNodeAccess(currentNode, bool);
+        } else {
+          this.modifyContentAccess(node, bool);
+        }
+      });
+    } else {
+      this.modifyContentAccess(node, bool);
+    }
+  };
+
+  modifyContentAccess = (node, bool) => {
+    node = _.get(node, "props.content") || node;
+    _.map(node, val => {
+      if (typeof val === "object") {
+        this.setAccess(val, bool);
+        this.modifyChildNodeAccess(val, bool);
+      }
+    });
+  };
+
+  setAccess = (obj, bool) => {
+    const fileId = obj.fileID;
+    obj.hasAccess = bool;
+    if (bool === !!CHECKBOX.SELECTED) {
+      fileId && Permissions.GRANTED.file_ids.add(fileId);
+      fileId && Permissions.REVOKED.file_ids.delete(fileId);
+    } else {
+      fileId && Permissions.GRANTED.file_ids.delete(fileId);
+      fileId && Permissions.REVOKED.file_ids.add(fileId);
+    }
+  };
+
+  iterateNodeParent = node => {
+    if (node && node.props.parentNode) {
+      const { parentNode } = node.props;
+      if (parentNode.current) {
+        return;
+      }
+      const checkboxValue = +node.props.content.hasAccess;
+      if (checkboxValue === CHECKBOX.DESELECTED) {
+        const selected = _.find(
+          _.get(parentNode, "nodeRefs", []),
+          node => node.current.props.content.hasAccess === !!CHECKBOX.SELECTED
+        );
+        if (!selected) {
+          parentNode.props.content.hasAccess = !!checkboxValue;
+          parentNode.setCheckboxValue(checkboxValue);
+        }
+      } else {
+        const content = _.get(
+          parentNode.props.content,
+          "[ectd:ectd]",
+          parentNode.props.content
+        );
+        content.hasAccess = !!checkboxValue;
+        parentNode.setCheckboxValue(checkboxValue);
+      }
+      this.iterateNodeParent(parentNode);
+    }
+  };
+
+  onSequenceSelected = sequence => {
+    Permissions.clear();
     this.treeNodesMap.clear();
     this.props.actions.setSelectedSequence(sequence);
-    this.props.actions.fetchSequenceJson(sequence);
+    this.props.dispatch(
+      SubmissionActions.fetchSequenceJson(
+        sequence,
+        this.state.selectedUser || this.props.user
+      )
+    );
     this.setState({
       treeExpand: false,
       selectedView: "",
       nodeProperties: null
     });
     this.closeValidationModal();
+  };
+
+  onSelectedSequence = sequence => {
+    if (Permissions.hasChanges()) {
+      this.showConfirmDialog(() => this.onSequenceSelected(sequence));
+      return;
+    }
+    this.onSequenceSelected(sequence);
   };
 
   togglePropertiesPane = () => {
@@ -166,14 +333,36 @@ class SubmissionView extends Component {
     }
   };
 
-  onViewTabChange = view => {
-    this.setState({ selectedView: view });
+  showConfirmDialog = callback => {
+    Modal.confirm({
+      title: translate("text.submission.unsaved"),
+      okText: translate("label.button.continue"),
+      cancelText: translate("label.button.cancel"),
+      onOk: callback
+    });
+  };
+
+  changeView = view => {
+    Permissions.clear();
+    const { selectedUser } = this.state;
+    const { selectedSubmission, user } = this.props;
     this.props.actions.setSelectedSequence(null);
-    if (view === "lifeCycle") {
-      const { selectedSubmission } = this.props;
-      this.props.actions.fetchLifeCycleJson(selectedSubmission);
-    }
+    this.props.dispatch(
+      SubmissionActions.fetchLifeCycleJson(
+        selectedSubmission,
+        selectedUser || user
+      )
+    );
     this.closeValidationModal();
+    this.setState({ selectedView: view });
+  };
+
+  onViewTabChange = view => {
+    if (this.state.editPermissions && Permissions.hasChanges()) {
+      this.showConfirmDialog(() => this.changeView(view));
+      return;
+    }
+    this.changeView(view);
   };
 
   onModeTabChange = mode => {
@@ -240,26 +429,68 @@ class SubmissionView extends Component {
       selectedSequence,
       selectedSubmission,
       sequenceJson,
-      lifeCycleJson
+      lifeCycleJson,
+      user
     } = this.props;
     const { selectedView, selectedMode } = this.state;
-    let key = `${selectedView}_${selectedMode}_`;
+
+    /* let key = `${selectedView}_${selectedMode}_`;
     if (selectedSequence) {
       key = `${key}${_.get(selectedSequence, "json_path", "")}#${_.size(
         sequenceJson
-      )}`;
+      )}_${_.get(sequenceJson, "[ectd:ectd][hash]", false)}`;
     } else {
       key = `${key}${_.get(
         selectedSubmission,
         "life_cycle_json_path",
         ""
-      )}#${_.size(lifeCycleJson)}`;
-    }
-    return key;
+      )}#${_.size(lifeCycleJson)}_${_.get(
+        lifeCycleJson,
+        "[ectd:ectd][hash]",
+        false
+      )}`;
+    } */
+
+    return selectedSequence
+      ? _.get(sequenceJson, "[ectd:ectd][hash]", false)
+      : _.get(lifeCycleJson, "[ectd:ectd][hash]", false);
   };
 
   onSequenceSortByChanged = sortBy => {
     this.setState({ sequenceSortBy: sortBy });
+  };
+
+  fetchUsers = (filters = "") => {
+    const { selectedCustomer } = this.props;
+    selectedCustomer &&
+      this.props.dispatch(
+        UsermanagementActions.fetchUsers({
+          customerId: selectedCustomer.id,
+          ...filters
+        })
+      );
+  };
+
+  onSequenceCheckboxChange = checkedSequence => {
+    const sequences = [...this.state.sequences];
+    checkedSequence.checkboxValue =
+      checkedSequence.checkboxValue === CHECKBOX.SELECTED
+        ? CHECKBOX.DESELECTED
+        : CHECKBOX.SELECTED;
+    if (checkedSequence.checkboxValue === CHECKBOX.SELECTED) {
+      if (checkedSequence.hasAccess) {
+        Permissions.REVOKED.sequence_ids.delete(checkedSequence.id);
+      } else {
+        Permissions.GRANTED.sequence_ids.add(checkedSequence.id);
+      }
+    } else {
+      if (!checkedSequence.hasAccess) {
+        Permissions.GRANTED.sequence_ids.delete(checkedSequence.id);
+      } else {
+        Permissions.REVOKED.sequence_ids.add(checkedSequence.id);
+      }
+    }
+    this.setState({ sequences });
   };
 
   getMenu = () => {
@@ -284,9 +515,6 @@ class SubmissionView extends Component {
   };
 
   onValidationResultItemClick = item => {
-    // item.ID = "n03098";
-    // item.name = "m5-3-2-3-reports-of-studies-using-other-human-biomaterials";
-    // item.title = "5.3.2.3 Reports of Studies Using Other Human Biomaterials";
     if (!this.state.treeExpand) {
       this.toggle(() => setTimeout(() => this.selectChildNode(item), 2000));
       return;
@@ -331,16 +559,129 @@ class SubmissionView extends Component {
     });
   };
 
+  openUsersSection = () => {
+    this.setState({ showUsersSection: !this.state.showUsersSection });
+  };
+
+  viewPermissions = (user = this.state.selectedUser) => {
+    const { selectedSubmission } = this.props;
+    Permissions.clear();
+    if (selectedSubmission) {
+      this.props.dispatch(
+        SubmissionActions.resetSequences(selectedSubmission.id)
+      );
+      this.setState({ sequences: [] });
+      this.props.dispatch(
+        SubmissionActions.fetchSequencesWithPermissions(
+          selectedSubmission.id,
+          user,
+          () => {
+            this.props.dispatch(ApiActions.requestOnDemand());
+          }
+        )
+      );
+      if (this.props.selectedSequence) {
+        this.props.dispatch(
+          SubmissionActions.fetchSequenceJson(this.props.selectedSequence, user)
+        );
+      } else {
+        this.props.dispatch(
+          SubmissionActions.fetchLifeCycleJson(selectedSubmission, user)
+        );
+      }
+    }
+    this.setState({
+      selectedUser: user,
+      viewPermissions: true,
+      showEditMessage: false,
+      editPermissions: false
+    });
+  };
+
+  hidePermissions = () => {
+    this.setState({
+      selectedUser: null,
+      viewPermissions: false
+    });
+    this.initData();
+  };
+
+  enableEditingPermissions = () => {
+    this.setState({
+      viewPermissions: false,
+      showEditMessage: true,
+      editPermissions: true
+    });
+  };
+
+  disableEditingPermissions = () => {
+    Permissions.clear();
+    this.setState({
+      selectedUser: null,
+      showEditMessage: false,
+      editPermissions: false
+    });
+    this.initData();
+  };
+
+  hideEditMessage = () => {
+    this.setState({ showEditMessage: false });
+  };
+
+  saveEditedPermissions = () => {
+    if (
+      Permissions.GRANTED.file_ids.size ||
+      Permissions.REVOKED.file_ids.size
+    ) {
+      this.props.dispatch(
+        SubmissionActions.assignFilePermissions(
+          {
+            user_ids: [this.state.selectedUser.user_id],
+            granted_file_ids: [...Permissions.GRANTED.file_ids],
+            revoked_file_ids: [...Permissions.REVOKED.file_ids]
+          },
+          this.viewPermissions
+        )
+      );
+    }
+    if (
+      Permissions.GRANTED.sequence_ids.size ||
+      Permissions.REVOKED.sequence_ids.size
+    ) {
+      this.props.dispatch(
+        SubmissionActions.assignSequencePermissions(
+          {
+            user_ids: [this.state.selectedUser.user_id],
+            granted_sequence_ids: [...Permissions.GRANTED.sequence_ids],
+            revoked_sequence_ids: [...Permissions.REVOKED.sequence_ids]
+          },
+          this.viewPermissions
+        )
+      );
+    }
+  };
+
   render() {
     const {
       loading,
-      sequences,
       selectedSequence,
       sequenceJson,
       lifeCycleJson,
-      selectedSubmission
+      selectedSubmission,
+      users,
+      role
     } = this.props;
-    const { selectedView, selectedMode, sequenceSortBy } = this.state;
+    const {
+      sequences,
+      selectedView,
+      selectedMode,
+      sequenceSortBy,
+      showUsersSection,
+      selectedUser,
+      showEditMessage,
+      viewPermissions,
+      editPermissions
+    } = this.state;
 
     if (!selectedSubmission) {
       return <Redirect to="/applications" />;
@@ -359,7 +700,12 @@ class SubmissionView extends Component {
                 <Icon type="left" />
                 <span className="text">Dashboard</span>
               </div>
-              <div className="submissionview__profilebar__title">omniVIEW</div>
+              <div className="submissionview__profilebar__title">
+                <img
+                  src="/images/omniview-cloud.svg"
+                  style={{ height: "25px", width: "106px" }}
+                />
+              </div>
               <div className="submissionview__profilebar__section">
                 <ProfileMenu />
               </div>
@@ -510,14 +856,44 @@ class SubmissionView extends Component {
               expand={this.state.sequencesExpand}
             >
               <div className="panel panel-sequences">
-                <NodeSequences
-                  submissionLabel={_.get(selectedSubmission, "name", "")}
-                  selected={selectedSequence}
-                  sequences={sequences}
-                  onSelectedSequence={this.onSelectedSequence}
-                  sortBy={sequenceSortBy}
-                  onSortByChanged={this.onSequenceSortByChanged}
-                />
+                <div style={{ height: showUsersSection ? "45%" : "94%" }}>
+                  <NodeSequences
+                    onSequenceCheckboxChange={this.onSequenceCheckboxChange}
+                    submissionLabel={_.get(selectedSubmission, "name", "")}
+                    selected={_.get(selectedSequence, "id", 0)}
+                    sequences={sequences}
+                    onSelectedSequence={this.onSelectedSequence}
+                    sortBy={sequenceSortBy}
+                    onSortByChanged={this.onSequenceSortByChanged}
+                    viewPermissions={viewPermissions}
+                    editPermissions={editPermissions}
+                  />
+                </div>
+                {(isLoggedInOmniciaAdmin(role) ||
+                  isLoggedInCustomerAdmin(role)) && (
+                  <div
+                    className="panel-sequences__users global__cursor-pointer"
+                    onClick={this.openUsersSection}
+                  >
+                    <Text
+                      type="bold"
+                      opacity={0.7}
+                      text={translate("label.dashboard.users")}
+                    />
+                    <Icon
+                      type={showUsersSection ? "up" : "down"}
+                      className="global__cursor-pointer"
+                    />
+                  </div>
+                )}
+                {showUsersSection && (
+                  <SubmissionViewUsers
+                    searchUsers={this.fetchUsers}
+                    users={users}
+                    selectedUser={selectedUser}
+                    onUserSelected={this.viewPermissions}
+                  />
+                )}
               </div>
             </Sidebar>
             <div
@@ -525,8 +901,102 @@ class SubmissionView extends Component {
               className="panels__tree"
               style={{ width: `${this.state.treePanelWidth}%` }}
             >
+              {showEditMessage && (
+                <div className="panels__tree__editblock">
+                  <Text
+                    className="panels__tree__editblock-text"
+                    type="medium"
+                    size="12px"
+                    text={translate("text.submission.editpermissions")}
+                  />
+                  <Text
+                    className="panels__tree__editblock-text global__cursor-pointer"
+                    onClick={this.hideEditMessage}
+                    type="bold"
+                    size="12px"
+                    text={translate("label.generic.ok")}
+                  />
+                </div>
+              )}
+
+              {viewPermissions &&
+                (isLoggedInOmniciaAdmin(role) ||
+                  isLoggedInCustomerAdmin(role)) && (
+                  <div className="panels__tree__permissions">
+                    <Row>
+                      <Avatar
+                        size="small"
+                        icon="user"
+                        size={35}
+                        style={{ marginRight: "8px" }}
+                      />
+                      <Text
+                        type="medium"
+                        text={translate("text.generic.viewingpermissions", {
+                          user: `${_.get(
+                            this.state.selectedUser,
+                            "first_name",
+                            ""
+                          )} ${_.get(this.state.selectedUser, "last_name", "")}`
+                        })}
+                      />
+                    </Row>
+                    <Row>
+                      <OmniButton
+                        type="secondary"
+                        label={translate("label.button.cancel")}
+                        buttonStyle={{ marginRight: "8px" }}
+                        onClick={this.hidePermissions}
+                      />
+                      <OmniButton
+                        type="primary"
+                        label={translate("label.button.editpermissions")}
+                        onClick={this.enableEditingPermissions}
+                      />
+                    </Row>
+                  </div>
+                )}
+
+              {editPermissions && (
+                <div className="panels__tree__permissions">
+                  <Row>
+                    <Avatar
+                      size="small"
+                      icon="user"
+                      size={35}
+                      style={{ marginRight: "8px" }}
+                    />
+                    <Text
+                      type="medium"
+                      text={translate("text.generic.editingpermissions", {
+                        user: `${_.get(
+                          this.state.selectedUser,
+                          "first_name",
+                          ""
+                        )} ${_.get(this.state.selectedUser, "last_name", "")}`
+                      })}
+                    />
+                  </Row>
+                  <Row>
+                    <OmniButton
+                      type="secondary"
+                      label={translate("label.button.cancel")}
+                      buttonStyle={{ marginRight: "8px" }}
+                      onClick={this.disableEditingPermissions}
+                    />
+                    <OmniButton
+                      // disabled={!Permissions.hasChanges()}
+                      type="primary"
+                      label={translate("label.button.savechanges")}
+                      onClick={this.saveEditedPermissions}
+                    />
+                  </Row>
+                </div>
+              )}
               <TreeNode
                 ref={this.treeRef}
+                parentNode={this.treeRef}
+                role={role}
                 key={this.createKey()}
                 label={this.getTreeLabel()}
                 content={this.getContent()}
@@ -536,6 +1006,10 @@ class SubmissionView extends Component {
                 mode={selectedMode}
                 view={selectedView}
                 submission={selectedSubmission}
+                viewPermissions={viewPermissions}
+                editPermissions={editPermissions}
+                onCheckChange={this.onCheckChange}
+                onExpandNode={this.onExpandNode}
                 defaultExpand
               />
             </div>
@@ -598,16 +1072,21 @@ const FlexBox = styled.div`
 function mapStateToProps(state) {
   return {
     loading: state.Api.loading,
+    user: state.Login.user,
+    role: state.Login.role,
     sequences: getSequences(state),
     selectedSequence: state.Submission.selectedSequence,
     lifeCycleJson: getLifeCycleJson(state),
     sequenceJson: getSequenceJson(state),
-    selectedSubmission: state.Application.selectedSubmission
+    selectedSubmission: state.Application.selectedSubmission,
+    selectedCustomer: state.Customer.selectedCustomer,
+    users: state.Usermanagement.users
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
+    dispatch,
     actions: bindActionCreators({ ...SubmissionActions }, dispatch)
   };
 }

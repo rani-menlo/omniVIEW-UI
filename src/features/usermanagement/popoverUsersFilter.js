@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import PropTypes from "prop-types";
 import UsersFilter from "./usersFilter.component";
 import _ from "lodash";
 import { connect } from "react-redux";
@@ -7,11 +8,12 @@ import { Popover } from "antd";
 import { UsermanagementActions } from "../../redux/actions";
 import { translate } from "../../translations/translator";
 import { ROLES } from "../../constants";
+import { getRoleName } from "../../utils";
 
 const initialFiltersState = {
-  selectedSortBy: "",
-  selectedRoles: [],
-  selectedDepts: []
+  sortBy: "",
+  roles: [],
+  departments: []
 };
 let clonedFiltersState = _.cloneDeep(initialFiltersState);
 
@@ -20,29 +22,74 @@ class PopoverUsersFilter extends Component {
     super(props);
     this.state = {
       visible: false,
-      filters: _.cloneDeep(clonedFiltersState)
+      filters: _.cloneDeep(initialFiltersState),
+      checkboxRoles: [],
+      checkboxDepts: []
     };
+  }
+
+  static propTypes = {
+    imageClassName: PropTypes.string,
+    placement: PropTypes.string,
+    restrictedRoles: PropTypes.arrayOf(PropTypes.number),
+    selectedCustomer: PropTypes.object
+  };
+
+  static defaultProps = {
+    imageClassName: ""
+  };
+
+  static getDerivedStateFromProps(props, state) {
+    if (props.departments.length && !state.checkboxDepts.length) {
+      return {
+        checkboxDepts: _.map(props.departments, dept => ({
+          ...dept,
+          label: dept.name,
+          value: dept.id
+        }))
+      };
+    }
+    return null;
   }
 
   componentDidMount() {
     this.props.dispatch(UsermanagementActions.getDepartments());
+    const { selectedCustomer } = this.props;
+    const customerRoles = _.get(selectedCustomer, "is_omnicia", false)
+      ? ROLES.OMNICIA
+      : ROLES.CUSTOMER;
+    const checkboxRoles = _.map(customerRoles, r => ({
+      label: getRoleName(r.name, true),
+      value: r.id
+    }));
+    const { restrictedRoles } = this.props;
+    restrictedRoles &&
+      _.map(restrictedRoles, roleId => {
+        _.remove(checkboxRoles, { value: roleId });
+      });
+    const checkboxDepts = _.map(this.props.departments, dept => ({
+      ...dept,
+      label: dept.name,
+      value: dept.id
+    }));
+    this.setState({ checkboxDepts, checkboxRoles }, () => this.update());
   }
 
   onRoleChange = checkedValues => {
     this.setState({
-      filters: { ...this.state.filters, selectedRoles: checkedValues }
+      filters: { ...this.state.filters, roles: checkedValues }
     });
   };
 
   onDeptChange = checkedValues => {
     this.setState({
-      filters: { ...this.state.filters, selectedDepts: checkedValues }
+      filters: { ...this.state.filters, departments: checkedValues }
     });
   };
 
   onSortChange = sortBy => {
     this.setState({
-      filters: { ...this.state.filters, selectedSortBy: sortBy }
+      filters: { ...this.state.filters, sortBy }
     });
   };
 
@@ -69,42 +116,39 @@ class PopoverUsersFilter extends Component {
 
   update = () => {
     clonedFiltersState = _.cloneDeep(this.state.filters);
-    this.props.onFiltersUpdate &&
-      this.props.onFiltersUpdate(this.state.filters);
+    if (this.props.onFiltersUpdate) {
+      if (!this.state.filters.roles.length) {
+        this.props.onFiltersUpdate({
+          ...this.state.filters,
+          roles: _.map(this.state.checkboxRoles, role => role.value)
+        });
+      } else {
+        this.props.onFiltersUpdate(this.state.filters);
+      }
+    }
     this.closePopover();
   };
 
   render() {
     const {
       visible,
-      filters: { selectedRoles, selectedDepts, selectedSortBy }
+      filters: { roles, departments, sortBy }
     } = this.state;
-    const { departments, selectedCustomer } = this.props;
-    const roles = _.get(selectedCustomer, "is_omnicia", false)
-      ? ROLES.OMNICIA
-      : ROLES.CUSTOMER;
-    const checkboxRoles = _.map(roles, r => ({
-      label: r.name,
-      value: r.id
-    }));
-    const checkboxDepts = _.map(departments, dept => ({
-      ...dept,
-      label: dept.name,
-      value: dept.id
-    }));
+    const { imageClassName, placement } = this.props;
 
     const resetDisabled = _.isEqual(this.state.filters, initialFiltersState);
 
     return (
       <Popover
+        placement={placement}
         content={
           <UsersFilter
-            roles={checkboxRoles}
-            selectedSortBy={selectedSortBy}
-            selectedRoles={selectedRoles}
-            selectedDepts={selectedDepts}
+            roles={this.state.checkboxRoles}
+            selectedSortBy={sortBy}
+            selectedRoles={roles}
+            selectedDepts={departments}
             resetDisabled={resetDisabled}
-            departments={checkboxDepts}
+            departments={this.state.checkboxDepts}
             reset={this.reset}
             cancel={this.cancel}
             update={this.update}
@@ -119,6 +163,7 @@ class PopoverUsersFilter extends Component {
         <Image
           src={`/images/filter${resetDisabled ? ".svg" : "-active.svg"}`}
           onClick={this.openPopover}
+          className={imageClassName}
           style={{
             borderColor: resetDisabled ? "rgba(74, 74, 74, 0.25)" : "#00a0ff"
           }}
@@ -144,8 +189,7 @@ const Image = styled.img`
 
 function mapStateToProps(state) {
   return {
-    departments: state.Usermanagement.departments,
-    selectedCustomer: state.Customer.selectedCustomer
+    departments: state.Usermanagement.departments
   };
 }
 

@@ -13,12 +13,13 @@ import {
   TableHeader,
   Row,
   Pagination,
-  PaginationCheckbox,
+  OmniCheckbox,
   OmniButton,
   SearchBox,
   ListViewGridView,
   SubHeader,
-  ContentLayout
+  ContentLayout,
+  DeactivateModal
 } from "../../../uikit/components";
 import { DEBOUNCE_TIME } from "../../../constants";
 import { translate } from "../../../translations/translator";
@@ -30,7 +31,9 @@ class CustomerDashboard extends Component {
       viewBy: "cards",
       pageNo: 1,
       itemsPerPage: 5,
-      searchText: ""
+      searchText: "",
+      selectedCustomer: "",
+      showDeactivateModal: false
     };
     this.searchCustomers = _.debounce(this.searchCustomers, DEBOUNCE_TIME);
   }
@@ -88,7 +91,6 @@ class CustomerDashboard extends Component {
           </p>
         </Menu.Item>
         <Menu.Item
-          disabled
           className="maindashboard__list__item-dropdown-menu-item"
           onClick={this.openUserMgmt(customer)}
         >
@@ -98,14 +100,20 @@ class CustomerDashboard extends Component {
           </p>
         </Menu.Item>
         <Menu.Item
-          disabled
           className="maindashboard__list__item-dropdown-menu-item"
+          onClick={this.openActivateDeactivateModal(customer)}
         >
-          <p style={{ color: "red" }}>
+          <p
+            style={{
+              color: _.get(customer, "is_active", false) ? "red" : "#00d592"
+            }}
+          >
             <img src="/images/deactivate.svg" />
-            <span>{`${translate("label.usermgmt.deactivate")} ${translate(
-              "label.dashboard.customer"
-            )}`}</span>
+            <span>{`${
+              _.get(customer, "is_active", false)
+                ? translate("label.usermgmt.deactivate")
+                : translate("label.usermgmt.activate")
+            } ${translate("label.dashboard.customer")}`}</span>
           </p>
         </Menu.Item>
       </Menu>
@@ -157,6 +165,28 @@ class CustomerDashboard extends Component {
     this.props.history.push("/usermanagement");
   };
 
+  closeActivateDeactivateModal = () => {
+    this.setState({ showDeactivateModal: false });
+  };
+
+  activateDeactivate = () => {
+    const { selectedCustomer, searchText } = this.state;
+    this.props.dispatch(
+      CustomerActions.activateDeactivateCustomer(
+        {
+          customerId: selectedCustomer.id,
+          is_active: +!_.get(selectedCustomer, "is_active", false)
+        },
+        _.size(searchText) >= 3 ? searchText : ""
+      )
+    );
+    this.closeActivateDeactivateModal();
+  };
+
+  openActivateDeactivateModal = customer => () => {
+    this.setState({ showDeactivateModal: true, selectedCustomer: customer });
+  };
+
   render() {
     const { viewBy, searchText } = this.state;
     const { customers, loading, customerCount, role } = this.props;
@@ -198,14 +228,16 @@ class CustomerDashboard extends Component {
                 </div>
               )}
             </div>
-            <OmniButton
-              type="add"
-              label={translate("label.button.add", {
-                type: translate("label.dashboard.customer")
-              })}
-              onClick={this.addCustomer}
-              // className="global__disabled-box"
-            />
+            {isLoggedInOmniciaAdmin(role) && (
+              <OmniButton
+                type="add"
+                label={translate("label.button.add", {
+                  type: translate("label.dashboard.customer")
+                })}
+                onClick={this.addCustomer}
+                // className="global__disabled-box"
+              />
+            )}
           </div>
           {viewBy === "lists" && (
             <React.Fragment>
@@ -215,9 +247,15 @@ class CustomerDashboard extends Component {
                   sortColumn={this.sortColumn}
                 />
                 {_.map(customers, customer => (
-                  <Row key={customer.id} className="maindashboard__list__item">
+                  <Row
+                    key={customer.id}
+                    className="maindashboard__list__item"
+                    style={{
+                      opacity: _.get(customer, "is_active", false) ? 1 : 0.5
+                    }}
+                  >
                     <Column width={getColumnWidth(TableColumnNames.CHECKBOX)}>
-                      <PaginationCheckbox />
+                      <OmniCheckbox />
                     </Column>
                     <Column
                       width={getColumnWidth(TableColumnNames.CUSTOMER_NAME)}
@@ -261,7 +299,7 @@ class CustomerDashboard extends Component {
                       {_.get(
                         customer,
                         "subscription",
-                        "12 in use  | 3 unassigned"
+                        `${_.get(customer, "number_of_users", "")} in use  | 0 unassigned`
                       )}
                       <Dropdown
                         overlay={this.getMenu(customer)()}
@@ -335,6 +373,22 @@ class CustomerDashboard extends Component {
               )}
             </React.Fragment>
           )}
+          <DeactivateModal
+            isActive={_.get(this.state, "selectedCustomer.is_active", false)}
+            visible={this.state.showDeactivateModal}
+            title={
+              _.get(this.state, "selectedCustomer.is_active", false)
+                ? `${translate("label.usermgmt.deactivateacc")}?`
+                : `${translate("label.usermgmt.activateacc")}?`
+            }
+            content={
+              _.get(this.state, "selectedCustomer.is_active", false)
+                ? translate("text.customer.deactivate")
+                : translate("text.customer.activate")
+            }
+            closeModal={this.closeActivateDeactivateModal}
+            deactivate={this.activateDeactivate}
+          />
         </ContentLayout>
       </React.Fragment>
     );
@@ -422,7 +476,8 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ ...CustomerActions }, dispatch)
+    actions: bindActionCreators({ ...CustomerActions }, dispatch),
+    dispatch
   };
 }
 

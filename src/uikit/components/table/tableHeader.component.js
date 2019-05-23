@@ -4,7 +4,7 @@ import styled from "styled-components";
 import Row from "../row/row.component";
 import PropTypes from "prop-types";
 import _ from "lodash";
-import PaginationCheckbox from "../pagination/paginationCheckbox.component";
+import OmniCheckbox from "../checkbox/omniCheckbox.component";
 
 class TableHeader extends Component {
   static propTypes = {
@@ -22,7 +22,7 @@ class TableHeader extends Component {
   }
 
   order = column => () => {
-    if (!column.name) {
+    if (!column.name || !column.sort) {
       return;
     }
     const state = { sortBy: column.key || "" };
@@ -63,10 +63,10 @@ class TableHeader extends Component {
             style={column.style}
           >
             <div
-              className="global__cursor-pointer"
+              className={column.sort && "global__cursor-pointer"}
               onClick={this.order(column)}
             >
-              {column.checkbox && <PaginationCheckbox />}
+              {column.checkbox && <OmniCheckbox />}
               {column.name}
               {column.sort && this.getSortIcon(column)}
             </div>

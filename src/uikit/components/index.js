@@ -5,7 +5,8 @@ import { default as DraggableModal } from "./modal/draggableModal.component";
 import { default as DeactivateModal } from "./modal/deactivateModal.component";
 import { default as Pagination } from "./pagination";
 import { default as PaginationButton } from "./pagination/paginationButton.component";
-import { default as PaginationCheckbox } from "./pagination/paginationCheckbox.component";
+import { default as OmniCheckbox } from "./checkbox/omniCheckbox.component";
+import { default as PermissionCheckbox } from "./checkbox/permissionCheckbox.component";
 import { default as Row } from "./row/row.component";
 import { default as Sidebar } from "./sidebar/sidebar.component";
 import { default as SubHeader } from "./subheader/subheader.component";
@@ -17,6 +18,8 @@ import { default as InputField } from "./formfield/InputField";
 import { default as NumericInput } from "./formfield/numericInput";
 import { default as PhoneField } from "./formfield/phoneField";
 import { default as Text } from "./text/text.component";
+import { default as CircularImage } from "./image/circularImage.component";
+import { default as ImageLoader } from "./image/imageLoader.component";
 
 export {
   OmniButton,
@@ -26,7 +29,8 @@ export {
   DeactivateModal,
   Pagination,
   PaginationButton,
-  PaginationCheckbox,
+  OmniCheckbox,
+  PermissionCheckbox,
   Row,
   Sidebar,
   SubHeader,
@@ -37,5 +41,7 @@ export {
   InputField,
   PhoneField,
   NumericInput,
-  Text
+  Text,
+  CircularImage,
+  ImageLoader
 };

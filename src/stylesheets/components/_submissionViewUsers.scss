@@ -1,0 +1,39 @@
+.submissionViewUsers {
+  height: 48%;
+  &__searchbox {
+    border-top: 0.1px solid #cecece;
+    border-bottom: 0.1px solid #cecece;
+    padding: 4px !important;
+    > input {
+      height: 30px;
+      margin-left: 0px;
+    }
+  }
+  &__users {
+    height: 70%;
+    overflow: auto;
+    &__user {
+      display: flex;
+      align-items: center;
+      background-color: $white;
+      margin-right: 1px;
+      padding-left: 10px;
+      padding-top: 6px;
+      padding-bottom: 6px;
+      border-bottom: solid 0.2px #cecece;
+      cursor: pointer;
+      &-selected {
+        background-color: $rockman-blue;
+      }
+      &__info {
+        margin-left: 8px;
+      }
+    }
+  }
+  &__filters {
+    padding: 2px 8px;
+    &-image {
+      padding: 5px !important;
+    }
+  }
+}

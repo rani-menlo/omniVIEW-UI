@@ -45,7 +45,7 @@ const getSequences = createSelector(
       "id",
       ""
     )}`;
-    return _.get(json, `${id}`);
+    return _.get(json, `${id}`, []);
   }
 );
 

@@ -15,11 +15,12 @@ export default (state = initialState, action) => {
         action.data.data,
         customer => customer.is_omnicia
       );
+      oAdminCustomer && _.remove(action.data.data, { id: oAdminCustomer.id });
       return {
         ...state,
         oAdminCustomer: oAdminCustomer || state.oAdminCustomer,
         customers: action.data.data,
-        customerCount: action.data.customerCount
+        customerCount: action.data.customerCount - 1
       };
     }
     case CustomerActionTypes.SET_SELECTED_CUSTOMER: {

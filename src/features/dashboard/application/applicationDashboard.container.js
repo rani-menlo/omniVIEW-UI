@@ -21,7 +21,7 @@ import {
   TableHeader,
   Row,
   Pagination,
-  PaginationCheckbox,
+  OmniCheckbox,
   OmniButton,
   SearchBox,
   ListViewGridView,
@@ -108,7 +108,7 @@ class ApplicationDashboard extends Component {
   };
 
   openCustomersScreen = () => {
-    this.props.history.goBack();
+    this.props.history.push("/");
   };
 
   onPageChange = pageNo => {
@@ -225,13 +225,16 @@ class ApplicationDashboard extends Component {
                 </div>
               )}
             </div>
-            <OmniButton
-              type="add"
-              label={translate("label.button.add", {
-                type: translate("label.dashboard.application")
-              })}
-              className="global__disabled-box"
-            />
+            {(isLoggedInOmniciaAdmin(this.props.role) ||
+              isLoggedInCustomerAdmin(this.props.role)) && (
+              <OmniButton
+                type="add"
+                label={translate("label.button.add", {
+                  type: translate("label.dashboard.application")
+                })}
+                className="global__disabled-box"
+              />
+            )}
           </div>
           {viewBy === "lists" && (
             <React.Fragment>
@@ -246,7 +249,7 @@ class ApplicationDashboard extends Component {
                     className="maindashboard__list__item"
                   >
                     <Column width={getColumnWidth(TableColumnNames.CHECKBOX)}>
-                      <PaginationCheckbox />
+                      <OmniCheckbox />
                     </Column>
                     <Column
                       width={getColumnWidth(TableColumnNames.APPLICATION_NAME)}

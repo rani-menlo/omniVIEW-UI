@@ -1,0 +1,15 @@
+.permissionCheckbox {
+  > .ant-checkbox > .ant-checkbox-inner {
+    border-color: $black;
+  }
+  > .ant-checkbox-indeterminate > .ant-checkbox-inner {
+    border-color: $black;
+    background-color: $black;
+    opacity: 0.5;
+    &::after {
+      width: 8px;
+      height: 2px;
+      background-color: $white;
+    }
+  }
+}

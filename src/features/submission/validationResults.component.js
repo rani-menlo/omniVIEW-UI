@@ -157,8 +157,8 @@ class ValidationResults extends Component {
                       <tr
                         key={idx}
                         onClick={this.onItemSelected(validation, idx)}
-                        className={`global__cursor-pointer ${selected ===
-                          idx && "global__node-selected"}`}
+                        className={`global__cursor-pointer ${selected === idx &&
+                          "global__node-selected"}`}
                       >
                         <td className="col-node">
                           <div
@@ -180,7 +180,17 @@ class ValidationResults extends Component {
                                 />
                               )}
                             </span>
-                            <span>{validation.title}</span>
+                            <span
+                              style={{
+                                display: "block",
+                                wordWrap: "break-word",
+                                width: "35%"
+                              }}
+                            >
+                              {_.size(validation.title) > 0
+                                ? validation.title
+                                : ""}
+                            </span>
                           </div>
                         </td>
                         <td className="col-error">{validation.error_no}</td>
@@ -192,7 +202,15 @@ class ValidationResults extends Component {
                           <span>{validation.severity}</span>
                         </td>
                         <td className="col-description">
-                          {validation.description}
+                          <span
+                            style={{
+                              display: "block",
+                              wordWrap: "break-word",
+                              width: "40%"
+                            }}
+                          >
+                            {validation.description}
+                          </span>
                         </td>
                       </tr>
                     );
@@ -208,7 +226,7 @@ class ValidationResults extends Component {
             <Button
               type="primary"
               onClick={onClose}
-              style={{ color: "white", fontWeight: 800, fontSize: '12px' }}
+              style={{ color: "white", fontWeight: 800, fontSize: "12px" }}
             >
               Close
             </Button>

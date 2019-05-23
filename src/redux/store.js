@@ -8,7 +8,7 @@ import rootReducer from "./reducers";
 const persistConfig = {
   key: "omniview",
   storage,
-  whitelist: ["Login", "Application"]
+  whitelist: ["Login", "Application", "Customer"]
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

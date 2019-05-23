@@ -5,6 +5,7 @@ import { default as CustomerApi } from "./customer.api";
 import { default as ApplicationApi } from "./application.api";
 import { default as SubmissionApi } from "./submission.api";
 import { default as UsermanagementApi } from "./usermanagement.api";
+import { default as ImageApi } from "./image.api";
 import { SERVER_URL } from "../../constants";
 import { responseInterceptor } from "./response.interceptor";
 
@@ -21,5 +22,6 @@ export {
   CustomerApi,
   ApplicationApi,
   SubmissionApi,
-  UsermanagementApi
+  UsermanagementApi,
+  ImageApi
 };

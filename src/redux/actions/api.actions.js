@@ -1,4 +1,4 @@
-import { ApiActionTypes } from '../actionTypes';
+import { ApiActionTypes } from "../actionTypes";
 
 export default {
   request: dispatch => {
@@ -9,5 +9,15 @@ export default {
   },
   failure: (dispatch, error) => {
     dispatch({ type: ApiActionTypes.FAILURE, error });
+  },
+  requestOnDemand: () => {
+    return dispatch => {
+      dispatch({ type: ApiActionTypes.REQUEST });
+    };
+  },
+  successOnDemand: () => {
+    return dispatch => {
+      dispatch({ type: ApiActionTypes.SUCCESS });
+    };
   }
 };

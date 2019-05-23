@@ -3,6 +3,9 @@ import PropTypes from "prop-types";
 import { Icon } from "antd";
 import _ from "lodash";
 import NodeSequenceTree from "./nodeSequenceTree";
+import { PermissionCheckbox } from "../../uikit/components";
+import { CHECKBOX } from "../../constants";
+import { Permissions } from "./permissions";
 
 class NodeSequences extends Component {
   constructor(props) {
@@ -14,16 +17,21 @@ class NodeSequences extends Component {
 
   static propTypes = {
     sequences: PropTypes.arrayOf(PropTypes.object),
-    selected: PropTypes.object,
+    onCheckboxChange: PropTypes.func,
+    selected: PropTypes.number,
     onSelectedSequence: PropTypes.func,
     sortBy: PropTypes.oneOf(["submission, sequence"]),
     onSortByChanged: PropTypes.func,
-    submissionLabel: PropTypes.string
+    submissionLabel: PropTypes.string,
+    viewPermissions: PropTypes.bool,
+    editPermissions: PropTypes.bool
   };
 
   static defaultProps = {
     sequences: [],
-    sortBy: "submission"
+    sortBy: "submission",
+    viewPermissions: false,
+    editPermissions: false
   };
 
   sortBy = sortBy => () => {
@@ -42,7 +50,13 @@ class NodeSequences extends Component {
   };
 
   getTree = () => {
-    const { sequences, selected, submissionLabel } = this.props;
+    const {
+      sequences,
+      selected,
+      submissionLabel,
+      viewPermissions,
+      editPermissions
+    } = this.props;
     return _.map(sequences, sequence => (
       <NodeSequenceTree
         key={sequence.id}
@@ -50,6 +64,9 @@ class NodeSequences extends Component {
         onSelected={this.onSelected}
         selected={selected}
         submissionLabel={submissionLabel}
+        onCheckboxChange={this.onCheckboxChange}
+        viewPermissions={viewPermissions}
+        editPermissions={editPermissions}
       />
     ));
   };
@@ -74,12 +91,50 @@ class NodeSequences extends Component {
     return this.state.order === "desc" ? newArray : newArray.reverse();
   };
 
+  onCheckboxChange = sequence => () => {
+    /* const sequencesList = [...this.state.sequencesList];
+    const idx = _.findIndex(sequencesList, seq => seq.id === sequence.id);
+    const newSequence = { ...sequence };
+    if (newSequence.checkboxValue === CHECKBOX.SELECTED_PARTIALLY) {
+      newSequence.checkboxValue = CHECKBOX.DESELECTED;
+      Permissions.REVOKED.sequence_ids.add(newSequence.json_path);
+      Permissions.GRANTED.sequence_ids.delete(newSequence.json_path);
+    } else if (newSequence.checkboxValue === CHECKBOX.DESELECTED) {
+      if (newSequence.hasAccess) {
+        newSequence.checkboxValue = CHECKBOX.SELECTED_PARTIALLY;
+        Permissions.REVOKED.sequence_ids.delete(newSequence.json_path);
+      } else {
+        newSequence.checkboxValue = CHECKBOX.SELECTED;
+        Permissions.GRANTED.sequence_ids.add(newSequence.json_path);
+      }
+    } else {
+      if (!newSequence.hasAccess) {
+        newSequence.checkboxValue = CHECKBOX.DESELECTED;
+        Permissions.GRANTED.sequence_ids.delete(newSequence.json_path);
+        Permissions.REVOKED.sequence_ids.add(newSequence.json_path);
+      } else {
+        newSequence.checkboxValue = CHECKBOX.SELECTED_PARTIALLY;
+        Permissions.GRANTED.sequence_ids.delete(newSequence.json_path);
+      }
+    }
+
+    sequencesList[idx] = newSequence;
+    this.setState({ sequencesList }); */
+    this.props.onSequenceCheckboxChange &&
+      this.props.onSequenceCheckboxChange(sequence);
+  };
+
   render() {
-    const { selected, sortBy, submissionLabel } = this.props;
+    const {
+      selected,
+      sortBy,
+      submissionLabel,
+      viewPermissions,
+      editPermissions
+    } = this.props;
     return (
       <React.Fragment>
         <div className="sortheader">
-          <div className="sortheader__text">Sort by:</div>
           <div
             className={`sortheader__section ${sortBy === "submission" &&
               "selected-sortby"}`}
@@ -103,16 +158,34 @@ class NodeSequences extends Component {
             : _.map(this.getList(), sequence => (
                 <div
                   key={sequence.id}
-                  onClick={this.onSelected(sequence)}
                   className={`sequenceslist__sequence global__cursor-pointer ${selected ===
-                    sequence && "global__node-selected"}`}
+                    sequence.id && "global__node-selected"}`}
+                  style={{
+                    opacity:
+                      viewPermissions || editPermissions
+                        ? sequence.checkboxValue === CHECKBOX.DESELECTED
+                          ? 0.3
+                          : 1
+                        : 1
+                  }}
                 >
+                  {editPermissions && (
+                    <PermissionCheckbox
+                      style={{ marginRight: "10px" }}
+                      value={sequence.checkboxValue}
+                      onChange={this.onCheckboxChange(sequence)}
+                    />
+                  )}
                   <Icon
                     type="folder"
                     theme="filled"
                     className="global__file-folder"
+                    onClick={this.onSelected(sequence)}
                   />
-                  <span className="global__node-text global__cursor-pointer">
+                  <span
+                    className="global__node-text global__cursor-pointer"
+                    onClick={this.onSelected(sequence)}
+                  >
                     {`${submissionLabel}\\${sequence.name}`}
                   </span>
                 </div>

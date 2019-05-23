@@ -5,6 +5,8 @@ import _ from "lodash";
 import { LoginActions, CustomerActions } from "../../redux/actions";
 import { withRouter } from "react-router-dom";
 import { translate } from "../../translations/translator";
+import { isLoggedInOmniciaAdmin, isLoggedInCustomerAdmin } from "../../utils";
+import { ImageLoader } from "../../uikit/components";
 
 class ProfileMenu extends Component {
   signOut = () => {
@@ -22,7 +24,11 @@ class ProfileMenu extends Component {
         CustomerActions.setSelectedCustomer(this.props.oAdminCustomer)
       );
     }
-    this.props.history.push("/usermanagement");
+    if (this.props.location.pathname === "/usermanagement") {
+      this.props.history.push("/usermanagement/parent");
+    } else {
+      this.props.history.push("/usermanagement");
+    }
   };
 
   getMenu = () => {
@@ -39,17 +45,20 @@ class ProfileMenu extends Component {
             )}`}</span>
           </p>
         </Menu.Item>
-        <Menu.Item
-          className="maindashboard__list__item-dropdown-menu-item"
-          onClick={this.manageUsers}
-        >
-          <p>
-            <img src="/images/user-management.svg" />
-            <span>{`${translate("label.generic.manage")} ${translate(
-              "label.dashboard.users"
-            )}`}</span>
-          </p>
-        </Menu.Item>
+        {(isLoggedInOmniciaAdmin(this.props.role) ||
+          isLoggedInCustomerAdmin(this.props.role)) && (
+          <Menu.Item
+            className="maindashboard__list__item-dropdown-menu-item"
+            onClick={this.manageUsers}
+          >
+            <p>
+              <img src="/images/user-management.svg" />
+              <span>{`${translate("label.generic.manage")} ${translate(
+                "label.dashboard.users"
+              )}`}</span>
+            </p>
+          </Menu.Item>
+        )}
         <Menu.Item
           className="maindashboard__list__item-dropdown-menu-item"
           onClick={this.signOut}
@@ -82,6 +91,12 @@ class ProfileMenu extends Component {
         <Dropdown overlay={this.getMenu()} trigger={["click"]}>
           <div className="profile__menu">
             <Avatar size="small" icon="user" />
+            <ImageLoader
+              path={user.profile}
+              width="36px"
+              height="36px"
+              type="circle"
+            />
             <span className="profile__menu-username">
               {`${_.get(user, "first_name", "")} ${_.get(
                 user,
@@ -100,6 +115,7 @@ class ProfileMenu extends Component {
 function mapStateToProps(state) {
   return {
     user: state.Login.user,
+    role: state.Login.role,
     oAdminCustomer: state.Customer.oAdminCustomer
   };
 }
