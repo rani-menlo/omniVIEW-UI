@@ -9,11 +9,12 @@ class SubmissionCard extends Component {
   static propTypes = {
     submission: PropTypes.object,
     onSelect: PropTypes.func,
-    onMenuItemClick: PropTypes.func
+    onMenuItemClick: PropTypes.func,
+    customer: PropTypes.object
   };
 
   render() {
-    const { submission, onSelect, getMenu } = this.props;
+    const { submission, onSelect, getMenu, customer } = this.props;
     return (
       <div className="submissioncard">
         <div className="submissioncard__heading">
@@ -83,12 +84,7 @@ class SubmissionCard extends Component {
             <span className="submissioncard__content__item-label">
               {translate("label.dashboard.users")}:
             </span>
-            <div>
-              <Avatar size="small" icon="user" />
-              <Avatar size="small" icon="user" />
-              <Avatar size="small" icon="user" />
-              <Avatar size="small" icon="user" />
-            </div>
+            <div>{customer.number_of_users}</div>
           </div>
         </div>
       </div>

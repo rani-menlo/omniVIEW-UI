@@ -1,7 +1,7 @@
 import React from "react";
 import _ from "lodash";
 import { Avatar, Modal, Icon } from "antd";
-import { Row, Text, OmniButton } from "../../uikit/components";
+import { Row, Text, OmniButton, ImageLoader } from "../../uikit/components";
 import { getRoleName, getFormattedDate } from "../../utils";
 import { translate } from "../../translations/translator";
 
@@ -19,7 +19,13 @@ const UserProfileCard = ({ user, visible, onClose, onEdit, onStatusClick }) => {
           className="userProfileCard-close"
           onClick={onClose}
         />
-        <Avatar size={140} icon="user" />
+        <ImageLoader
+          path={_.get(user, "profile")}
+          width="140px"
+          height="140px"
+          type="circle"
+        />
+        {/* <Avatar size={140} icon="user" /> */}
         <Text
           className="userProfileCard-name"
           type="extra_bold"

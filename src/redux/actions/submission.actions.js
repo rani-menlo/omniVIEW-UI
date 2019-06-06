@@ -1,4 +1,5 @@
 import _ from "lodash";
+import { message } from "antd";
 import { SubmissionActionTypes } from "../actionTypes";
 import { SubmissionApi } from "../api";
 import { ApiActions } from ".";
@@ -49,14 +50,15 @@ export default {
           data,
           id
         });
-        ApiActions.success(dispatch);
+
+        !callback && ApiActions.success(dispatch);
         callback && callback();
       } catch (err) {
         ApiActions.failure(dispatch);
       }
     };
   },
-  resetSequences: submissionId => {
+  resetSequences: (submissionId, callback) => {
     return async (dispatch, getState) => {
       ApiActions.request(dispatch);
       try {
@@ -70,6 +72,7 @@ export default {
           id
         });
         ApiActions.success(dispatch);
+        callback && callback();
       } catch (err) {
         ApiActions.failure(dispatch);
       }
@@ -285,10 +288,47 @@ export default {
     return async dispatch => {
       ApiActions.request(dispatch);
       try {
-        await SubmissionApi.assignSubmissionPermissions(data);
+        const res = await SubmissionApi.assignSubmissionPermissions(data);
         dispatch({
           type: SubmissionActionTypes.ASSIGN_PERMISSIONS
         });
+        if (_.get(res, "data.message") === "Success") {
+          message.success("Permissions Updated");
+        }
+        ApiActions.success(dispatch);
+      } catch (err) {
+        ApiActions.failure(dispatch);
+      }
+    };
+  },
+  assignFolderPermissions: data => {
+    return async dispatch => {
+      ApiActions.request(dispatch);
+      try {
+        const res = await SubmissionApi.assignFolderPermissions(data);
+        dispatch({
+          type: SubmissionActionTypes.ASSIGN_PERMISSIONS
+        });
+        if (_.get(res, "data.message") === "Success") {
+          message.success("Permissions Updated");
+        }
+        ApiActions.success(dispatch);
+      } catch (err) {
+        ApiActions.failure(dispatch);
+      }
+    };
+  },
+  assignGlobalPermissions: data => {
+    return async dispatch => {
+      ApiActions.request(dispatch);
+      try {
+        const res = await SubmissionApi.assignGlobalPermissions(data);
+        dispatch({
+          type: SubmissionActionTypes.ASSIGN_PERMISSIONS
+        });
+        if (_.get(res, "data.message") === "Success") {
+          message.success("Permissions Updated");
+        }
         ApiActions.success(dispatch);
       } catch (err) {
         ApiActions.failure(dispatch);

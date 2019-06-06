@@ -4,6 +4,7 @@ import { UsermanagementActionTypes } from "../actionTypes";
 
 const initialState = {
   users: [],
+  usersOfFileOrSubmission: [],
   usersCount: 0,
   departments: [],
   licences: [],
@@ -37,6 +38,14 @@ export default (state = initialState, action) => {
           ...state,
           users: action.data.data,
           usersCount: action.data.usercount
+        };
+      }
+    }
+    case UsermanagementActionTypes.FETCH_USERS_OF_FILE_OR_SUBMISSION: {
+      if (!action.data.error) {
+        return {
+          ...state,
+          usersOfFileOrSubmission: action.data.data,
         };
       }
     }

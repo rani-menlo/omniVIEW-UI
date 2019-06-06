@@ -24,4 +24,11 @@
       @include text-bold-active(12px);
     }
   }
+  &-danger {
+    background-color: $red !important;
+    > span {
+      @include text-bold-active(12px);
+      color: $white;
+    }
+  }
 }

@@ -20,13 +20,13 @@
 .global__file-folder {
   font-size: 20px;
   margin-right: 8px;
-  color: $softsun;
+  color: $softsun !important;
 }
 
 .global__caret {
   font-size: 20px;
   margin-right: 4px;
-  color: $spanish-grey;
+  color: $spanish-grey !important;
   cursor: pointer;
 }
 

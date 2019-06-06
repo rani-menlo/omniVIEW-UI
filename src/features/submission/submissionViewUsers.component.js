@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import _ from "lodash";
 import PopoverUsersFilter from "../usermanagement/popoverUsersFilter";
 import { Avatar, Icon } from "antd";
-import { Text, SearchBox, Row } from "../../uikit/components";
+import { Text, SearchBox, Row, ImageLoader } from "../../uikit/components";
 import { translate } from "../../translations/translator";
 import { getRoleName } from "../../utils";
 import { DEBOUNCE_TIME } from "../../constants";
@@ -61,7 +61,7 @@ class SubmissionViewUsers extends Component {
       <div className="submissionViewUsers">
         <div className="submissionViewUsers__filters">
           <PopoverUsersFilter
-            restrictedRoles={[1, 4]}
+            // restrictedRoles={[1, 4]}
             placement="left"
             onFiltersUpdate={this.onFiltersUpdate}
             imageClassName="submissionViewUsers__filters-image"
@@ -86,7 +86,14 @@ class SubmissionViewUsers extends Component {
               }`}
               onClick={this.setSelectedUser(user)}
             >
-              <Avatar size="small" icon="user" size={35} />
+              <ImageLoader
+                path={_.get(user, "profile")}
+                width="35px"
+                height="35px"
+                type="circle"
+                globalAccess={_.get(user, "has_global_access")}
+              />
+              {/* <Avatar size="small" icon="user" size={35} /> */}
               <div className="submissionViewUsers__users__user__info">
                 <Text
                   type="regular"

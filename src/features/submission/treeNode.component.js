@@ -1,11 +1,12 @@
 import React, { Component } from "react";
-import { Icon } from "antd";
+import { Icon, Dropdown, Menu } from "antd";
 import PropTypes from "prop-types";
 import _ from "lodash";
 import uuidv4 from "uuid/v4";
-import { PermissionCheckbox } from "../../uikit/components";
+import { PermissionCheckbox, Text } from "../../uikit/components";
 import { CHECKBOX } from "../../constants";
-import { isLoggedInAuthor, isLoggedInCustomerAdmin, isLoggedInOmniciaAdmin } from "../../utils";
+import { isLoggedInCustomerAdmin, isLoggedInOmniciaAdmin } from "../../utils";
+import { translate } from "../../translations/translator";
 
 class TreeNode extends Component {
   constructor(props) {
@@ -16,10 +17,12 @@ class TreeNode extends Component {
       nodes: [],
       expand: this.props.defaultExpand || this.props.expand,
       prevProps: this.props,
-      checkboxValue: CHECKBOX.RESET_DEFAULT
+      checkboxValue: CHECKBOX.RESET_DEFAULT,
+      showDotsIcon: false
     };
     this.nodeRefs = [];
     this.nodeElementRef = React.createRef();
+    this._fileIds = [];
   }
 
   static propTypes = {
@@ -40,6 +43,7 @@ class TreeNode extends Component {
     ]),
     viewPermissions: PropTypes.bool,
     editPermissions: PropTypes.bool,
+    openPermissionsModal: PropTypes.func,
     propsCheckboxValue: PropTypes.number
   };
 
@@ -256,7 +260,7 @@ class TreeNode extends Component {
       const subFoldr = {};
       _.map(array, item => {
         subFoldr.title = item.title;
-        subFoldr.hasAccess = item.hasAccess;
+        subFoldr.hasAccess = subFoldr.hasAccess || item.hasAccess;
         subFoldr["_stfKey"] = item["_stfKey"];
         subFoldr["_omitKey"] = item["_omitKey"];
         _.map(item, (v, k) => {
@@ -270,6 +274,7 @@ class TreeNode extends Component {
             } else {
               subFoldr[k] = v;
             }
+            subFoldr[k].hasAccess = subFoldr[k].hasAccess || v.hasAccess;
           }
         });
       });
@@ -404,12 +409,17 @@ class TreeNode extends Component {
         this.state.nodeId,
         this.state.properties,
         leafParent,
-        extraProperties
+        extraProperties,
+        this
       );
   };
 
   deSelectNode = () => {
     this.setState({ selected: false });
+  };
+
+  hideDotsIcon = () => {
+    this.setState({ showDotsIcon: false });
   };
 
   getLabel = () => {
@@ -495,8 +505,96 @@ class TreeNode extends Component {
     this.props.onCheckChange && this.props.onCheckChange(this);
   };
 
+  onMouseEnter = () => {
+    this.setState({
+      showDotsIcon: true
+    });
+  };
+
+  onMouseLeave = () => {
+    if (this.props.selectedNodeId === this.state.nodeId) {
+      return;
+    }
+    this.setState({
+      showDotsIcon: false
+    });
+  };
+
+  getMenu = () => {
+    const style = {
+      marginRight: "5px"
+    };
+    return (
+      <Menu>
+        {this.state.nodes.length && (
+          <Menu.Item disabled>
+            <div className="global__center-vert">
+              <img src="/images/plus-black.svg" style={style} />
+              <Text
+                type="regular"
+                size="12px"
+                text={translate("label.node.fullyexpand")}
+              />
+            </div>
+          </Menu.Item>
+        )}
+        <Menu.Item disabled>
+          <div className="global__center-vert">
+            <img src="/images/life-cycle.svg" style={style} />
+            <Text
+              type="regular"
+              size="12px"
+              text={translate("label.node.selectinlifecycle")}
+            />
+          </div>
+        </Menu.Item>
+        {(isLoggedInOmniciaAdmin(this.props.role) ||
+          isLoggedInCustomerAdmin(this.props.role)) && (
+          <Menu.Item
+            style={{ borderTop: "1px solid rgba(74, 74, 74, 0.25)" }}
+            onClick={this.openPermissionsModal}
+          >
+            <div className="global__center-vert">
+              <img src="/images/assign.svg" style={style} />
+              <Text
+                type="regular"
+                size="12px"
+                text={translate("label.node.assignuseraccess")}
+              />
+            </div>
+          </Menu.Item>
+        )}
+      </Menu>
+    );
+  };
+
+  openPermissionsModal = () => {
+    const { properties, nodes } = this.state;
+    this._fileIds = [];
+    if (properties.fileID) {
+      this._fileIds.push(properties.fileID);
+    }
+    _.map(nodes, node => {
+      this.iterateFileIds(node.value);
+    });
+    const isFolder = properties.fileID ? false : true;
+    this.props.openPermissionsModal(properties.title, isFolder, this._fileIds);
+  };
+
+  iterateFileIds = obj => {
+    _.map(obj, (val, key) => {
+      if (key === "fileID") {
+        this._fileIds.push(val);
+      } else if (key === "leaf") {
+        this._fileIds = _.concat(this._fileIds, _.map(val, "fileID"));
+      } else {
+        typeof val === "object" && this.iterateFileIds(val);
+      }
+    });
+  };
+
   render() {
-    const { nodes, expand, checkboxValue } = this.state;
+    const { nodes, expand, checkboxValue, showDotsIcon } = this.state;
     const {
       defaultPaddingLeft,
       selectedNodeId,
@@ -508,7 +606,8 @@ class TreeNode extends Component {
       editPermissions,
       onCheckChange,
       onExpandNode,
-      role
+      role,
+      openPermissionsModal
     } = this.props;
     const paddingLeft = this.props.paddingLeft + defaultPaddingLeft;
     return (
@@ -529,6 +628,8 @@ class TreeNode extends Component {
           title={this.getLabel()}
           onClick={this.selectNode}
           onDoubleClick={this.openFile}
+          onMouseEnter={this.onMouseEnter}
+          onMouseLeave={this.onMouseLeave}
         >
           {editPermissions && (
             <PermissionCheckbox
@@ -537,12 +638,24 @@ class TreeNode extends Component {
               onChange={this.onCheckboxChange}
             />
           )}
-          <div style={{ paddingLeft }} className="global__center-vert">
+          <div
+            style={{ paddingLeft, width: "100%" }}
+            className="global__center-vert"
+          >
             {this.getCaretIcon()}
             {this.getLeafIcon()}
             <span className="global__node-text" style={{ overflow: "hidden" }}>
               {this.getLabel()}
             </span>
+            {showDotsIcon && (
+              <Dropdown overlay={this.getMenu} trigger={["click"]}>
+                <img
+                  src="/images/overflow-on.svg"
+                  className="global__cursor-pointer"
+                  style={{ marginLeft: "auto", marginRight: "8px" }}
+                />
+              </Dropdown>
+            )}
           </div>
         </div>
         {expand &&
@@ -564,6 +677,7 @@ class TreeNode extends Component {
               submission={submission}
               viewPermissions={viewPermissions}
               editPermissions={editPermissions}
+              openPermissionsModal={openPermissionsModal}
               onCheckChange={onCheckChange}
               onExpandNode={onExpandNode}
             />

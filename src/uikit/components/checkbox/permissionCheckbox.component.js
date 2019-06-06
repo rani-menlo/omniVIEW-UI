@@ -1,7 +1,13 @@
 import React from "react";
 import { Checkbox } from "antd";
 
-const PermissionCheckbox = ({ style, value, onChange }) => {
+const PermissionCheckbox = ({
+  style,
+  value,
+  onChange,
+  className,
+  disabled
+}) => {
   let checked = false;
   let indeterminate = false;
   if (value === 1) {
@@ -12,7 +18,8 @@ const PermissionCheckbox = ({ style, value, onChange }) => {
   }
   return (
     <Checkbox
-      className="permissionCheckbox"
+      disabled={disabled}
+      className={`permissionCheckbox ${className}`}
       style={style}
       checked={checked}
       indeterminate={indeterminate}

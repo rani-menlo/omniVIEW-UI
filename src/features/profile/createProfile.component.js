@@ -8,7 +8,8 @@ import {
   InputField,
   PhoneField,
   OmniButton,
-  CircularImage
+  CircularLocalImageFile,
+  ImageLoader
 } from "../../uikit/components";
 import Header from "../header/header.component";
 import { translate } from "../../translations/translator";
@@ -55,7 +56,8 @@ class CreateProfile extends Component {
         value: "",
         error: ""
       },
-      selectedFile: null
+      selectedFile: null,
+      existingProfileImageChanged: false
     };
     this.uploadContainer = React.createRef();
   }
@@ -77,6 +79,9 @@ class CreateProfile extends Component {
     state.lname.value = user.last_name;
     state.email.value = user.email;
     state.phone.value = user.phone;
+    if (user.profile) {
+      state.selectedFile = user.profile;
+    }
     return state;
   };
 
@@ -220,14 +225,6 @@ class CreateProfile extends Component {
       return;
     }
 
-    /* let reqObject = {
-      user_name: state.username.value,
-      password: state.password.value,
-      firstname: state.fname.value,
-      lastname: state.lname.value,
-      emailaddress: state.email.value,
-      phonenumber: state.phone.value
-    }; */
     const reqObject = new FormData();
     reqObject.append("user_name", state.username.value);
     reqObject.append("firstname", state.fname.value);
@@ -235,22 +232,24 @@ class CreateProfile extends Component {
     reqObject.append("emailaddress", state.email.value);
     reqObject.append("phonenumber", state.phone.value);
 
-    if (this.state.selectedFile) {
-      const ext = this.state.selectedFile.name.substring(
-        this.state.selectedFile.name.lastIndexOf(".") + 1
-      );
-      reqObject.append("profileimage", this.state.selectedFile, {
-        header: { contentType: `image/${ext}; charset=UTF-8` }
-      });
-    }
-
     if (state.editProfile) {
       if (state.showChangePassword && state.oldPassword.value) {
         reqObject.append("oldpassword", state.oldPassword.value);
         reqObject.append("password", state.password.value);
       }
+      if (state.existingProfileImageChanged) {
+        reqObject.append("profileimage", this.state.selectedFile);
+        reqObject.append("profile", this.props.user.profile);
+      } else {
+        if (this.state.selectedFile) {
+          reqObject.append("profileimage", this.state.selectedFile);
+        }
+      }
     } else {
       reqObject.append("password", state.password.value);
+      if (this.state.selectedFile) {
+        reqObject.append("profileimage", this.state.selectedFile);
+      }
     }
 
     this.props.dispatch(
@@ -265,7 +264,10 @@ class CreateProfile extends Component {
   onFileSelected = info => {
     const { file, target } = info;
     if (target) {
-      this.setState({ selectedFile: target.files[0] });
+      this.setState({
+        selectedFile: target.files[0],
+        existingProfileImageChanged: this.props.user.profile ? true : false
+      });
       return;
     }
     if (file.status === "uploading") {
@@ -274,7 +276,10 @@ class CreateProfile extends Component {
   };
 
   deletePhoto = () => {
-    this.setState({ selectedFile: null });
+    this.setState({
+      selectedFile: null,
+      existingProfileImageChanged: this.props.user.profile ? true : false
+    });
   };
 
   replacePhoto = () => {
@@ -510,10 +515,20 @@ class CreateProfile extends Component {
             />
             {this.state.selectedFile && (
               <div className="createProfile__fields">
-                <CircularImage
-                  file={this.state.selectedFile}
-                  className="createProfile__fields-image"
-                />
+                {!this.state.existingProfileImageChanged &&
+                this.props.user.profile ? (
+                  <ImageLoader
+                    path={this.state.selectedFile}
+                    type="circle"
+                    width="100px"
+                    height="100px"
+                  />
+                ) : (
+                  <CircularLocalImageFile
+                    file={this.state.selectedFile}
+                    className="createProfile__fields-image"
+                  />
+                )}
                 <div className="createProfile__fields__vertical">
                   <Text
                     className="global__link"

@@ -155,6 +155,7 @@ class UserManagementContainer extends Component {
   };
 
   openAdduser = () => {
+    this.props.dispatch(UsermanagementActions.resetLicences());
     this.props.history.push("/usermanagement/add");
   };
 
@@ -443,6 +444,7 @@ class UserManagementContainer extends Component {
             deactivate={this.activateDeactivate}
           />
           <UserProfileCard
+            key={_.get(this.state, "selectedUser.profile")}
             visible={this.state.showUserCard}
             user={this.state.selectedUser}
             onClose={this.closeUserCard}

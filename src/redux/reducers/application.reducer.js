@@ -15,6 +15,12 @@ export default (state = initialState, action) => {
         submissionCount: action.data.submissionCount
       };
     }
+    case ApplicationActionTypes.RESET_APPLICATIONS: {
+      return {
+        ...state,
+        submissions: []
+      };
+    }
     case ApplicationActionTypes.SET_SELECTED_SUBMISSION: {
       return {
         ...state,

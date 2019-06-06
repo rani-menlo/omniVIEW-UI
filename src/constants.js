@@ -4,16 +4,35 @@ const path = "/api/v1/";
 
 const SERVER_URL = process.env.REACT_APP_SERVER_URL;
 
+const ROLE_IDS = {
+  OMNICIA: {
+    administrator: 1,
+    author: 3,
+    publisher: 2
+  },
+  CUSTOMER: {
+    administrator: 4,
+    author: 6,
+    publisher: 5
+  }
+};
+
 const ROLES = {
   OMNICIA: [
-    { name: translate("label.role.administrator"), id: 1 },
-    { name: translate("label.role.author"), id: 3 },
-    { name: translate("label.role.publisher"), id: 2 }
+    {
+      name: translate("label.role.administrator"),
+      id: ROLE_IDS.OMNICIA.administrator
+    },
+    { name: translate("label.role.author"), id: ROLE_IDS.OMNICIA.author },
+    { name: translate("label.role.publisher"), id: ROLE_IDS.OMNICIA.publisher }
   ],
   CUSTOMER: [
-    { name: translate("label.role.administrator"), id: 4 },
-    { name: translate("label.role.author"), id: 6 },
-    { name: translate("label.role.publisher"), id: 5 }
+    {
+      name: translate("label.role.administrator"),
+      id: ROLE_IDS.CUSTOMER.administrator
+    },
+    { name: translate("label.role.author"), id: ROLE_IDS.CUSTOMER.author },
+    { name: translate("label.role.publisher"), id: ROLE_IDS.CUSTOMER.publisher }
   ]
 };
 
@@ -41,7 +60,7 @@ const URI = {
   GET_APPLICATIONS: `${path}submission/getSubmissions`,
   // Sequence
   GET_SEQUENCES: `${path}sequence/getSequences`,
-  GET_SEQUENCES_WITH_PERMISSIONS: `${path}file/getSequences`,
+  GET_SEQUENCES_WITH_PERMISSIONS: `${path}sequence/getSequences`,
   // Validation
   VALIDATE_SEQUENCE: `${path}validation/sequenceValidation`,
   // User
@@ -57,9 +76,14 @@ const URI = {
   GET_JSON_WITH_PERMISSION: `${path}file/getSequenceJsonFile`,
   GET_NEW_PATH: `${path}file/getNewPath`,
   GET_RESOURCE_FILE: `${path}file/getResourceFile`,
-  ASSIGN_FILE_PERMISSIONS: `${path}file/assignFilePermissions`,
-  ASSIGN_SUBMISSION_PERMISSIONS: `${path}file/assignSubmissionPermissions`,
-  ASSIGN_SEQUENCE_PERMISSIONS: `${path}file/assignSequencePermissions`
+  // acces
+  ASSIGN_FILE_PERMISSIONS: `${path}access/assignFilePermissions`,
+  ASSIGN_SUBMISSION_PERMISSIONS: `${path}access/assignSubmissionPermissions`,
+  ASSIGN_SEQUENCE_PERMISSIONS: `${path}access/assignSequencePermissions`,
+  GET_USERS_OF_SUBMISSIONS: `${path}access/getSubmissionAccessedUsers`,
+  GET_USERS_OF_FILES: `${path}access/getFolderAccessedUsers`,
+  ASSIGN_FOLDER_PERMISSIONS: `${path}access/assignFolderPermissions`,
+  ASSIGN_GLOBAL_PERMISSIONS: `${path}access/updateGlobalPermissions`
 };
 
 const DATE_FORMAT = "MM/DD/YYYY";
@@ -79,6 +103,7 @@ export {
   VIEWER,
   DEBOUNCE_TIME,
   ROLES,
+  ROLE_IDS,
   CHECKBOX,
   IMAGE_SUPPORT_TYPES
 };

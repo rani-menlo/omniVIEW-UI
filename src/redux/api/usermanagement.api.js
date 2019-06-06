@@ -10,5 +10,7 @@ export default {
   addCustomer: customer => api.post(URI.ADD_CUSTOMER, customer),
   editCustomer: customer => api.post(URI.EDIT_CUSTOMER, customer),
   activateDeactivateUser: user => api.post(URI.ACTIVATE_DEACTIVATE, user),
-  fetchUsers: data => api.post(URI.GET_USERS, data)
+  fetchUsers: data => api.post(URI.GET_USERS, data),
+  fetchUsersOfSubmissions: (data) => api.post(URI.GET_USERS_OF_SUBMISSIONS, data),
+  fetchUsersOfFiles: (data) => api.post(URI.GET_USERS_OF_FILES, data),
 };

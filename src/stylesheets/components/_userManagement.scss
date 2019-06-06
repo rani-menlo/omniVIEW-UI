@@ -26,9 +26,10 @@
       flex-wrap: wrap;
       &__user {
         display: flex;
+        align-items: flex-start;
         margin-bottom: 40px;
         margin-right: 8px;
-        min-width: 32.4%;
+        width: 32%;
         &__info {
           margin-left: 6px;
           &-name {
@@ -47,7 +48,7 @@
           &-link {
             @include text-normal(16px);
             color: $blue;
-            margin-right: 8px;
+            margin-right: 4px;
             text-decoration: underline;
             cursor: pointer;
           }
@@ -55,7 +56,7 @@
             width: 2px;
             height: 2px;
             background: $black;
-            margin-right: 8px;
+            margin-right: 4px;
           }
         }
       }

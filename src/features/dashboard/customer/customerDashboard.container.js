@@ -154,10 +154,8 @@ class CustomerDashboard extends Component {
   };
 
   openOadminUserManagement = () => {
-    const { oAdminCustomer } = this.props;
-    if (oAdminCustomer) {
-      this.openUserMgmt(oAdminCustomer)();
-    }
+    const { user } = this.props;
+    this.openUserMgmt(user.customer)();
   };
 
   openUserMgmt = customer => () => {
@@ -299,7 +297,11 @@ class CustomerDashboard extends Component {
                       {_.get(
                         customer,
                         "subscription",
-                        `${_.get(customer, "number_of_users", "")} in use  | 0 unassigned`
+                        `${_.get(
+                          customer,
+                          "number_of_users",
+                          ""
+                        )} in use  | 0 unassigned`
                       )}
                       <Dropdown
                         overlay={this.getMenu(customer)()}
@@ -469,7 +471,6 @@ function mapStateToProps(state) {
     role: state.Login.role,
     user: state.Login.user,
     customers: state.Customer.customers,
-    oAdminCustomer: state.Customer.oAdminCustomer,
     customerCount: state.Customer.customerCount
   };
 }
