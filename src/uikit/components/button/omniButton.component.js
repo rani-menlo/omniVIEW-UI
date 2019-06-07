@@ -8,7 +8,8 @@ const OmniButton = ({
   className,
   type,
   buttonStyle,
-  disabled
+  disabled,
+  image
 }) => {
   if (type === "add") {
     return (
@@ -17,7 +18,7 @@ const OmniButton = ({
         onClick={onClick}
         style={buttonStyle}
       >
-        <img src="/images/plus.svg" />
+        {image || <img src="/images/plus.svg" />}
         <span className="omniButton-add-text">{label}</span>
       </span>
     );
@@ -36,12 +37,13 @@ const OmniButton = ({
 };
 
 OmniButton.propTypes = {
-  type: PropTypes.oneOf(["add", "primary", "secondary"]),
+  type: PropTypes.oneOf(["add", "primary", "secondary", "danger"]),
   label: PropTypes.string.isRequired,
   onClick: PropTypes.func,
   className: PropTypes.string,
   buttonStyle: PropTypes.object,
-  disabled: PropTypes.bool
+  disabled: PropTypes.bool,
+  image: PropTypes.node
 };
 
 OmniButton.defaultProps = {

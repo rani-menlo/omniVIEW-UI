@@ -4,10 +4,26 @@
     color: $sky-of-margritte;
     cursor: pointer;
   }
+  &-assignpermissions {
+    display: inline-flex !important;
+    border: solid 1px $platinum-granite;
+    background: $white !important;
+    height: 40px;
+    > .omniButton-add-text {
+      @include text-medium(14px);
+    }
+    &_visible {
+      display: initial;
+    }
+    &_hidden {
+      display: none !important;
+    }
+  }
   &__header {
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
+    margin-bottom: 10px;
     &__addEdit {
       @include text-bold-active;
       cursor: pointer;
@@ -29,7 +45,7 @@
     margin-top: 24px;
   }
   &__list {
-    margin-top: 24px;
+    margin-top: 20px;
     &__item {
       cursor: pointer;
       padding: 15px 10px;

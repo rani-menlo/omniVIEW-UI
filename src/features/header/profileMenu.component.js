@@ -19,11 +19,9 @@ class ProfileMenu extends Component {
   };
 
   manageUsers = () => {
-    if (this.props.oAdminCustomer) {
-      this.props.dispatch(
-        CustomerActions.setSelectedCustomer(this.props.oAdminCustomer)
-      );
-    }
+    this.props.dispatch(
+      CustomerActions.setSelectedCustomer(this.props.user.customer)
+    );
     if (this.props.location.pathname === "/usermanagement") {
       this.props.history.push("/usermanagement/parent");
     } else {
@@ -90,13 +88,13 @@ class ProfileMenu extends Component {
         /> */}
         <Dropdown overlay={this.getMenu()} trigger={["click"]}>
           <div className="profile__menu">
-            <Avatar size="small" icon="user" />
             <ImageLoader
               path={user.profile}
               width="36px"
               height="36px"
               type="circle"
             />
+            {/* <Avatar size={36} icon="user" /> */}
             <span className="profile__menu-username">
               {`${_.get(user, "first_name", "")} ${_.get(
                 user,
@@ -115,8 +113,7 @@ class ProfileMenu extends Component {
 function mapStateToProps(state) {
   return {
     user: state.Login.user,
-    role: state.Login.role,
-    oAdminCustomer: state.Customer.oAdminCustomer
+    role: state.Login.role
   };
 }
 

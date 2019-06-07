@@ -8,8 +8,13 @@
   "label.generic.current": "Current",
   "label.generic.new": "New",
   "label.generic.ok": "OK",
+  "label.generic.view": "View",
+  "label.generic.all": "All",
+  "label.generic.assigned": "Assigned",
+  "text.generic.areyousure": "Are you sure you want to continue?",
   "text.generic.editingpermissions": "Editing {user}’s permissions",
-  "text.generic.viewingpermissions": "Viewing {user}’s structure.",
+  "text.generic.viewingpermissions": "Viewing {user}’s structure",
+  "text.generic.editlifecycle": "(To edit permissions switch to Life Cycle View)",
 
   "label.role.administrator": "Administrator",
   "label.role.administrators": "Administrators",
@@ -26,6 +31,7 @@
   "label.button.update": "Update",
   "label.button.continue": "Continue",
   "label.button.editpermissions": "Edit Permissions",
+  "label.button.editpermissionsglobal": "Edit Permissions of Global User",
   "text.pagination": "Showing - {top}-{bottom} of {total} {type}",
   "text.pagination.noofitems": "Number of Items:",
   "label.pagination.back": "Back",
@@ -68,6 +74,7 @@
   "label.storage.tb": "TB",
   "label.storage.gb": "GB",
 
+  "label.dashboard.dashboard": "Dashboard",
   "label.dashboard.customers": "Customers",
   "label.dashboard.customer": "Customer",
   "label.dashboard.customername": "Customer Name",
@@ -84,6 +91,8 @@
   "label.dashboard.applications": "Applications",
   "label.dashboard.application": "Application",
   "label.dashboard.applicationname": "Application Name",
+  "label.dashboard.assignglobalpermissions": "Assign Global Permissions",
+  "label.dashboard.assignpermissions": "Assign Permissions",
   "error.dashboard.notfound": "No {type} found",
 
   "label.usermgmt.title": "User Management",
@@ -145,6 +154,7 @@
 
   "text.submission.editpermissions": "You can edit the sequence, folders, and files this user can access by checking or unchecking them.",
   "text.submission.unsaved": "You have unsaved changes. Are you sure you want to continue?",
+  "text.submission.permissionsoverride": "You have modified the permissions both at sequence level and file level. But file level permissions will have precedence over sequence level, hence sequence level permisssions will be overwritten by file level permissions.",
 
   "error.licence.atleastone": "Enter atleast one license",
 
@@ -152,5 +162,17 @@
   "label.filter.filters": "Filters",
 
   "label.switch.on": "On",
-  "label.switch.off": "Off"
+  "label.switch.off": "Off",
+
+  "label.permissions.globalaccess": "Global Access",
+  "text.permissions.global": "Select who you want to have global access to all applications. Global access allows full access to all applications and the files therein.",
+  "text.permissions.individual": "Select who you want to permit access to the selected applications. Permissions to specific sequences, folders, and files can be fine tuned inside of OmniView.",
+  "text.permissions.filelevel": "Select the users you want to permit access to the selected sequence, folder, or file.",
+
+  "label.node.fullyexpand": "Fully Expand Item",
+  "label.node.selectinlifecycle": "Select in Life Cycle View",
+  "label.node.assignuseraccess": "Assign User Access",
+  "label.menu.openinomniview": "Open in omniVIEW",
+  "label.menu.openinomnifile": "Open in omniFILE",
+  "label.menu.openinnewwindow": "Open in new Window"
 }

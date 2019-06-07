@@ -3,17 +3,22 @@ import _ from "lodash";
 import { translate } from "../../translations/translator";
 import { getFormattedDate } from "../../utils";
 import { Avatar } from "antd";
+import { ImageLoader } from "../../uikit/components";
 
 const UserCard = ({ user, onAvatarClick, onStatusClick, onEdit }) => {
   const isActive = _.get(user, "is_active", false);
   return (
     <div key={user.user_id} className="userManagement__group__users__user">
-      <Avatar
-        size={48}
-        icon="user"
-        onClick={onAvatarClick}
+      <ImageLoader
+        path={user.profile}
+        type="circle"
+        width="48px"
+        height="48px"
         className="global__cursor-pointer"
+        globalAccess={_.get(user, "has_global_access")}
+        onClick={onAvatarClick}
       />
+      {/* <Avatar size={48} icon="user" onClick={onAvatarClick} /> */}
       <div className="userManagement__group__users__user__info">
         <p className="userManagement__group__users__user__info-name">{`${_.get(
           user,

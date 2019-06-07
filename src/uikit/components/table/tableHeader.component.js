@@ -66,7 +66,12 @@ class TableHeader extends Component {
               className={column.sort && "global__cursor-pointer"}
               onClick={this.order(column)}
             >
-              {column.checkbox && <OmniCheckbox />}
+              {column.checkbox && (
+                <OmniCheckbox
+                  onCheckboxChange={column.onCheckboxChange}
+                  checked={column.checked}
+                />
+              )}
               {column.name}
               {column.sort && this.getSortIcon(column)}
             </div>

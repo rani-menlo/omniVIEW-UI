@@ -49,6 +49,11 @@ export default {
       }
     };
   },
+  resetApplications: () => {
+    return {
+      type: ApplicationActionTypes.RESET_APPLICATIONS
+    }
+  },
   setSelectedSubmission: submission => {
     return {
       type: ApplicationActionTypes.SET_SELECTED_SUBMISSION,

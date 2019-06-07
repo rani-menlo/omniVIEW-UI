@@ -8,8 +8,8 @@ const Image = styled.img`
   border-radius: 100px;
 `;
 
-const CircularImage = ({ file, className }) => {
-  if (!file) {
+const CircularLocalImageFile = ({ file, className }) => {
+  if (!file || typeof file === 'string') {
     return null;
   }
   const [fileData, setFileData] = useState("");
@@ -28,12 +28,12 @@ const CircularImage = ({ file, className }) => {
   );
 };
 
-CircularImage.propTypes = {
+CircularLocalImageFile.propTypes = {
   file: PropTypes.object
 };
 
-CircularImage.defaultProps = {
+CircularLocalImageFile.defaultProps = {
   file: null
 };
 
-export default React.memo(CircularImage);
+export default React.memo(CircularLocalImageFile);

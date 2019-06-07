@@ -102,9 +102,11 @@
       }
     }
     .panels__tree {
-      overflow-y: auto;
-      overflow-x: hidden;
-      height: 100%;
+      &__structure {
+        overflow-y: auto;
+        overflow-x: hidden;
+        height: 90%;
+      }
       &__editblock {
         display: flex;
         justify-content: space-between;

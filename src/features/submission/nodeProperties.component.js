@@ -5,7 +5,11 @@ import styled from "styled-components";
 import _ from "lodash";
 import { TypesJson } from "./types";
 import Row from "../../uikit/components/row/row.component";
-import { isLoggedInAuthor, isLoggedInOmniciaAdmin, isLoggedInCustomerAdmin } from "../../utils";
+import {
+  isLoggedInAuthor,
+  isLoggedInOmniciaAdmin,
+  isLoggedInCustomerAdmin
+} from "../../utils";
 
 class NodeProperties extends Component {
   static propTypes = {
@@ -334,7 +338,7 @@ class NodeProperties extends Component {
         <RowItems>
           <div className="label">Submission Description:</div>
           <div className="value">
-            {_.get(applicantInfo, "[submission-description]", "")}
+            {_.get(applicantInfo, "[submission-description].length") || ""}
           </div>
         </RowItems>
         <RowItems>

@@ -18,8 +18,9 @@ import { default as InputField } from "./formfield/InputField";
 import { default as NumericInput } from "./formfield/numericInput";
 import { default as PhoneField } from "./formfield/phoneField";
 import { default as Text } from "./text/text.component";
-import { default as CircularImage } from "./image/circularImage.component";
+import { default as CircularLocalImageFile } from "./image/circularLocalImageFile.component";
 import { default as ImageLoader } from "./image/imageLoader.component";
+import { default as AssignPermissionsModal } from "./modal/assignPermissionsModal.component";
 
 export {
   OmniButton,
@@ -42,6 +43,7 @@ export {
   PhoneField,
   NumericInput,
   Text,
-  CircularImage,
-  ImageLoader
+  CircularLocalImageFile,
+  ImageLoader,
+  AssignPermissionsModal
 };

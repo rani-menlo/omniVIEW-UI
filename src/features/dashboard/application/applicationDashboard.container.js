@@ -1,11 +1,15 @@
 import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
 import _ from "lodash";
-import { Icon, Dropdown, Menu, Avatar } from "antd";
+import { Icon, Dropdown, Menu, Avatar, message } from "antd";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import SubmissionCard from "../submissionCard.component";
-import { ApplicationActions } from "../../../redux/actions";
+import {
+  ApplicationActions,
+  SubmissionActions,
+  UsermanagementActions
+} from "../../../redux/actions";
 import Header from "../../header/header.component";
 import styled from "styled-components";
 import { DEBOUNCE_TIME } from "../../../constants";
@@ -13,7 +17,8 @@ import {
   isLoggedInOmniciaRole,
   isLoggedInCustomerAdmin,
   getFormattedDate,
-  isLoggedInOmniciaAdmin
+  isLoggedInOmniciaAdmin,
+  isAdmin
 } from "../../../utils";
 import {
   Loader,
@@ -26,9 +31,13 @@ import {
   SearchBox,
   ListViewGridView,
   SubHeader,
-  ContentLayout
+  ContentLayout,
+  AssignPermissionsModal,
+  Text
 } from "../../../uikit/components";
 import { translate } from "../../../translations/translator";
+import submissionActions from "../../../redux/actions/submission.actions";
+import usermanagementActions from "../../../redux/actions/usermanagement.actions";
 // import { Customers } from "./sampleCustomers";
 
 class ApplicationDashboard extends Component {
@@ -38,7 +47,63 @@ class ApplicationDashboard extends Component {
       viewBy: "cards",
       pageNo: 1,
       itemsPerPage: 5,
-      searchText: ""
+      searchText: "",
+      submissions: [],
+      assignGlobalPermissions: false,
+      assignPermissions: false,
+      showPermissionsModal: false,
+      checkedSubmissions: [],
+      TableColumns: [
+        {
+          name: TableColumnNames.CHECKBOX,
+          checkbox: true,
+          checked: false,
+          sort: false,
+          width: "5%",
+          onCheckboxChange: this.checkAll
+        },
+        {
+          name: TableColumnNames.APPLICATION_NAME,
+          key: "name",
+          checkbox: false,
+          sort: true,
+          width: "22%"
+        },
+        {
+          name: TableColumnNames.SEQUENCES,
+          key: "sequence_count",
+          checkbox: false,
+          sort: true,
+          width: "12%"
+        },
+        {
+          name: TableColumnNames.ADDEDBY,
+          key: "created_by",
+          checkbox: false,
+          sort: true,
+          width: "26%",
+          style: { justifyContent: "center" }
+        },
+        {
+          name: TableColumnNames.ADDEDON,
+          key: "created_at",
+          checkbox: false,
+          sort: true,
+          width: "14%"
+        },
+        {
+          name: TableColumnNames.LAST_UPDATED,
+          key: "updated_at",
+          checkbox: false,
+          sort: true,
+          width: "17%"
+        },
+        {
+          name: TableColumnNames.USERS,
+          checkbox: false,
+          width: "14%"
+        }
+      ]
     };
     this.searchApplications = _.debounce(
       this.searchApplications,
@@ -46,8 +111,31 @@ class ApplicationDashboard extends Component {
     );
   }
 
+  getColumnWidth = _.memoize(name => {
+    const col = _.find(this.state.TableColumns, col => col.name === name);
+    return _.get(col, "width");
+  });
+
+  static getDerivedStateFromProps(props, state) {
+    if (
+      _.get(props, "submissions.length") &&
+      !_.get(state, "submissions.length")
+    ) {
+      return {
+        submissions: props.submissions
+      };
+    }
+    return null;
+  }
+
   componentDidMount() {
     this.fetchApplications();
+    if (!isAdmin(this.props.role.slug)) {
+      const TableColumns = [...this.state.TableColumns];
+      TableColumns.shift();
+      this.setState({ TableColumns });
+    }
+    // message.success("Hello", 0);
   }
 
   onMenuClick = submission => ({ key }) => {
@@ -55,28 +143,64 @@ class ApplicationDashboard extends Component {
   };
 
   getMenu = submission => () => {
+    const style = {
+      marginRight: "8px"
+    };
     return (
       <Menu onClick={this.onMenuClick(submission)}>
         <Menu.Item disabled>
-          <span className="submissioncard__heading-dropdown--item">
-            Edit User Permissions
-          </span>
+          <div className="global__center-vert">
+            <img src="/images/omni-view-cloud.jpg" style={style} />
+            <Text
+              type="regular"
+              size="12px"
+              text={translate("label.menu.openinomniview")}
+            />
+          </div>
         </Menu.Item>
         <Menu.Item disabled>
-          <span className="submissioncard__heading-dropdown--item red-text">
-            Remove Application
-          </span>
+          <div className="global__center-vert">
+            <img src="/images/omni-file.jpg" style={style} />
+            <Text
+              type="regular"
+              size="12px"
+              text={translate("label.menu.openinomnifile")}
+            />
+          </div>
         </Menu.Item>
         <Menu.Item key="window">
-          <span className="submissioncard__heading-dropdown--item">
-            Open in new Window
-          </span>
+          <div className="global__center-vert">
+            <img src="/images/new-window.png" style={style} />
+            <Text
+              type="regular"
+              size="12px"
+              text={translate("label.menu.openinnewwindow")}
+            />
+          </div>
         </Menu.Item>
+        {(isLoggedInOmniciaAdmin(this.props.role) ||
+          isLoggedInCustomerAdmin(this.props.role)) && (
+          <Menu.Item
+            key="permissions"
+            style={{ borderTop: "1px solid rgba(74, 74, 74, 0.25)" }}
+          >
+            <div className="global__center-vert">
+              <img src="/images/assign.svg" style={style} />
+              <Text
+                type="regular"
+                size="12px"
+                text={translate("label.node.assignuseraccess")}
+              />
+            </div>
+          </Menu.Item>
+        )}
       </Menu>
     );
   };
 
   fetchApplications = (sortBy = "name", orderBy = "ASC") => {
+    this.props.actions.resetApplications();
+    this.setState({ submissions: [] });
     const { viewBy, pageNo, itemsPerPage, searchText } = this.state;
     const { selectedCustomer } = this.props;
     if (viewBy === "lists") {
@@ -99,12 +223,26 @@ class ApplicationDashboard extends Component {
   };
 
   changeView = type => {
-    this.setState({ viewBy: type }, () => this.fetchApplications());
+    const TableColumns = [...this.state.TableColumns];
+    TableColumns[0].checked = false;
+    this.setState(
+      {
+        viewBy: type,
+        assignGlobalPermissions: false,
+        assignPermissions: false,
+        TableColumns
+      },
+      () => this.fetchApplications()
+    );
   };
 
   onSubmissionSelected = submission => () => {
     this.props.actions.setSelectedSubmission(submission);
-    this.props.history.push("/submission");
+    this.props.dispatch(
+      submissionActions.resetSequences(submission.id, () => {
+        this.props.history.push("/submission");
+      })
+    );
   };
 
   openCustomersScreen = () => {
@@ -155,17 +293,105 @@ class ApplicationDashboard extends Component {
       newWindow.addEventListener("load", function() {
         newWindow.document.title = submission.name;
       });
+    } else if (key === "permissions") {
+      this.setState({ checkedSubmissions: [submission] });
+      this.openPermissionsModal();
     }
   };
 
-  render() {
-    const { viewBy, searchText } = this.state;
-    const {
+  checkAll = e => {
+    const checked = _.get(e, "target.checked", false);
+    if (!this.state.submissions.length) {
+      e.preventDefault();
+      return;
+    }
+    let checkedSubmissions = [];
+    let submissions = this.state.submissions.slice(0, this.state.itemsPerPage);
+    submissions = _.map(submissions, submission => ({
+      ...submission,
+      checked
+    }));
+    if (checked) {
+      checkedSubmissions = [...submissions];
+    } else {
+      checkedSubmissions.length = 0;
+    }
+    const TableColumns = [...this.state.TableColumns];
+    TableColumns[0].checked = checked;
+    this.setState({
       submissions,
-      loading,
-      selectedCustomer,
-      submissionCount
-    } = this.props;
+      TableColumns,
+      // assignGlobalPermissions: checked,
+      assignPermissions: checkedSubmissions.length !== 0,
+      checkedSubmissions
+    });
+  };
+
+  onCheckboxChange = submission => e => {
+    const checked = e.target.checked;
+    const submissions = this.state.submissions.slice(
+      0,
+      this.state.itemsPerPage
+    );
+    submission.checked = checked;
+
+    const TableColumns = [...this.state.TableColumns];
+    let assignGlobalPermissions = false;
+    let assignPermissions = false;
+    const checkedSubmissions = [...this.state.checkedSubmissions];
+    if (checked) {
+      assignGlobalPermissions = _.every(submissions, ["checked", true]);
+      checkedSubmissions.push(submission);
+    } else {
+      _.remove(checkedSubmissions, submission);
+    }
+    TableColumns[0].checked = assignGlobalPermissions;
+    // if (!assignGlobalPermissions) {
+    assignPermissions = _.some(submissions, ["checked", true]);
+    // }
+    this.setState({
+      submissions,
+      TableColumns,
+      // assignGlobalPermissions,
+      assignPermissions,
+      checkedSubmissions
+    });
+  };
+
+  openPermissionsModal = () => {
+    this.props.dispatch(usermanagementActions.resetUsersOfFileOrSubmission());
+    this.setState({ showPermissionsModal: true });
+  };
+
+  assignGlobalPermissions = () => {
+    this.props.dispatch(usermanagementActions.resetUsers());
+    this.setState({
+      showPermissionsModal: true,
+      assignGlobalPermissions: true,
+      checkedSubmissions: this.state.submissions
+    });
+  };
+
+  closePermissionsModal = () => {
+    this.checkAll();
+    this.setState({
+      showPermissionsModal: false,
+      assignGlobalPermissions: false
+    });
+  };
+
+  render() {
+    const {
+      viewBy,
+      searchText,
+      TableColumns,
+      submissions,
+      assignGlobalPermissions,
+      assignPermissions,
+      showPermissionsModal,
+      checkedSubmissions
+    } = this.state;
+    const { loading, selectedCustomer, submissionCount, role } = this.props;
     if (!selectedCustomer) {
       return <Redirect to="/customers" />;
     }
@@ -225,19 +451,45 @@ class ApplicationDashboard extends Component {
                 </div>
               )}
             </div>
-            {(isLoggedInOmniciaAdmin(this.props.role) ||
-              isLoggedInCustomerAdmin(this.props.role)) && (
-              <OmniButton
-                type="add"
-                label={translate("label.button.add", {
-                  type: translate("label.dashboard.application")
-                })}
-                className="global__disabled-box"
-              />
-            )}
+            <div className="global__center-vert">
+              {isAdmin(role.slug) && submissions.length !== 0 && (
+                <OmniButton
+                  type="add"
+                  image={<img src="/images/global-permissions.svg" />}
+                  label={translate("label.dashboard.assignglobalpermissions")}
+                  className="maindashboard-assignpermissions"
+                  buttonStyle={{ marginRight: "10px" }}
+                  onClick={this.assignGlobalPermissions}
+                />
+              )}
+              {(isLoggedInOmniciaAdmin(this.props.role) ||
+                isLoggedInCustomerAdmin(this.props.role)) && (
+                <OmniButton
+                  type="add"
+                  label={translate("label.button.add", {
+                    type: translate("label.dashboard.application")
+                  })}
+                  className="global__disabled-box"
+                />
+              )}
+            </div>
           </div>
           {viewBy === "lists" && (
             <React.Fragment>
+              {(isLoggedInOmniciaAdmin(this.props.role) ||
+                isLoggedInCustomerAdmin(this.props.role)) && (
+                <div className="global__center-vert" style={{ height: "40px" }}>
+                  <OmniButton
+                    type="add"
+                    image={<img src="/images/assign.svg" />}
+                    label={translate("label.dashboard.assignpermissions")}
+                    className={`maindashboard-assignpermissions maindashboard-assignpermissions_${
+                      assignPermissions ? "visible" : "hidden"
+                    }`}
+                    onClick={this.openPermissionsModal}
+                  />
+                </div>
+              )}
               <div className="maindashboard__list">
                 <TableHeader
                   columns={TableColumns}
@@ -248,26 +500,36 @@ class ApplicationDashboard extends Component {
                     key={submission.id}
                     className="maindashboard__list__item"
                   >
-                    <Column width={getColumnWidth(TableColumnNames.CHECKBOX)}>
-                      <OmniCheckbox />
-                    </Column>
+                    {isAdmin(role.slug) && (
+                      <Column
+                        width={this.getColumnWidth(TableColumnNames.CHECKBOX)}
+                      >
+                        <OmniCheckbox
+                          checked={submission.checked}
+                          onCheckboxChange={this.onCheckboxChange(submission)}
+                        />
+                      </Column>
+                    )}
                     <Column
-                      width={getColumnWidth(TableColumnNames.APPLICATION_NAME)}
+                      width={this.getColumnWidth(
+                        TableColumnNames.APPLICATION_NAME
+                      )}
                       className="maindashboard__list__item-text-bold"
                       onClick={this.onSubmissionSelected(submission)}
                     >
                       {_.get(submission, "name", "")}
                     </Column>
                     <Column
-                      width={getColumnWidth(TableColumnNames.SEQUENCES)}
+                      width={this.getColumnWidth(TableColumnNames.SEQUENCES)}
                       className="maindashboard__list__item-text"
                       onClick={this.onSubmissionSelected(submission)}
                     >
                       {_.get(submission, "sequence_count", "")}
                     </Column>
                     <Column
-                      width={getColumnWidth(TableColumnNames.ADDEDBY)}
+                      width={this.getColumnWidth(TableColumnNames.ADDEDBY)}
                       className="maindashboard__list__item-text"
+                      style={{ textAlign: "center" }}
                       onClick={this.onSubmissionSelected(submission)}
                     >
                       <Avatar
@@ -278,29 +540,24 @@ class ApplicationDashboard extends Component {
                       {_.get(submission, "created_by") || "Corabelle Durrad"}
                     </Column>
                     <Column
-                      width={getColumnWidth(TableColumnNames.ADDEDON)}
+                      width={this.getColumnWidth(TableColumnNames.ADDEDON)}
                       className="maindashboard__list__item-text"
                       onClick={this.onSubmissionSelected(submission)}
                     >
                       {getFormattedDate(_.get(submission, "created_at"))}
                     </Column>
                     <Column
-                      width={getColumnWidth(TableColumnNames.LAST_UPDATED)}
+                      width={this.getColumnWidth(TableColumnNames.LAST_UPDATED)}
                       className="maindashboard__list__item-text"
                       onClick={this.onSubmissionSelected(submission)}
                     >
                       {getFormattedDate(_.get(submission, "updated_at"))}
                     </Column>
                     <Column
-                      width={getColumnWidth(TableColumnNames.USERS)}
+                      width={this.getColumnWidth(TableColumnNames.USERS)}
                       className="maindashboard__list__item__row maindashboard__list__item-text"
                     >
-                      <div>
-                        <Avatar size="small" icon="user" />
-                        <Avatar size="small" icon="user" />
-                        <Avatar size="small" icon="user" />
-                        <Avatar size="small" icon="user" />
-                      </div>
+                      <div>{this.props.selectedCustomer.number_of_users}</div>
                       <Dropdown
                         overlay={this.getMenu(submission)}
                         trigger={["click"]}
@@ -356,6 +613,7 @@ class ApplicationDashboard extends Component {
                   <SubmissionCard
                     key={submission.id}
                     submission={submission}
+                    customer={selectedCustomer}
                     onSelect={this.onSubmissionSelected}
                     getMenu={this.getMenu(submission)}
                   />
@@ -375,6 +633,14 @@ class ApplicationDashboard extends Component {
               )}
             </React.Fragment>
           )}
+          {showPermissionsModal && (
+            <AssignPermissionsModal
+              visible={showPermissionsModal}
+              assignGlobalPermissions={assignGlobalPermissions}
+              closeModal={this.closePermissionsModal}
+              submissions={checkedSubmissions}
+            />
+          )}
         </ContentLayout>
       </React.Fragment>
     );
@@ -390,61 +656,6 @@ const TableColumnNames = {
   LAST_UPDATED: translate("label.dashboard.lastupdated"),
   USERS: translate("label.dashboard.users")
 };
-
-const TableColumns = [
-  {
-    name: TableColumnNames.CHECKBOX,
-    checkbox: true,
-    sort: false,
-    width: "5%"
-  },
-  {
-    name: TableColumnNames.APPLICATION_NAME,
-    key: "name",
-    checkbox: false,
-    sort: true,
-    width: "22%"
-  },
-  {
-    name: TableColumnNames.SEQUENCES,
-    key: "sequence_count",
-    checkbox: false,
-    sort: true,
-    width: "12%"
-  },
-  {
-    name: TableColumnNames.ADDEDBY,
-    key: "created_by",
-    checkbox: false,
-    sort: true,
-    width: "20%",
-    style: { justifyContent: "center" }
-  },
-  {
-    name: TableColumnNames.ADDEDON,
-    key: "created_at",
-    checkbox: false,
-    sort: true,
-    width: "12%"
-  },
-  {
-    name: TableColumnNames.LAST_UPDATED,
-    key: "updated_at",
-    checkbox: false,
-    sort: true,
-    width: "15%"
-  },
-  {
-    name: TableColumnNames.USERS,
-    checkbox: false,
-    width: "24%"
-  }
-];
-
-const getColumnWidth = _.memoize(name => {
-  const col = _.find(TableColumns, col => col.name === name);
-  return _.get(col, "width");
-});
 
 const Column = styled.div`
   width: ${props => props.width};
@@ -462,6 +673,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
+    dispatch,
     actions: bindActionCreators({ ...ApplicationActions }, dispatch)
   };
 }

@@ -23,7 +23,13 @@ export default {
   assignSubmissionPermissions: data => {
     return api.post(URI.ASSIGN_SUBMISSION_PERMISSIONS, data);
   },
+  assignFolderPermissions: data => {
+    return api.post(URI.ASSIGN_FOLDER_PERMISSIONS, data);
+  },
   assignSequencePermissions: data => {
     return api.post(URI.ASSIGN_SEQUENCE_PERMISSIONS, data);
+  },
+  assignGlobalPermissions: data => {
+    return api.post(URI.ASSIGN_GLOBAL_PERMISSIONS, data);
   }
 };
