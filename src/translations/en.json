@@ -11,6 +11,7 @@
   "label.generic.view": "View",
   "label.generic.all": "All",
   "label.generic.assigned": "Assigned",
+  "text.generic.areyousure": "Are you sure you want to continue?",
   "text.generic.editingpermissions": "Editing {user}’s permissions",
   "text.generic.viewingpermissions": "Viewing {user}’s structure",
   "text.generic.editlifecycle": "(To edit permissions switch to Life Cycle View)",
@@ -153,6 +154,7 @@
 
   "text.submission.editpermissions": "You can edit the sequence, folders, and files this user can access by checking or unchecking them.",
   "text.submission.unsaved": "You have unsaved changes. Are you sure you want to continue?",
+  "text.submission.permissionsoverride": "You have modified the permissions both at sequence level and file level. But file level permissions will have precedence over sequence level, hence sequence level permisssions will be overwritten by file level permissions.",
 
   "error.licence.atleastone": "Enter atleast one license",
 

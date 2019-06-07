@@ -659,55 +659,7 @@ class SubmissionView extends Component {
     this.setState({ showEditMessage: false });
   };
 
-  saveEditedPermissions = () => {
-    /* if (
-      Permissions.GRANTED.file_ids.size ||
-      Permissions.REVOKED.file_ids.size
-    ) {
-      this.props.dispatch(
-        SubmissionActions.assignFilePermissions(
-          {
-            user_ids: [this.state.selectedUser.user_id],
-            granted_file_ids: [...Permissions.GRANTED.file_ids],
-            revoked_file_ids: [...Permissions.REVOKED.file_ids]
-          },
-          () => {
-            if (
-              Permissions.GRANTED.sequence_ids.size ||
-              Permissions.REVOKED.sequence_ids.size
-            ) {
-              this.props.dispatch(
-                SubmissionActions.assignSequencePermissions(
-                  {
-                    user_ids: [this.state.selectedUser.user_id],
-                    granted_sequence_ids: [...Permissions.GRANTED.sequence_ids],
-                    revoked_sequence_ids: [...Permissions.REVOKED.sequence_ids]
-                  },
-                  this.viewPermissions
-                )
-              );
-              this.props.dispatch(ApiActions.requestOnDemand());
-            } else {
-              this.viewPermissions();
-            }
-          }
-        )
-      );
-    } else if (
-      Permissions.GRANTED.sequence_ids.size ||
-      Permissions.REVOKED.sequence_ids.size
-    ) {
-      this.props.dispatch(
-        SubmissionActions.assignSequencePermissions(
-          {
-            user_ids: [this.state.selectedUser.user_id],
-            granted_sequence_ids: [...Permissions.GRANTED.sequence_ids],
-            revoked_sequence_ids: [...Permissions.REVOKED.sequence_ids]
-          },
-          this.viewPermissions
-        )
-      );
-    } */
+  save = () => {
     if (
       Permissions.GRANTED.sequence_ids.size ||
       Permissions.REVOKED.sequence_ids.size
@@ -756,6 +708,24 @@ class SubmissionView extends Component {
         )
       );
     }
+  };
+
+  saveEditedPermissions = () => {
+    if (
+      (Permissions.GRANTED.sequence_ids.size ||
+        Permissions.REVOKED.sequence_ids.size) &&
+      (Permissions.GRANTED.file_ids.size || Permissions.REVOKED.file_ids.size)
+    ) {
+      Modal.confirm({
+        title: translate("text.generic.areyousure"),
+        content: translate("text.submission.permissionsoverride"),
+        okText: translate("label.button.continue"),
+        cancelText: translate("label.button.cancel"),
+        onOk: this.save
+      });
+      return;
+    }
+    this.save();
   };
 
   openPermissionsModal = (label, isFolder, fileIds) => {
