@@ -7,7 +7,7 @@
 
     .section-title {
       @include text-bold-active(14px);
-      margin: 5px 5px;
+      margin: 20px 5px 10px 5px;
       &::after {
         content: "";
         display: block;
@@ -41,23 +41,25 @@
     display: block;
     border-top: solid 1px $ash-blue;
     padding: 6px 12px;
+    margin-top: 20px;
   }
   &__life-cycle-table {
     overflow-x: auto;
-    table {
+    > table {
+      width: 100%;
       border-bottom: solid 1px $ash-blue;
       thead > tr {
         background: $rockman-blue;
         border-top: solid 1px $ash-blue;
         border-bottom: solid 1px $ash-blue;
+        > th {
+          @include text-normal(12px);
+          opacity: 0.5;
+          padding: 6px 12px;
+          border-right: solid 1px $ash-blue;
+        }
       }
-      th {
-        @include text-normal(12px);
-        opacity: 0.5;
-        padding: 6px 12px;
-        border-right: solid 1px $ash-blue;
-      }
-      td {
+      tbody > tr > td {
         @include text-normal(12px);
         border-right: solid 1px $ash-blue;
         padding: 6px 12px;

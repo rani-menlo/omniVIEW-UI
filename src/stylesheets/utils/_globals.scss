@@ -95,6 +95,29 @@
   }
 }
 
+.omnimodal {
+  > .ant-modal-content {
+    > .ant-modal-body {
+      > .ant-modal-confirm-body-wrapper {
+        > .ant-modal-confirm-btns {
+          > .ant-btn:first-child {
+            border-color: $black !important;
+            @include text-bold-active(12px);
+            &:active,
+            &:hover,
+            &:focus {
+              border-color: $black !important;
+              > span {
+                @include text-bold-active(12px);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
 p {
   margin-bottom: 1px !important;
 }

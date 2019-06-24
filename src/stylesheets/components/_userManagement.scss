@@ -29,7 +29,8 @@
         align-items: flex-start;
         margin-bottom: 40px;
         margin-right: 8px;
-        width: 32%;
+        min-width: 32%;
+        max-width: 42%;
         &__info {
           margin-left: 6px;
           &-name {
@@ -38,6 +39,7 @@
           }
           &-text {
             @include text-normal(16px);
+            word-break: break-word;
             &-active {
               color: $caribbean-green;
             }

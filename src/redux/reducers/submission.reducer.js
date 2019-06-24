@@ -45,7 +45,7 @@ export default (state = initialState, action) => {
         ...state,
         validations: {
           ...state.validations,
-          [action.id]: action.data
+          [action.id]: action.data.data
         }
       };
     }

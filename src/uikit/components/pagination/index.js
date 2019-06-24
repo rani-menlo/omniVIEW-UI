@@ -127,7 +127,9 @@ class Pagination extends Component {
     return (
       <div className="pagination" style={containerStyle}>
         <PaginationLib
+          showLessItems
           total={total}
+          // size="small"
           showTotal={showTotal}
           pageSize={this.state.pageSize || 1}
           current={current}
