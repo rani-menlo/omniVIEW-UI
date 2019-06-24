@@ -1,6 +1,11 @@
 .pagination {
   > .ant-pagination {
     opacity: 1;
+    > .ant-pagination-prev,
+    > .ant-pagination-total-text,
+    > .ant-pagination-item {
+      margin-right: 4px !important;
+    }
   }
   display: flex;
   background: $blue;
@@ -22,7 +27,7 @@
         border: none !important;
         border-radius: 0px !important;
         border-top-left-radius: 4px !important;
-        border-bottom-left-radius: 4px !important; 
+        border-bottom-left-radius: 4px !important;
       }
       &-arrows {
         display: flex;

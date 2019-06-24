@@ -16,13 +16,14 @@ class TreeNode extends Component {
       properties: {},
       nodes: [],
       expand: this.props.defaultExpand || this.props.expand,
+      fullyExpand: false,
       prevProps: this.props,
       checkboxValue: CHECKBOX.RESET_DEFAULT,
       showDotsIcon: false
     };
     this.nodeRefs = [];
     this.nodeElementRef = React.createRef();
-    this._fileIds = [];
+    this._fileIds = null;
   }
 
   static propTypes = {
@@ -34,6 +35,7 @@ class TreeNode extends Component {
     expand: PropTypes.bool,
     selectedNodeId: PropTypes.string,
     onNodeSelected: PropTypes.func,
+    selectInLifeCycle: PropTypes.func,
     mode: PropTypes.oneOf(["standard", "qc"]),
     view: PropTypes.oneOf(["current", "lifeCycle"]),
     defaultExpand: PropTypes.bool,
@@ -57,15 +59,16 @@ class TreeNode extends Component {
   };
 
   static getDerivedStateFromProps(props, state) {
-    const newState = {};
+    const newState = { fullyExpand: state.fullyExpand };
     if (props.expand !== state.prevProps.expand) {
       newState.expand = props.expand;
+      newState.fullyExpand = false;
     }
     return _.size(newState) ? { ...newState, prevProps: props } : null;
   }
 
   componentDidMount() {
-    let { content, view, mode, propsCheckboxValue } = this.props;
+    let { content, view, mode } = this.props;
     const properties = {};
     let nodes = [];
     // get object from the ectd:ectd
@@ -95,17 +98,32 @@ class TreeNode extends Component {
           stfFolders = _.map(stfFolders, stfFolder => {
             const keys = [];
             let leaf = [];
+            const studyCategories = {};
             _.map(stfFolder, (value, key) => {
               if (typeof value === "object") {
                 keys.push(key);
+                if (key === "study-categories") {
+                  studyCategories[stfFolder.sequence] = value;
+                }
                 if (value.leaf) {
-                  leaf = [...leaf, ...value.leaf];
+                  const newLeafs = _.map(value.leaf, lf => ({
+                    ...lf,
+                    ...(_.has(value, "file-tag") && {
+                      "file-tag": value["file-tag"]
+                    }),
+                    ...(_.has(value, "site-identifier") && {
+                      "site-identifier": value["site-identifier"]
+                    })
+                  }));
+                  leaf = [...leaf, ...newLeafs];
                 }
               }
             });
             leaf = _.sortBy(leaf, "ID");
             stfFolder = _.omit(stfFolder, keys);
             stfFolder.leaf = leaf;
+            stfFolder["study-categories"] = studyCategories;
+
             return stfFolder;
             // return this.removeSubfoldersAndAppendLeafToParent(stfFolder);
           });
@@ -160,20 +178,29 @@ class TreeNode extends Component {
       }
     }
     _.map(content, (value, key) => {
-      if (typeof value === "string" || typeof value === "boolean") {
+      if (
+        typeof value === "string" ||
+        typeof value === "boolean" ||
+        key === "study-categories" ||
+        key === "lifeCycles"
+      ) {
         properties[key] = value;
       } else {
         const node = { label: key, value };
         if (_.isArray(value) && key === "leaf") {
+          this.setCurrentView(value);
           _.map(value, val => {
-            this.setCurrentView(val, value);
+            // this.setCurrentView(val, value);
             if (view === "current" && !val.showInCurrentView) {
               return;
             }
             const newNode = { label: "leaf", value: val, leafParent: value };
             nodes.push(newNode);
           });
-        } else if (value.version && value.version.includes("STF")) {
+        } else if (
+          _.get(value, "version", "").includes("STF") ||
+          _.get(value, "STF", false)
+        ) {
           const groups = _.groupBy(content, val => val.title);
           node.leafParent = groups[value.title];
           nodes.push(node);
@@ -185,6 +212,12 @@ class TreeNode extends Component {
         }
       }
     });
+
+    // making STF nodes to come in top
+    const leafNodes = _.filter(nodes, { label: "leaf" });
+    const stfNodes = _.difference(nodes, leafNodes);
+    nodes = [].concat(stfNodes).concat(leafNodes);
+
     if (properties["_stfKey"] && mode === "standard") {
       nodes = this.sortByTitle(nodes);
     }
@@ -257,26 +290,87 @@ class TreeNode extends Component {
     const groupedFldrs = _.groupBy(stfFolders, "_stfKey");
     const consolidatedFolder = {};
     _.map(groupedFldrs, (array, key) => {
-      const subFoldr = {};
-      _.map(array, item => {
-        subFoldr.title = item.title;
-        subFoldr.hasAccess = subFoldr.hasAccess || item.hasAccess;
-        subFoldr["_stfKey"] = item["_stfKey"];
-        subFoldr["_omitKey"] = item["_omitKey"];
+      const subFoldr = {
+        lifeCycles: []
+      };
+      _.map(array, (item, idx) => {
+        subFoldr.lifeCycles.push(item);
+        if (idx === 0) {
+          subFoldr.hasAccess = subFoldr.hasAccess || item.hasAccess;
+        }
+        // subFoldr.hasAccess = subFoldr.hasAccess || item.hasAccess;
         _.map(item, (v, k) => {
           if (typeof v === "object") {
-            if (subFoldr[k]) {
+            if (v.leaf) {
+              v.leaf = _.map(v.leaf, lf => ({
+                ...lf,
+                ...(_.has(v, "file-tag") && { "file-tag": v["file-tag"] }),
+                ...(_.has(v, "site-identifier") && {
+                  "site-identifier": v["site-identifier"]
+                })
+              }));
+              subFoldr.lifeCycles = subFoldr.lifeCycles.concat(v.leaf);
+            }
+            if (_.get(subFoldr, "[k].leaf")) {
               let leaf = [...subFoldr[k].leaf, ...v.leaf];
               if (view === "current") {
                 leaf = this.setLatestFiles(leaf);
               }
               subFoldr[k].leaf = leaf;
             } else {
+              if (!_.isArray(v)) {
+                v["sequence"] = item["sequence"];
+                v["operation"] = item["operation"];
+                v["ID"] = item["ID"];
+                v["fileID"] = item["fileID"];
+                v["xlink:href"] = item["xlink:href"];
+                v["STF"] = true;
+                v["study-id"] = item["study-id"];
+                v["study-title"] = item["study-title"];
+                if (v["study-categories"]) {
+                  v["study-categories"][item.sequence] =
+                    item["study-categories"];
+                } else {
+                  v["study-categories"] = {
+                    [item.sequence]: item["study-categories"]
+                  };
+                }
+              }
+              if (_.isArray(v) && k === "study-categories") {
+                subFoldr[k] = subFoldr[k] || {};
+                subFoldr[k][item.sequence] = (
+                  subFoldr[k][item.sequence] || []
+                ).concat(v);
+              } else {
+                let leaf = [];
+                if (subFoldr[k]) {
+                  leaf = subFoldr[k].leaf;
+                }
+                subFoldr[k] = v;
+                subFoldr[k].leaf = [...leaf, ...subFoldr[k].leaf];
+              }
+            }
+
+            if (k !== "study-categories") {
+              subFoldr[k].hasAccess = subFoldr[k].hasAccess || v.hasAccess;
+            }
+          } else {
+            if (idx === 0) {
               subFoldr[k] = v;
             }
-            subFoldr[k].hasAccess = subFoldr[k].hasAccess || v.hasAccess;
+            // subFoldr[k] = v;
           }
         });
+      });
+      _.map(subFoldr, (val, key) => {
+        if (
+          typeof val === "object" &&
+          key !== "lifeCycles" &&
+          key !== "study-categories"
+        ) {
+          val["lifeCycles"] = subFoldr["lifeCycles"];
+          val["study-categories"] = subFoldr["study-categories"];
+        }
       });
       consolidatedFolder[key] = subFoldr;
     });
@@ -284,6 +378,9 @@ class TreeNode extends Component {
   };
 
   setLatestFiles = array => {
+    if (!_.isArray(array)) {
+      return;
+    }
     const newArray = [...array];
     _.map(array, item => {
       if (!item) {
@@ -306,12 +403,46 @@ class TreeNode extends Component {
     return newArray;
   };
 
-  setCurrentView = (obj, array) => {
-    const itemsByTitle = _.groupBy(array, "title");
+  setCurrentView = array => {
+    /* const itemsByTitle = _.groupBy(array, "title");
     const items = itemsByTitle[obj.title];
     const operation = _.get(items, `[${items.length - 1}].operation`, "");
     obj.showInCurrentView =
-      operation !== "delete" && obj.operation === operation;
+      operation !== "delete" && obj.operation === operation; */
+    // get the latest files based on modified-file property
+    let files = this.setLatestFiles(array);
+    // get all deleted files
+    const deletedFiles = _.filter(files, { operation: "delete" });
+    // make all files visible except deleted files
+    files = _.difference(files, deletedFiles);
+    files = _.map(files, file => {
+      file.showInCurrentView = true;
+      return file;
+    });
+    // from the deleted files get the latest update of the file through
+    // modified-file property and make it visible
+    _.map(deletedFiles, deletedFile => {
+      deletedFile.showInCurrentView = false;
+      let modifiedFile = deletedFile["modified-file"];
+      if (modifiedFile) {
+        modifiedFile = modifiedFile.substring(
+          modifiedFile.lastIndexOf("#") + 1
+        );
+        let file = _.find(array, { ID: modifiedFile });
+        if (file) {
+          modifiedFile = file["modified-file"];
+          if (modifiedFile) {
+            modifiedFile = modifiedFile.substring(
+              modifiedFile.lastIndexOf("#") + 1
+            );
+            file = _.find(array, { ID: modifiedFile });
+            file.showInCurrentView = true;
+          } else {
+            file.showInCurrentView = true;
+          }
+        }
+      }
+    });
   };
 
   getCaretIcon = () => {
@@ -357,7 +488,15 @@ class TreeNode extends Component {
       );
     }
     if (this.props.label === "leaf") {
-      if (properties.operation === "new") {
+      if (properties.is_x_ref) {
+        icon = (
+          <img
+            src="/images/file-cross-ref.svg"
+            className="global__file-folder"
+            style={style}
+          />
+        );
+      } else if (properties.operation === "new") {
         icon = (
           <img
             src="/images/file-new.svg"
@@ -448,6 +587,10 @@ class TreeNode extends Component {
     ) {
       return;
     }
+
+    if (_.get(properties, "operation", "") === "delete") {
+      return;
+    }
     const fileHref = properties["xlink:href"];
     let type = "";
     if (fileHref) {
@@ -494,6 +637,10 @@ class TreeNode extends Component {
     this.state.expand && this.setState({ expand: false });
   };
 
+  fullyExpand = () => {
+    this.setState({ fullyExpand: true, expand: true });
+  };
+
   setCheckboxValue = checkboxValue => {
     this.setState({
       checkboxValue
@@ -501,7 +648,6 @@ class TreeNode extends Component {
   };
 
   onCheckboxChange = e => {
-    this.checkboxMutated = true;
     this.props.onCheckChange && this.props.onCheckChange(this);
   };
 
@@ -527,7 +673,7 @@ class TreeNode extends Component {
     return (
       <Menu>
         {this.state.nodes.length && (
-          <Menu.Item disabled>
+          <Menu.Item onClick={this.fullyExpand}>
             <div className="global__center-vert">
               <img src="/images/plus-black.svg" style={style} />
               <Text
@@ -538,63 +684,85 @@ class TreeNode extends Component {
             </div>
           </Menu.Item>
         )}
-        <Menu.Item disabled>
-          <div className="global__center-vert">
-            <img src="/images/life-cycle.svg" style={style} />
-            <Text
-              type="regular"
-              size="12px"
-              text={translate("label.node.selectinlifecycle")}
-            />
-          </div>
-        </Menu.Item>
-        {(isLoggedInOmniciaAdmin(this.props.role) ||
-          isLoggedInCustomerAdmin(this.props.role)) && (
-          <Menu.Item
-            style={{ borderTop: "1px solid rgba(74, 74, 74, 0.25)" }}
-            onClick={this.openPermissionsModal}
-          >
+        {this.props.view !== "lifeCycle" && (
+          <Menu.Item onClick={this.props.selectInLifeCycle}>
             <div className="global__center-vert">
-              <img src="/images/assign.svg" style={style} />
+              <img src="/images/life-cycle.svg" style={style} />
               <Text
                 type="regular"
                 size="12px"
-                text={translate("label.node.assignuseraccess")}
+                text={translate("label.node.selectinlifecycle")}
               />
             </div>
           </Menu.Item>
         )}
+        {(isLoggedInOmniciaAdmin(this.props.role) ||
+          isLoggedInCustomerAdmin(this.props.role)) &&
+          !this.props.editPermissions && (
+            <Menu.Item
+              style={{ borderTop: "1px solid rgba(74, 74, 74, 0.25)" }}
+              onClick={this.openPermissionsModal}
+              disabled={this.state.properties.is_x_ref}
+            >
+              <div className="global__center-vert">
+                <img src="/images/assign.svg" style={style} />
+                <Text
+                  type="regular"
+                  size="12px"
+                  text={translate("label.node.assignuseraccess")}
+                />
+              </div>
+            </Menu.Item>
+          )}
       </Menu>
     );
   };
 
   openPermissionsModal = () => {
     const { properties, nodes } = this.state;
-    this._fileIds = [];
-    if (properties.fileID) {
-      this._fileIds.push(properties.fileID);
+    this._fileIds = new Set();
+    if (properties.fileID && !properties.is_x_ref) {
+      this._fileIds.add(properties.fileID);
     }
     _.map(nodes, node => {
       this.iterateFileIds(node.value);
     });
     const isFolder = properties.fileID ? false : true;
-    this.props.openPermissionsModal(properties.title, isFolder, this._fileIds);
+    this.props.openPermissionsModal(
+      properties,
+      isFolder,
+      Array.from(this._fileIds)
+    );
   };
 
   iterateFileIds = obj => {
     _.map(obj, (val, key) => {
-      if (key === "fileID") {
-        this._fileIds.push(val);
+      if (key === "fileID" && !obj.is_x_ref) {
+        this._fileIds.add(val);
       } else if (key === "leaf") {
-        this._fileIds = _.concat(this._fileIds, _.map(val, "fileID"));
+        const filesNoXref = _.filter(val, { is_x_ref: false });
+        const filesNoXrefIds = _.map(filesNoXref, "fileID");
+        _.map(filesNoXrefIds, id => {
+          this._fileIds.add(id);
+        });
       } else {
-        typeof val === "object" && this.iterateFileIds(val);
+        typeof val === "object" &&
+          key !== "lifeCycles" &&
+          key !== "study-categories" &&
+          this.iterateFileIds(val);
       }
     });
   };
 
   render() {
-    const { nodes, expand, checkboxValue, showDotsIcon } = this.state;
+    const {
+      nodes,
+      expand,
+      checkboxValue,
+      showDotsIcon,
+      fullyExpand,
+      properties
+    } = this.state;
     const {
       defaultPaddingLeft,
       selectedNodeId,
@@ -607,7 +775,8 @@ class TreeNode extends Component {
       onCheckChange,
       onExpandNode,
       role,
-      openPermissionsModal
+      openPermissionsModal,
+      selectInLifeCycle
     } = this.props;
     const paddingLeft = this.props.paddingLeft + defaultPaddingLeft;
     return (
@@ -636,6 +805,7 @@ class TreeNode extends Component {
               style={{ marginLeft: "10px" }}
               value={checkboxValue}
               onChange={this.onCheckboxChange}
+              disabled={properties.is_x_ref}
             />
           )}
           <div
@@ -664,7 +834,7 @@ class TreeNode extends Component {
               ref={this.nodeRefs[idx]}
               parentNode={this}
               role={role}
-              expand={this.props.expand}
+              expand={this.props.expand || fullyExpand}
               paddingLeft={paddingLeft}
               key={node.label + idx + mode}
               label={node.label}
@@ -680,6 +850,7 @@ class TreeNode extends Component {
               openPermissionsModal={openPermissionsModal}
               onCheckChange={onCheckChange}
               onExpandNode={onExpandNode}
+              selectInLifeCycle={selectInLifeCycle}
             />
           ))}
       </React.Fragment>

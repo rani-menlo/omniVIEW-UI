@@ -87,6 +87,7 @@ class UserManagementContainer extends Component {
   };
 
   changeView = type => {
+    this.selectedFilters = {};
     this.setState({ viewBy: type }, () => this.fetchUsers());
   };
 

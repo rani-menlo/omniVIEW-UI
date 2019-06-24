@@ -85,6 +85,7 @@ class SubmissionView extends Component {
     if (this.parentHeaderRef.current) {
       state.parentHeaderHeight = this.parentHeaderRef.current.clientHeight + 28;
     }
+    // if user is not admin, by default enable view permissions.
     if (
       !isLoggedInOmniciaAdmin(this.props.role) &&
       !isLoggedInCustomerAdmin(this.props.role)
@@ -125,6 +126,7 @@ class SubmissionView extends Component {
   initData = () => {
     const { selectedSubmission, user } = this.props;
     if (selectedSubmission) {
+      // fetch sequences first then lifecycle json
       this.props.dispatch(
         SubmissionActions.fetchSequencesWithPermissions(
           selectedSubmission.id,
@@ -151,43 +153,68 @@ class SubmissionView extends Component {
     });
   };
 
+  /* finding a new file in the array of files.
+   looping the array recursively till we get the new file */
+  getNewFileInLifeCycle = (array, modified) => {
+    let leafID = modified.substring(
+      modified.lastIndexOf("#") + 1,
+      modified.length
+    );
+    const fileId = leafID || modified;
+    const oldFile = _.find(array, { ID: fileId });
+    const newModified = _.get(oldFile, "[modified-file]");
+    if (!newModified) {
+      return oldFile;
+    }
+    return this.getNewFileInLifeCycle(array, newModified);
+  };
+
   onNodeSelected = (id, properties, leafParent, extraProperties, node) => {
     if (
       this.state.selectedNode &&
       this.state.selectedNode.state.nodeId !== id
     ) {
       this.state.selectedNode.hideDotsIcon();
+      // this.state.selectedNode.fullyExpandFalse();
     }
-    if (leafParent) {
+    if (properties.lifeCycles) {
+      const cycles = _.groupBy(properties.lifeCycles, "sequence");
+      properties.lifeCycles = _.map(cycles, array => array[0]);
+    }
+    if (leafParent && !properties.lifeCycles) {
       let lifeCycles = [];
-      if (_.isArray(leafParent)) {
-        const href = properties["xlink:href"];
-        const fileName = href.substring(href.lastIndexOf("/") + 1, href.length);
-        lifeCycles = _.filter(leafParent, leaf => {
-          const name = leaf["xlink:href"].substring(
-            leaf["xlink:href"].lastIndexOf("/") + 1,
-            leaf["xlink:href"].length
-          );
-          return name === fileName;
-        });
-        const deletedLeafs = _.filter(
+      if (_.isArray(leafParent) && leafParent.length > 1) {
+        const newFile = this.getNewFileInLifeCycle(
           leafParent,
-          leaf => leaf.operation === "delete"
+          _.get(properties, "ID")
         );
-        _.forEach(deletedLeafs, deletedLeaf => {
-          const modified = _.get(deletedLeaf, "[modified-file]", "");
-          const hashId = modified.substring(
+        if (newFile) {
+          leafParent = _.sortBy(leafParent, leaf => {
+            return leaf.ID === newFile.ID ? 0 : 1;
+          });
+        }
+        let fileId = _.get(newFile, "ID", properties.ID);
+        _.map(leafParent, leaf => {
+          if (leaf.ID === fileId) {
+            lifeCycles.push(leaf);
+            return;
+          }
+          const modified = _.get(leaf, "[modified-file]", "");
+          const leafID = modified.substring(
             modified.lastIndexOf("#") + 1,
             modified.length
           );
-          const leaf = _.find(lifeCycles, life => life.ID === hashId);
-          if (leaf) {
-            lifeCycles.push(deletedLeaf);
-            return false;
+          if (leafID === fileId) {
+            lifeCycles.push(leaf);
+            fileId = leaf.ID;
           }
         });
       } else {
-        lifeCycles.push(leafParent);
+        if (_.isArray(leafParent)) {
+          lifeCycles = lifeCycles.concat(leafParent);
+        } else {
+          lifeCycles.push(leafParent);
+        }
       }
       properties.lifeCycles = lifeCycles;
     }
@@ -248,6 +275,9 @@ class SubmissionView extends Component {
   };
 
   setAccess = (obj, bool) => {
+    if (_.get(obj, "is_x_ref", false)) {
+      return;
+    }
     const fileId = obj.fileID;
     obj.hasAccess = bool;
     if (bool === !!CHECKBOX.SELECTED) {
@@ -347,7 +377,13 @@ class SubmissionView extends Component {
       return "Submission Properties";
     } else if (nodeProperties.name === "m1-regional") {
       return "M1 Regional Properties";
-    } else if (_.get(nodeProperties, "version", "").includes("STF")) {
+    } else if (
+      _.get(nodeProperties, "version", "").includes("STF") ||
+      _.get(nodeProperties, "STF")
+    ) {
+      if (_.get(nodeProperties, "[study-categories].length")) {
+        return "Study Properties";
+      }
       return "STF Properties";
     } else if (nodeProperties.fileID) {
       return "Document Properties";
@@ -358,6 +394,7 @@ class SubmissionView extends Component {
 
   showConfirmDialog = callback => {
     Modal.confirm({
+      className: "omnimodal",
       title: translate("text.submission.unsaved"),
       okText: translate("label.button.continue"),
       cancelText: translate("label.button.cancel"),
@@ -367,13 +404,17 @@ class SubmissionView extends Component {
 
   changeView = view => {
     Permissions.clear();
-    const { selectedUser } = this.state;
+    const { selectedUser, nodeProperties } = this.state;
     const { selectedSubmission, user } = this.props;
     this.props.actions.setSelectedSequence(null);
     this.props.dispatch(
       SubmissionActions.fetchLifeCycleJson(
         selectedSubmission,
-        selectedUser || user
+        selectedUser || user,
+        () => {
+          this.clearTreeNodesMap();
+          nodeProperties && this.onValidationResultItemClick(nodeProperties);
+        }
       )
     );
     this.closeValidationModal();
@@ -405,25 +446,25 @@ class SubmissionView extends Component {
     this.props.history.push("/applications");
   };
 
-  getTreeLabel = () => {
-    const {
-      selectedSubmission,
-      selectedSequence,
-      sequenceJson,
-      lifeCycleJson
-    } = this.props;
+  getSubmissionLabel = () => {
+    const { selectedSequence, sequenceJson, lifeCycleJson } = this.props;
     const jsonData = selectedSequence ? sequenceJson : lifeCycleJson;
     const label = _.get(
       jsonData,
       "[fda-regional:fda-regional][admin][application-set][application][application-information][application-number][$t]",
       ""
     );
+    return label;
+  };
+
+  getTreeLabel = () => {
+    const { selectedSubmission, selectedSequence } = this.props;
     if (this.state.selectedView) {
       const selectedView =
         this.state.selectedView === "current"
           ? "[Current View]"
           : "[Life Cycle View]";
-      return `Submission ${label} ${selectedView}`;
+      return `Submission ${this.getSubmissionLabel()} ${selectedView}`;
     } else {
       return `Sequence ${_.get(selectedSubmission, "name", "")}\\${_.get(
         selectedSequence,
@@ -551,16 +592,30 @@ class SubmissionView extends Component {
     this.selectChildNode(item);
   };
 
+  getNodeFromMap = item => {
+    return _.get(item, "ID")
+      ? this.treeNodesMap.get(item.ID)
+      : this.treeNodesMap.get(
+          `${_.get(item, "name", "")}_${_.get(item, "title", "")}`
+        );
+  };
+
   selectChildNode = item => {
     if (!this.treeNodesMap.size) {
       this.searchNode(this.treeRef.current, item);
     }
-    let selectedNode = null;
-    if (item.ID) {
-      selectedNode = this.treeNodesMap.get(item.ID);
-    } else {
-      selectedNode = this.treeNodesMap.get(`${item.name}_${item.title}`);
+    if (_.get(item, "ID") === "m1") {
+      item = { ID: "m1-regional_US Regional" };
     }
+    let selectedNode = this.getNodeFromMap(item);
+
+    // this case
+    if (!selectedNode) {
+      let files = _.get(item, "lifeCycles");
+      files = _.filter(files, { showInCurrentView: true });
+      selectedNode = this.getNodeFromMap(_.get(files, "[0]"));
+    }
+
     if (selectedNode) {
       selectedNode.selectNode();
       const elem = _.get(selectedNode, "nodeElementRef.current", null);
@@ -586,6 +641,11 @@ class SubmissionView extends Component {
     _.forEach(node.nodeRefs, nodeRef => {
       this.searchNode(_.get(nodeRef, "current"), item);
     });
+  };
+
+  selectInLifeCycle = () => {
+    this.clearTreeNodesMap();
+    this.changeView("lifeCycle");
   };
 
   openUsersSection = () => {
@@ -728,12 +788,14 @@ class SubmissionView extends Component {
     this.save();
   };
 
-  openPermissionsModal = (label, isFolder, fileIds) => {
+  openPermissionsModal = (properties, isFolder, fileIds) => {
     this.props.dispatch(usermanagementActions.resetUsersOfFileOrSubmission());
     this.setState({
       showPermissionsModal: true,
       fileLevelAccessObj: {
-        label,
+        label: properties.hash
+          ? `Submission ${this.getSubmissionLabel()}`
+          : properties.title,
         isFolder,
         fileIds
       }
@@ -741,7 +803,27 @@ class SubmissionView extends Component {
   };
 
   closePermissionsModal = () => {
+    if (this.state.selectedUser) {
+      this.viewPermissions();
+    }
     this.setState({ showPermissionsModal: false });
+  };
+
+  getFormFile = () => {
+    const { selectedSequence, sequenceJson, lifeCycleJson } = this.props;
+    let formFile = null;
+    const json = selectedSequence ? sequenceJson : lifeCycleJson;
+    const m1Regional = _.get(
+      json,
+      "[ectd:ectd][m1-administrative-information-and-prescribing-information][m1-regional]"
+    );
+    _.forEach(m1Regional, (val, key) => {
+      if (_.includes(key, "submission-information")) {
+        formFile = _.get(val, "Form FDA 1571.leaf[0]", "");
+        return false;
+      }
+    });
+    return formFile;
   };
 
   render() {
@@ -999,13 +1081,13 @@ class SubmissionView extends Component {
                     size="12px"
                     text={translate("text.submission.editpermissions")}
                   />
-                  <Text
+                  {/* <Text
                     className="panels__tree__editblock-text global__cursor-pointer"
                     onClick={this.hideEditMessage}
                     type="bold"
                     size="12px"
                     text={translate("label.generic.ok")}
-                  />
+                  /> */}
                 </div>
               )}
 
@@ -1041,19 +1123,6 @@ class SubmissionView extends Component {
                       />
                     </Row>
                     <Row>
-                      {(selectedView === "lifeCycle" ||
-                        selectedSequence !== null) &&
-                        !isAdmin(_.get(this.state, "selectedUser.role_name")) &&
-                        _.get(this.state, "selectedUser.has_global_access") && (
-                          <OmniButton
-                            type="danger"
-                            buttonStyle={{ marginRight: "8px" }}
-                            label={translate(
-                              "label.button.editpermissionsglobal"
-                            )}
-                            onClick={this.enableEditingPermissions}
-                          />
-                        )}
                       <OmniButton
                         type="secondary"
                         label={translate("label.button.cancel")}
@@ -1063,14 +1132,29 @@ class SubmissionView extends Component {
                       {(selectedView === "lifeCycle" ||
                         selectedSequence !== null) && (
                         <OmniButton
+                          type={
+                            !isAdmin(
+                              _.get(this.state, "selectedUser.role_name")
+                            ) &&
+                            _.get(this.state, "selectedUser.has_global_access")
+                              ? "danger"
+                              : "primary"
+                          }
                           disabled={
                             isAdmin(
                               _.get(this.state, "selectedUser.role_name")
                             ) ||
                             _.get(this.state, "selectedUser.has_global_access")
                           }
-                          type="primary"
-                          label={translate("label.button.editpermissions")}
+                          label={
+                            !isAdmin(
+                              _.get(this.state, "selectedUser.role_name")
+                            ) &&
+                            _.get(this.state, "selectedUser.has_global_access")
+                              ? translate("label.button.editpermissionsglobal")
+                              : translate("label.button.editpermissions")
+                          }
+                          buttonStyle={{ borderColor: "transparent" }}
                           onClick={this.enableEditingPermissions}
                         />
                       )}
@@ -1147,6 +1231,7 @@ class SubmissionView extends Component {
                   onCheckChange={this.onCheckChange}
                   onExpandNode={this.onExpandNode}
                   openPermissionsModal={this.openPermissionsModal}
+                  selectInLifeCycle={this.selectInLifeCycle}
                   defaultExpand
                 />
               </div>
@@ -1159,14 +1244,21 @@ class SubmissionView extends Component {
               <div className="panel panel-properties">
                 <NodeProperties
                   properties={this.state.nodeProperties}
+                  formFile={this.getFormFile()}
                   m1Json={
                     selectedSequence
                       ? _.get(sequenceJson, "[fda-regional:fda-regional]", "")
                       : _.get(lifeCycleJson, "[fda-regional:fda-regional]", "")
                   }
+                  projectJson={
+                    selectedSequence
+                      ? _.get(sequenceJson, "[project]", "")
+                      : _.get(lifeCycleJson, "[project]", "")
+                  }
                   sequence={selectedSequence || _.get(sequences, "[0]", "")}
                   submission={selectedSubmission}
                   view={selectedView}
+                  mode={selectedMode}
                 />
               </div>
             </Sidebar>

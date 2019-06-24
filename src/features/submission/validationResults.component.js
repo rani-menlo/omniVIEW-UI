@@ -7,6 +7,8 @@ import { SubmissionActions } from "../../redux/actions";
 import Loader from "../../uikit/components/loader";
 import _ from "lodash";
 import { getValidationsBySequence } from "../../redux/selectors/validationResults.selector";
+import { Text, Row } from "../../uikit/components";
+import { translate } from "../../translations/translator";
 
 class ValidationResults extends Component {
   constructor(props) {
@@ -81,11 +83,10 @@ class ValidationResults extends Component {
   };
 
   render() {
-    const { onClose, loading, label, sequence } = this.props;
+    const { onClose, label, sequence } = this.props;
     const { validationResults, sort, selected } = this.state;
     return (
       <React.Fragment>
-        <Loader loading={loading} />
         <div className="validationResults">
           <div className="validationResults__header">
             <div className="validationResults__header__title global__center-horiz-vert">
@@ -182,9 +183,7 @@ class ValidationResults extends Component {
                             </span>
                             <span
                               style={{
-                                display: "block",
-                                wordWrap: "break-word",
-                                width: "35%"
+                                wordBreak: "break-word"
                               }}
                             >
                               {_.size(validation.title) > 0
@@ -204,9 +203,7 @@ class ValidationResults extends Component {
                         <td className="col-description">
                           <span
                             style={{
-                              display: "block",
-                              wordWrap: "break-word",
-                              width: "40%"
+                              wordBreak: "break-word"
                             }}
                           >
                             {validation.description}
@@ -239,7 +236,6 @@ class ValidationResults extends Component {
 
 function mapStateToProps(state, props) {
   return {
-    loading: state.Api.loading,
     validations: getValidationsBySequence(state, props)
   };
 }

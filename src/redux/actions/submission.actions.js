@@ -60,7 +60,7 @@ export default {
   },
   resetSequences: (submissionId, callback) => {
     return async (dispatch, getState) => {
-      ApiActions.request(dispatch);
+      // ApiActions.request(dispatch);
       try {
         let data = { data: [] };
         const selectedCustomer = getState().Customer.selectedCustomer;
@@ -71,7 +71,7 @@ export default {
           data,
           id
         });
-        ApiActions.success(dispatch);
+        // ApiActions.success(dispatch);
         callback && callback();
       } catch (err) {
         ApiActions.failure(dispatch);
@@ -96,7 +96,7 @@ export default {
       }
     };
   },
-  fetchLifeCycleJson: (submission, user) => {
+  fetchLifeCycleJson: (submission, user, callback) => {
     return async (dispatch, getState) => {
       ApiActions.request(dispatch);
       try {
@@ -124,6 +124,7 @@ export default {
           id
         });
         ApiActions.success(dispatch);
+        callback && callback();
       } catch (err) {
         console.log(err);
         ApiActions.failure(dispatch);
@@ -263,7 +264,7 @@ export default {
           type: SubmissionActionTypes.ASSIGN_PERMISSIONS
         });
         callback && callback();
-        ApiActions.success(dispatch);
+        !callback && ApiActions.success(dispatch);
       } catch (err) {
         ApiActions.failure(dispatch);
       }
@@ -278,7 +279,7 @@ export default {
           type: SubmissionActionTypes.ASSIGN_PERMISSIONS
         });
         callback && callback();
-        ApiActions.success(dispatch);
+        !callback && ApiActions.success(dispatch);
       } catch (err) {
         ApiActions.failure(dispatch);
       }

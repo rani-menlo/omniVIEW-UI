@@ -22,8 +22,14 @@
   &__header {
     display: flex;
     justify-content: space-between;
-    flex-wrap: wrap;
     margin-bottom: 10px;
+    &__section {
+      width: 78%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
     &__addEdit {
       @include text-bold-active;
       cursor: pointer;
@@ -69,6 +75,7 @@
       &-text {
         @include text-normal(14px);
         padding-left: 4px;
+        word-break: break-word;
         &-bold {
           @include text-bold-active(14px);
         }

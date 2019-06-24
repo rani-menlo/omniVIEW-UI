@@ -487,7 +487,7 @@ class AddUser extends Component {
                           key={licence.id}
                           value={licence.id}
                         >
-                          <div style={{ width: "70%" }}>
+                          <div style={{ width: "90%" }}>
                             <div className="global__center-vert">
                               <Text
                                 type="bold"

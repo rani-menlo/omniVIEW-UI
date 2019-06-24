@@ -148,7 +148,7 @@ class ApplicationDashboard extends Component {
     };
     return (
       <Menu onClick={this.onMenuClick(submission)}>
-        <Menu.Item disabled>
+        <Menu.Item key="openinomniview">
           <div className="global__center-vert">
             <img src="/images/omni-view-cloud.jpg" style={style} />
             <Text
@@ -296,6 +296,8 @@ class ApplicationDashboard extends Component {
     } else if (key === "permissions") {
       this.setState({ checkedSubmissions: [submission] });
       this.openPermissionsModal();
+    } else if (key === "openinomniview") {
+      this.onSubmissionSelected(submission)();
     }
   };
 
@@ -437,42 +439,43 @@ class ApplicationDashboard extends Component {
             </div>
           )}
           <div className="maindashboard__header">
-            <div className="global__center-vert">
-              <span className="maindashboard__header-customers">
-                {_.get(selectedCustomer, "company_name", "")}
-              </span>
-              {(isLoggedInOmniciaAdmin(this.props.role) ||
-                isLoggedInCustomerAdmin(this.props.role)) && (
-                <div
-                  className="maindashboard__header__addEdit"
-                  onClick={this.openUserManagement}
-                >
-                  {translate("label.usermgmt.title")}
-                </div>
-              )}
-            </div>
-            <div className="global__center-vert">
+            <div className="maindashboard__header__section">
+              <div style={{ marginBottom: "8px" }}>
+                <span className="maindashboard__header-customers">
+                  {_.get(selectedCustomer, "company_name", "")}
+                </span>
+                {(isLoggedInOmniciaAdmin(this.props.role) ||
+                  isLoggedInCustomerAdmin(this.props.role)) && (
+                  <div
+                    className="maindashboard__header__addEdit"
+                    onClick={this.openUserManagement}
+                  >
+                    {translate("label.usermgmt.title")}
+                  </div>
+                )}
+              </div>
               {isAdmin(role.slug) && submissions.length !== 0 && (
                 <OmniButton
                   type="add"
                   image={<img src="/images/global-permissions.svg" />}
                   label={translate("label.dashboard.assignglobalpermissions")}
                   className="maindashboard-assignpermissions"
-                  buttonStyle={{ marginRight: "10px" }}
+                  buttonStyle={{ marginRight: "4px" }}
                   onClick={this.assignGlobalPermissions}
                 />
               )}
-              {(isLoggedInOmniciaAdmin(this.props.role) ||
-                isLoggedInCustomerAdmin(this.props.role)) && (
-                <OmniButton
-                  type="add"
-                  label={translate("label.button.add", {
-                    type: translate("label.dashboard.application")
-                  })}
-                  className="global__disabled-box"
-                />
-              )}
             </div>
+            {(isLoggedInOmniciaAdmin(this.props.role) ||
+              isLoggedInCustomerAdmin(this.props.role)) && (
+              <OmniButton
+                type="add"
+                label={translate("label.button.add", {
+                  type: translate("label.dashboard.application")
+                })}
+                buttonStyle={{ height: "40px" }}
+                className="global__disabled-box"
+              />
+            )}
           </div>
           {viewBy === "lists" && (
             <React.Fragment>

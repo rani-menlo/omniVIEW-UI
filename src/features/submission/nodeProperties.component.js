@@ -10,6 +10,8 @@ import {
   isLoggedInOmniciaAdmin,
   isLoggedInCustomerAdmin
 } from "../../utils";
+import { Text } from "../../uikit/components";
+import { Icon } from "antd";
 
 class NodeProperties extends Component {
   static propTypes = {
@@ -17,29 +19,56 @@ class NodeProperties extends Component {
     sequence: PropTypes.object,
     submission: PropTypes.object,
     m1Json: PropTypes.object,
-    view: PropTypes.oneOf(["current", "lifeCycle"])
+    projectJson: PropTypes.object,
+    view: PropTypes.oneOf(["current", "lifeCycle"]),
+    mode: PropTypes.oneOf(["standard", "qc"]),
+    formFile: PropTypes.object
   };
 
   getFileName = fullName => {
     return fullName.substring(fullName.lastIndexOf("/") + 1, fullName.length);
   };
 
-  openFile = () => {
-    const { properties } = this.props;
-    const fileHref = properties["xlink:href"];
-    /* const types = fileHref && fileHref.split(".");
-    const type = _.get(types, "[1]", "pdf"); */
+  getFileTypeIcon = fileName => {
+    if (!fileName) {
+      return null;
+    }
+    if (fileName === "folder") {
+      return (
+        <Icon
+          type="folder"
+          theme="filled"
+          className="global__file-folder"
+          style={{ marginRight: "8px" }}
+        />
+      );
+    }
+    const ext = fileName.substring(fileName.lastIndexOf(".") + 1);
+    let src = "";
+    if (ext === "pdf") {
+      src = "filetype-pdf.svg";
+    } else if (ext === "doc" || ext === "docx") {
+      src = "filetype-docx.svg";
+    } else if (ext === "xpt") {
+      src = "filetype-xpt.svg";
+    } else {
+      src = "file-attachment.svg";
+    }
+    return <img src={`/images/${src}`} style={{ marginRight: "8px" }} />;
+  };
+
+  loadFile = (fileHref, fileID, title) => {
     const type = fileHref.substring(fileHref.lastIndexOf(".") + 1);
     let newWindow = null;
-    if (type.includes("pdf") && properties.fileID) {
+    if (type.includes("pdf") && fileID) {
       newWindow = window.open(
-        `${process.env.PUBLIC_URL}/viewer/pdf/${properties.fileID}`,
+        `${process.env.PUBLIC_URL}/viewer/pdf/${fileID}`,
         "_blank"
       );
     } else {
-      if (properties.fileID) {
+      if (fileID) {
         newWindow = window.open(
-          `${process.env.PUBLIC_URL}/viewer/${type}/${properties.fileID}`,
+          `${process.env.PUBLIC_URL}/viewer/${type}/${fileID}`,
           "_blank"
         );
       }
@@ -47,41 +76,225 @@ class NodeProperties extends Component {
 
     if (newWindow) {
       newWindow.addEventListener("load", function() {
-        newWindow.document.title = _.get(properties, "title", "");
+        newWindow.document.title = title || "";
       });
     }
   };
 
-  getStfProperties = () => {
+  openFile = () => {
     const { properties } = this.props;
+    const fileHref = properties["xlink:href"];
+    this.loadFile(fileHref, properties.fileID, properties.title);
+  };
+
+  openLifeCycleFile = lifeCycle => () => {
+    const fileHref = lifeCycle["xlink:href"];
+    this.loadFile(fileHref, lifeCycle.fileID, lifeCycle.title);
+  };
+
+  openFormFile = () => {
+    const { formFile } = this.props;
+    const fileHref = formFile["xlink:href"];
+    this.loadFile(fileHref, formFile.fileID, formFile.title);
+  };
+
+  getStfProperties = () => {
+    const { properties, mode, submission } = this.props;
     return (
       <React.Fragment>
         <RowItems>
           <div className="label">Study Title:</div>
-          <div className="value">{properties.title || ""}</div>
+          <div className="value">{properties["study-title"] || ""}</div>
         </RowItems>
         <RowItems>
           <div className="label">Study ID:</div>
-          <div className="value">{properties.ID || ""}</div>
+          <div className="value">{properties["study-id"] || ""}</div>
         </RowItems>
-        <RowItems>
-          <div className="label">Categories:</div>
-        </RowItems>
+        {mode === "qc" && (
+          <RowItems>
+            <div className="label">Categories:</div>
+            <div className="value">
+              <table>
+                {_.map(properties["study-categories"], (studyCateg, idx) => {
+                  return _.map(studyCateg, category => {
+                    return (
+                      <tr key={idx}>
+                        <td style={{ paddingRight: "10px" }}>
+                          <Text
+                            type="regular"
+                            size="12px"
+                            text={category.name || ""}
+                          />
+                        </td>
+                        <td style={{ paddingRight: "10px" }}>
+                          <Text
+                            type="regular"
+                            size="12px"
+                            text={`[${category["info-type"]}]`}
+                          />
+                        </td>
+                        <td style={{ paddingRight: "10px" }}>
+                          <Text
+                            type="regular"
+                            size="12px"
+                            text={category.value || ""}
+                          />
+                        </td>
+                      </tr>
+                    );
+                  });
+                })}
+              </table>
+            </div>
+          </RowItems>
+        )}
+        {mode === "standard" && (
+          <React.Fragment>
+            <span className="properties-life-cycle-title">Aggregated STFs</span>
+            <div className="properties__life-cycle-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>File Name</th>
+                    <th>Leaf ID</th>
+                    <th>Operation</th>
+                    <th>Modified File</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {_.map(properties.lifeCycles, (lifeCycle, idx) => (
+                    <tr key={idx}>
+                      <td className="properties__life-cycle-table-link">
+                        <a
+                          onClick={
+                            _.get(lifeCycle, "operation", "") === "delete"
+                              ? ""
+                              : this.openFile
+                          }
+                        >
+                          {this.getFileName(lifeCycle["xlink:href"])}
+                        </a>
+                      </td>
+                      <td className="properties__life-cycle-table-link">
+                        {this.getLifeCycleId(lifeCycle)}
+                      </td>
+                      <td>{lifeCycle.operation}</td>
+                      <td className="properties__life-cycle-table-link">
+                        {this.getModifiedFile(lifeCycle)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <span
+              className="properties-life-cycle-title"
+              style={{ marginTop: "none" }}
+            >
+              Study Categories
+            </span>
+            <div className="properties__life-cycle-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Sequence</th>
+                    <th>Categories</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {_.map(
+                    properties["study-categories"],
+                    (categories, sequence) => {
+                      return (
+                        <tr>
+                          <td>
+                            {`${_.get(submission, "name", "")}\\${sequence}`}
+                          </td>
+                          <td>
+                            <table>
+                              {_.map(categories, (studyCateg, idx) => {
+                                return (
+                                  <tr key={idx}>
+                                    <td
+                                      className="value"
+                                      style={{ paddingRight: "10px" }}
+                                    >
+                                      <Text
+                                        type="regular"
+                                        size="12px"
+                                        text={studyCateg.name || ""}
+                                      />
+                                    </td>
+                                    <td
+                                      className="value"
+                                      style={{ paddingRight: "10px" }}
+                                    >
+                                      <Text
+                                        type="regular"
+                                        size="12px"
+                                        text={`[${studyCateg["info-type"]}]`}
+                                      />
+                                    </td>
+                                    <td
+                                      className="value"
+                                      style={{ paddingRight: "10px" }}
+                                    >
+                                      <Text
+                                        type="regular"
+                                        size="12px"
+                                        text={studyCateg.value || ""}
+                                      />
+                                    </td>
+                                  </tr>
+                                );
+                              })}
+                            </table>
+                          </td>
+                        </tr>
+                      );
+                    }
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </React.Fragment>
+        )}
       </React.Fragment>
     );
   };
 
   isSTF = () => {
     const { properties } = this.props;
-    return _.get(properties, "version", "").includes("STF");
+    return (
+      _.get(properties, "version", "").includes("STF") ||
+      _.get(properties, "STF", false)
+    );
   };
 
-  getLeafProperties = properties => {
-    if (!_.get(properties, "fileID", "")) {
+  getLeafProperties = () => {
+    const { m1Json, mode } = this.props;
+    const isM1 = this.isM1();
+    const isSTF = this.isSTF();
+    const properties = isM1
+      ? m1Json["m1-regional-properties"]
+      : this.props.properties;
+    if (!_.get(properties, "fileID", "") || (isSTF && mode === "standard")) {
       return null;
     }
+
+    let containingFolder = _.get(properties, "[xlink:href]", "");
+    const tokens = containingFolder.split("/");
+    if (tokens.length > 1) {
+      containingFolder = tokens[tokens.length - 2];
+    } else {
+      containingFolder = properties.operation === "delete" ? "" : "us";
+    }
+
     return (
       <React.Fragment>
+        {(isSTF || isM1) && (
+          <div className="section-title">Leaf Properties</div>
+        )}
         <RowItems>
           <div className="label">Title:</div>
           <div className="value">{properties.title || ""}</div>
@@ -89,11 +302,30 @@ class NodeProperties extends Component {
         <RowItems>
           <div className="label">File Name:</div>
           <div className="value link">
-            <a onClick={this.openFile}>
+            <a
+              onClick={
+                _.get(properties, "operation", "") === "delete"
+                  ? ""
+                  : this.openFile
+              }
+            >
+              {this.getFileTypeIcon(this.getFileName(properties["xlink:href"]))}
               {this.getFileName(properties["xlink:href"])}
             </a>
           </div>
         </RowItems>
+        {_.has(properties, "file-tag") && (
+          <RowItems>
+            <div className="label">File Tag:</div>
+            <div className="value">{properties["file-tag"] || ""}</div>
+          </RowItems>
+        )}
+        {_.has(properties, "site-identifier") && (
+          <RowItems>
+            <div className="label">Site Identifier:</div>
+            <div className="value">{properties["site-identifier"] || ""}</div>
+          </RowItems>
+        )}
         <RowItems>
           <div className="label">eCTD Operation:</div>
           <div className="value">{properties.operation || ""}</div>
@@ -102,23 +334,41 @@ class NodeProperties extends Component {
           <div className="label">Leaf ID:</div>
           <div className="value">{properties.ID || ""}</div>
         </RowItems>
+        {properties["xlink:href"] && (
+          <RowItems>
+            <div className="label">File Link(Href):</div>
+            <div className="value link">
+              <a
+                onClick={
+                  _.get(properties, "operation", "") === "delete"
+                    ? ""
+                    : this.openFile
+                }
+              >
+                {properties["xlink:href"] || ""}
+              </a>
+            </div>
+          </RowItems>
+        )}
+        {properties.checksum && (
+          <RowItems>
+            <div className="label">Checksum:</div>
+            <div className="value">{properties.checksum || ""}</div>
+          </RowItems>
+        )}
         <RowItems>
-          <div className="label">File Link(Href):</div>
-          <div className="value link">
-            <a onClick={this.openFile}>{properties["xlink:href"] || ""}</a>
-          </div>
-        </RowItems>
-        <RowItems>
-          <div className="label">Checksum:</div>
-          <div className="value">{properties.checksum || ""}</div>
-        </RowItems>
-        <RowItems>
-          <div className="label">Checksum type:</div>
+          <div className="label">Checksum Type:</div>
           <div className="value">{properties["checksum-type"] || ""}</div>
         </RowItems>
+        {properties["modified-file"] && (
+          <RowItems>
+            <div className="label">Modified File:</div>
+            <div className="value">{properties["modified-file"] || ""}</div>
+          </RowItems>
+        )}
         {properties.version && (
           <RowItems>
-            <div className="label">version:</div>
+            <div className="label">Version:</div>
             <div className="value">{properties.version || ""}</div>
           </RowItems>
         )}
@@ -126,10 +376,15 @@ class NodeProperties extends Component {
           <div className="label">Xlink Type:</div>
           <div className="value">{properties["xlink:type"]}</div>
         </RowItems>
-        <RowItems>
-          <div className="label">Containing Folder:</div>
-          <div className="value">{properties.folder || ""}</div>
-        </RowItems>
+        {containingFolder && (
+          <RowItems>
+            <div className="label">Containing Folder:</div>
+            <div className="value global__center-vert">
+              {this.getFileTypeIcon("folder")}
+              {containingFolder}
+            </div>
+          </RowItems>
+        )}
         {properties.manufacturer && (
           <RowItems>
             <div className="label">Manufacturer:</div>
@@ -148,16 +403,75 @@ class NodeProperties extends Component {
 
   isRootSubmission = () => {
     const { properties } = this.props;
-    return _.get(properties, "[dtd-version]", "");
+    return _.get(properties, "hash", "") && !properties.isSequence;
   };
 
   isRootSequence = () => {
     const { properties } = this.props;
-    return this.isRootSubmission() && properties.isSequence;
+    return _.get(properties, "hash", "") && properties.isSequence;
+  };
+
+  getSequenceProperties = () => {
+    const { projectJson, submission } = this.props;
+    const nextSeq = _.get(projectJson, "next_seq", "");
+    const previousSeq = _.get(projectJson, "pre_seq", "");
+    let nextSeqName = "";
+    let previousSeqName = "";
+    nextSeqName = nextSeq && nextSeq.name;
+    nextSeqName =
+      nextSeqName &&
+      `${_.get(submission, "name")}\\${nextSeqName} (${_.get(
+        nextSeq,
+        "submission_type",
+        ""
+      )}-${_.get(nextSeq, "submission_sub_type", "")})`;
+
+    previousSeqName = previousSeq && previousSeq.name;
+    previousSeqName =
+      previousSeqName &&
+      `${_.get(submission, "name")}\\${previousSeqName} (${_.get(
+        previousSeq,
+        "submission_type",
+        ""
+      )}-${_.get(previousSeq, "submission_sub_type", "")})`;
+
+    const currentSeq = `${_.get(submission, "name")}\\${_.get(
+      projectJson,
+      "name",
+      ""
+    )} (${_.get(nextSeq || previousSeq, "submission_type", "")}-${_.get(
+      nextSeq || previousSeq,
+      "submission_sub_type",
+      ""
+    )})`;
+    return (
+      <React.Fragment>
+        <RowItems>
+          <div className="label">Current Sequence:</div>
+          <div className="value">{currentSeq || ""}</div>
+        </RowItems>
+        <RowItems>
+          <div className="label">Containing Folder:</div>
+          <div className="value">{projectJson["containing_folder"] || ""}</div>
+        </RowItems>
+        {previousSeqName && (
+          <RowItems>
+            <div className="label">Previous Sequence:</div>
+            <div className="value">{previousSeqName}</div>
+          </RowItems>
+        )}
+        {nextSeqName && (
+          <RowItems>
+            <div className="label">Next Sequence:</div>
+            <div className="value">{nextSeqName}</div>
+          </RowItems>
+        )}
+      </React.Fragment>
+    );
   };
 
   getRootProperties = () => {
-    const { properties, m1Json } = this.props;
+    const { m1Json, projectJson, submission } = this.props;
     const label = _.get(
       m1Json,
       "[admin][application-set][application][application-information][application-number][$t]",
@@ -168,6 +482,24 @@ class NodeProperties extends Component {
       "[admin][applicant-info][company-name]",
       ""
     );
+    const firstSeq = `${_.get(submission, "name")}\\${_.get(
+      projectJson,
+      "first_seq.name",
+      ""
+    )} (${_.get(projectJson, "first_seq.submission_type", "")}-${_.get(
+      projectJson,
+      "first_seq.submission_sub_type",
+      ""
+    )})`;
+    const lastSeq = `${_.get(submission, "name")}\\${_.get(
+      projectJson,
+      "last_seq.name",
+      ""
+    )} (${_.get(projectJson, "last_seq.submission_type", "")}-${_.get(
+      projectJson,
+      "last_seq.submission_sub_type",
+      ""
+    )})`;
     return (
       <React.Fragment>
         <RowItems>
@@ -178,18 +510,18 @@ class NodeProperties extends Component {
           <div className="label">Company:</div>
           <div className="value">{companyName || ""}</div>
         </RowItems>
-        {/* <Row>
+        <RowItems>
           <div className="label">Containing Folder:</div>
-          <div className="value">{properties.folder || ""}</div>
-        </Row>
-        <Row>
+          <div className="value">{projectJson["containing_folder"] || ""}</div>
+        </RowItems>
+        <RowItems>
           <div className="label">First Sequence:</div>
-          <div className="value">{properties.firstSequence || ""}</div>
-        </Row>
-        <Row>
+          <div className="value">{firstSeq}</div>
+        </RowItems>
+        <RowItems>
           <div className="label">Last Sequence:</div>
-          <div className="value">{properties.lastSequence || ""}</div>
-        </Row> */}
+          <div className="value">{lastSeq}</div>
+        </RowItems>
       </React.Fragment>
     );
   };
@@ -213,6 +545,9 @@ class NodeProperties extends Component {
 
   getFolderProperties = () => {
     const { properties } = this.props;
+    if (this.isRootSubmission() || this.isRootSequence()) {
+      return null;
+    }
     return (
       <React.Fragment>
         <RowItems>
@@ -223,37 +558,43 @@ class NodeProperties extends Component {
           <div className="label">Xml Tag:</div>
           <div className="value">{properties.name || ""}</div>
         </RowItems>
-        {properties["formType"] && (
+        {_.has(properties, "indication") && (
+          <RowItems>
+            <div className="label">Indication:</div>
+            <div className="value">{properties.indication || ""}</div>
+          </RowItems>
+        )}
+        {_.has(properties, "formType") && (
           <RowItems>
             <div className="label">Form Type:</div>
             <div className="value">{properties.formType || ""}</div>
           </RowItems>
         )}
-        {properties.dosageform && (
-          <RowItems>
-            <div className="label">Dosage Form:</div>
-            <div className="value">{properties.dosageform || ""}</div>
-          </RowItems>
-        )}
-        {properties.manufacturer && (
-          <RowItems>
-            <div className="label">Manufacturer:</div>
-            <div className="value">{properties.manufacturer || ""}</div>
-          </RowItems>
-        )}
-        {properties["product-name"] && (
+        {_.has(properties, "product-name") && (
           <RowItems>
             <div className="label">Product Name:</div>
             <div className="value">{properties["product-name"] || ""}</div>
           </RowItems>
         )}
-        {properties.substance && (
+        {_.has(properties, "substance") && (
           <RowItems>
             <div className="label">Substance:</div>
             <div className="value">{properties.substance || ""}</div>
           </RowItems>
         )}
-        {properties.excipient && (
+        {_.has(properties, "manufacturer") && (
+          <RowItems>
+            <div className="label">Manufacturer:</div>
+            <div className="value">{properties.manufacturer || ""}</div>
+          </RowItems>
+        )}
+        {_.has(properties, "dosageform") && (
+          <RowItems>
+            <div className="label">Dosage Form:</div>
+            <div className="value">{properties.dosageform || ""}</div>
+          </RowItems>
+        )}
+        {_.has(properties, "excipient") && (
           <RowItems>
             <div className="label">Excipient:</div>
             <div className="value">{properties.excipient || ""}</div>
@@ -302,7 +643,14 @@ class NodeProperties extends Component {
   };
 
   getM1Properties = () => {
-    const { m1Json, properties, sequence, view } = this.props;
+    const {
+      m1Json,
+      properties,
+      sequence,
+      view,
+      projectJson,
+      formFile
+    } = this.props;
     const m1Properties = m1Json["m1-regional-properties"];
     const applicantInfo = _.get(m1Json, "[admin][applicant-info]");
     const application = _.get(m1Json, "[admin][application-set][application]");
@@ -321,6 +669,12 @@ class NodeProperties extends Component {
         type.code ===
         _.get(submissionInfo, "[submission-id][submission-type]", "")
     ).display;
+    const leafProperties =
+      this.isM1() &&
+      _.get(
+        m1Json,
+        "m1-administrative-information-and-prescribing-information.leaf[0]"
+      );
     return (
       <React.Fragment>
         {!this.isRootSequence() && (
@@ -332,19 +686,21 @@ class NodeProperties extends Component {
         {!this.isRootSequence() && (
           <RowItems>
             <div className="label">Index Type:</div>
-            <div className="value">{_.get(m1Properties, "title", "")}</div>
+            <div className="value">
+              {_.get(m1Properties, "title", "") ||
+                _.get(leafProperties, "title", "")}
+            </div>
           </RowItems>
         )}
         <RowItems>
           <div className="label">Submission Description:</div>
-          <div className="value">
-            {_.get(applicantInfo, "[submission-description].length") || ""}
-          </div>
+          <div className="value">{_.get(projectJson, "description", "")}</div>
         </RowItems>
         <RowItems>
           <div className="label">Company Name:</div>
           <div className="value">
-            {_.size(_.get(applicantInfo, "[company-name]", "")) || ""}
+            {(_.size(_.get(applicantInfo, "[company-name]", "")) || "") &&
+              _.get(applicantInfo, "[company-name]")}
           </div>
         </RowItems>
         <RowItems>
@@ -387,10 +743,12 @@ class NodeProperties extends Component {
           <div className="label">Supplement Effective Date Type: </div>
           <div className="value">{_.get(submissionInfo, "date", "")}</div>
         </RowItems>
-        <RowItems>
-          <div className="label">Date Type: </div>
-          <div className="value">{_.get(submissionInfo, "date", "")}</div>
-        </RowItems>
+        {_.has(submissionInfo, "date") && (
+          <RowItems>
+            <div className="label">Date Type: </div>
+            <div className="value">{_.get(submissionInfo, "date", "")}</div>
+          </RowItems>
+        )}
         <RowItems>
           <div className="label">Sequence Number: </div>
           <div className="value">
@@ -405,10 +763,69 @@ class NodeProperties extends Component {
             {_.get(sequence, "[submission_sub_type]", "")}
           </div>
         </RowItems>
-        <RowItems>
-          <div className="label">Form: </div>
-          <div className="value">{_.get(submissionInfo, "", "")}</div>
-        </RowItems>
+        {formFile && (
+          <RowItems>
+            <div className="label">Form: </div>
+            <div className="value link">
+              <a onClick={this.openFormFile}>
+                {this.getFileTypeIcon(_.get(formFile, "[xlink:href]", ""))}
+                {this.getFileName(_.get(formFile, "[xlink:href]", ""))}
+              </a>
+            </div>
+          </RowItems>
+        )}
+        {leafProperties && (
+          <React.Fragment>
+            <div className="section-title">Leaf Properties</div>
+            <RowItems>
+              <div className="label">Title:</div>
+              <div className="value">{leafProperties.title || ""}</div>
+            </RowItems>
+            <RowItems>
+              <div className="label">File Name:</div>
+              <div className="value">
+                {this.getFileTypeIcon(
+                  this.getFileName(leafProperties["xlink:href"])
+                )}
+                {this.getFileName(leafProperties["xlink:href"])}
+              </div>
+            </RowItems>
+            <RowItems>
+              <div className="label">eCTD Operation:</div>
+              <div className="value">{leafProperties.operation || ""}</div>
+            </RowItems>
+            <RowItems>
+              <div className="label">Leaf ID:</div>
+              <div className="value">{leafProperties.ID || ""}</div>
+            </RowItems>
+            <RowItems>
+              <div className="label">File Link(Href):</div>
+              <div className="value">{leafProperties["xlink:href"] || ""}</div>
+            </RowItems>
+            <RowItems>
+              <div className="label">Checksum:</div>
+              <div className="value">{leafProperties.checksum || ""}</div>
+            </RowItems>
+            <RowItems>
+              <div className="label">Checksum Type:</div>
+              <div className="value">
+                {leafProperties["checksum-type"] || ""}
+              </div>
+            </RowItems>
+            <RowItems>
+              <div className="label">Xlink Type:</div>
+              <div className="value">{leafProperties["xlink:type"]}</div>
+            </RowItems>
+
+            <RowItems>
+              <div className="label">Containing Folder:</div>
+              <div className="value global__center-vert">
+                {this.getFileTypeIcon("folder")}
+                us
+              </div>
+            </RowItems>
+          </React.Fragment>
+        )}
       </React.Fragment>
     );
   };
@@ -434,8 +851,78 @@ class NodeProperties extends Component {
       : "";
   };
 
+  getLifeCycleTable = () => {
+    const { properties, mode } = this.props;
+    if (!properties.fileID || (this.isSTF() && mode === "standard")) {
+      return null;
+    }
+    return (
+      <React.Fragment>
+        <span className="properties-life-cycle-title">
+          {this.isSTF() ? "STF Life Cycle" : "Document Life Cycle"}
+        </span>
+        <div className="properties__life-cycle-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Leaf ID</th>
+                <th style={{ paddingLeft: "4px", paddingRight: "4px" }}>
+                  Operation
+                </th>
+                <th>Modified File</th>
+                <th>File Name</th>
+                <th>Title</th>
+              </tr>
+            </thead>
+            <tbody>
+              {_.map(properties.lifeCycles, (lifeCycle, idx) => (
+                <tr key={idx}>
+                  <td>
+                    <div className="global__center-vert">
+                      <Icon
+                        className="properties__life-cycle-table-link"
+                        type="right-square"
+                        style={{
+                          marginLeft: "-6px",
+                          fontSize: "15px",
+                          visibility:
+                            properties.sequence === lifeCycle.sequence
+                              ? "visible"
+                              : "hidden"
+                        }}
+                      />
+                      <span style={{ marginLeft: "10px" }}>
+                        {this.getLifeCycleId(lifeCycle)}
+                      </span>
+                    </div>
+                  </td>
+                  <td>{lifeCycle.operation}</td>
+                  <td className="properties__life-cycle-table-link">
+                    {this.getModifiedFile(lifeCycle)}
+                  </td>
+                  <td className="properties__life-cycle-table-link link">
+                    <a
+                      onClick={
+                        _.get(lifeCycle, "operation", "") === "delete"
+                          ? ""
+                          : this.openLifeCycleFile(lifeCycle)
+                      }
+                    >
+                      {this.getFileName(lifeCycle["xlink:href"])}
+                    </a>
+                  </td>
+                  <td>{lifeCycle.title}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </React.Fragment>
+    );
+  };
+
   render() {
-    const { properties, m1Json, role } = this.props;
+    const { properties, role } = this.props;
     if (
       !properties ||
       (!isLoggedInCustomerAdmin(role) &&
@@ -450,6 +937,7 @@ class NodeProperties extends Component {
           {this.isRootSubmission() && this.getRootProperties()}
           {this.isRootSequence() && (
             <React.Fragment>
+              {this.getSequenceProperties()}
               <div className="section-title">M1 Properties</div>
               {this.getM1Properties()}
             </React.Fragment>
@@ -457,52 +945,9 @@ class NodeProperties extends Component {
           {this.isFolder() && this.getFolderProperties()}
           {this.isSTF() && this.getStfProperties()}
           {this.isM1() && this.getM1Properties()}
-          {(this.isSTF() || this.isM1()) && (
-            <div className="section-title">Leaf Properties</div>
-          )}
-          {this.getLeafProperties(
-            this.isM1() ? m1Json["m1-regional-properties"] : properties
-          )}
+          {this.getLeafProperties()}
         </div>
-        {_.get(properties, "lifeCycles.length", "") && (
-          <React.Fragment>
-            <span className="properties-life-cycle-title">
-              {this.isSTF() ? "STF Life Cycle" : "Document Life Cycle"}
-            </span>
-            <div className="properties__life-cycle-table">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Leaf ID</th>
-                    <th>Operation</th>
-                    <th>Modified File</th>
-                    <th>File Name</th>
-                    <th>Title</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {_.map(properties.lifeCycles, (lifeCycle, idx) => (
-                    <tr key={idx}>
-                      <td className="properties__life-cycle-table-link">
-                        {this.getLifeCycleId(lifeCycle)}
-                      </td>
-                      <td>{lifeCycle.operation}</td>
-                      <td className="properties__life-cycle-table-link">
-                        {this.getModifiedFile(lifeCycle)}
-                      </td>
-                      <td className="properties__life-cycle-table-link link">
-                        <a onClick={this.openFile}>
-                          {this.getFileName(lifeCycle["xlink:href"])}
-                        </a>
-                      </td>
-                      <td>{properties.title}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </React.Fragment>
-        )}
+        {this.getLifeCycleTable()}
       </div>
     );
   }

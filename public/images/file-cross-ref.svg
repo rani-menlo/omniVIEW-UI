@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <g fill="none" fill-rule="evenodd">
+        <path d="M0 0h24v24H0z"/>
+        <g fill="#42A5F5" fill-rule="nonzero">
+            <path d="M18.194 7.8h-5.807A.394.394 0 0 1 12 7.4v-.8c0-.22.173-.4.387-.4h5.807V3.4c0-.149.08-.285.207-.354a.377.377 0 0 1 .4.025l5.032 3.6A.405.405 0 0 1 24 7a.404.404 0 0 1-.167.328l-5.032 3.6a.376.376 0 0 1-.4.025.401.401 0 0 1-.207-.354V7.8zM5.806 17.8h5.807c.214 0 .387-.18.387-.4v-.8c0-.22-.173-.4-.387-.4H5.806v-2.8a.403.403 0 0 0-.207-.354.377.377 0 0 0-.4.025l-5.032 3.6A.405.405 0 0 0 0 17c0 .13.062.253.167.328l5.032 3.6c.12.086.275.093.4.025a.401.401 0 0 0 .207-.354v-2.8z"/>
+        </g>
+        <path fill="#4A4A4A" stroke="#111" d="M7 1v3h3"/>
+        <path fill="#FFF" stroke="#4A4A4A" stroke-linecap="square" d="M7 1H1v11h9V4z"/>
+        <path fill="#4A4A4A" d="M7 1v3h3z"/>
+        <path stroke="#4A4A4A" stroke-linecap="square" d="M3 4h2M3 6.5h5M3 9h5"/>
+        <g>
+            <path fill="#4A4A4A" stroke="#111" d="M20 12v3h3"/>
+            <path fill="#FFF" stroke="#4A4A4A" stroke-linecap="square" d="M20 12h-6v11h9v-8z"/>
+            <path fill="#4A4A4A" d="M20 12v3h3z"/>
+            <path stroke="#4A4A4A" stroke-linecap="square" d="M16 15h2M16 17.5h5M16 20h5"/>
+        </g>
+    </g>
+</svg>
