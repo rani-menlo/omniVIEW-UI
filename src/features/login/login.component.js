@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { Form, Input, Button, Checkbox } from "antd";
@@ -80,6 +81,10 @@ class Login extends Component {
     });
   };
 
+  forgotPwd = () => {
+    this.props.history.push("/forgotpwd");
+  };
+
   render() {
     const { loading, error } = this.props;
     const { username, password } = this.state;
@@ -107,15 +112,11 @@ class Login extends Component {
               {username.error && (
                 <p className="login-fieldError">{username.error}</p>
               )}
-              <div className="login__pwdsection">
+              <div className="login__pwdsection" onClick={this.forgotPwd}>
                 <span className="global__field-label">
                   {translate("label.form.password")}
                 </span>
-                <a
-                  className="login__pwdsection-forgot-pwd"
-                  tabIndex="3"
-                  style={{ cursor: "not-allowed", opacity: 0.5 }}
-                >
+                <a className="login__pwdsection-forgot-pwd" tabIndex="3">
                   {translate("text.login.forgotpwd")}
                 </a>
               </div>
@@ -170,4 +171,4 @@ const LoginForm = Form.create()(Login);
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(LoginForm);
+)(withRouter(LoginForm));

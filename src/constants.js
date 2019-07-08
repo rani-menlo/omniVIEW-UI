@@ -48,6 +48,9 @@ const URI = {
   LOGIN: `${path}auth/login`,
   OTP: `${path}auth/otpgeneration`,
   OTP_VERIFY: `${path}auth/otpverification`,
+  FORGOT_PWD: `${path}auth/forgotPassword`,
+  RESET_PWD: `${path}auth/resetPassword/:key`,
+  RESET_PWD_LINK_EXPIRY: `${path}auth/checkPasswordExpiry`,
   // Customer
   ADD_CUSTOMER: `${path}customer/createCustomer`,
   EDIT_CUSTOMER: `${path}customer/editCustomer`,

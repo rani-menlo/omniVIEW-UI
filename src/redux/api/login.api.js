@@ -11,6 +11,12 @@ export default {
   verifyOtp: data => {
     return api.post(URI.OTP_VERIFY, data);
   },
+  forgotPwd: data => {
+    return api.post(URI.FORGOT_PWD, data);
+  },
+  resetPassword: data => {
+    return api.post(URI.RESET_PWD.replace(":key", data.key), data);
+  },
   createOrUpdateProfile: data => {
     return api.post(URI.CREATE_UPDATE_PROFILE, data);
   }

@@ -1257,15 +1257,16 @@ const PDF_ROUTER = "viewer/pdf";
                             workerParameters[key];
                         }
                         parameters = Object.create(null);
-
+                        debugger;
                         //custom data  Feb 1 2019
                         parameters.docBaseUrl = SERVER_URL;
                         // adding token as custom header
-                        /* const token = localStorage.getItem('omniview_user_token');
+                        const token = localStorage.getItem('omniview_user_token');
+                        console.log("****", token);
                         const header = {
                           'x-auth-token': token
                         };
-                        parameters.httpHeaders = header; */
+                        parameters.httpHeaders = header;
                         if (typeof file === "string") {
                           this.setTitleUsingUrl(file);
                           parameters.url = file;
@@ -1385,6 +1386,7 @@ const PDF_ROUTER = "viewer/pdf";
           return open;
         })(),
         download: function download() {
+          debugger;
           var _this3 = this;
 
           function downloadByUrl() {

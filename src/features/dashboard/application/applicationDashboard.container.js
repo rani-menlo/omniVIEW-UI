@@ -135,7 +135,6 @@ class ApplicationDashboard extends Component {
       TableColumns.shift();
       this.setState({ TableColumns });
     }
-    // message.success("Hello", 0);
   }
 
   onMenuClick = submission => ({ key }) => {

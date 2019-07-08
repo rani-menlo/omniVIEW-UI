@@ -177,7 +177,7 @@ class SubmissionView extends Component {
       this.state.selectedNode.hideDotsIcon();
       // this.state.selectedNode.fullyExpandFalse();
     }
-    if (properties.lifeCycles) {
+    /* if (properties.lifeCycles) {
       const cycles = _.groupBy(properties.lifeCycles, "sequence");
       properties.lifeCycles = _.map(cycles, array => array[0]);
     }
@@ -217,7 +217,7 @@ class SubmissionView extends Component {
         }
       }
       properties.lifeCycles = lifeCycles;
-    }
+    } */
     if (this.props.selectedSequence) {
       properties.isSequence = true;
     }
@@ -612,7 +612,7 @@ class SubmissionView extends Component {
     // this case
     if (!selectedNode) {
       let files = _.get(item, "lifeCycles");
-      files = _.filter(files, { showInCurrentView: true });
+      // files = _.filter(files, { showInCurrentView: true });
       selectedNode = this.getNodeFromMap(_.get(files, "[0]"));
     }
 
@@ -1028,7 +1028,15 @@ class SubmissionView extends Component {
               expand={this.state.sequencesExpand}
             >
               <div className="panel panel-sequences">
-                <div style={{ height: showUsersSection ? "45%" : "93.2%" }}>
+                <div
+                  style={{
+                    height: showUsersSection
+                      ? "45%"
+                      : isAdmin(role.name)
+                      ? "calc(100% - 33px)"
+                      : "100%"
+                  }}
+                >
                   <NodeSequences
                     onSequenceCheckboxChange={this.onSequenceCheckboxChange}
                     submissionLabel={_.get(selectedSubmission, "name", "")}
@@ -1041,8 +1049,7 @@ class SubmissionView extends Component {
                     editPermissions={editPermissions}
                   />
                 </div>
-                {(isLoggedInOmniciaAdmin(role) ||
-                  isLoggedInCustomerAdmin(role)) && (
+                {isAdmin(role.name) && (
                   <div
                     className="panel-sequences__users global__cursor-pointer"
                     onClick={this.openUsersSection}
@@ -1140,12 +1147,9 @@ class SubmissionView extends Component {
                               ? "danger"
                               : "primary"
                           }
-                          disabled={
-                            isAdmin(
-                              _.get(this.state, "selectedUser.role_name")
-                            ) ||
-                            _.get(this.state, "selectedUser.has_global_access")
-                          }
+                          disabled={isAdmin(
+                            _.get(this.state, "selectedUser.role_name")
+                          )}
                           label={
                             !isAdmin(
                               _.get(this.state, "selectedUser.role_name")
@@ -1208,7 +1212,8 @@ class SubmissionView extends Component {
                 style={{
                   height: showEditMessage
                     ? "83%"
-                    : viewPermissions || editPermissions
+                    : isAdmin(_.get(this.state, "selectedUser.role_name")) &&
+                      (viewPermissions || editPermissions)
                     ? "90%"
                     : "100%"
                 }}

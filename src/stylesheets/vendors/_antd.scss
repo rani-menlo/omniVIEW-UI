@@ -44,3 +44,25 @@
     }
   }
 }
+
+.ant-message-notice-content {
+  min-width: 200px;
+  height: 36px;
+  border-radius: 24px !important;
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.5) !important;
+  background-color: $blue-atoll !important;
+  padding: 5px 20px 0px 6px !important;
+  text-align: left;
+
+  > .ant-message-custom-content {
+    > .anticon {
+      top: 2px;
+      color: $white;
+      font-size: 22px;
+    }
+    > span {
+      @include text-medium(14px);
+      color: $white;
+    }
+  }
+}

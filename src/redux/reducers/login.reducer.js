@@ -1,6 +1,7 @@
 import { LoginActionTypes } from "../actionTypes";
 import _ from "lodash";
 import { message } from "antd";
+import { Toast } from "../../uikit/components";
 
 const initialState = {
   user: null,
@@ -14,7 +15,8 @@ const initialState = {
     otpReceived: false,
     verified: false,
     verifying: false
-  }
+  },
+  forgotPwdError: ""
 };
 
 export default (state = initialState, action) => {
@@ -142,12 +144,18 @@ export default (state = initialState, action) => {
     }
     case LoginActionTypes.CREATE_UPDATE_PROFILE: {
       if (action.data.error) {
-        message.error(action.data.message);
+        Toast.error(action.data.message);
         return state;
       }
       return {
         ...state,
         user: { ...state.user, ...action.data.data }
+      };
+    }
+    case LoginActionTypes.FORGOT_PWD_ERROR: {
+      return {
+        ...state,
+        forgotPwdError: action.error
       };
     }
     default:

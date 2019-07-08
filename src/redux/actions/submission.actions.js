@@ -3,6 +3,7 @@ import { message } from "antd";
 import { SubmissionActionTypes } from "../actionTypes";
 import { SubmissionApi } from "../api";
 import { ApiActions } from ".";
+import { Toast } from "../../uikit/components";
 // import lifecyclejson from "./life.json";
 
 export default {
@@ -294,7 +295,7 @@ export default {
           type: SubmissionActionTypes.ASSIGN_PERMISSIONS
         });
         if (_.get(res, "data.message") === "Success") {
-          message.success("Permissions Updated");
+          Toast.success("Permissions Updated");
         }
         ApiActions.success(dispatch);
       } catch (err) {
@@ -311,7 +312,7 @@ export default {
           type: SubmissionActionTypes.ASSIGN_PERMISSIONS
         });
         if (_.get(res, "data.message") === "Success") {
-          message.success("Permissions Updated");
+          Toast.success("Permissions Updated");
         }
         ApiActions.success(dispatch);
       } catch (err) {
@@ -328,7 +329,7 @@ export default {
           type: SubmissionActionTypes.ASSIGN_PERMISSIONS
         });
         if (_.get(res, "data.message") === "Success") {
-          message.success("Permissions Updated");
+          Toast.success("Permissions Updated");
         }
         ApiActions.success(dispatch);
       } catch (err) {

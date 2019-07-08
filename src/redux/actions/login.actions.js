@@ -1,6 +1,8 @@
+import _ from "lodash";
 import { LoginActionTypes } from "../actionTypes";
 import { ApiActions } from ".";
 import { LoginApi } from "../api";
+import { Toast } from "../../uikit/components";
 
 export default {
   login: data => {
@@ -14,7 +16,6 @@ export default {
         });
         ApiActions.success(dispatch);
       } catch (err) {
-        console.log(err);
         ApiActions.failure(dispatch);
       }
     };
@@ -28,10 +29,12 @@ export default {
           type: LoginActionTypes.CREATE_UPDATE_PROFILE,
           data: res.data
         });
+        if (!res.data.error) {
+          Toast.success("Profile Updated!");
+          history.push("/customers");
+        }
         ApiActions.success(dispatch);
-        !res.data.error && history.push("/customers");
       } catch (err) {
-        console.log(err);
         ApiActions.failure(dispatch);
       }
     };
@@ -65,7 +68,6 @@ export default {
         });
         ApiActions.success(dispatch);
       } catch (err) {
-        console.log(err);
         ApiActions.failure(dispatch);
       }
     };
@@ -106,6 +108,52 @@ export default {
   logOut: () => {
     return {
       type: LoginActionTypes.LOGOUT
+    };
+  },
+  forgotPassword: (data, callback) => {
+    return async dispatch => {
+      try {
+        ApiActions.request(dispatch);
+        const res = await LoginApi.forgotPwd(data);
+        dispatch({
+          type: res.data.error
+            ? LoginActionTypes.FORGOT_PWD_ERROR
+            : LoginActionTypes.FORGOT_PWD,
+          ...(res.data.error && { error: res.data.message })
+        });
+        ApiActions.success(dispatch);
+        !res.data.error && callback();
+      } catch (err) {
+        ApiActions.failure(dispatch);
+      }
+    };
+  },
+  resetPassword: (data, callback) => {
+    return async dispatch => {
+      try {
+        ApiActions.request(dispatch);
+        const res = await LoginApi.resetPassword(data);
+        dispatch({
+          type: LoginActionTypes.RESET_PWD,
+          data: res.data
+        });
+
+        if (!_.get(res, "data.error", false)) {
+          Toast.success(_.get(res, "data.message", ""));
+        } else {
+          Toast.error(_.get(res, "data.message", ""));
+        }
+        ApiActions.success(dispatch);
+        !res.data.error && callback();
+      } catch (err) {
+        ApiActions.failure(dispatch);
+      }
+    };
+  },
+  setForgotPwdError: error => {
+    return {
+      type: LoginActionTypes.FORGOT_PWD_ERROR,
+      error
     };
   }
 };

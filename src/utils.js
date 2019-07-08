@@ -11,7 +11,7 @@ const isLoggedInOmniciaRole = role => _.get(role, "slug", "").includes("o_");
 const isLoggedInCustomerAdmin = role => _.get(role, "slug", "") === "c_admin";
 const isLoggedInOmniciaAdmin = role => _.get(role, "slug", "") === "o_admin";
 const isLoggedInAuthor = role => _.get(role, "slug", "").includes("_author");
-const isAdmin = roleName => _.includes(roleName, "admin");
+const isAdmin = roleName => _.includes(_.toLower(roleName), "admin");
 const isEmail = mail => REGEX_EMAIL.test(mail);
 const isValidPwd = pwd => REGEX_PWD.test(pwd);
 const isPhone = phone => isValidPhoneNumber(phone);

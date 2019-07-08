@@ -1,11 +1,11 @@
 import Redux from "../store";
 import _ from 'lodash';
 import { LoginActions } from "../actions";
-import { message } from "antd";
+import { Toast } from "../../uikit/components";
 
 const responseInterceptor = error => {
   if (_.get(error, "response.status") === 401) {
-    message.error("Session Expired!");
+    Toast.error("Session Expired!");
     Redux.store.dispatch(LoginActions.logOut());
   }
 };

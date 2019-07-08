@@ -17,14 +17,15 @@ import {
   Pagination,
   Text
 } from "../../uikit/components";
-import { DEBOUNCE_TIME } from "../../constants";
-import { UsermanagementActions } from "../../redux/actions";
+import { DEBOUNCE_TIME, ROLES } from "../../constants";
+import { UsermanagementActions, CustomerActions } from "../../redux/actions";
 import { Avatar, Dropdown, Menu, Icon, Popover, Modal } from "antd";
 import { translate } from "../../translations/translator";
 import { getRoleName, getFormattedDate } from "../../utils";
 import PopoverUsersFilter from "./popoverUsersFilter";
 import UserCard from "./userCard.component";
 import UserProfileCard from "./userProfileCard.component";
+import PopoverCustomers from "./popoverCustomers.component";
 
 class UserManagementContainer extends Component {
   constructor(props) {
@@ -95,8 +96,7 @@ class UserManagementContainer extends Component {
     this.fetchUsers();
   } */
 
-  fetchUsers = () => {
-    const { selectedCustomer } = this.props;
+  fetchUsers = (selectedCustomer = this.props.selectedCustomer) => {
     const { viewBy, pageNo, itemsPerPage, searchText } = this.state;
     if (selectedCustomer) {
       if (viewBy === "lists") {
@@ -119,6 +119,26 @@ class UserManagementContainer extends Component {
         );
       }
     }
+  };
+
+  onCustomerSelected = customer => {
+    this.props.dispatch(CustomerActions.setSelectedCustomer(customer));
+    const omniciaRoles = _.map(ROLES.OMNICIA, "id");
+    const customerRoles = _.map(ROLES.CUSTOMER, "id");
+    const roles = _.get(customer, "is_omnicia", false)
+      ? omniciaRoles
+      : customerRoles;
+
+    if (this.selectedFilters.roles) {
+      const diff = _.difference(this.selectedFilters.roles, roles);
+      if (diff.length) {
+        this.selectedFilters.roles = _.map(this.selectedFilters.roles, role =>
+          role < 4 ? role + 3 : role - 3
+        );
+      }
+    }
+
+    this.fetchUsers(customer);
   };
 
   onPageChange = pageNo => {
@@ -255,13 +275,28 @@ class UserManagementContainer extends Component {
             onFiltersUpdate={this.onFiltersUpdate}
             selectedCustomer={selectedCustomer}
           />
-          <Text
-            type="extra_bold"
-            size="20px"
-            className="userManagement-subheader-title"
-            text={selectedCustomer.company_name}
-            onClick={this.goBack}
-          />
+          <Popover
+            trigger="click"
+            placement="bottom"
+            content={
+              <PopoverCustomers onCustomerSelected={this.onCustomerSelected} />
+            }
+          >
+            <Row style={{ marginLeft: "auto" }}>
+              <Text
+                type="extra_bold"
+                size="20px"
+                className="userManagement-subheader-title"
+                text={selectedCustomer.company_name}
+                // onClick={this.goBack}
+              />
+              <img
+                className="global__cursor-pointer"
+                src="/images/caret-inactive.svg"
+                style={{ marginLeft: "5px" }}
+              />
+            </Row>
+          </Popover>
           <div style={{ marginLeft: "auto" }}>
             <SearchBox
               placeholder={translate("text.header.search", {

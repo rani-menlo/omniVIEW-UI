@@ -5,7 +5,7 @@ import { Input } from "antd";
 
 const onInputText = onChange => e => {
   const { value } = e.target;
-  if (value === " ") {
+  if (value.includes(" ")) {
     return;
   }
   onChange && onChange(e);
