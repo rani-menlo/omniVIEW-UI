@@ -194,7 +194,13 @@ class AssignPermissions extends Component {
   sort = () => {
     let { order } = this.state;
     order = order === "asc" ? "desc" : "asc";
-    const users = _.orderBy(this.state.users, ["first_name"], [order]);
+    const users = _.orderBy(
+      this.state.users,
+      user => {
+        return _.toLower(user.first_name);
+      },
+      [order]
+    );
     this.setState({ users, order });
   };
 
