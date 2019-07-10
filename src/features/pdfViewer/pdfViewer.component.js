@@ -64,6 +64,7 @@ class PdfViewer extends Component {
         url = `${SERVER_URL}${URI.GET_RESOURCE_FILE}/${fileId}${hash}`;
       }
     }
+    url = `${url}?token=${localStorage.getItem("omniview_user_token")}`;
     this.setState({ url, type: params.type, loading: false, largeFile });
   }
 
@@ -81,6 +82,7 @@ class PdfViewer extends Component {
     }
 
     if (type === "pdf") {
+      url = url.substring(0, url.lastIndexOf("?"));
       return <iframe width="100%" height="100%" src={url} />;
     }
 

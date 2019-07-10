@@ -336,7 +336,9 @@ class CreateProfile extends Component {
               type="regular"
               size="14px"
               opacity={0.5}
-              text={translate("text.profile.passwordmsg")}
+              text={`${translate("text.profile.uniqueuserpwd")} ${translate(
+                "text.form.pwdreq"
+              )}`}
             />
             <div
               className="createProfile__fields"

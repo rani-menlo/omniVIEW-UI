@@ -2,6 +2,7 @@ import { UsermanagementActionTypes } from "../actionTypes";
 import _ from "lodash";
 import ApiActions from "./api.actions";
 import { UsermanagementApi } from "../api";
+import { Toast } from "../../uikit/components";
 
 export default {
   getDepartments: () => {
@@ -122,8 +123,11 @@ export default {
           type: UsermanagementActionTypes.ADD_USER,
           data: res.data
         });
+        if (!res.data.error) {
+          Toast.success("User Created!");
+          history.goBack();
+        }
         ApiActions.success(dispatch);
-        !res.data.error && history.goBack();
       } catch (err) {
         ApiActions.failure(dispatch);
       }
@@ -138,8 +142,11 @@ export default {
           type: UsermanagementActionTypes.UPDATE_USER,
           data: res.data
         });
+        if (!res.data.error) {
+          Toast.success("User Updated!");
+          history.goBack();
+        }
         ApiActions.success(dispatch);
-        !res.data.error && history.goBack();
       } catch (err) {
         ApiActions.failure(dispatch);
       }
@@ -155,6 +162,7 @@ export default {
           type: UsermanagementActionTypes.FETCH_USERS,
           data: res.data
         });
+        !res.data.error && Toast.success("User Status Updated!");
         ApiActions.success(dispatch);
       } catch (err) {
         ApiActions.failure(dispatch);
@@ -170,8 +178,11 @@ export default {
           type: UsermanagementActionTypes.ADD_CUSTOMER,
           data: res.data
         });
+        if (!res.data.error) {
+          Toast.success("Customer Created!");
+          history.goBack();
+        }
         ApiActions.success(dispatch);
-        !res.data.error && history.goBack();
       } catch (err) {
         ApiActions.failure(dispatch);
       }
@@ -186,8 +197,11 @@ export default {
           type: UsermanagementActionTypes.EDIT_CUSTOMER,
           data: res.data
         });
+        if (!res.data.error) {
+          Toast.success("Customer Updated!");
+          history.goBack();
+        }
         ApiActions.success(dispatch);
-        !res.data.error && history.goBack();
       } catch (err) {
         ApiActions.failure(dispatch);
       }

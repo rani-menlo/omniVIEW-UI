@@ -389,6 +389,7 @@ class AddCustomer extends Component {
             })}
           </p>
           <InputField
+            allowSpaces
             className="addUser__fields-field"
             style={{ marginRight: "14px" }}
             label={`${translate("label.form.companyname")}*`}

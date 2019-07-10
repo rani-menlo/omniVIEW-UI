@@ -16,6 +16,8 @@ import UserManagementContainer from "./features/usermanagement/userManagement.co
 import AddUser from "./features/usermanagement/adduser.component";
 import AddCustomer from "./features/usermanagement/addCustomer.component";
 import CreateProfile from "./features/profile/createProfile.component";
+import ForgotPassword from "./features/forgotpwd/forgotpwd.component";
+import ResetPassword from "./features/forgotpwd/resetPassword.component";
 
 const Routes = () => {
   return (
@@ -24,6 +26,12 @@ const Routes = () => {
         <BrowserRouter>
           <Switch>
             <Route exact path="/" component={LoginContainer} />
+            <Route exact path="/forgotpwd" component={ForgotPassword} />
+            <Route
+              exact
+              path="/resetPassword/:key"
+              component={ResetPassword}
+            />
             <PrivateRoute
               exact
               path="/viewer/:type/:fileId?"
@@ -68,7 +76,7 @@ const Routes = () => {
               path="/profile/edit"
               component={CreateProfile}
             />
-            {/* <Redirect to="/" /> */}
+            <Redirect to="/" />
           </Switch>
         </BrowserRouter>
       </PersistGate>

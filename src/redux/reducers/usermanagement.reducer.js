@@ -1,6 +1,7 @@
 import _ from "lodash";
 import { message } from "antd";
 import { UsermanagementActionTypes } from "../actionTypes";
+import { Toast } from "../../uikit/components";
 
 const initialState = {
   users: [],
@@ -57,7 +58,7 @@ export default (state = initialState, action) => {
     }
     case UsermanagementActionTypes.ADD_USER: {
       if (action.data.error) {
-        message.error(action.data.message);
+        Toast.error(action.data.message);
         return state;
       }
       return {
@@ -70,7 +71,7 @@ export default (state = initialState, action) => {
     case UsermanagementActionTypes.EDIT_CUSTOMER:
     case UsermanagementActionTypes.UPDATE_USER: {
       if (action.data.error) {
-        message.error(action.data.message);
+        Toast.error(action.data.message);
         return state;
       }
       return {

@@ -865,19 +865,19 @@ class NodeProperties extends Component {
           <table>
             <thead>
               <tr>
-                <th>Leaf ID</th>
+                <th>File Name</th>
                 <th style={{ paddingLeft: "4px", paddingRight: "4px" }}>
                   Operation
                 </th>
+                <th>Leaf ID</th>
                 <th>Modified File</th>
-                <th>File Name</th>
                 <th>Title</th>
               </tr>
             </thead>
             <tbody>
               {_.map(properties.lifeCycles, (lifeCycle, idx) => (
                 <tr key={idx}>
-                  <td>
+                  <td className="properties__life-cycle-table-link link">
                     <div className="global__center-vert">
                       <Icon
                         className="properties__life-cycle-table-link"
@@ -891,25 +891,22 @@ class NodeProperties extends Component {
                               : "hidden"
                         }}
                       />
-                      <span style={{ marginLeft: "10px" }}>
-                        {this.getLifeCycleId(lifeCycle)}
-                      </span>
+                      <a
+                        onClick={
+                          _.get(lifeCycle, "operation", "") === "delete"
+                            ? ""
+                            : this.openLifeCycleFile(lifeCycle)
+                        }
+                        style={{ marginLeft: "10px" }}
+                      >
+                        {this.getFileName(lifeCycle["xlink:href"])}
+                      </a>
                     </div>
                   </td>
                   <td>{lifeCycle.operation}</td>
+                  <td>{this.getLifeCycleId(lifeCycle)}</td>
                   <td className="properties__life-cycle-table-link">
                     {this.getModifiedFile(lifeCycle)}
-                  </td>
-                  <td className="properties__life-cycle-table-link link">
-                    <a
-                      onClick={
-                        _.get(lifeCycle, "operation", "") === "delete"
-                          ? ""
-                          : this.openLifeCycleFile(lifeCycle)
-                      }
-                    >
-                      {this.getFileName(lifeCycle["xlink:href"])}
-                    </a>
                   </td>
                   <td>{lifeCycle.title}</td>
                 </tr>

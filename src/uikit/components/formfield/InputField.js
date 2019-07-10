@@ -3,9 +3,9 @@ import PropTypes from "prop-types";
 import FormItem from "antd/lib/form/FormItem";
 import { Input } from "antd";
 
-const onInputText = onChange => e => {
+const onInputText = (onChange, allowSpaces) => e => {
   const { value } = e.target;
-  if (value === " ") {
+  if (value.includes(" ") && !allowSpaces) {
     return;
   }
   onChange && onChange(e);
@@ -20,7 +20,8 @@ const InputField = ({
   error,
   style,
   className,
-  disabled
+  disabled,
+  allowSpaces
 }) => {
   return (
     <div style={style} className={className}>
@@ -38,7 +39,7 @@ const InputField = ({
           <Input
             disabled={disabled}
             placeholder={placeholder}
-            onChange={onInputText(onChange)}
+            onChange={onInputText(onChange, allowSpaces)}
             value={value}
             className={error && "global__field__error-box"}
           />
@@ -58,7 +59,8 @@ InputField.propTypes = {
   error: PropTypes.string,
   style: PropTypes.object,
   className: PropTypes.string,
-  disabled: PropTypes.bool
+  disabled: PropTypes.bool,
+  allowSpaces: PropTypes.bool
 };
 
 InputField.defaultProps = {

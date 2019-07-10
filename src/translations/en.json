@@ -27,6 +27,8 @@
   "label.button.add": "Add New {type}",
   "label.button.savechanges": "Save Changes",
   "label.button.savesubmit": "Save & Submit",
+  "label.button.submit": "Submit",
+  "label.button.backtologin": "Back to Login",
   "label.button.resetfilters": "Reset Filters",
   "label.button.update": "Update",
   "label.button.continue": "Continue",
@@ -53,6 +55,7 @@
   "error.form.invalid": "Invalid {type}",
   "error.form.pwdmismatch": "Password mismatch",
   "error.form.pwdreq": "Password does not meet requirements",
+  "text.form.pwdreq": "Password must be minimum of 8 characters, include at least one uppercase letter, one lowercase letter, one number, and a special character(#?!@$%^&*-).",
 
   "text.login.title": "Login",
   "text.login.forgotpwd": "Forgot your password?",
@@ -70,6 +73,12 @@
   "label.authcode.sendother": "Send another code",
   "placeholder.authcode.code": "Code",
   "error.authcode.invalid": "Invalid Code.",
+
+  "label.forgotpwd.forgotpwd": "Forgot Password",
+  "label.forgotpwd.createnew": "Create a New Password",
+  "text.forgotpwd.title": "Enter the email address assigned to this account to receive instructions on how to reset your password",
+  "text.forgotpwd.success": "Check your email for instructions to reset your password",
+  "text.forgotpwd.linkexpired": "Your password reset link is no longer valid, generate a new link by clicking on Forgot Password",
 
   "label.storage.tb": "TB",
   "label.storage.gb": "GB",
@@ -117,7 +126,7 @@
   "label.profile.edit": "Edit Your Profile",
   "text.profile.addmsg": "Complete the form below to create a profile. Fields with an * are mandatory.",
   "text.profile.editmsg": "Make edits to your user profile below",
-  "text.profile.passwordmsg": "Create a unique username and password. Password must be minimum of 8 characters, include at least one uppercase letter, one lowercase letter, one number, and a special character(#?!@$%^&*-).",
+  "text.profile.uniqueuserpwd": "Create a unique username and password.",
 
   "text.user.editmsg": "Make edits to this {type} profile below",
   "text.user.addmsg": "Complete the form below to add a new {type}. Fields with an * are mandatory.",

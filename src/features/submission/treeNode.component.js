@@ -276,25 +276,15 @@ class TreeNode extends Component {
   };
 
   getConsolidatedStfFolders = stfFolders => {
-    /* const folders = [];
-    const omitKeys = [];
-    _.map(rootFolder, (value, key) => {
-      const version = _.get(value, "version", "");
-      if (typeof value === "object" && version.includes("STF")) {
-        omitKeys.push(key);
-        const k = key.substring(0, key.lastIndexOf("[")) || key;
-        folders.push({ ..._.cloneDeep(value), _objectKey: k });
-      }
-    }); */
     const { view } = this.props;
     const groupedFldrs = _.groupBy(stfFolders, "_stfKey");
     const consolidatedFolder = {};
     _.map(groupedFldrs, (array, key) => {
       const subFoldr = {
-        lifeCycles: []
+        // lifeCycles: []
       };
       _.map(array, (item, idx) => {
-        subFoldr.lifeCycles.push(item);
+        // subFoldr.lifeCycles.push(item);
         if (idx === 0) {
           subFoldr.hasAccess = subFoldr.hasAccess || item.hasAccess;
         }
@@ -309,7 +299,8 @@ class TreeNode extends Component {
                   "site-identifier": v["site-identifier"]
                 })
               }));
-              subFoldr.lifeCycles = subFoldr.lifeCycles.concat(v.leaf);
+              // subFoldr.lifeCycles = subFoldr.lifeCycles.concat(v.leaf);
+              v.lifeCycles = item.lifeCycles;
             }
             if (_.get(subFoldr, "[k].leaf")) {
               let leaf = [...subFoldr[k].leaf, ...v.leaf];
@@ -347,7 +338,14 @@ class TreeNode extends Component {
                   leaf = subFoldr[k].leaf;
                 }
                 subFoldr[k] = v;
-                subFoldr[k].leaf = [...leaf, ...subFoldr[k].leaf];
+                let leafs = [];
+                if (leaf) {
+                  leafs = [...leaf];
+                }
+                if (subFoldr[k].leaf) {
+                  leafs = [...leafs, ...subFoldr[k].leaf];
+                }
+                subFoldr[k].leaf = leafs;
               }
             }
 
@@ -368,7 +366,7 @@ class TreeNode extends Component {
           key !== "lifeCycles" &&
           key !== "study-categories"
         ) {
-          val["lifeCycles"] = subFoldr["lifeCycles"];
+          // val["lifeCycles"] = subFoldr["lifeCycles"];
           val["study-categories"] = subFoldr["study-categories"];
         }
       });
@@ -404,11 +402,6 @@ class TreeNode extends Component {
   };
 
   setCurrentView = array => {
-    /* const itemsByTitle = _.groupBy(array, "title");
-    const items = itemsByTitle[obj.title];
-    const operation = _.get(items, `[${items.length - 1}].operation`, "");
-    obj.showInCurrentView =
-      operation !== "delete" && obj.operation === operation; */
     // get the latest files based on modified-file property
     let files = this.setLatestFiles(array);
     // get all deleted files

@@ -1,6 +1,7 @@
 import { CustomerActionTypes } from "../actionTypes";
 import { CustomerApi } from "../api";
 import { ApiActions } from ".";
+import { Toast } from "../../uikit/components";
 
 export default {
   fetchCustomersByList: (pageNo, itemsPerPage, sortBy, order, search) => {
@@ -57,6 +58,7 @@ export default {
           type: CustomerActionTypes.FETCH_CUSTOMERS,
           data: res.data
         });
+        !res.data.error && Toast.success("Customer Status Updated!");
         ApiActions.success(dispatch);
       } catch (err) {
         ApiActions.failure(dispatch);
