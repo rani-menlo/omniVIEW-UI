@@ -51,6 +51,7 @@ const URI = {
   FORGOT_PWD: `${path}auth/forgotPassword`,
   RESET_PWD: `${path}auth/resetPassword/:key`,
   RESET_PWD_LINK_EXPIRY: `${path}auth/checkPasswordExpiry`,
+
   // Customer
   ADD_CUSTOMER: `${path}customer/createCustomer`,
   EDIT_CUSTOMER: `${path}customer/editCustomer`,
@@ -59,13 +60,18 @@ const URI = {
   GET_DEPARTMENTS: `${path}customer/getDepartments`,
   GET_LICENCES: `${path}customer/getAvailableLicences`,
   GET_ALL_LICENCES: `${path}customer/getAllLicences`,
+  GET_SUBSCRIPTIONS_IN_USE: `${path}customer/getSubscriptionsInUse`,
+
   // Submission
   GET_APPLICATIONS: `${path}submission/getSubmissions`,
+
   // Sequence
   GET_SEQUENCES: `${path}sequence/getSequences`,
   GET_SEQUENCES_WITH_PERMISSIONS: `${path}sequence/getSequences`,
+
   // Validation
   VALIDATE_SEQUENCE: `${path}validation/sequenceValidation`,
+
   // User
   PROFILE_IMAGE: `${path}user/getProfileImage`,
   GET_USERS: `${path}user/getUsers`,
@@ -73,13 +79,15 @@ const URI = {
   UPDATE_USER: `${path}user/updateUsers`,
   CREATE_UPDATE_PROFILE: `${path}user/updateProfile`,
   ACTIVATE_DEACTIVATE: `${path}user/activateOrDeactivateUser`,
+
   // File
   GET_FILE_SIZE: `${path}file/getFileSize`,
   GET_JSON: `${path}file/getFile`,
   GET_JSON_WITH_PERMISSION: `${path}file/getSequenceJsonFile`,
   GET_NEW_PATH: `${path}file/getNewPath`,
   GET_RESOURCE_FILE: `${path}file/getResourceFile`,
-  // acces
+
+  // access
   ASSIGN_FILE_PERMISSIONS: `${path}access/assignFilePermissions`,
   ASSIGN_SUBMISSION_PERMISSIONS: `${path}access/assignSubmissionPermissions`,
   ASSIGN_SEQUENCE_PERMISSIONS: `${path}access/assignSequencePermissions`,

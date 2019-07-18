@@ -23,6 +23,7 @@ import {
 } from "../../../uikit/components";
 import { DEBOUNCE_TIME } from "../../../constants";
 import { translate } from "../../../translations/translator";
+import LicenceInUse from "../../license/licenceInUseUnAssigned.component";
 
 class CustomerDashboard extends Component {
   constructor(props) {
@@ -33,7 +34,9 @@ class CustomerDashboard extends Component {
       itemsPerPage: 5,
       searchText: "",
       selectedCustomer: "",
-      showDeactivateModal: false
+      showDeactivateModal: false,
+      showSubscriptionsInUse: false,
+      showLicenceUnAssigned: false
     };
     this.searchCustomers = _.debounce(this.searchCustomers, DEBOUNCE_TIME);
   }
@@ -69,6 +72,31 @@ class CustomerDashboard extends Component {
   onCustomerSelected = customer => () => {
     this.props.actions.setSelectedCustomer(customer);
     this.props.history.push("/applications");
+  };
+
+  subscriptionsInUse = customer => event => {
+    event.stopPropagation();
+    this.setState({
+      selectedCustomer: customer,
+      showSubscriptionsInUse: true,
+      showLicenceUnAssigned: false
+    });
+  };
+
+  subscriptionsUnAssigned = customer => event => {
+    event.stopPropagation();
+    this.setState({
+      selectedCustomer: customer,
+      showLicenceUnAssigned: true,
+      showSubscriptionsInUse: false
+    });
+  };
+
+  closeSubscriptionsModal = () => {
+    this.setState({
+      showSubscriptionsInUse: false,
+      showLicenceUnAssigned: false
+    });
   };
 
   editCustomer = customer => () => {
@@ -186,7 +214,12 @@ class CustomerDashboard extends Component {
   };
 
   render() {
-    const { viewBy, searchText } = this.state;
+    const {
+      viewBy,
+      searchText,
+      showSubscriptionsInUse,
+      showLicenceUnAssigned
+    } = this.state;
     const { customers, loading, customerCount, role } = this.props;
     return (
       <React.Fragment>
@@ -358,6 +391,8 @@ class CustomerDashboard extends Component {
                     customer={customer}
                     onSelect={this.onCustomerSelected}
                     getMenu={this.getMenu(customer)}
+                    subscriptionsInUse={this.subscriptionsInUse}
+                    subscriptionsUnAssigned={this.subscriptionsUnAssigned}
                   />
                 ))}
               </div>
@@ -391,6 +426,14 @@ class CustomerDashboard extends Component {
             closeModal={this.closeActivateDeactivateModal}
             deactivate={this.activateDeactivate}
           />
+          {(showSubscriptionsInUse || showLicenceUnAssigned) && (
+            <LicenceInUse
+              type={showSubscriptionsInUse ? "inuse" : "unassigned"}
+              visible={showSubscriptionsInUse || showLicenceUnAssigned}
+              closeModal={this.closeSubscriptionsModal}
+              customer={this.state.selectedCustomer}
+            />
+          )}
         </ContentLayout>
       </React.Fragment>
     );

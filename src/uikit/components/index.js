@@ -18,6 +18,7 @@ import { default as InputField } from "./formfield/InputField";
 import { default as NumericInput } from "./formfield/numericInput";
 import { default as PhoneField } from "./formfield/phoneField";
 import { default as Text } from "./text/text.component";
+import { default as IconText } from "./iconText.component";
 import { default as Toast } from "./toast/toast";
 import { default as CircularLocalImageFile } from "./image/circularLocalImageFile.component";
 import { default as ImageLoader } from "./image/imageLoader.component";
@@ -44,6 +45,7 @@ export {
   PhoneField,
   NumericInput,
   Text,
+  IconText,
   Toast,
   CircularLocalImageFile,
   ImageLoader,

@@ -21,5 +21,7 @@ export default {
     });
   },
   activateDeactivateCustomer: customer =>
-    api.post(URI.ACTIVATE_DEACTIVATE_CUSTOMER, customer)
+    api.post(URI.ACTIVATE_DEACTIVATE_CUSTOMER, customer),
+  getSubscriptionsInUse: customerId =>
+    api.post(URI.GET_SUBSCRIPTIONS_IN_USE, { customerId })
 };

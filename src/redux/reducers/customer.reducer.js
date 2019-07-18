@@ -5,6 +5,8 @@ const initialState = {
   customers: [],
   customerCount: 0,
   selectedCustomer: null,
+  subscriptionsInUse: [],
+  licencesUnAssigned: []
 };
 
 export default (state = initialState, action) => {
@@ -20,6 +22,25 @@ export default (state = initialState, action) => {
       return {
         ...state,
         selectedCustomer: action.customer
+      };
+    }
+    case CustomerActionTypes.SUBSCRIPTIONS_IN_USE: {
+      return {
+        ...state,
+        subscriptionsInUse: action.data.data
+      };
+    }
+    case CustomerActionTypes.LICENCES_UN_ASSIGNED: {
+      return {
+        ...state,
+        licencesUnAssigned: action.data
+      };
+    }
+    case CustomerActionTypes.RESET_IN_USE_UN_ASSIGNED: {
+      return {
+        ...state,
+        subscriptionsInUse: [],
+        licencesUnAssigned: []
       };
     }
     default:

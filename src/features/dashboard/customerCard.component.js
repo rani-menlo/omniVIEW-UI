@@ -28,7 +28,13 @@ class CustomerCard extends Component {
   };
 
   render() {
-    const { customer, onSelect, getMenu } = this.props;
+    const {
+      customer,
+      onSelect,
+      getMenu,
+      subscriptionsInUse,
+      subscriptionsUnAssigned
+    } = this.props;
     return (
       <div
         className="customercard"
@@ -86,7 +92,7 @@ class CustomerCard extends Component {
             </span>
           </div>
           <div className="global__hr-line" />
-          {/* <div className="customercard__content__item">
+          <div className="customercard__content__item">
             <img src="/images/key.svg" />
             <span
               className="customercard__content__item-text"
@@ -94,10 +100,17 @@ class CustomerCard extends Component {
             >
               Subscription Licences:
             </span>
-            <span className="customercard__content__item-subtext">
-              {_.get(customer, "number_of_users", "")} in use | 0 unassigned
-            </span>
-          </div> */}
+            <p style={{ marginLeft: "13px", paddingLeft: "20px" }}>
+              <span onClick={subscriptionsInUse(customer)}>
+                {`${_.get(customer, "number_of_users", "")} ${translate(
+                  "label.generic.inuse"
+                )} | `}
+              </span>
+              <span onClick={subscriptionsUnAssigned(customer)}>{`0 ${translate(
+                "label.generic.unassigned"
+              )}`}</span>
+            </p>
+          </div>
         </div>
       </div>
     );

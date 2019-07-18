@@ -1,6 +1,7 @@
-import { CustomerActionTypes } from "../actionTypes";
-import { CustomerApi } from "../api";
-import { ApiActions } from ".";
+import _ from "lodash";
+import { CustomerActionTypes, UsermanagementActionTypes } from "../actionTypes";
+import { CustomerApi, UsermanagementApi } from "../api";
+import { ApiActions, CustomerActions } from ".";
 import { Toast } from "../../uikit/components";
 
 export default {
@@ -63,6 +64,42 @@ export default {
       } catch (err) {
         ApiActions.failure(dispatch);
       }
+    };
+  },
+  getSubscriptionsInUse: customerId => {
+    return async dispatch => {
+      ApiActions.request(dispatch);
+      try {
+        const res = await CustomerApi.getSubscriptionsInUse(customerId);
+        dispatch({
+          type: CustomerActionTypes.SUBSCRIPTIONS_IN_USE,
+          data: res.data
+        });
+        ApiActions.success(dispatch);
+      } catch (err) {
+        ApiActions.failure(dispatch);
+      }
+    };
+  },
+  getLicences: customerId => {
+    return async dispatch => {
+      ApiActions.request(dispatch);
+      try {
+        const res = await UsermanagementApi.fetchLicences(customerId);
+        let licences = _.get(res, "data.licences", {});
+        dispatch({
+          type: CustomerActionTypes.LICENCES_UN_ASSIGNED,
+          data: licences
+        });
+        ApiActions.success(dispatch);
+      } catch (err) {
+        ApiActions.failure(dispatch);
+      }
+    };
+  },
+  resetLicencesInUseAndUnAssigned: () => {
+    return {
+      type: CustomerActionTypes.RESET_IN_USE_UN_ASSIGNED
     };
   }
 };
