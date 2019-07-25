@@ -17,6 +17,7 @@ import { default as ContentLayout } from "./layout/contentLayout.component";
 import { default as InputField } from "./formfield/InputField";
 import { default as NumericInput } from "./formfield/numericInput";
 import { default as PhoneField } from "./formfield/phoneField";
+import { default as SelectField } from "./formfield/selectField";
 import { default as Text } from "./text/text.component";
 import { default as IconText } from "./iconText.component";
 import { default as Toast } from "./toast/toast";
@@ -42,6 +43,7 @@ export {
   ListViewGridView,
   ContentLayout,
   InputField,
+  SelectField,
   PhoneField,
   NumericInput,
   Text,

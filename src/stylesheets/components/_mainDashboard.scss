@@ -48,7 +48,7 @@
   &__cards {
     display: flex;
     flex-wrap: wrap;
-    margin-top: 24px;
+    margin-top: 50px;
   }
   &__list {
     margin-top: 20px;
@@ -84,6 +84,9 @@
         }
         &-inactive {
           color: $coral-red;
+        }
+        &-link {
+          color: $blue;
         }
       }
       &__row {

@@ -1,11 +1,11 @@
 .addUser {
-  padding: 40px 10%;
+  padding: 25px 10%;
   &-companyname {
     color: $sky-of-margritte !important;
     text-decoration: underline;
     cursor: pointer;
     text-align: center;
-    margin-top: -25px;
+    // margin-top: -25px;
     margin-bottom: 25px !important;
   }
   &-title {
@@ -185,6 +185,22 @@
       &-warning {
         color: $red;
       }
+    }
+  }
+
+  &__tabs {
+    .ant-tabs-bar {
+      text-align: center;
+    }
+    .ant-tabs-tab {
+      @include text-medium(16px);
+      opacity: 0.5;
+    }
+
+    .ant-tabs-tab-active {
+      @include text-medium(16px);
+      opacity: 1;
+      color: $black !important;
     }
   }
 }

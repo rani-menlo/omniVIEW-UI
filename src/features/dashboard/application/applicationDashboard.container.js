@@ -8,7 +8,8 @@ import SubmissionCard from "../submissionCard.component";
 import {
   ApplicationActions,
   SubmissionActions,
-  UsermanagementActions
+  UsermanagementActions,
+  CustomerActions
 } from "../../../redux/actions";
 import Header from "../../header/header.component";
 import styled from "styled-components";
@@ -33,11 +34,16 @@ import {
   SubHeader,
   ContentLayout,
   AssignPermissionsModal,
-  Text
+  Text,
+  Toast
 } from "../../../uikit/components";
 import { translate } from "../../../translations/translator";
 import submissionActions from "../../../redux/actions/submission.actions";
 import usermanagementActions from "../../../redux/actions/usermanagement.actions";
+import LicenceInUseUnAssigned from "../../license/licenceInUseUnAssigned.component";
+import AssignLicence from "../../license/assignLicence.component";
+import AssignLicenceWithUsers from "../../license/assignLicenceWithUsers.component";
+import { CustomerApi } from "../../../redux/api";
 // import { Customers } from "./sampleCustomers";
 
 class ApplicationDashboard extends Component {
@@ -52,6 +58,12 @@ class ApplicationDashboard extends Component {
       assignGlobalPermissions: false,
       assignPermissions: false,
       showPermissionsModal: false,
+      showSubscriptionsInUse: false,
+      showLicenceUnAssigned: false,
+      showUsersModal: false,
+      showAssignLicenceToUser: false,
+      assigningLicence: null,
+      selectedUser: null,
       checkedSubmissions: [],
       TableColumns: [
         {
@@ -128,8 +140,14 @@ class ApplicationDashboard extends Component {
     return null;
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     this.fetchApplications();
+    if (!isLoggedInOmniciaRole(this.props.role)) {
+      const res = await CustomerApi.getCustomerById(
+        this.props.selectedCustomer.id
+      );
+      this.props.dispatch(CustomerActions.setSelectedCustomer(res.data.data));
+    }
     if (!isAdmin(this.props.role.slug)) {
       const TableColumns = [...this.state.TableColumns];
       TableColumns.shift();
@@ -381,6 +399,93 @@ class ApplicationDashboard extends Component {
     });
   };
 
+  subscriptionsInUse = () => {
+    this.setState({
+      showSubscriptionsInUse: true,
+      showLicenceUnAssigned: false
+    });
+  };
+
+  subscriptionsUnAssigned = () => {
+    this.setState({
+      showLicenceUnAssigned: true,
+      showSubscriptionsInUse: false
+    });
+  };
+
+  closeSubscriptionsModal = () => {
+    this.setState({
+      showSubscriptionsInUse: false,
+      showLicenceUnAssigned: false
+    });
+  };
+
+  openUsersModal = license => {
+    this.setState({
+      showLicenceUnAssigned: false,
+      showAssignLicenceToUser: false,
+      showUsersModal: true,
+      assigningLicence: license
+    });
+  };
+
+  goBackToUsersModal = () => {
+    this.setState({
+      showAssignLicenceToUser: false,
+      showUsersModal: true
+    });
+  };
+
+  closeUsersModal = () => {
+    this.setState({
+      selectedUser: null,
+      showUsersModal: false,
+      assigningLicence: null
+    });
+  };
+
+  closeAssignLicenceToUserModal = () => {
+    this.setState({
+      selectedUser: null,
+      showAssignLicenceToUser: false
+    });
+  };
+
+  onUserSelect = user => {
+    this.setState({
+      showAssignLicenceToUser: true,
+      showUsersModal: false,
+      selectedUser: user
+    });
+  };
+
+  assignLicence = () => {
+    const { assigningLicence, selectedUser } = this.state;
+    const someLicence = assigningLicence.licences[0];
+    this.props.dispatch(
+      UsermanagementActions.assignLicense(
+        {
+          ...(_.includes(someLicence.slug, "view")
+            ? { omni_view_license: someLicence.id }
+            : { omni_file_license: someLicence.id }),
+          user_id: selectedUser.user_id
+        },
+        () => {
+          Toast.success(
+            `License has been assigned to ${_.get(
+              selectedUser,
+              "first_name",
+              ""
+            )} ${_.get(selectedUser, "last_name", "")}`
+          );
+        }
+      )
+    );
+    this.setState({
+      showAssignLicenceToUser: false
+    });
+  };
+
   render() {
     const {
       viewBy,
@@ -390,7 +495,9 @@ class ApplicationDashboard extends Component {
       assignGlobalPermissions,
       assignPermissions,
       showPermissionsModal,
-      checkedSubmissions
+      checkedSubmissions,
+      showSubscriptionsInUse,
+      showLicenceUnAssigned
     } = this.state;
     const { loading, selectedCustomer, submissionCount, role } = this.props;
     if (!selectedCustomer) {
@@ -476,6 +583,45 @@ class ApplicationDashboard extends Component {
               />
             )}
           </div>
+          {(isLoggedInOmniciaAdmin(role) || isLoggedInCustomerAdmin(role)) && (
+            <div className="global__center-vert" sty>
+              <img
+                src="/images/key.svg"
+                style={{ marginRight: "8px", opacity: 0.5 }}
+              />
+              <Text
+                type="bold"
+                size="14px"
+                opacity={0.5}
+                text={`${translate("text.customer.subslicences")}:`}
+                textStyle={{ marginRight: "4px" }}
+              />
+              <Text
+                type="regular"
+                className="global__cursor-pointer"
+                size="14px"
+                text={`${_.get(
+                  selectedCustomer,
+                  "assigned_licenses",
+                  0
+                )} ${translate("label.generic.inuse")}`}
+                textStyle={{ marginRight: "8px" }}
+                onClick={this.subscriptionsInUse}
+              />
+              <Text
+                type="regular"
+                className="global__cursor-pointer"
+                size="14px"
+                text={`${_.get(selectedCustomer, "revoked_licenses", 0) +
+                  _.get(
+                    selectedCustomer,
+                    "unassigned_licenses",
+                    0
+                  )} ${translate("label.generic.unassigned")}`}
+                onClick={this.subscriptionsUnAssigned}
+              />
+            </div>
+          )}
           {viewBy === "lists" && (
             <React.Fragment>
               {(isLoggedInOmniciaAdmin(this.props.role) ||
@@ -643,6 +789,31 @@ class ApplicationDashboard extends Component {
               submissions={checkedSubmissions}
             />
           )}
+          {(showSubscriptionsInUse || showLicenceUnAssigned) && (
+            <LicenceInUseUnAssigned
+              type={showSubscriptionsInUse ? "inuse" : "unassigned"}
+              visible={showSubscriptionsInUse || showLicenceUnAssigned}
+              closeModal={this.closeSubscriptionsModal}
+              customer={this.props.selectedCustomer}
+              onAssignLicenseClick={this.openUsersModal}
+            />
+          )}
+          {this.state.showUsersModal && (
+            <AssignLicenceWithUsers
+              licence={this.state.assigningLicence}
+              selectedUser={this.state.selectedUser}
+              closeModal={this.closeUsersModal}
+              onUserSelect={this.onUserSelect}
+            />
+          )}
+          <AssignLicence
+            visible={this.state.showAssignLicenceToUser}
+            licence={this.state.assigningLicence}
+            user={this.state.selectedUser}
+            closeModal={this.closeAssignLicenceToUserModal}
+            back={this.goBackToUsersModal}
+            submit={this.assignLicence}
+          />
         </ContentLayout>
       </React.Fragment>
     );

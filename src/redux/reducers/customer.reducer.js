@@ -6,7 +6,11 @@ const initialState = {
   customerCount: 0,
   selectedCustomer: null,
   subscriptionsInUse: [],
-  licencesUnAssigned: []
+  licencesUnAssigned: [],
+  lookupLicences: {
+    licences: [],
+    types: []
+  }
 };
 
 export default (state = initialState, action) => {
@@ -16,6 +20,13 @@ export default (state = initialState, action) => {
         ...state,
         customers: action.data.data,
         customerCount: action.data.customerCount
+      };
+    }
+    case CustomerActionTypes.ADD_CUSTOMER: {
+      return {
+        ...state,
+        customers: state.customers.push(action.data.data.customer),
+        selectedCustomer: action.data.data.customer
       };
     }
     case CustomerActionTypes.SET_SELECTED_CUSTOMER: {
@@ -41,6 +52,29 @@ export default (state = initialState, action) => {
         ...state,
         subscriptionsInUse: [],
         licencesUnAssigned: []
+      };
+    }
+    case CustomerActionTypes.GET_LICENCE_LOOKUPS: {
+      return {
+        ...state,
+        lookupLicences: {
+          licences: _.map(
+            action.data.subscription_licences || action.data.licences,
+            licence => ({
+              key: licence.id,
+              value: licence.name,
+              ...licence
+            })
+          ),
+          types: _.map(
+            action.data.subscription_types || action.data.types,
+            type => ({
+              key: type.id,
+              value: type.name,
+              ...type
+            })
+          )
+        }
       };
     }
     default:

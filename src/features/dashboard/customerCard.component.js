@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { Dropdown, Menu } from "antd";
 import _ from "lodash";
 import { translate } from "../../translations/translator";
+import { isLoggedInOmniciaAdmin } from "../../utils";
 
 class CustomerCard extends Component {
   constructor(props) {
@@ -33,7 +34,8 @@ class CustomerCard extends Component {
       onSelect,
       getMenu,
       subscriptionsInUse,
-      subscriptionsUnAssigned
+      subscriptionsUnAssigned,
+      role
     } = this.props;
     return (
       <div
@@ -98,18 +100,24 @@ class CustomerCard extends Component {
               className="customercard__content__item-text"
               style={{ fontSize: "14px" }}
             >
-              Subscription Licences:
+              {translate("label.dashboard.subscription")}:
             </span>
-            <p style={{ marginLeft: "13px", paddingLeft: "20px" }}>
-              <span onClick={subscriptionsInUse(customer)}>
-                {`${_.get(customer, "number_of_users", "")} ${translate(
-                  "label.generic.inuse"
-                )} | `}
-              </span>
-              <span onClick={subscriptionsUnAssigned(customer)}>{`0 ${translate(
-                "label.generic.unassigned"
-              )}`}</span>
-            </p>
+            {isLoggedInOmniciaAdmin(role) && (
+              <p style={{ marginLeft: "13px", paddingLeft: "20px" }}>
+                <span onClick={subscriptionsInUse(customer)}>
+                  {`${_.get(customer, "assigned_licenses", 0)} ${translate(
+                    "label.generic.inuse"
+                  )} | `}
+                </span>
+                <span onClick={subscriptionsUnAssigned(customer)}>{`${_.get(
+                  customer,
+                  "revoked_licenses",
+                  0
+                ) + _.get(customer, "unassigned_licenses", 0)} ${translate(
+                  "label.generic.unassigned"
+                )}`}</span>
+              </p>
+            )}
           </div>
         </div>
       </div>

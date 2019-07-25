@@ -15,7 +15,8 @@ import {
   TableHeader,
   Row,
   Pagination,
-  Text
+  Text,
+  Toast
 } from "../../uikit/components";
 import { DEBOUNCE_TIME, ROLES } from "../../constants";
 import { UsermanagementActions, CustomerActions } from "../../redux/actions";
@@ -26,6 +27,8 @@ import PopoverUsersFilter from "./popoverUsersFilter";
 import UserCard from "./userCard.component";
 import UserProfileCard from "./userProfileCard.component";
 import PopoverCustomers from "./popoverCustomers.component";
+import LicenceInUseUnAssigned from "../license/licenceInUseUnAssigned.component";
+import AssignLicence from "../license/assignLicence.component";
 
 class UserManagementContainer extends Component {
   constructor(props) {
@@ -38,7 +41,10 @@ class UserManagementContainer extends Component {
       showUserCard: false,
       selectedUser: null,
       pageNo: 1,
-      itemsPerPage: 5
+      itemsPerPage: 5,
+      showLicenceUnAssignedModal: false,
+      assigningLicence: null,
+      showAssignLicenceToUser: false
     };
     this.searchUsers = _.debounce(this.searchUsers, DEBOUNCE_TIME);
   }
@@ -58,8 +64,8 @@ class UserManagementContainer extends Component {
           </p>
         </Menu.Item>
         <Menu.Item
-          disabled
           className="maindashboard__list__item-dropdown-menu-item"
+          onClick={this.showLicenceUnAssignedModal(usr)}
         >
           <p>
             <img src="/images/key.svg" />
@@ -239,8 +245,74 @@ class UserManagementContainer extends Component {
     this.setState({ showUserCard: false });
   };
 
+  showLicenceUnAssignedModal = user => () => {
+    this.setState({ selectedUser: user, showLicenceUnAssignedModal: true });
+  };
+
+  goBackToUnAssignedModal = () => {
+    this.setState({
+      showAssignLicenceToUser: false,
+      showLicenceUnAssignedModal: true
+    });
+  };
+
+  closeLicenseUnAssignedModal = () => {
+    this.setState({ showLicenceUnAssignedModal: false });
+  };
+
+  onAssignLicenseClick = license => {
+    this.setState({
+      showLicenceUnAssignedModal: false,
+      showAssignLicenceToUser: true,
+      assigningLicence: license
+    });
+  };
+
+  closeAssignLicenceToUserModal = () => {
+    this.setState({
+      showAssignLicenceToUser: false
+    });
+  };
+
+  assignLicence = () => {
+    const { assigningLicence, selectedUser } = this.state;
+    const someLicence = assigningLicence.licences[0];
+    this.props.dispatch(
+      UsermanagementActions.assignLicense(
+        {
+          ...(_.includes(someLicence.slug, "view")
+            ? { omni_view_license: someLicence.id }
+            : { omni_file_license: someLicence.id }),
+          user_id: selectedUser.user_id
+        },
+        () => {
+          Toast.success(
+            `License has been assigned to ${_.get(
+              selectedUser,
+              "first_name",
+              ""
+            )} ${_.get(selectedUser, "last_name", "")}`
+          );
+          this.fetchUsers();
+        }
+      )
+    );
+    this.setState({
+      showAssignLicenceToUser: false,
+      showLicenceUnAssignedModal: false
+    });
+  };
+
   render() {
-    const { searchText, viewBy, pageNo, itemsPerPage } = this.state;
+    const {
+      searchText,
+      viewBy,
+      pageNo,
+      itemsPerPage,
+      showLicenceUnAssignedModal,
+      showAssignLicenceToUser,
+      assigningLicence
+    } = this.state;
     const { loading, selectedCustomer, usersCount } = this.props;
     if (!selectedCustomer) {
       return <Redirect to="/customers" />;
@@ -336,6 +408,9 @@ class UserManagementContainer extends Component {
                           onAvatarClick={this.openUserCard(usr)}
                           onStatusClick={this.openActivateDeactivateModal(usr)}
                           onEdit={this.editUser(usr)}
+                          onAssignLicenseClick={this.showLicenceUnAssignedModal(
+                            usr
+                          )}
                         />
                       ))}
                     </div>
@@ -487,6 +562,23 @@ class UserManagementContainer extends Component {
             onEdit={this.editUserFromUserCard}
             onStatusClick={this.openStatusModal}
           />
+          {showLicenceUnAssignedModal && (
+            <LicenceInUseUnAssigned
+              type="unassigned"
+              visible={showLicenceUnAssignedModal}
+              closeModal={this.closeLicenseUnAssignedModal}
+              customer={this.props.selectedCustomer}
+              onAssignLicenseClick={this.onAssignLicenseClick}
+            />
+          )}
+          <AssignLicence
+            visible={showAssignLicenceToUser}
+            licence={assigningLicence}
+            user={this.state.selectedUser}
+            closeModal={this.closeAssignLicenceToUserModal}
+            back={this.goBackToUnAssignedModal}
+            submit={this.assignLicence}
+          />
         </ContentLayout>
       </React.Fragment>
     );
@@ -542,7 +634,7 @@ const TableColumns = [
     name: TableColumnNames.EXP_DATE,
     key: "expired_date",
     checkbox: false,
-    sort: true,
+    // sort: true,
     width: "15%"
   }
 ];

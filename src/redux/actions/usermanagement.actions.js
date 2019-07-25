@@ -32,11 +32,11 @@ export default {
     return async dispatch => {
       ApiActions.request(dispatch);
       try {
-        const res = await UsermanagementApi.fetchLicences(customerId);
+        const res = await UsermanagementApi.fetchAvailableLicences(customerId);
         let licences = _.get(res, "data.licences", {});
-        const licencesByApp = _.groupBy(licences, "app_name");
+        const licencesByType = _.groupBy(licences, "licenceType");
         let newLicences = [];
-        _.map(licencesByApp, appLicences => {
+        _.map(licencesByType, appLicences => {
           const licencesByName = _.groupBy(appLicences, "name");
           _.map(licencesByName, (licences, name) => {
             const revokedLicences = _.filter(licences, "revoked_date");
@@ -55,6 +55,7 @@ export default {
             });
           });
         });
+        newLicences = _.sortBy(newLicences, "duration");
         dispatch({
           type: UsermanagementActionTypes.FETCH_LICENCES,
           data: newLicences
@@ -69,18 +70,12 @@ export default {
     type: UsermanagementActionTypes.FETCH_LICENCES,
     data: []
   }),
-  getAllLicences: () => {
-    return async (dispatch, getState) => {
+  getAllLicences: customerId => {
+    return async dispatch => {
       ApiActions.request(dispatch);
       try {
-        const licences = getState().Usermanagement.allLicences;
-        let data = [];
-        if (licences.length) {
-          data = licences;
-        } else {
-          const res = await UsermanagementApi.fetchAllLicences();
-          data = res.data.data;
-        }
+        const res = await UsermanagementApi.fetchAllLicences(customerId);
+        const data = res.data.data;
         dispatch({
           type: UsermanagementActionTypes.FETCH_ALL_LICENCES,
           data
@@ -89,6 +84,11 @@ export default {
       } catch (err) {
         ApiActions.failure(dispatch);
       }
+    };
+  },
+  resetAllLicences: () => {
+    return {
+      type: UsermanagementActionTypes.RESET_ALL_LICENCES
     };
   },
   fetchUsers: data => {
@@ -169,44 +169,6 @@ export default {
       }
     };
   },
-  addCustomer: (customer, history) => {
-    return async dispatch => {
-      ApiActions.request(dispatch);
-      try {
-        const res = await UsermanagementApi.addCustomer(customer);
-        dispatch({
-          type: UsermanagementActionTypes.ADD_CUSTOMER,
-          data: res.data
-        });
-        if (!res.data.error) {
-          Toast.success("Customer Created!");
-          history.goBack();
-        }
-        ApiActions.success(dispatch);
-      } catch (err) {
-        ApiActions.failure(dispatch);
-      }
-    };
-  },
-  editCustomer: (customer, history) => {
-    return async dispatch => {
-      ApiActions.request(dispatch);
-      try {
-        const res = await UsermanagementApi.editCustomer(customer);
-        dispatch({
-          type: UsermanagementActionTypes.EDIT_CUSTOMER,
-          data: res.data
-        });
-        if (!res.data.error) {
-          Toast.success("Customer Updated!");
-          history.goBack();
-        }
-        ApiActions.success(dispatch);
-      } catch (err) {
-        ApiActions.failure(dispatch);
-      }
-    };
-  },
   fetchUsersOfSubmissions: (customerId, submission_ids) => {
     return async dispatch => {
       ApiActions.request(dispatch);
@@ -219,6 +181,22 @@ export default {
           type: UsermanagementActionTypes.FETCH_USERS_OF_FILE_OR_SUBMISSION,
           data: res.data
         });
+        ApiActions.success(dispatch);
+      } catch (err) {
+        ApiActions.failure(dispatch);
+      }
+    };
+  },
+  assignLicense: (data, callback) => {
+    return async dispatch => {
+      ApiActions.request(dispatch);
+      try {
+        const res = await UsermanagementApi.assignLicense(data);
+        dispatch({
+          type: UsermanagementActionTypes.ASSIGN_LICENSE,
+          data: res.data
+        });
+        !res.data.error && callback();
         ApiActions.success(dispatch);
       } catch (err) {
         ApiActions.failure(dispatch);

@@ -33,6 +33,7 @@ class LicenceInUseUnAssigned extends Component {
   static propTypes = {
     visible: PropTypes.bool,
     closeModal: PropTypes.func,
+    onAssignLicenseClick: PropTypes.func,
     type: PropTypes.oneOf(["inuse, unassigned"])
   };
 
@@ -85,7 +86,7 @@ class LicenceInUseUnAssigned extends Component {
             "expired_date"
           );
           _.map(licencesByExpiredDate, (licenceList, expiryDate) => {
-            const diff = moment(expiryDate).diff(purchaseDate, "days");
+            const diff = moment(expiryDate).diff(new Date(), "days");
             combinedLicences.push({
               name,
               licenceType,
@@ -120,7 +121,7 @@ class LicenceInUseUnAssigned extends Component {
       if (type === "inuse") {
         this.props.dispatch(CustomerActions.getSubscriptionsInUse(customer.id));
       } else {
-        this.props.dispatch(CustomerActions.getLicences(customer.id));
+        this.props.dispatch(CustomerActions.getAvailableLicences(customer.id));
       }
     }
   }
@@ -180,9 +181,41 @@ class LicenceInUseUnAssigned extends Component {
     );
   };
 
+  onAssignLicenseClick = licence => () => {
+    this.props.onAssignLicenseClick && this.props.onAssignLicenseClick(licence);
+  };
+
   render() {
     const { visible, closeModal, type } = this.props;
     const { subscriptions, licencesUnAssigned, selectedMenuItem } = this.state;
+    const error = (
+      <Row style={{ flexDirection: "column" }}>
+        <img
+          src="/images/alert-low.svg"
+          style={{ width: "40px", height: "40px" }}
+        />
+        <Text
+          type="extra_bold"
+          size="16px"
+          text={`${
+            type === "inuse"
+              ? translate("text.licence.nolicenceaasigned")
+              : translate("text.licence.outoflicences")
+          }`}
+          textStyle={{ marginTop: "10px" }}
+        />
+        {type === "unassigned" && (
+          <Text
+            type="regular"
+            size="14px"
+            opacity={0.5}
+            text={translate("text.licence.contactadmin")}
+            textStyle={{ marginTop: "5px" }}
+            onClick={closeModal}
+          />
+        )}
+      </Row>
+    );
     return (
       <Modal
         destroyOnClose
@@ -191,154 +224,174 @@ class LicenceInUseUnAssigned extends Component {
         footer={null}
         wrapClassName="licence-modal"
       >
-        <div className="licence-modal__header">
-          <Text
-            type="extra_bold"
-            size="16px"
-            text="Subscription Licenses - In Use"
-            text={`${translate("text.customer.subslicences")} - ${_.startCase(
-              translate(
-                type === "inuse"
-                  ? "label.generic.inuse"
-                  : "label.generic.unassigned"
-              )
-            )}`}
-          />
-          <img
-            src="/images/close.svg"
-            className="licence-modal__header-close"
-            onClick={closeModal}
-          />
-        </div>
-        <div className="global__center-vert" style={{ marginBottom: "15px" }}>
-          <Dropdown
-            overlay={this.getDropdownMenu}
-            trigger={["click"]}
-            className="global__center-vert global__cursor-pointer"
-          >
-            <div>
-              <Text
-                type="bold"
-                opacity={0.5}
-                textStyle={{ marginRight: "4px" }}
-                size="14px"
-                text={`${translate("label.dashboard.applications")}:`}
-              />
+        {(subscriptions.length > 0 || licencesUnAssigned.length > 0) && (
+          <React.Fragment>
+            <div className="licence-modal__header">
               <Text
                 type="extra_bold"
-                opacity={0.5}
-                textStyle={{ marginRight: "4px" }}
-                size="14px"
-                text={_.get(selectedMenuItem, "value", "")}
+                size="16px"
+                text={`${translate(
+                  "text.customer.subslicences"
+                )} - ${_.startCase(
+                  translate(
+                    type === "inuse"
+                      ? "label.generic.inuse"
+                      : "label.generic.unassigned"
+                  )
+                )}`}
               />
-              <Icon type="down" />
+              <img
+                src="/images/close.svg"
+                className="licence-modal__header-close"
+                onClick={closeModal}
+              />
             </div>
-          </Dropdown>
-          <IconText
-            containerStyle={{ marginLeft: "auto", marginRight: "20px" }}
-            text={translate("label.licence.duration")}
-            image="/images/sort-result.svg"
-            imageStyle={{ width: "12px", height: "12px" }}
-            onClick={this.orderByDuration}
-          />
-          {type === "inuse" && (
-            <IconText
-              text={translate("label.licence.expirationdate")}
-              image="/images/sort-result.svg"
-              imageStyle={{ width: "12px", height: "12px" }}
-              onClick={this.orderByExpireDate}
-            />
-          )}
-        </div>
-        <div className="licence-modal__content">
-          {type === "inuse" &&
-            _.map(subscriptions, subscription => {
-              return (
-                <div className="licence-modal__content__row">
-                  <div>
-                    <Text type="bold" size="14px" text={subscription.name} />
-                    <Text
-                      type="regular"
-                      opacity={0.75}
-                      size="14px"
-                      text={` ${subscription.licenceType} - ${translate(
-                        "label.generic.purchased"
-                      )} ${getFormattedDate(subscription.purchase_date)}`}
-                    />
-                  </div>
-                  <Row style={{ alignItems: "normal" }}>
-                    <ImageLoader
-                      type="circle"
-                      width="40px"
-                      height="40px"
-                      path={subscription.profile}
-                    />
-                    <div style={{ marginLeft: "5px" }}>
-                      <Text
-                        type="regular"
-                        size="14px"
-                        text={subscription.first_name}
-                      />
-                      <Text
-                        type="regular"
-                        opacity={0.75}
-                        size="14px"
-                        text={`${translate(
-                          "label.usermgmt.expires"
-                        )} ${getFormattedDate(subscription.expired_date)}`}
+            <div
+              className="global__center-vert"
+              style={{ marginBottom: "15px" }}
+            >
+              <Dropdown
+                overlay={this.getDropdownMenu}
+                trigger={["click"]}
+                className="global__center-vert global__cursor-pointer"
+              >
+                <div>
+                  <Text
+                    type="bold"
+                    opacity={0.5}
+                    textStyle={{ marginRight: "4px" }}
+                    size="14px"
+                    text={`${translate("label.dashboard.applications")}:`}
+                  />
+                  <Text
+                    type="extra_bold"
+                    opacity={0.5}
+                    textStyle={{ marginRight: "4px" }}
+                    size="14px"
+                    text={_.get(selectedMenuItem, "value", "")}
+                  />
+                  <Icon type="down" />
+                </div>
+              </Dropdown>
+              <IconText
+                containerStyle={{ marginLeft: "auto", marginRight: "20px" }}
+                text={translate("label.licence.duration")}
+                image="/images/sort-result.svg"
+                imageStyle={{ width: "12px", height: "12px" }}
+                onClick={this.orderByDuration}
+              />
+              {type === "inuse" && (
+                <IconText
+                  text={translate("label.licence.expirationdate")}
+                  image="/images/sort-result.svg"
+                  imageStyle={{ width: "12px", height: "12px" }}
+                  onClick={this.orderByExpireDate}
+                />
+              )}
+            </div>
+            <div className="licence-modal__content">
+              {type === "inuse" &&
+                _.map(subscriptions, subscription => {
+                  return (
+                    <div className="licence-modal__content__row">
+                      <div>
+                        <Text
+                          type="bold"
+                          size="14px"
+                          text={subscription.name}
+                        />
+                        <Text
+                          type="regular"
+                          opacity={0.75}
+                          size="14px"
+                          text={` ${subscription.licenceType} - ${translate(
+                            "label.generic.purchased"
+                          )} ${getFormattedDate(subscription.purchase_date)}`}
+                        />
+                      </div>
+                      <Row style={{ alignItems: "normal" }}>
+                        <ImageLoader
+                          type="circle"
+                          width="40px"
+                          height="40px"
+                          path={subscription.profile}
+                        />
+                        <div style={{ marginLeft: "5px" }}>
+                          <Text
+                            type="regular"
+                            size="14px"
+                            text={`${_.get(
+                              subscription,
+                              "first_name",
+                              ""
+                            )} ${_.get(subscription, "last_name", "")}`}
+                          />
+                          <Text
+                            type="regular"
+                            opacity={0.75}
+                            size="14px"
+                            text={`${translate(
+                              "label.usermgmt.expires"
+                            )} ${getFormattedDate(subscription.expired_date)}`}
+                          />
+                        </div>
+                      </Row>
+                    </div>
+                  );
+                })}
+              {type === "unassigned" &&
+                _.map(licencesUnAssigned, licence => {
+                  return (
+                    <div className="licence-modal__content__row">
+                      <div>
+                        <Text
+                          type="bold"
+                          size="14px"
+                          text={`${licence.licenceType} ${licence.name} (x${
+                            licence.licences.length
+                          })`}
+                        />
+                        <Text
+                          type="regular"
+                          opacity={0.75}
+                          size="14px"
+                          text={`${translate(
+                            "label.generic.purchased"
+                          )} ${getFormattedDate(licence.purchaseDate)} - `}
+                          textStyle={{ display: "inline" }}
+                        />
+                        <Text
+                          type="regular"
+                          opacity={0.75}
+                          size="14px"
+                          text={`${
+                            licence.expireInDays
+                              ? translate("text.licence.expiresindays", {
+                                  value: licence.expireInDays
+                                })
+                              : `${translate(
+                                  "label.usermgmt.expires"
+                                )}  ${getFormattedDate(
+                                  licence.licences[0].expired_date
+                                )}`
+                          }`}
+                          className="licence-modal__content__row-textred"
+                        />
+                      </div>
+                      <OmniButton
+                        type="secondary"
+                        label={translate("label.usermgmt.assignlicence")}
+                        onClick={this.onAssignLicenseClick(licence)}
                       />
                     </div>
-                  </Row>
-                </div>
-              );
-            })}
-          {type === "unassigned" &&
-            _.map(licencesUnAssigned, licence => {
-              return (
-                <div className="licence-modal__content__row">
-                  <div>
-                    <Text
-                      type="bold"
-                      size="14px"
-                      text={`${licence.licenceType} ${licence.name} (x${
-                        licence.licences.length
-                      })`}
-                    />
-                    <Text
-                      type="regular"
-                      opacity={0.75}
-                      size="14px"
-                      text={`${translate(
-                        "label.generic.purchased"
-                      )} ${getFormattedDate(licence.purchase_date)} - `}
-                      textStyle={{ display: "inline" }}
-                    />
-                    <Text
-                      type="regular"
-                      opacity={0.75}
-                      size="14px"
-                      text={`${
-                        licence.expireInDays
-                          ? translate("text.licence.expiresindays", {
-                              value: licence.expireInDays
-                            })
-                          : `${translate(
-                              "label.usermgmt.expires"
-                            )}  ${getFormattedDate(
-                              licence.licences[0].expired_date
-                            )}`
-                      }`}
-                      className="licence-modal__content__row-textred"
-                    />
-                  </div>
-                  <OmniButton
-                    type="secondary"
-                    label={translate("label.usermgmt.assignlicence")}
-                  />
-                </div>
-              );
-            })}
-        </div>
+                  );
+                })}
+            </div>
+          </React.Fragment>
+        )}
+        {type === "inuse" && !subscriptions.length && error}
+        {type === "unassigned" && !licencesUnAssigned.length && error}
+
         <div style={{ marginTop: "12px", textAlign: "right" }}>
           <OmniButton
             label={translate("label.button.done")}

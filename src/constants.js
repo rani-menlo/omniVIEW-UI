@@ -53,14 +53,17 @@ const URI = {
   RESET_PWD_LINK_EXPIRY: `${path}auth/checkPasswordExpiry`,
 
   // Customer
+  GET_CUSTOMER: `${path}customer/getCustomerByID/:customerId`,
   ADD_CUSTOMER: `${path}customer/createCustomer`,
   EDIT_CUSTOMER: `${path}customer/editCustomer`,
   ACTIVATE_DEACTIVATE_CUSTOMER: `${path}customer/activateOrDeactivateCustomer`,
   GET_CUSTOMERS: `${path}customer/getCustomers`,
   GET_DEPARTMENTS: `${path}customer/getDepartments`,
-  GET_LICENCES: `${path}customer/getAvailableLicences`,
-  GET_ALL_LICENCES: `${path}customer/getAllLicences`,
+  GET_AVAILABLE_LICENCES: `${path}customer/getAvailableLicences`,
+  GET_ALL_LICENCES: `${path}customer/getAllLicences/:customer_id`,
   GET_SUBSCRIPTIONS_IN_USE: `${path}customer/getSubscriptionsInUse`,
+  GET_LICENCE_LOOKUP_INFO: `${path}customer/licenceLookupInfo`,
+  ADD_NEW_LICENCES: `${path}customer/addLicences`,
 
   // Submission
   GET_APPLICATIONS: `${path}submission/getSubmissions`,
@@ -79,6 +82,7 @@ const URI = {
   UPDATE_USER: `${path}user/updateUsers`,
   CREATE_UPDATE_PROFILE: `${path}user/updateProfile`,
   ACTIVATE_DEACTIVATE: `${path}user/activateOrDeactivateUser`,
+  ASSIGN_LICENSE: `${path}user/assignLicense`,
 
   // File
   GET_FILE_SIZE: `${path}file/getFileSize`,

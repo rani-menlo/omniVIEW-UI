@@ -1,0 +1,21 @@
+.newlicence {
+  display: flex;
+  &__field {
+    width: 40%;
+    margin-right: 15px;
+    &-select {
+      width: 100%;
+      > .ant-select-selection {
+        border-color: $black;
+      }
+    }
+  }
+  &__field-input {
+    width: 12%;
+    margin-right: 15px;
+  }
+  &-remove {
+    align-self: center;
+    margin-top: -10px;
+  }
+}

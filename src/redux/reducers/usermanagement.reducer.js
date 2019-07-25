@@ -30,7 +30,13 @@ export default (state = initialState, action) => {
     case UsermanagementActionTypes.FETCH_ALL_LICENCES: {
       return {
         ...state,
-        allLicences: action.data
+        allLicences: _.sortBy(action.data, "duration")
+      };
+    }
+    case UsermanagementActionTypes.RESET_ALL_LICENCES: {
+      return {
+        ...state,
+        allLicences: []
       };
     }
     case UsermanagementActionTypes.FETCH_USERS: {
@@ -46,7 +52,7 @@ export default (state = initialState, action) => {
       if (!action.data.error) {
         return {
           ...state,
-          usersOfFileOrSubmission: action.data.data,
+          usersOfFileOrSubmission: action.data.data
         };
       }
     }
@@ -67,8 +73,6 @@ export default (state = initialState, action) => {
         licences: []
       };
     }
-    case UsermanagementActionTypes.ADD_CUSTOMER:
-    case UsermanagementActionTypes.EDIT_CUSTOMER:
     case UsermanagementActionTypes.UPDATE_USER: {
       if (action.data.error) {
         Toast.error(action.data.message);

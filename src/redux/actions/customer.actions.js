@@ -43,6 +43,45 @@ export default {
       }
     };
   },
+  addCustomer: (customer, callback) => {
+    return async dispatch => {
+      ApiActions.request(dispatch);
+      try {
+        const res = await CustomerApi.addCustomer(customer);
+        if (res.data.error) {
+          Toast.error(res.data.message);
+          ApiActions.failure(dispatch);
+        } else {
+          dispatch({
+            type: CustomerActionTypes.ADD_CUSTOMER,
+            data: res.data
+          });
+          callback && callback();
+          ApiActions.success(dispatch);
+        }
+      } catch (err) {
+        ApiActions.failure(dispatch);
+      }
+    };
+  },
+  editCustomer: (customer, callback) => {
+    return async dispatch => {
+      ApiActions.request(dispatch);
+      try {
+        const res = await CustomerApi.editCustomer(customer);
+        dispatch({
+          type: CustomerActionTypes.EDIT_CUSTOMER,
+          data: res.data
+        });
+        if (!res.data.error) {
+          callback && callback();
+        }
+        ApiActions.success(dispatch);
+      } catch (err) {
+        ApiActions.failure(dispatch);
+      }
+    };
+  },
   setSelectedCustomer: customer => {
     return {
       type: CustomerActionTypes.SET_SELECTED_CUSTOMER,
@@ -81,16 +120,47 @@ export default {
       }
     };
   },
-  getLicences: customerId => {
+  getAvailableLicences: customerId => {
     return async dispatch => {
       ApiActions.request(dispatch);
       try {
-        const res = await UsermanagementApi.fetchLicences(customerId);
+        const res = await UsermanagementApi.fetchAvailableLicences(customerId);
         let licences = _.get(res, "data.licences", {});
         dispatch({
           type: CustomerActionTypes.LICENCES_UN_ASSIGNED,
           data: licences
         });
+        ApiActions.success(dispatch);
+      } catch (err) {
+        ApiActions.failure(dispatch);
+      }
+    };
+  },
+  getLicenceLookUps: () => {
+    return async (dispatch, getState) => {
+      ApiActions.request(dispatch);
+      try {
+        let lookups = getState().Customer.lookupLicences;
+        if (!lookups.licences.length || !lookups.types.length) {
+          const res = await CustomerApi.getLicenceLookUps();
+          lookups = _.get(res, "data.data");
+        }
+        dispatch({
+          type: CustomerActionTypes.GET_LICENCE_LOOKUPS,
+          data: lookups
+        });
+        ApiActions.success(dispatch);
+      } catch (err) {
+        ApiActions.failure(dispatch);
+      }
+    };
+  },
+  addNewLicences: (data, callback) => {
+    return async dispatch => {
+      ApiActions.request(dispatch);
+      try {
+        const res = await CustomerApi.addNewLicences(data);
+        !res.data.error && callback && callback();
         ApiActions.success(dispatch);
       } catch (err) {
         ApiActions.failure(dispatch);

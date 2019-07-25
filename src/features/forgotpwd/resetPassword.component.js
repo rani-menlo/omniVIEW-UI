@@ -7,7 +7,7 @@ import _ from "lodash";
 import Header from "../header/header.component";
 import { translate } from "../../translations/translator";
 import Split from "react-split";
-import SplitterLayout from 'react-splitter-layout';
+import SplitterLayout from "react-splitter-layout";
 
 import {
   Text,
@@ -117,116 +117,102 @@ class ResetPassword extends Component {
       <React.Fragment>
         <Loader loading={this.props.loading} />
         <Header style={{ marginBottom: "0px", justifyContent: "center" }} />
-        {/* <Split
-          sizes={[50, 50]}
-          minSize={100}
-          gutterSize={10}
-          gutterAlign="center"
-          snapOffset={30}
-          dragInterval={1}
-          direction="vertical"
-          cursor="col-resize"
-        > */}
-        <SplitterLayout vertical>
-          <div>Test</div>
-          <ContentLayout
-            className="resetpassword"
-            childStyle={expired && { paddingRight: "10%" }}
-          >
-            {!expired && (
-              <React.Fragment>
-                <div style={{ marginBottom: "15px" }}>
-                  <Text
-                    type="extra_bold"
-                    size="24px"
-                    text={translate("label.forgotpwd.createnew")}
-                  />
-                  <Text
-                    type="regular"
-                    opacity={0.5}
-                    size="14px"
-                    text={translate("text.form.pwdreq")}
-                  />
-                  <div
-                    className="global__hr-line"
-                    style={{ margin: "15px 0px" }}
-                  />
-                </div>
-                <InputField
-                  type="password"
-                  className="resetpassword-field"
-                  style={{ marginRight: "14px" }}
-                  label={`${translate("label.generic.new")} ${translate(
-                    "label.form.password"
-                  )}`}
-                  value={password.value}
-                  placeholder={`${translate("label.generic.new")} ${translate(
-                    "label.form.password"
-                  )}`}
-                  error={password.error}
-                  onChange={this.onInputChange("password")}
-                />
-                <InputField
-                  type="password"
-                  className="resetpassword-field"
-                  label={`${translate("label.generic.new")} ${translate(
-                    "label.form.password"
-                  )} ${translate("label.generic.again")}`}
-                  value={confirmPwd.value}
-                  placeholder={`${translate("label.generic.new")} ${translate(
-                    "label.form.password"
-                  )} ${translate("label.generic.again")}`}
-                  error={confirmPwd.error}
-                  onChange={this.onInputChange("confirmPwd")}
-                />
-              </React.Fragment>
-            )}
-            {expired && (
-              <div
-                className="global__center-vert"
-                style={{ flexDirection: "column" }}
-              >
-                <img
-                  src="/images/alert-low.svg"
-                  style={{ width: "40px", height: "40px" }}
+        <ContentLayout
+          className="resetpassword"
+          childStyle={expired && { paddingRight: "10%" }}
+        >
+          {!expired && (
+            <React.Fragment>
+              <div style={{ marginBottom: "15px" }}>
+                <Text
+                  type="extra_bold"
+                  size="24px"
+                  text={translate("label.forgotpwd.createnew")}
                 />
                 <Text
-                  type="bold"
-                  size="16px"
-                  textStyle={{ marginTop: "12px" }}
-                  text={translate("text.forgotpwd.linkexpired")}
+                  type="regular"
+                  opacity={0.5}
+                  size="14px"
+                  text={translate("text.form.pwdreq")}
+                />
+                <div
+                  className="global__hr-line"
+                  style={{ margin: "15px 0px" }}
                 />
               </div>
-            )}
-            <div
-              className={`resetpassword__buttons ${expired &&
-                "global__center-horiz-vert"}`}
-            >
-              <OmniButton
-                className="resetpassword__buttons-btn"
-                type="secondary"
-                label={
-                  expired
-                    ? translate("label.button.backtologin")
-                    : translate("label.button.cancel")
-                }
-                onClick={this.goToLogin}
+              <InputField
+                type="password"
+                className="resetpassword-field"
+                style={{ marginRight: "14px" }}
+                label={`${translate("label.generic.new")} ${translate(
+                  "label.form.password"
+                )}`}
+                value={password.value}
+                placeholder={`${translate("label.generic.new")} ${translate(
+                  "label.form.password"
+                )}`}
+                error={password.error}
+                onChange={this.onInputChange("password")}
               />
-              <OmniButton
-                type="primary"
-                className="resetpassword__buttons-btn"
-                label={
-                  expired
-                    ? translate("label.forgotpwd.forgotpwd")
-                    : translate("label.button.submit")
-                }
-                buttonStyle={{ marginLeft: "16px" }}
-                onClick={this.submit}
+              <InputField
+                type="password"
+                className="resetpassword-field"
+                label={`${translate("label.generic.new")} ${translate(
+                  "label.form.password"
+                )} ${translate("label.generic.again")}`}
+                value={confirmPwd.value}
+                placeholder={`${translate("label.generic.new")} ${translate(
+                  "label.form.password"
+                )} ${translate("label.generic.again")}`}
+                error={confirmPwd.error}
+                onChange={this.onInputChange("confirmPwd")}
+              />
+            </React.Fragment>
+          )}
+          {expired && (
+            <div
+              className="global__center-vert"
+              style={{ flexDirection: "column" }}
+            >
+              <img
+                src="/images/alert-low.svg"
+                style={{ width: "40px", height: "40px" }}
+              />
+              <Text
+                type="bold"
+                size="16px"
+                textStyle={{ marginTop: "12px" }}
+                text={translate("text.forgotpwd.linkexpired")}
               />
             </div>
-          </ContentLayout>
-        {/* </Split> */}
-        </SplitterLayout>
+          )}
+          <div
+            className={`resetpassword__buttons ${expired &&
+              "global__center-horiz-vert"}`}
+          >
+            <OmniButton
+              className="resetpassword__buttons-btn"
+              type="secondary"
+              label={
+                expired
+                  ? translate("label.button.backtologin")
+                  : translate("label.button.cancel")
+              }
+              onClick={this.goToLogin}
+            />
+            <OmniButton
+              type="primary"
+              className="resetpassword__buttons-btn"
+              label={
+                expired
+                  ? translate("label.forgotpwd.forgotpwd")
+                  : translate("label.button.submit")
+              }
+              buttonStyle={{ marginLeft: "16px" }}
+              onClick={this.submit}
+            />
+          </div>
+        </ContentLayout>
       </React.Fragment>
     );
   }

@@ -9,6 +9,7 @@ import OmniCheckbox from "../checkbox/omniCheckbox.component";
 class TableHeader extends Component {
   static propTypes = {
     columns: PropTypes.arrayOf(PropTypes.object),
+    style: PropTypes.object,
     sortColumn: PropTypes.func
   };
 
@@ -52,9 +53,9 @@ class TableHeader extends Component {
   };
 
   render() {
-    const { columns } = this.props;
+    const { columns, style } = this.props;
     return (
-      <div className="tableHeader">
+      <div className="tableHeader" style={style}>
         {_.map(columns, column => (
           <RowItems
             key={column.name}

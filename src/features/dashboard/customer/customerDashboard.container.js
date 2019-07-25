@@ -5,7 +5,7 @@ import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import styled from "styled-components";
 import CustomerCard from "../customerCard.component";
-import { CustomerActions } from "../../../redux/actions";
+import { CustomerActions, UsermanagementActions } from "../../../redux/actions";
 import Header from "../../header/header.component";
 import { isLoggedInOmniciaRole, isLoggedInOmniciaAdmin } from "../../../utils";
 import {
@@ -19,11 +19,14 @@ import {
   ListViewGridView,
   SubHeader,
   ContentLayout,
-  DeactivateModal
+  DeactivateModal,
+  Toast
 } from "../../../uikit/components";
 import { DEBOUNCE_TIME } from "../../../constants";
 import { translate } from "../../../translations/translator";
-import LicenceInUse from "../../license/licenceInUseUnAssigned.component";
+import LicenceInUseUnAssigned from "../../license/licenceInUseUnAssigned.component";
+import AssignLicenceWithUsers from "../../license/assignLicenceWithUsers.component";
+import AssignLicence from "../../license/assignLicence.component";
 
 class CustomerDashboard extends Component {
   constructor(props) {
@@ -36,7 +39,11 @@ class CustomerDashboard extends Component {
       selectedCustomer: "",
       showDeactivateModal: false,
       showSubscriptionsInUse: false,
-      showLicenceUnAssigned: false
+      showLicenceUnAssigned: false,
+      showUsersModal: false,
+      showAssignLicenceToUser: false,
+      assigningLicence: null,
+      selectedUser: null
     };
     this.searchCustomers = _.debounce(this.searchCustomers, DEBOUNCE_TIME);
   }
@@ -178,7 +185,12 @@ class CustomerDashboard extends Component {
   };
 
   addCustomer = () => {
-    this.props.history.push("/usermanagement/customer/add");
+    this.props.dispatch(UsermanagementActions.resetAllLicences());
+    this.props.actions.setSelectedCustomer(null);
+    setTimeout(
+      () => this.props.history.push("/usermanagement/customer/add"),
+      100
+    );
   };
 
   openOadminUserManagement = () => {
@@ -213,12 +225,82 @@ class CustomerDashboard extends Component {
     this.setState({ showDeactivateModal: true, selectedCustomer: customer });
   };
 
+  openUsersModal = license => {
+    this.props.dispatch(
+      CustomerActions.setSelectedCustomer(this.state.selectedCustomer)
+    );
+    this.setState({
+      showLicenceUnAssigned: false,
+      showAssignLicenceToUser: false,
+      showUsersModal: true,
+      assigningLicence: license
+    });
+  };
+
+  goBackToUsersModal = () => {
+    this.setState({
+      showAssignLicenceToUser: false,
+      showUsersModal: true
+    });
+  };
+
+  closeUsersModal = () => {
+    this.setState({
+      selectedUser: null,
+      showUsersModal: false,
+      assigningLicence: null
+    });
+  };
+
+  closeAssignLicenceToUserModal = () => {
+    this.setState({
+      selectedUser: null,
+      showAssignLicenceToUser: false
+    });
+  };
+
+  onUserSelect = user => {
+    this.setState({
+      showAssignLicenceToUser: true,
+      showUsersModal: false,
+      selectedUser: user
+    });
+  };
+
+  assignLicence = () => {
+    const { assigningLicence, selectedUser } = this.state;
+    const someLicence = assigningLicence.licences[0];
+    this.props.dispatch(
+      UsermanagementActions.assignLicense(
+        {
+          ...(_.includes(someLicence.slug, "view")
+            ? { omni_view_license: someLicence.id }
+            : { omni_file_license: someLicence.id }),
+          user_id: selectedUser.user_id
+        },
+        () => {
+          Toast.success(
+            `License has been assigned to ${_.get(
+              selectedUser,
+              "first_name",
+              ""
+            )} ${_.get(selectedUser, "last_name", "")}`
+          );
+        }
+      )
+    );
+    this.setState({
+      showAssignLicenceToUser: false
+    });
+  };
+
   render() {
     const {
       viewBy,
       searchText,
       showSubscriptionsInUse,
-      showLicenceUnAssigned
+      showLicenceUnAssigned,
+      showUsersModal
     } = this.state;
     const { customers, loading, customerCount, role } = this.props;
     return (
@@ -327,15 +409,23 @@ class CustomerDashboard extends Component {
                       width={getColumnWidth(TableColumnNames.SUBSCRIPTION)}
                       className="maindashboard__list__item__row maindashboard__list__item-text"
                     >
-                      {_.get(
-                        customer,
-                        "subscription",
-                        `${_.get(
-                          customer,
-                          "number_of_users",
-                          ""
-                        )} in use  | 0 unassigned`
-                      )}
+                      <p>
+                        <span onClick={this.subscriptionsInUse(customer)}>
+                          {`${_.get(
+                            customer,
+                            "assigned_licenses",
+                            0
+                          )} ${translate("label.generic.inuse")} | `}
+                        </span>
+                        <span
+                          onClick={this.subscriptionsUnAssigned(customer)}
+                        >{`${_.get(customer, "revoked_licenses", 0) +
+                          _.get(
+                            customer,
+                            "unassigned_licenses",
+                            0
+                          )} ${translate("label.generic.unassigned")}`}</span>
+                      </p>
                       <Dropdown
                         overlay={this.getMenu(customer)()}
                         trigger={["click"]}
@@ -387,6 +477,7 @@ class CustomerDashboard extends Component {
               <div className="maindashboard__cards">
                 {_.map(customers, customer => (
                   <CustomerCard
+                    role={role}
                     key={customer.id}
                     customer={customer}
                     onSelect={this.onCustomerSelected}
@@ -427,13 +518,30 @@ class CustomerDashboard extends Component {
             deactivate={this.activateDeactivate}
           />
           {(showSubscriptionsInUse || showLicenceUnAssigned) && (
-            <LicenceInUse
+            <LicenceInUseUnAssigned
               type={showSubscriptionsInUse ? "inuse" : "unassigned"}
               visible={showSubscriptionsInUse || showLicenceUnAssigned}
               closeModal={this.closeSubscriptionsModal}
               customer={this.state.selectedCustomer}
+              onAssignLicenseClick={this.openUsersModal}
             />
           )}
+          {showUsersModal && (
+            <AssignLicenceWithUsers
+              licence={this.state.assigningLicence}
+              selectedUser={this.state.selectedUser}
+              closeModal={this.closeUsersModal}
+              onUserSelect={this.onUserSelect}
+            />
+          )}
+          <AssignLicence
+            visible={this.state.showAssignLicenceToUser}
+            licence={this.state.assigningLicence}
+            user={this.state.selectedUser}
+            closeModal={this.closeAssignLicenceToUserModal}
+            back={this.goBackToUsersModal}
+            submit={this.assignLicence}
+          />
         </ContentLayout>
       </React.Fragment>
     );
@@ -455,7 +563,7 @@ const TableColumns = [
     name: TableColumnNames.CHECKBOX,
     checkbox: true,
     sort: false,
-    width: "5%"
+    width: "3%"
   },
   {
     name: TableColumnNames.CUSTOMER_NAME,
@@ -495,7 +603,7 @@ const TableColumns = [
   {
     name: TableColumnNames.SUBSCRIPTION,
     checkbox: false,
-    width: "20%"
+    width: "22%"
   }
 ];
 

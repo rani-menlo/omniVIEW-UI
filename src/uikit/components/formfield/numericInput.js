@@ -2,11 +2,17 @@ import React from "react";
 import PropTypes from "prop-types";
 import { InputField } from "..";
 
-const onInputText = onChange => e => {
+const onInputText = (onChange, limit) => e => {
   const { value } = e.target;
   const reg = /^([0-9]*)?$/;
   if (!Number.isNaN(value) && reg.test(value)) {
-    onChange(e);
+    if (limit) {
+      if (Number(value) <= limit) {
+        onChange(e);
+      }
+    } else {
+      onChange(e);
+    }
   }
 };
 
@@ -17,13 +23,14 @@ const NumericInput = ({
   placeholder,
   error,
   style,
-  className
+  className,
+  limit
 }) => {
   return (
     <InputField
       label={label}
       value={value}
-      onChange={onInputText(onChange)}
+      onChange={onInputText(onChange, limit)}
       placeholder={placeholder}
       error={error}
       style={style}

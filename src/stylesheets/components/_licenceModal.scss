@@ -29,6 +29,20 @@
         display: inline;
         color: $red;
       }
+      &-selected {
+        background-color: $rockman-blue !important;
+      }
+    }
+  }
+  &__assign {
+    margin-top: 20px;
+    padding: 0px 20% 0px 20%;
+
+    &__user {
+      border-top: 1px solid $shadowed-steel;
+      border-bottom: 1px solid $shadowed-steel;
+      padding: 10px;
+      margin: 20px 0px
     }
   }
 }
