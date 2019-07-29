@@ -40,22 +40,27 @@ export default {
           const licencesByName = _.groupBy(appLicences, "name");
           _.map(licencesByName, (licences, name) => {
             const revokedLicences = _.filter(licences, "revoked_date");
-            /* if (revokedLicences.length) {
-              newLicences = [...newLicences, ...revokedLicences];
-              licences = _.filter(
-                licences,
-                li => !revokedLicences.includes(li)
-              );
-            } */
-            licences = _.difference(licences, revokedLicences);
+            if (licences.length !== revokedLicences.length) {
+              licences = _.difference(licences, revokedLicences);
+            }
             const licencesByDate = _.groupBy(licences, "purchase_date");
             _.map(licencesByDate, licences => {
               licences[0].remaining = licences.length;
               newLicences.push(licences[0]);
             });
+            if (licences.length !== revokedLicences.length) {
+              const revokedLicencesByDate = _.groupBy(
+                revokedLicences,
+                "purchase_date"
+              );
+              _.map(revokedLicencesByDate, licences => {
+                licences[0].remaining = licences.length;
+                newLicences.push(licences[0]);
+              });
+            }
           });
         });
-        newLicences = _.sortBy(newLicences, "duration");
+        newLicences = _.sortBy(newLicences, ["duration", "licenceType"]);
         dispatch({
           type: UsermanagementActionTypes.FETCH_LICENCES,
           data: newLicences

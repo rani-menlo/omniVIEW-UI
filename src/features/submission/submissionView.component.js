@@ -615,8 +615,12 @@ class SubmissionView extends Component {
     // this case
     if (!selectedNode) {
       let files = _.get(item, "lifeCycles");
-      // files = _.filter(files, { showInCurrentView: true });
-      selectedNode = this.getNodeFromMap(_.get(files, "[0]"));
+      _.forEach(files, file => {
+        selectedNode = this.getNodeFromMap(file);
+        if (selectedNode) {
+          return false;
+        }
+      });
     }
 
     if (selectedNode) {

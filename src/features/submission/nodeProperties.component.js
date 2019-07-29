@@ -658,17 +658,25 @@ class NodeProperties extends Component {
       application,
       "[application-information][application-number]"
     );
-    const applicationType = _.find(
-      _.get(TypesJson, "[application-type]", ""),
-      type => type.code === applicationNumber["application-type"]
-    ).display;
+    const applicationType = _.get(
+      _.find(
+        _.get(TypesJson, "[application-type]", ""),
+        type => type.code === applicationNumber["application-type"]
+      ),
+      "display",
+      ""
+    );
     const submissionInfo = _.get(application, "[submission-information]");
-    const submissionType = _.find(
-      _.get(TypesJson, "[submission-type]", ""),
-      type =>
-        type.code ===
-        _.get(submissionInfo, "[submission-id][submission-type]", "")
-    ).display;
+    const submissionType = _.get(
+      _.find(
+        _.get(TypesJson, "[submission-type]", ""),
+        type =>
+          type.code ===
+          _.get(submissionInfo, "[submission-id][submission-type]", "")
+      ),
+      "display",
+      ""
+    );
     const leafProperties =
       this.isM1() &&
       _.get(
@@ -908,7 +916,9 @@ class NodeProperties extends Component {
                   <td className="properties__life-cycle-table-link">
                     {this.getModifiedFile(lifeCycle)}
                   </td>
-                  <td>{lifeCycle.title}</td>
+                  <td className="properties__life-cycle-table-text">
+                    {lifeCycle.title}
+                  </td>
                 </tr>
               ))}
             </tbody>

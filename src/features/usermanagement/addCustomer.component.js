@@ -74,7 +74,8 @@ class AddCustomer extends Component {
         omniViewError: "",
         omniFileError: ""
       },
-      allLicences: null
+      allLicences: null,
+      disableCustomerDetailsTab: false
     };
   }
 
@@ -293,26 +294,11 @@ class AddCustomer extends Component {
     };
 
     if (!state.editCustomer) {
-      /* const application_access = [];
-      state.subscription.omniView && application_access.push("omniView");
-      state.subscription.omniFile && application_access.push("omniFile");
-
-      reqObject = {
-        ...reqObject,
-        application_access,
-        subscriptions: {
-          "omni-view": {
-            ...state.licences.omniView
-          },
-          "omni-file": {
-            ...state.licences.omniFile
-          }
-        }
-      }; */
       this.props.dispatch(
         CustomerActions.addCustomer(reqObject, () => {
           Toast.success("Customer Added");
           this.onTabChange("subscriptionLicences");
+          this.setState({ disableCustomerDetailsTab: true });
         })
       );
     } else {
@@ -468,7 +454,11 @@ class AddCustomer extends Component {
             className="addUser__tabs"
             onChange={this.onTabChange}
           >
-            <TabPane tab="Customer Details" key="customerDetails">
+            <TabPane
+              tab="Customer Details"
+              key="customerDetails"
+              disabled={this.state.disableCustomerDetailsTab}
+            >
               <p className="addUser-title">
                 {editCustomer
                   ? translate("label.usermgmt.edit")

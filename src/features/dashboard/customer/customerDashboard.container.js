@@ -286,6 +286,7 @@ class CustomerDashboard extends Component {
               ""
             )} ${_.get(selectedUser, "last_name", "")}`
           );
+          this.fetchCustomers();
         }
       )
     );

@@ -185,7 +185,7 @@
   "text.licence.areyousuretoassign": "Are you sure you want to assign this license to this user?",
   "text.licence.chooseuser": "Choose who you want to assign this license to",
   "text.licence.outoflicences": "You’re out of licenses!",
-  "text.licence.nolicenceaasigned": "No licences aasigned!",
+  "text.licence.nolicenceaasigned": "No licenses assigned!",
   "text.licence.contactadmin": "Contact an Omnicia Admin to purchase more licenses for your account",
   "text.licence.belowarecorrect": "Confirm that the details below are correct.",
   "text.licence.accesspermitteduntil": "Access will be permitted until: {date}",

@@ -2,14 +2,15 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import _ from "lodash";
 import { connect } from "react-redux";
-import { Modal, Checkbox } from "antd";
+import { Modal, Checkbox, Icon } from "antd";
 import { UsermanagementActions } from "../../redux/actions";
 import { ROLE_IDS } from "../../constants";
 import {
   IconText,
   Text,
   ImageLoader,
-  OmniButton
+  OmniButton,
+  Row
 } from "../../uikit/components";
 import { translate } from "../../translations/translator";
 import { getFormattedDate } from "../../utils";
@@ -91,70 +92,85 @@ class AssignLicenceWithUsers extends Component {
             onClick={this.orderByExpireDate}
           />
         </div> */}
-        <div className="licence-modal__content" style={{ marginTop: "15px" }}>
-          {_.map(users, user => {
-            return (
-              <div
-                key={user.user_id}
-                className={`licence-modal__content__row global__cursor-pointer ${_.get(
-                  this.state,
-                  "selected.user_id",
-                  ""
-                ) === user.user_id && "licence-modal__content__row-selected"}`}
-                style={{ justifyContent: "unset" }}
-                onClick={this.select(user)}
-              >
-                <ImageLoader
-                  type="circle"
-                  width="40px"
-                  height="40px"
-                  path={user.profile}
-                />
-                <div style={{ marginLeft: "8px" }}>
-                  <Text
-                    type="bold"
-                    size="14px"
-                    text={`${_.get(user, "first_name", "")} ${_.get(
-                      user,
-                      "last_name",
-                      ""
-                    )}`}
+        {(_.get(users, "length") || "") && (
+          <div className="licence-modal__content" style={{ marginTop: "15px" }}>
+            {_.map(users, user => {
+              return (
+                <div
+                  key={user.user_id}
+                  className={`licence-modal__content__row global__cursor-pointer ${_.get(
+                    this.state,
+                    "selected.user_id",
+                    ""
+                  ) === user.user_id &&
+                    "licence-modal__content__row-selected"}`}
+                  style={{ justifyContent: "unset" }}
+                  onClick={this.select(user)}
+                >
+                  <ImageLoader
+                    type="circle"
+                    width="40px"
+                    height="40px"
+                    path={user.profile}
                   />
-                  <Text
-                    type="regular"
-                    size="14px"
-                    opacity={0.75}
-                    className={`global__text-${
-                      _.get(user, "license_status", 0) ? "green" : "red"
-                    }`}
-                    text={
-                      _.get(user, "license_status", 0)
-                        ? translate("label.user.active")
-                        : translate("label.user.inactive")
+                  <div style={{ marginLeft: "8px" }}>
+                    <Text
+                      type="bold"
+                      size="14px"
+                      text={`${_.get(user, "first_name", "")} ${_.get(
+                        user,
+                        "last_name",
+                        ""
+                      )}`}
+                    />
+                    <Text
+                      type="regular"
+                      size="14px"
+                      opacity={0.75}
+                      className={`global__text-${
+                        _.get(user, "license_status", 0) ? "green" : "red"
+                      }`}
+                      text={
+                        _.get(user, "license_status", 0)
+                          ? translate("label.user.active")
+                          : translate("label.user.inactive")
+                      }
+                      textStyle={{ display: "inline" }}
+                    />
+                    <Text
+                      type="regular"
+                      size="14px"
+                      opacity={0.75}
+                      text={`${(_.get(user, "license_status", 0) || "") &&
+                        ` - License ${translate(
+                          "label.usermgmt.expires"
+                        )}`} ${getFormattedDate(_.get(user, "expiryDate"))}`}
+                      textStyle={{ display: "inline" }}
+                    />
+                  </div>
+                  <Checkbox
+                    checked={
+                      _.get(this.state, "selected.user_id", "") === user.user_id
                     }
-                    textStyle={{ display: "inline" }}
-                  />
-                  <Text
-                    type="regular"
-                    size="14px"
-                    opacity={0.75}
-                    text={`${(_.get(user, "license_status", 0) || "") &&
-                       ` - License ${translate("label.usermgmt.expires")}`} ${getFormattedDate(
-                      _.get(user, "expiryDate")
-                    )}`}
-                    textStyle={{ display: "inline" }}
+                    style={{ marginLeft: "auto" }}
                   />
                 </div>
-                <Checkbox
-                  checked={
-                    _.get(this.state, "selected.user_id", "") === user.user_id
-                  }
-                  style={{ marginLeft: "auto" }}
-                />
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
+        {!(_.get(users, "length") || "") && (
+          <Row className="maindashboard__nodata">
+            <Icon
+              style={{ fontSize: "20px" }}
+              type="exclamation-circle"
+              className="maindashboard__nodata-icon"
+            />
+            {translate("error.dashboard.notfound", {
+              type: translate("label.dashboard.users")
+            })}
+          </Row>
+        )}
         <div style={{ marginTop: "20px", textAlign: "right" }}>
           <OmniButton
             type="secondary"

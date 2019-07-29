@@ -246,7 +246,11 @@ class UserManagementContainer extends Component {
   };
 
   showLicenceUnAssignedModal = user => () => {
-    this.setState({ selectedUser: user, showLicenceUnAssignedModal: true });
+    this.setState({
+      selectedUser: user,
+      showLicenceUnAssignedModal: true,
+      showUserCard: false
+    });
   };
 
   goBackToUnAssignedModal = () => {
@@ -490,7 +494,7 @@ class UserManagementContainer extends Component {
                       width={getColumnWidth(TableColumnNames.EXP_DATE)}
                       className="maindashboard__list__item__row maindashboard__list__item-text"
                     >
-                      {getFormattedDate(_.get(usr, "expired_date")) ||
+                      {getFormattedDate(_.get(usr, "expiryDate")) ||
                         "__ /__ /____"}
                       <Dropdown
                         overlay={this.getMenu(usr)}
@@ -560,6 +564,9 @@ class UserManagementContainer extends Component {
             user={this.state.selectedUser}
             onClose={this.closeUserCard}
             onEdit={this.editUserFromUserCard}
+            onAssignLicence={this.showLicenceUnAssignedModal(
+              this.state.selectedUser
+            )}
             onStatusClick={this.openStatusModal}
           />
           {showLicenceUnAssignedModal && (

@@ -26,6 +26,7 @@
     .value {
       width: 65%;
       @include text-normal(12px);
+      word-break: break-all;
     }
 
     .link {
@@ -69,6 +70,10 @@
     &-link {
       color: $sky-of-margritte !important;
       opacity: 1 !important;
+    }
+    &-text {
+      min-width: 150px;
+      word-break: break-word;
     }
   }
 }

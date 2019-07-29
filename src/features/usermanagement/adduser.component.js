@@ -545,7 +545,7 @@ class AddUser extends Component {
                             className="addUser__licences__box-warning"
                             size="12px"
                             text={translate("error.user.licenceassigned", {
-                              product: this.getLicenceAppName(licence.app_name),
+                              product: licence.licenceType,
                               remain: licence.validDays,
                               expire: licence.unassignValidity
                             })}

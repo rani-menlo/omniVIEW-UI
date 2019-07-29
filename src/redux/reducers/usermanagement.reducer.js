@@ -30,7 +30,7 @@ export default (state = initialState, action) => {
     case UsermanagementActionTypes.FETCH_ALL_LICENCES: {
       return {
         ...state,
-        allLicences: _.sortBy(action.data, "duration")
+        allLicences: _.sortBy(action.data, ["duration", "type_name"])
       };
     }
     case UsermanagementActionTypes.RESET_ALL_LICENCES: {
