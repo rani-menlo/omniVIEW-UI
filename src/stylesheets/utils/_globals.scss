@@ -95,6 +95,14 @@
   }
 }
 
+.global__text-red {
+  color: $red !important;
+}
+
+.global__text-green {
+  color: $caribbean-green !important;
+}
+
 .omnimodal {
   > .ant-modal-content {
     > .ant-modal-body {

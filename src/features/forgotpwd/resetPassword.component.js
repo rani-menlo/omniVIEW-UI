@@ -6,6 +6,8 @@ import { URI } from "../../constants";
 import _ from "lodash";
 import Header from "../header/header.component";
 import { translate } from "../../translations/translator";
+import Split from "react-split";
+import SplitterLayout from "react-splitter-layout";
 
 import {
   Text,

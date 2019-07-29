@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { Dropdown, Menu } from "antd";
 import _ from "lodash";
 import { translate } from "../../translations/translator";
+import { isLoggedInOmniciaAdmin } from "../../utils";
 
 class CustomerCard extends Component {
   constructor(props) {
@@ -28,7 +29,14 @@ class CustomerCard extends Component {
   };
 
   render() {
-    const { customer, onSelect, getMenu } = this.props;
+    const {
+      customer,
+      onSelect,
+      getMenu,
+      subscriptionsInUse,
+      subscriptionsUnAssigned,
+      role
+    } = this.props;
     return (
       <div
         className="customercard"
@@ -86,18 +94,31 @@ class CustomerCard extends Component {
             </span>
           </div>
           <div className="global__hr-line" />
-          {/* <div className="customercard__content__item">
+          <div className="customercard__content__item">
             <img src="/images/key.svg" />
             <span
               className="customercard__content__item-text"
               style={{ fontSize: "14px" }}
             >
-              Subscription Licences:
+              {translate("label.dashboard.subscription")}:
             </span>
-            <span className="customercard__content__item-subtext">
-              {_.get(customer, "number_of_users", "")} in use | 0 unassigned
-            </span>
-          </div> */}
+            {isLoggedInOmniciaAdmin(role) && (
+              <p style={{ marginLeft: "13px", paddingLeft: "20px" }}>
+                <span onClick={subscriptionsInUse(customer)}>
+                  {`${_.get(customer, "assigned_licenses", 0)} ${translate(
+                    "label.generic.inuse"
+                  )} | `}
+                </span>
+                <span onClick={subscriptionsUnAssigned(customer)}>{`${_.get(
+                  customer,
+                  "revoked_licenses",
+                  0
+                ) + _.get(customer, "unassigned_licenses", 0)} ${translate(
+                  "label.generic.unassigned"
+                )}`}</span>
+              </p>
+            )}
+          </div>
         </div>
       </div>
     );

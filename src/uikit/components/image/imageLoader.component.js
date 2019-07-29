@@ -49,7 +49,6 @@ class ImageLoader extends Component {
       globalAccess
     } = this.props;
     const newStyle = {
-      // backgroundImage: `url("${this.state.image}")`,
       height,
       width,
       ...style

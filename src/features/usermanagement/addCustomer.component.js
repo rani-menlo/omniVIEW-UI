@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import styled from "styled-components";
 import _ from "lodash";
 import { connect } from "react-redux";
 import {
@@ -9,20 +10,32 @@ import {
   Row,
   OmniButton,
   NumericInput,
-  DeactivateModal
+  DeactivateModal,
+  Text,
+  TableHeader,
+  Pagination,
+  Toast,
+  ImageLoader
 } from "../../uikit/components";
 import Header from "../header/header.component";
-import { Checkbox, Switch } from "antd";
-import { UsermanagementActions } from "../../redux/actions";
-import { isPhone, isEmail } from "../../utils";
+import { Checkbox, Switch, Tabs, Icon } from "antd";
+import { UsermanagementActions, CustomerActions } from "../../redux/actions";
+import { isPhone, isEmail, getFormattedDate } from "../../utils";
 import { translate } from "../../translations/translator";
+import AddNewLicence from "../license/addNewLicence.component";
+
+const TabPane = Tabs.TabPane;
 
 class AddCustomer extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      pageNo: 1,
+      itemsPerPage: 5,
       editCustomer: false,
+      selectedTab: "customerDetails",
       showDeactivateModal: false,
+      openAddNewLicenceModal: false,
       statusActive: true,
       cname: {
         value: "",
@@ -60,34 +73,36 @@ class AddCustomer extends Component {
         omniFile: {},
         omniViewError: "",
         omniFileError: ""
-      }
+      },
+      allLicences: null,
+      disableCustomerDetailsTab: false
     };
   }
 
   static getDerivedStateFromProps(props, state) {
-    if (
-      !_.size(state.licences.omniView) &&
-      !_.size(state.licences.omniFile) &&
-      props.allLicences.length
-    ) {
-      const licenceObj = {};
-      _.map(props.allLicences, licence => {
-        licenceObj[licence.slug] = 0;
-      });
+    if (state.allLicences === null && props.allLicences.length) {
       return {
-        licences: {
-          ...state.licences,
-          omniView: licenceObj,
-          omniFile: licenceObj
-        }
+        /* allLicences: AddCustomer.getItemsBasedOnPagination(
+          props.allLicences,
+          state.pageNo,
+          state.itemsPerPage
+        ) */
+        allLicences: props.allLicences
       };
     }
     return null;
   }
 
+  static getItemsBasedOnPagination(array, pageNo, itemsPerPage) {
+    return _.slice(
+      array,
+      (pageNo - 1) * itemsPerPage,
+      pageNo * itemsPerPage - 1
+    );
+  }
+
   componentDidMount() {
     const { history, selectedCustomer } = this.props;
-    this.props.dispatch(UsermanagementActions.getAllLicences());
     if (history.location.pathname.includes("/edit")) {
       if (selectedCustomer) {
         const state = this.populateState();
@@ -246,7 +261,7 @@ class AddCustomer extends Component {
           type: translate("label.form.noofapplications")
         });
       }
-      if (state.subscription.omniView) {
+      /* if (state.subscription.omniView) {
         const values = _.values(state.licences.omniView);
         if (this.hasAllZeros(values)) {
           error = true;
@@ -259,7 +274,7 @@ class AddCustomer extends Component {
           error = true;
           state.licences.omniFileError = translate("error.licence.atleastone");
         }
-      }
+      } */
     }
 
     if (error) {
@@ -279,24 +294,12 @@ class AddCustomer extends Component {
     };
 
     if (!state.editCustomer) {
-      const application_access = [];
-      state.subscription.omniView && application_access.push("omniView");
-      state.subscription.omniFile && application_access.push("omniFile");
-
-      reqObject = {
-        ...reqObject,
-        application_access,
-        subscriptions: {
-          "omni-view": {
-            ...state.licences.omniView
-          },
-          "omni-file": {
-            ...state.licences.omniFile
-          }
-        }
-      };
       this.props.dispatch(
-        UsermanagementActions.addCustomer(reqObject, this.props.history)
+        CustomerActions.addCustomer(reqObject, () => {
+          Toast.success("Customer Added");
+          this.onTabChange("subscriptionLicences");
+          this.setState({ disableCustomerDetailsTab: true });
+        })
       );
     } else {
       reqObject.customerId = _.get(this.props, "selectedCustomer.id", "");
@@ -307,7 +310,10 @@ class AddCustomer extends Component {
       );
       reqObject.is_active = state.statusActive ? 1 : 0;
       this.props.dispatch(
-        UsermanagementActions.editCustomer(reqObject, this.props.history)
+        CustomerActions.editCustomer(reqObject, () => {
+          Toast.success("Customer Updated!");
+          this.props.history.goBack();
+        })
       );
     }
   };
@@ -330,7 +336,10 @@ class AddCustomer extends Component {
   };
 
   closeModal = () => {
-    this.setState({ showDeactivateModal: false });
+    this.setState({
+      showDeactivateModal: false,
+      openAddNewLicenceModal: false
+    });
   };
 
   onStatusClick = () => {
@@ -343,6 +352,70 @@ class AddCustomer extends Component {
 
   deactivate = () => {
     this.setState({ showDeactivateModal: false, statusActive: false });
+  };
+
+  onTabChange = tab => {
+    const { selectedCustomer } = this.props;
+    if (selectedCustomer && tab === "subscriptionLicences") {
+      this.props.dispatch(
+        UsermanagementActions.getAllLicences(selectedCustomer.id)
+      );
+    }
+    this.setState({ selectedTab: tab });
+  };
+
+  openAddNewLicence = () => {
+    this.setState({ openAddNewLicenceModal: true });
+  };
+
+  addNewLicence = licences => {
+    const { selectedCustomer } = this.props;
+    const newLicences = _.map(licences, licence => ({
+      subscription_type_id: licence.application.id,
+      subscription_licence_id: licence.duration.id,
+      number_of_licences: licence.quantity
+    }));
+    this.props.dispatch(
+      CustomerActions.addNewLicences(
+        {
+          customer_id: selectedCustomer.id,
+          subscriptions: newLicences
+        },
+        () => {
+          Toast.success("Subscription Licenses Added!");
+          this.onTabChange("subscriptionLicences");
+        }
+      )
+    );
+    this.closeModal();
+  };
+
+  onPageChange = pageNo => {
+    this.setState({
+      pageNo,
+      allLicences: AddCustomer.getItemsBasedOnPagination(
+        this.props.allLicences,
+        pageNo,
+        this.state.itemsPerPage
+      )
+    });
+  };
+
+  onPageSizeChange = itemsPerPage => {
+    this.setState({
+      itemsPerPage,
+      allLicences: AddCustomer.getItemsBasedOnPagination(
+        this.props.allLicences,
+        this.state.pageNo,
+        itemsPerPage
+      )
+    });
+  };
+
+  sortColumn = (sortBy, orderBy) => {
+    const { allLicences } = this.state;
+    const sortedLicences = _.orderBy(allLicences, [sortBy], [orderBy]);
+    this.setState({ allLicences: sortedLicences });
   };
 
   render() {
@@ -359,280 +432,420 @@ class AddCustomer extends Component {
       subscription: { omniView, omniFile },
       licences,
       editCustomer,
-      statusActive
+      statusActive,
+      selectedTab
     } = this.state;
-    const { allLicences, loading } = this.props;
+    const { loading, licencesUnAssigned } = this.props;
+    const { allLicences } = this.state;
     return (
       <React.Fragment>
         <Loader loading={loading} />
         <Header style={{ marginBottom: "0px" }} />
         <ContentLayout className="addUser">
-          <p className="addUser-title">
-            {editCustomer
-              ? translate("label.usermgmt.edit")
-              : translate("label.usermgmt.add")}{" "}
-            {translate("label.dashboard.customer")}
-          </p>
-          <p className="addUser-subtitle">
-            {editCustomer
-              ? translate("text.user.editmsg", {
-                  type: _.toLower(translate("label.dashboard.customer"))
-                })
-              : translate("text.user.addmsg", {
-                  type: _.toLower(translate("label.dashboard.customer"))
-                })}
-          </p>
-          <div className="global__hr-line" />
-          <p className="addUser-heading">
-            {translate("label.user.details", {
-              type: translate("label.dashboard.company")
-            })}
-          </p>
-          <InputField
-            allowSpaces
-            className="addUser__fields-field"
-            style={{ marginRight: "14px" }}
-            label={`${translate("label.form.companyname")}*`}
-            value={cname.value}
-            placeholder={translate("label.form.companyname")}
-            error={cname.error}
-            onChange={this.onInputChange("cname")}
+          <Text
+            type="extra_bold"
+            size="20px"
+            className="addUser-companyname"
+            text={_.get(this.props.selectedCustomer, "company_name", "")}
+            onClick={this.goBack}
           />
-          <p className="addUser-heading">
-            {translate("label.user.details", {
-              type: translate("label.dashboard.companyadmin")
-            })}
-          </p>
-          <Row className="addUser__fields">
-            <InputField
-              className="addUser__fields-field"
-              style={{ marginRight: "14px" }}
-              label={`${translate("label.form.fname")}*`}
-              value={fname.value}
-              placeholder={translate("label.form.fname")}
-              error={fname.error}
-              onChange={this.onInputChange("fname")}
-            />
-            <InputField
-              className="addUser__fields-field"
-              label={`${translate("label.form.lname")}*`}
-              value={lname.value}
-              placeholder={translate("label.form.lname")}
-              error={lname.error}
-              onChange={this.onInputChange("lname")}
-            />
-          </Row>
-          <Row className="addUser__fields">
-            <InputField
-              className="addUser__fields-field"
-              style={{ marginRight: "14px" }}
-              label={`${translate("label.form.email")}*`}
-              value={email.value}
-              placeholder={translate("placeholder.form.email")}
-              error={email.error}
-              onChange={this.onInputChange("email")}
-            />
-            <PhoneField
-              className="addUser__fields-field"
-              error={phone.error}
-              label={`${translate("label.form.phone")}*`}
-              value={phone.value}
-              onChange={this.onPhoneChange}
-            />
-          </Row>
-          <p className="addUser-heading">
-            {translate("text.customer.subsoptions")}
-          </p>
-          <div className="addUser__section">
-            <p className="addUser__section-label addUser__section-label-inactive">
-              {translate("text.customer.amtofdatastorage")}
-            </p>
-            <Row className="addUser__fields">
-              <NumericInput
-                className="addUser__fields-numeric"
-                style={{ marginRight: "14px" }}
-                label={`${translate("label.form.storageof", {
-                  type: translate("label.storage.tb")
-                })}*`}
-                value={storageTB}
-                onChange={this.onStorageChange("storageTB")}
-              />
-              <NumericInput
-                className="addUser__fields-numeric"
-                style={{ marginRight: "14px" }}
-                label={`${translate("label.form.storageof", {
-                  type: translate("label.storage.gb")
-                })}*`}
-                value={storageGB}
-                onChange={this.onStorageChange("storageGB")}
-              />
-            </Row>
-            {storageError && (
-              <p className="global__field__error-text">{storageError}</p>
-            )}
-            <p className="addUser__section-label addUser__section-label-inactive">
-              {translate("text.customer.noofapplications")}
-            </p>
-            <NumericInput
-              className="addUser__fields-numeric"
-              style={{ marginRight: "14px" }}
-              label={`${translate("label.form.noofapplications")}*`}
-              value={storageApplications.value}
-              error={storageApplications.error}
-              onChange={this.onInputChange("storageApplications")}
-            />
-          </div>
-          {!editCustomer && (
-            <React.Fragment>
+          <Tabs
+            activeKey={selectedTab}
+            className="addUser__tabs"
+            onChange={this.onTabChange}
+          >
+            <TabPane
+              tab="Customer Details"
+              key="customerDetails"
+              disabled={this.state.disableCustomerDetailsTab}
+            >
+              <p className="addUser-title">
+                {editCustomer
+                  ? translate("label.usermgmt.edit")
+                  : translate("label.usermgmt.add")}{" "}
+                {translate("label.dashboard.customer")}
+              </p>
+              <p className="addUser-subtitle">
+                {editCustomer
+                  ? translate("text.user.editmsg", {
+                      type: _.toLower(translate("label.dashboard.customer"))
+                    })
+                  : translate("text.user.addmsg", {
+                      type: _.toLower(translate("label.dashboard.customer"))
+                    })}
+              </p>
+              <div className="global__hr-line" />
               <p className="addUser-heading">
-                {translate("text.customer.subslicences")}
+                {translate("label.user.details", {
+                  type: translate("label.dashboard.company")
+                })}
+              </p>
+              <InputField
+                allowSpaces
+                className="addUser__fields-field"
+                style={{ marginRight: "14px" }}
+                label={`${translate("label.form.companyname")}*`}
+                value={cname.value}
+                placeholder={translate("label.form.companyname")}
+                error={cname.error}
+                onChange={this.onInputChange("cname")}
+              />
+              <p className="addUser-heading">
+                {translate("label.user.details", {
+                  type: translate("label.dashboard.companyadmin")
+                })}
+              </p>
+              <Row className="addUser__fields">
+                <InputField
+                  className="addUser__fields-field"
+                  style={{ marginRight: "14px" }}
+                  label={`${translate("label.form.fname")}*`}
+                  value={fname.value}
+                  placeholder={translate("label.form.fname")}
+                  error={fname.error}
+                  onChange={this.onInputChange("fname")}
+                />
+                <InputField
+                  className="addUser__fields-field"
+                  label={`${translate("label.form.lname")}*`}
+                  value={lname.value}
+                  placeholder={translate("label.form.lname")}
+                  error={lname.error}
+                  onChange={this.onInputChange("lname")}
+                />
+              </Row>
+              <Row className="addUser__fields">
+                <InputField
+                  className="addUser__fields-field"
+                  style={{ marginRight: "14px" }}
+                  label={`${translate("label.form.email")}*`}
+                  value={email.value}
+                  placeholder={translate("placeholder.form.email")}
+                  error={email.error}
+                  onChange={this.onInputChange("email")}
+                />
+                <PhoneField
+                  className="addUser__fields-field"
+                  error={phone.error}
+                  label={`${translate("label.form.phone")}*`}
+                  value={phone.value}
+                  onChange={this.onPhoneChange}
+                />
+              </Row>
+              <p className="addUser-heading">
+                {translate("text.customer.subsoptions")}
               </p>
               <div className="addUser__section">
                 <p className="addUser__section-label addUser__section-label-inactive">
-                  {translate("text.customer.applicationstolicence")}
+                  {translate("text.customer.amtofdatastorage")}
                 </p>
-                <div className="global__center-vert">
-                  <Checkbox
-                    value="omniView"
-                    className="addUser__section-checkbox"
-                    checked={omniView}
-                    onChange={this.onSubscriptionChecked}
-                  >
-                    {translate("label.product.omniview")}
-                  </Checkbox>
-                  <Checkbox
-                    disabled
-                    value="omniFile"
-                    className="addUser__section-checkbox"
-                    checked={omniFile}
-                    onChange={this.onSubscriptionChecked}
-                  >
-                    {translate("label.product.omnifile")}
-                  </Checkbox>
-                </div>
-                {omniView && (
-                  <React.Fragment>
-                    <p
-                      className="addUser__section-label addUser__section-label-inactive"
-                      style={{ marginTop: "26px" }}
-                    >
-                      {translate("text.customer.nooflicencetopurchase", {
-                        type: translate("label.product.omniview")
-                      })}
-                    </p>
-                    <div className="addUser__section__licences">
-                      {_.map(allLicences, licence => {
-                        return (
-                          <NumericInput
-                            key={licence.name}
-                            className="addUser__fields-numeric"
-                            style={{ marginRight: "40px" }}
-                            label={`${licence.name}`}
-                            value={_.get(
-                              licences,
-                              `omniView[${licence.slug}]`,
-                              0
-                            )}
-                            onChange={this.onLicenceValueChange(
-                              "omniView",
-                              licence
-                            )}
-                          />
-                        );
-                      })}
-                    </div>
-                    {licences.omniViewError && (
-                      <p className="global__field__error-text">
-                        {licences.omniViewError}
-                      </p>
-                    )}
-                  </React.Fragment>
-                )}
-                {omniFile && (
-                  <React.Fragment>
-                    <p
-                      className="addUser__section-label addUser__section-label-inactive"
-                      style={{ marginTop: "26px" }}
-                    >
-                      {translate("text.customer.nooflicencetopurchase", {
-                        type: translate("label.product.omnifile")
-                      })}
-                    </p>
-                    <div className="addUser__section__licences">
-                      {_.map(allLicences, licence => {
-                        return (
-                          <NumericInput
-                            key={licence.name}
-                            className="addUser__fields-numeric"
-                            style={{ marginRight: "40px" }}
-                            label={`${licence.name}`}
-                            value={_.get(
-                              licences,
-                              `omniFile[${licence.slug}]`,
-                              0
-                            )}
-                            onChange={this.onLicenceValueChange(
-                              "omniFile",
-                              licence
-                            )}
-                          />
-                        );
-                      })}
-                    </div>
-                    {licences.omniFileError && (
-                      <p className="global__field__error-text">
-                        {licences.omniFileError}
-                      </p>
-                    )}
-                  </React.Fragment>
-                )}
-              </div>
-            </React.Fragment>
-          )}
-          {editCustomer && (
-            <React.Fragment>
-              <p className="addUser-heading">
-                {translate("label.user.accstatus")}
-              </p>
-              <div className="addUser__account">
-                <div className="addUser__account__status">
-                  <Switch
-                    size="small"
-                    onClick={this.onStatusClick}
-                    checked={statusActive}
+                <Row className="addUser__fields">
+                  <NumericInput
+                    className="addUser__fields-numeric"
+                    style={{ marginRight: "14px" }}
+                    label={`${translate("label.form.storageof", {
+                      type: translate("label.storage.tb")
+                    })}*`}
+                    value={storageTB}
+                    onChange={this.onStorageChange("storageTB")}
                   />
-                  <p
-                    className={`addUser__account__status-${
-                      statusActive ? "active" : "inactive"
-                    }`}
-                  >
-                    {statusActive
-                      ? translate("label.user.active")
-                      : translate("label.user.inactive")}
-                  </p>
-                </div>
+                  <NumericInput
+                    className="addUser__fields-numeric"
+                    style={{ marginRight: "14px" }}
+                    label={`${translate("label.form.storageof", {
+                      type: translate("label.storage.gb")
+                    })}*`}
+                    value={storageGB}
+                    onChange={this.onStorageChange("storageGB")}
+                  />
+                </Row>
+                {storageError && (
+                  <p className="global__field__error-text">{storageError}</p>
+                )}
+                <p className="addUser__section-label addUser__section-label-inactive">
+                  {translate("text.customer.noofapplications")}
+                </p>
+                <NumericInput
+                  className="addUser__fields-numeric"
+                  style={{ marginRight: "14px" }}
+                  label={`${translate("label.form.noofapplications")}*`}
+                  value={storageApplications.value}
+                  error={storageApplications.error}
+                  onChange={this.onInputChange("storageApplications")}
+                />
               </div>
-            </React.Fragment>
-          )}
-          <div className="addUser__buttons">
-            <OmniButton
-              type="secondary"
-              label={translate("label.button.cancel")}
-              className="addUser__buttons-btn"
-              onClick={this.goBack}
-            />
-            <OmniButton
-              type="primary"
-              label={
-                editCustomer
-                  ? translate("label.button.savechanges")
-                  : translate("label.button.savesubmit")
-              }
-              className="addUser__buttons-btn"
-              buttonStyle={{ marginLeft: "16px" }}
-              onClick={this.save}
-            />
-          </div>
+              {/* {!editCustomer && (
+                <React.Fragment>
+                  <p className="addUser-heading">
+                    {translate("text.customer.subslicences")}
+                  </p>
+                  <div className="addUser__section">
+                    <p className="addUser__section-label addUser__section-label-inactive">
+                      {translate("text.customer.applicationstolicence")}
+                    </p>
+                    <div className="global__center-vert">
+                      <Checkbox
+                        value="omniView"
+                        className="addUser__section-checkbox"
+                        checked={omniView}
+                        onChange={this.onSubscriptionChecked}
+                      >
+                        {translate("label.product.omniview")}
+                      </Checkbox>
+                      <Checkbox
+                        disabled
+                        value="omniFile"
+                        className="addUser__section-checkbox"
+                        checked={omniFile}
+                        onChange={this.onSubscriptionChecked}
+                      >
+                        {translate("label.product.omnifile")}
+                      </Checkbox>
+                    </div>
+                    {omniView && (
+                      <React.Fragment>
+                        <p
+                          className="addUser__section-label addUser__section-label-inactive"
+                          style={{ marginTop: "26px" }}
+                        >
+                          {translate("text.customer.nooflicencetopurchase", {
+                            type: translate("label.product.omniview")
+                          })}
+                        </p>
+                        <div className="addUser__section__licences">
+                          {_.map(allLicences, licence => {
+                            return (
+                              <NumericInput
+                                key={licence.name}
+                                className="addUser__fields-numeric"
+                                style={{ marginRight: "40px" }}
+                                label={`${licence.name}`}
+                                value={_.get(
+                                  licences,
+                                  `omniView[${licence.slug}]`,
+                                  0
+                                )}
+                                onChange={this.onLicenceValueChange(
+                                  "omniView",
+                                  licence
+                                )}
+                              />
+                            );
+                          })}
+                        </div>
+                        {licences.omniViewError && (
+                          <p className="global__field__error-text">
+                            {licences.omniViewError}
+                          </p>
+                        )}
+                      </React.Fragment>
+                    )}
+                    {omniFile && (
+                      <React.Fragment>
+                        <p
+                          className="addUser__section-label addUser__section-label-inactive"
+                          style={{ marginTop: "26px" }}
+                        >
+                          {translate("text.customer.nooflicencetopurchase", {
+                            type: translate("label.product.omnifile")
+                          })}
+                        </p>
+                        <div className="addUser__section__licences">
+                          {_.map(allLicences, licence => {
+                            return (
+                              <NumericInput
+                                key={licence.name}
+                                className="addUser__fields-numeric"
+                                style={{ marginRight: "40px" }}
+                                label={`${licence.name}`}
+                                value={_.get(
+                                  licences,
+                                  `omniFile[${licence.slug}]`,
+                                  0
+                                )}
+                                onChange={this.onLicenceValueChange(
+                                  "omniFile",
+                                  licence
+                                )}
+                              />
+                            );
+                          })}
+                        </div>
+                        {licences.omniFileError && (
+                          <p className="global__field__error-text">
+                            {licences.omniFileError}
+                          </p>
+                        )}
+                      </React.Fragment>
+                    )}
+                  </div>
+                </React.Fragment>
+              )} */}
+              {editCustomer && (
+                <React.Fragment>
+                  <p className="addUser-heading">
+                    {translate("label.user.accstatus")}
+                  </p>
+                  <div className="addUser__account">
+                    <div className="addUser__account__status">
+                      <Switch
+                        size="small"
+                        onClick={this.onStatusClick}
+                        checked={statusActive}
+                      />
+                      <p
+                        className={`addUser__account__status-${
+                          statusActive ? "active" : "inactive"
+                        }`}
+                      >
+                        {statusActive
+                          ? translate("label.user.active")
+                          : translate("label.user.inactive")}
+                      </p>
+                    </div>
+                  </div>
+                </React.Fragment>
+              )}
+              <div className="addUser__buttons">
+                <OmniButton
+                  type="secondary"
+                  label={translate("label.button.cancel")}
+                  className="addUser__buttons-btn"
+                  onClick={this.goBack}
+                />
+                <OmniButton
+                  type="primary"
+                  label={
+                    editCustomer
+                      ? translate("label.button.savechanges")
+                      : translate("label.button.savecontinue")
+                  }
+                  className="addUser__buttons-btn"
+                  buttonStyle={{ marginLeft: "16px" }}
+                  onClick={this.save}
+                />
+              </div>
+            </TabPane>
+            <TabPane
+              tab="Subscription Licences"
+              key="subscriptionLicences"
+              disabled={!this.props.selectedCustomer}
+            >
+              <Row style={{ justifyContent: "space-between" }}>
+                <Text
+                  type="regular"
+                  size="16px"
+                  opacity={0.5}
+                  text={translate("text.licence.viewallexisting")}
+                />
+                <OmniButton
+                  type="add"
+                  label={translate("label.button.add", {
+                    type: translate("label.licence.licences")
+                  })}
+                  onClick={this.openAddNewLicence}
+                />
+              </Row>
+              <TableHeader
+                columns={TableColumns}
+                style={{ marginTop: "10px" }}
+                sortColumn={this.sortColumn}
+              />
+              {_.map(allLicences, licence => (
+                <Row
+                  key={licence.id}
+                  className="maindashboard__list__item"
+                  style={{ cursor: "auto" }}
+                >
+                  <Column
+                    width={getColumnWidth(TableColumnNames.APPLICATION)}
+                    className="maindashboard__list__item-text-bold"
+                  >
+                    {_.get(licence, "type_name", "")}
+                  </Column>
+                  <Column
+                    width={getColumnWidth(TableColumnNames.DURATION)}
+                    className="maindashboard__list__item-text"
+                  >
+                    {_.get(licence, "duration_name", "")}
+                  </Column>
+                  <Column
+                    width={getColumnWidth(TableColumnNames.EXPIRATION_DATE)}
+                    className="maindashboard__list__item-text"
+                  >
+                    {getFormattedDate(_.get(licence, "expired_date", ""))}
+                  </Column>
+                  <Column
+                    width={getColumnWidth(TableColumnNames.STATUS)}
+                    className="maindashboard__list__item-text"
+                  >
+                    {_.get(licence, "first_name", "")
+                      ? "Assigned"
+                      : "Unassigned"}
+                  </Column>
+                  <Column
+                    width={getColumnWidth(TableColumnNames.USER)}
+                    className="maindashboard__list__item-text"
+                  >
+                    {_.get(licence, "first_name", "") && (
+                      <ImageLoader
+                        style={{ marginRight: "5px" }}
+                        type="circle"
+                        width="20px"
+                        height="20px"
+                        path={licence.profile}
+                      />
+                    )}
+                    {`${_.get(licence, "first_name", "")}  ${_.get(
+                      licence,
+                      "last_name",
+                      ""
+                    )}`}
+                  </Column>
+                  <Column
+                    width={getColumnWidth(TableColumnNames.ACTIONS)}
+                    className="maindashboard__list__item-text maindashboard__list__item-text-link"
+                    style={{ cursor: "not-allowed" }}
+                  >
+                    {_.get(licence, "first_name", "") ? "Remove" : "Assign"}
+                  </Column>
+                </Row>
+              ))}
+              {/* <Pagination
+                containerStyle={
+                  _.get(allLicences, "length", 0) > 4
+                    ? { marginTop: "1%" }
+                    : { marginTop: "20%" }
+                }
+                total={_.get(this.props.allLicences, "length", 0)}
+                showTotal={(total, range) =>
+                  translate("text.pagination", {
+                    top: range[0],
+                    bottom: range[1],
+                    total,
+                    type: translate("label.dashboard.customers")
+                  })
+                }
+                pageSize={this.state.itemsPerPage}
+                current={this.state.pageNo}
+                onPageChange={this.onPageChange}
+                onPageSizeChange={this.onPageSizeChange}
+              /> */}
+              {!_.get(allLicences, "length", 0) && (
+                <Row className="maindashboard__nodata">
+                  <Icon
+                    style={{ fontSize: "20px" }}
+                    type="exclamation-circle"
+                    className="maindashboard__nodata-icon"
+                  />
+                  {translate("error.dashboard.notfound", {
+                    type: translate("text.customer.subslicences")
+                  })}
+                </Row>
+              )}
+            </TabPane>
+          </Tabs>
+
           <DeactivateModal
             isActive={this.state.statusActive}
             visible={this.state.showDeactivateModal}
@@ -641,11 +854,73 @@ class AddCustomer extends Component {
             closeModal={this.closeModal}
             deactivate={this.deactivate}
           />
+          {this.state.openAddNewLicenceModal && (
+            <AddNewLicence
+              visible={this.state.openAddNewLicenceModal}
+              closeModal={this.closeModal}
+              addNewLicence={this.addNewLicence}
+            />
+          )}
         </ContentLayout>
       </React.Fragment>
     );
   }
 }
+
+const getColumnWidth = _.memoize(name => {
+  const col = _.find(TableColumns, col => col.name === name);
+  return _.get(col, "width");
+});
+
+const Column = styled.div`
+  width: ${props => props.width};
+`;
+
+const TableColumnNames = {
+  APPLICATION: translate("label.dashboard.application"),
+  DURATION: translate("label.licence.duration"),
+  EXPIRATION_DATE: translate("label.licence.expirationdate"),
+  STATUS: translate("label.user.status"),
+  USER: translate("label.dashboard.user"),
+  ACTIONS: translate("label.generic.actions")
+};
+
+const TableColumns = [
+  {
+    name: TableColumnNames.APPLICATION,
+    key: "type_name",
+    // sort: true,
+    width: "20%"
+  },
+  {
+    name: TableColumnNames.DURATION,
+    key: "duration",
+    // sort: true,
+    width: "20%"
+  },
+  {
+    name: TableColumnNames.EXPIRATION_DATE,
+    key: "expired_date",
+    // sort: true,
+    width: "20%"
+  },
+  {
+    name: TableColumnNames.STATUS,
+    key: "status",
+    // sort: true,
+    width: "15%"
+  },
+  {
+    name: TableColumnNames.USER,
+    key: "first_name",
+    // sort: true,
+    width: "20%"
+  },
+  {
+    name: TableColumnNames.ACTIONS,
+    width: "10%"
+  }
+];
 
 function mapStateToProps(state) {
   return {

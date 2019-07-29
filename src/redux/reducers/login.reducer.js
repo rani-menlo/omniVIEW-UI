@@ -42,7 +42,11 @@ export default (state = initialState, action) => {
         },
         userId: data.userId,
         name: data.name,
-        email: data.email
+        email: data.email,
+        "omniview-pro": _.find(
+          data.licenses,
+          licence => licence.type_slug === "omniview-pro"
+        )
       };
     }
     case LoginActionTypes.SEND_OTP: {

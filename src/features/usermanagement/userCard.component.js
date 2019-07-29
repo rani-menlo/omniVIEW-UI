@@ -5,7 +5,13 @@ import { getFormattedDate } from "../../utils";
 import { Avatar } from "antd";
 import { ImageLoader } from "../../uikit/components";
 
-const UserCard = ({ user, onAvatarClick, onStatusClick, onEdit }) => {
+const UserCard = ({
+  user,
+  onAvatarClick,
+  onStatusClick,
+  onEdit,
+  onAssignLicenseClick
+}) => {
   const isActive = _.get(user, "is_active", false);
   return (
     <div key={user.user_id} className="userManagement__group__users__user">
@@ -33,20 +39,19 @@ const UserCard = ({ user, onAvatarClick, onStatusClick, onEdit }) => {
           {translate("label.usermgmt.subscriptionstatus")}:
           <span
             className={`userManagement__group__users__user__info-text-${
-              isActive ? "active" : "inactive"
+              _.get(user, "license_status", 0) ? "active" : "inactive"
             }`}
           >
-            {isActive
+            {_.get(user, "license_status", 0)
               ? ` ${translate("label.user.active")}`
               : ` ${translate("label.user.inactive")}`}
           </span>
         </p>
-        {user.role_id !== 1 && (
+        {user.role_id !== 1 && (_.get(user, "license_status") || "") && (
           <p className="userManagement__group__users__user__info-text">
-            {isActive
-              ? `${translate("label.usermgmt.expires")}: `
-              : `${translate("label.usermgmt.expired")}: `}
-            {getFormattedDate(_.get(user, "expired_date")) || ""}
+            {`${translate("label.usermgmt.expires")} ${getFormattedDate(
+              _.get(user, "expiryDate")
+            )}`}
           </p>
         )}
         <p className="userManagement__group__users__user__info-text">
@@ -64,7 +69,7 @@ const UserCard = ({ user, onAvatarClick, onStatusClick, onEdit }) => {
             <React.Fragment>
               <p
                 className="userManagement__group__users__user__info-link"
-                style={{ cursor: "not-allowed", opacity: 0.5 }}
+                onClick={onAssignLicenseClick}
               >
                 {translate("label.usermgmt.assignlicence")}
               </p>

@@ -3,14 +3,15 @@ import { URI } from "../../constants";
 
 export default {
   fetchDepartments: () => api.get(URI.GET_DEPARTMENTS),
-  fetchLicences: customerId => api.post(URI.GET_LICENCES, { customerId }),
-  fetchAllLicences: () => api.get(URI.GET_ALL_LICENCES),
+  fetchAvailableLicences: customerId =>
+    api.post(URI.GET_AVAILABLE_LICENCES, { customerId }),
+  fetchAllLicences: customerId =>
+    api.get(URI.GET_ALL_LICENCES.replace(":customer_id", customerId)),
+  assignLicense: data => api.post(URI.ASSIGN_LICENSE, data),
   addUser: user => api.post(URI.ADD_USER, user),
   updateUser: user => api.post(URI.UPDATE_USER, user),
-  addCustomer: customer => api.post(URI.ADD_CUSTOMER, customer),
-  editCustomer: customer => api.post(URI.EDIT_CUSTOMER, customer),
   activateDeactivateUser: user => api.post(URI.ACTIVATE_DEACTIVATE, user),
   fetchUsers: data => api.post(URI.GET_USERS, data),
-  fetchUsersOfSubmissions: (data) => api.post(URI.GET_USERS_OF_SUBMISSIONS, data),
-  fetchUsersOfFiles: (data) => api.post(URI.GET_USERS_OF_FILES, data),
+  fetchUsersOfSubmissions: data => api.post(URI.GET_USERS_OF_SUBMISSIONS, data),
+  fetchUsersOfFiles: data => api.post(URI.GET_USERS_OF_FILES, data)
 };

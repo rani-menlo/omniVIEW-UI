@@ -457,25 +457,28 @@ class SubmissionView extends Component {
     return label;
   };
 
-  getTreeLabel = () => {
+  getSequenceLabel = () => {
     const { selectedSubmission, selectedSequence } = this.props;
+    return `${_.get(selectedSubmission, "name", "")}\\${_.get(
+      selectedSequence,
+      "name",
+      ""
+    )} (${_.get(selectedSequence, "submission_type", "")}-${_.get(
+      selectedSequence,
+      "submission_sub_type",
+      ""
+    )})`;
+  };
+
+  getTreeLabel = () => {
     if (this.state.selectedView) {
       const selectedView =
         this.state.selectedView === "current"
           ? "[Current View]"
           : "[Life Cycle View]";
       return `Submission ${this.getSubmissionLabel()} ${selectedView}`;
-    } else {
-      return `Sequence ${_.get(selectedSubmission, "name", "")}\\${_.get(
-        selectedSequence,
-        "name",
-        ""
-      )} (${_.get(selectedSequence, "submission_type", "")}-${_.get(
-        selectedSequence,
-        "submission_sub_type",
-        ""
-      )})`;
     }
+    return `Sequence ${this.getSequenceLabel()}`;
   };
 
   validate = () => {
@@ -612,8 +615,12 @@ class SubmissionView extends Component {
     // this case
     if (!selectedNode) {
       let files = _.get(item, "lifeCycles");
-      // files = _.filter(files, { showInCurrentView: true });
-      selectedNode = this.getNodeFromMap(_.get(files, "[0]"));
+      _.forEach(files, file => {
+        selectedNode = this.getNodeFromMap(file);
+        if (selectedNode) {
+          return false;
+        }
+      });
     }
 
     if (selectedNode) {
@@ -633,6 +640,9 @@ class SubmissionView extends Component {
     const id = _.get(node, "state.properties.ID");
     if (id) {
       this.treeNodesMap.set(id, node);
+    } else if (_.get(node, "[state][properties][dtd-version]")) {
+      const label = this.getSequenceLabel();
+      this.treeNodesMap.set(`${label}_${label}`, node);
     } else {
       const name = _.get(node, "state.properties.name", "");
       const title = _.get(node, "state.properties.title", "");
@@ -947,8 +957,21 @@ class SubmissionView extends Component {
               <div
                 className={`submissionview__header__validate icon_text_border ${selectedSequence &&
                   "global__cursor-pointer"}`}
-                style={!selectedSequence ? { border: 0 } : {}}
-                onClick={selectedSequence && this.validate}
+                style={{
+                  ...(!(
+                    isLoggedInOmniciaAdmin(role) || this.props["omniview-pro"]
+                  ) && {
+                    opacity: 0.2,
+                    cursor: "not-allowed"
+                  }),
+                  ...(!selectedSequence && { border: 0 })
+                }}
+                onClick={
+                  selectedSequence &&
+                  (isLoggedInOmniciaAdmin(role) ||
+                    this.props["omniview-pro"]) &&
+                  this.validate
+                }
               >
                 <img
                   src="/images/folder-validate.svg"
@@ -1315,6 +1338,7 @@ function mapStateToProps(state) {
   return {
     loading: state.Api.loading,
     user: state.Login.user,
+    "omniview-pro": state.Login["omniview-pro"],
     role: state.Login.role,
     sequences: getSequences(state),
     selectedSequence: state.Submission.selectedSequence,

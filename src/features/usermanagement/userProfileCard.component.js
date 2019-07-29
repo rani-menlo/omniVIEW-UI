@@ -5,7 +5,14 @@ import { Row, Text, OmniButton, ImageLoader } from "../../uikit/components";
 import { getRoleName, getFormattedDate } from "../../utils";
 import { translate } from "../../translations/translator";
 
-const UserProfileCard = ({ user, visible, onClose, onEdit, onStatusClick }) => {
+const UserProfileCard = ({
+  user,
+  visible,
+  onClose,
+  onEdit,
+  onStatusClick,
+  onAssignLicence
+}) => {
   return (
     <Modal
       visible={visible}
@@ -68,19 +75,20 @@ const UserProfileCard = ({ user, visible, onClose, onEdit, onStatusClick }) => {
             type="regular"
             size="14px"
             opacity={0.5}
-            text={`${
-              _.get(user, "is_active", false)
-                ? translate("label.usermgmt.expires")
-                : translate("label.usermgmt.expired")
-            } ${getFormattedDate(_.get(user, "expired_date", ""))}`}
+            text={`${_.get(user, "is_active", false) &&
+              ` ${translate("label.usermgmt.expires")}`} ${getFormattedDate(
+              _.get(user, "expiryDate")
+            )}`}
           />
         )}
-        <OmniButton
-          disabled
-          className="userProfileCard-button"
-          type="primary"
-          label={translate("label.usermgmt.assignnewlicence")}
-        />
+        {_.get(user, "role_id") !== 1 && (
+          <OmniButton
+            className="userProfileCard-button"
+            type="primary"
+            label={translate("label.usermgmt.assignnewlicence")}
+            onClick={onAssignLicence}
+          />
+        )}
         <OmniButton
           onClick={onEdit}
           className="userProfileCard-button"

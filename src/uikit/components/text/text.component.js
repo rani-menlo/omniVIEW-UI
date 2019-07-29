@@ -14,7 +14,7 @@ const Text = ({ text, type, size, opacity, className, textStyle, onClick }) => {
 };
 
 Text.propTypes = {
-  text: PropTypes.string,
+  text: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   type: PropTypes.oneOf(["regular", "medium", "bold", "extra_bold"]),
   size: PropTypes.string,
   opacity: PropTypes.number,

@@ -217,13 +217,13 @@ class AddUser extends Component {
       );
     } else {
       _.map(state.selectedLicences, licence => {
-        if (licence.app_name === "omni-view") {
+        if (_.includes(licence.slug, "omniview")) {
           reqObject["subscriptions"] = {
             ...reqObject["subscriptions"],
             "omni-view": licence.id
           };
         }
-        if (licence.app_name === "omni-file") {
+        if (_.includes(licence.slug, "omnifile")) {
           reqObject["subscriptions"] = {
             ...reqObject["subscriptions"],
             "omni-file": licence.id
@@ -508,7 +508,7 @@ class AddUser extends Component {
                                 type="bold"
                                 size="12px"
                                 opacity={0.75}
-                                text={this.getLicenceAppName(licence.app_name)}
+                                text={_.get(licence, "licenceType", "")}
                                 textStyle={{ marginRight: "5px" }}
                               />
                               <Text
@@ -545,7 +545,7 @@ class AddUser extends Component {
                             className="addUser__licences__box-warning"
                             size="12px"
                             text={translate("error.user.licenceassigned", {
-                              product: this.getLicenceAppName(licence.app_name),
+                              product: licence.licenceType,
                               remain: licence.validDays,
                               expire: licence.unassignValidity
                             })}
