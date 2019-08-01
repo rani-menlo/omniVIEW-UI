@@ -486,6 +486,10 @@ class ApplicationDashboard extends Component {
     });
   };
 
+  openSubscriptions = () => {
+    this.props.history.push("/subscriptions");
+  };
+
   render() {
     const {
       viewBy,
@@ -590,11 +594,13 @@ class ApplicationDashboard extends Component {
                 style={{ marginRight: "8px", opacity: 0.5 }}
               />
               <Text
+                className="global__cursor-pointer"
                 type="bold"
                 size="14px"
                 opacity={0.5}
                 text={`${translate("text.customer.subslicences")}:`}
                 textStyle={{ marginRight: "4px" }}
+                onClick={this.openSubscriptions}
               />
               <Text
                 type="regular"

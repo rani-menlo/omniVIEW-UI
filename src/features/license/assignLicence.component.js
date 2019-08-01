@@ -45,9 +45,15 @@ const AssignLicence = ({
         <Text
           type="regular"
           size="14px"
-          text={`${_.get(licence, "licenceType", "")} - ${translate(
+          text={`${_.get(licence, "licenceType", "") ||
+            _.get(licence, "type_name", "")} - ${translate(
             "label.generic.purchasedon",
-            { date: getFormattedDate(_.get(licence, "purchaseDate", null)) }
+            {
+              date: getFormattedDate(
+                _.get(licence, "purchaseDate", null) ||
+                  _.get(licence, "purchase_date", "")
+              )
+            }
           )}`}
         />
         <div className="licence-modal__assign__user global__center-vert">
@@ -86,9 +92,9 @@ const AssignLicence = ({
               size="14px"
               opacity={0.75}
               text={`${(_.get(user, "license_status", 0) || "") &&
-                ` - License ${translate("label.usermgmt.expires")}`} ${getFormattedDate(
-                _.get(user, "expiryDate")
-              )}`}
+                ` - License ${translate(
+                  "label.usermgmt.expires"
+                )}`} ${getFormattedDate(_.get(user, "expiryDate"))}`}
               textStyle={{ display: "inline" }}
             />
           </div>

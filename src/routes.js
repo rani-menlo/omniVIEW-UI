@@ -18,6 +18,7 @@ import AddCustomer from "./features/usermanagement/addCustomer.component";
 import CreateProfile from "./features/profile/createProfile.component";
 import ForgotPassword from "./features/forgotpwd/forgotpwd.component";
 import ResetPassword from "./features/forgotpwd/resetPassword.component";
+import SubscriptionsPage from "./features/license/subscriptionsPage.component";
 
 const Routes = () => {
   return (
@@ -75,6 +76,11 @@ const Routes = () => {
               exact
               path="/profile/edit"
               component={CreateProfile}
+            />
+            <PrivateRoute
+              exact
+              path="/subscriptions"
+              component={SubscriptionsPage}
             />
             <Redirect to="/" />
           </Switch>

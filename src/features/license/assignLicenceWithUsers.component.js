@@ -70,7 +70,11 @@ class AssignLicenceWithUsers extends Component {
               licence,
               "licenceType",
               ""
-            )} - ${_.get(licence, "name", "")}`}
+            ) || _.get(licence, "type_name", "")} - ${_.get(
+              licence,
+              "name",
+              ""
+            ) || _.get(licence, "duration_name", "")}`}
           />
           <img
             src="/images/close.svg"

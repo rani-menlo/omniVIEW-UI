@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import styled from "styled-components";
 import _ from "lodash";
+import uuidv4 from "uuid/v4";
 import { connect } from "react-redux";
 import {
   Loader,
@@ -18,11 +19,16 @@ import {
   ImageLoader
 } from "../../uikit/components";
 import Header from "../header/header.component";
-import { Checkbox, Switch, Tabs, Icon } from "antd";
+import { Checkbox, Switch, Tabs, Icon, Popover } from "antd";
 import { UsermanagementActions, CustomerActions } from "../../redux/actions";
 import { isPhone, isEmail, getFormattedDate } from "../../utils";
 import { translate } from "../../translations/translator";
 import AddNewLicence from "../license/addNewLicence.component";
+import PopoverCustomers from "./popoverCustomers.component";
+import LicenceInUseUnAssigned from "../license/licenceInUseUnAssigned.component";
+import AssignLicence from "../license/assignLicence.component";
+import AssignLicenceWithUsers from "../license/assignLicenceWithUsers.component";
+import Subscriptions from "../license/subscriptions.component";
 
 const TabPane = Tabs.TabPane;
 
@@ -74,31 +80,36 @@ class AddCustomer extends Component {
         omniViewError: "",
         omniFileError: ""
       },
+      disableCustomerDetailsTab: false,
       allLicences: null,
-      disableCustomerDetailsTab: false
+      showLicenceUnAssigned: false,
+      showUsersModal: false,
+      showAssignLicenceToUser: false,
+      assigningLicence: null,
+      selectedUser: null
     };
   }
 
   static getDerivedStateFromProps(props, state) {
     if (state.allLicences === null && props.allLicences.length) {
       return {
-        /* allLicences: AddCustomer.getItemsBasedOnPagination(
+        allLicences: AddCustomer.getItemsBasedOnPagination(
           props.allLicences,
           state.pageNo,
           state.itemsPerPage
-        ) */
-        allLicences: props.allLicences
+        )
+        // allLicences: props.allLicences
       };
     }
     return null;
   }
 
   static getItemsBasedOnPagination(array, pageNo, itemsPerPage) {
-    return _.slice(
-      array,
-      (pageNo - 1) * itemsPerPage,
-      pageNo * itemsPerPage - 1
-    );
+    const from = (pageNo - 1) * itemsPerPage;
+    const to = pageNo * itemsPerPage;
+    const newArray = _.slice(array, from, to);
+
+    return newArray;
   }
 
   componentDidMount() {
@@ -113,8 +124,7 @@ class AddCustomer extends Component {
     }
   }
 
-  populateState = () => {
-    const { selectedCustomer } = this.props;
+  populateState = (selectedCustomer = this.props.selectedCustomer) => {
     const state = { ...this.state };
     state.cname.value = selectedCustomer.company_name;
     state.fname.value = selectedCustomer.first_name;
@@ -413,9 +423,110 @@ class AddCustomer extends Component {
   };
 
   sortColumn = (sortBy, orderBy) => {
-    const { allLicences } = this.state;
-    const sortedLicences = _.orderBy(allLicences, [sortBy], [orderBy]);
-    this.setState({ allLicences: sortedLicences });
+    const { allLicences } = this.props;
+    const sortedLicences = _.orderBy(
+      allLicences,
+      [sortBy],
+      [_.toLower(orderBy)]
+    );
+    this.setState({
+      allLicences: AddCustomer.getItemsBasedOnPagination(
+        sortedLicences,
+        this.state.pageNo,
+        this.state.itemsPerPage
+      )
+    });
+  };
+
+  onCustomerSelected = customer => {
+    this.props.dispatch(CustomerActions.setSelectedCustomer(customer));
+    this.props.dispatch(UsermanagementActions.resetAllLicences());
+    const newState = this.populateState(customer);
+    this.setState(
+      {
+        ...newState,
+        allLicences: null
+      },
+      () => {
+        if (this.state.selectedTab === "subscriptionLicences") {
+          this.props.dispatch(
+            UsermanagementActions.getAllLicences(customer.id)
+          );
+        }
+      }
+    );
+  };
+
+  openUsersModal = license => () => {
+    this.setState({
+      showAssignLicenceToUser: false,
+      showUsersModal: true,
+      assigningLicence: license
+    });
+  };
+
+  goBackToUsersModal = () => {
+    this.setState({
+      showAssignLicenceToUser: false,
+      showUsersModal: true
+    });
+  };
+
+  closeUsersModal = () => {
+    this.setState({
+      selectedUser: null,
+      showUsersModal: false,
+      assigningLicence: null
+    });
+  };
+
+  closeAssignLicenceToUserModal = () => {
+    this.setState({
+      selectedUser: null,
+      showAssignLicenceToUser: false
+    });
+  };
+
+  onUserSelect = user => {
+    this.setState({
+      showAssignLicenceToUser: true,
+      showUsersModal: false,
+      selectedUser: user
+    });
+  };
+
+  assignLicence = () => {
+    const { assigningLicence, selectedUser } = this.state;
+    this.props.dispatch(
+      UsermanagementActions.assignLicense(
+        {
+          ...(_.includes(assigningLicence.type_slug, "view")
+            ? { omni_view_license: assigningLicence.id }
+            : { omni_file_license: assigningLicence.id }),
+          user_id: selectedUser.user_id
+        },
+        () => {
+          Toast.success(
+            `License has been assigned to ${_.get(
+              selectedUser,
+              "first_name",
+              ""
+            )} ${_.get(selectedUser, "last_name", "")}`
+          );
+          this.props.dispatch(UsermanagementActions.resetAllLicences());
+          this.setState({ selectedUser: null, allLicences: null }, () => {
+            this.props.dispatch(
+              UsermanagementActions.getAllLicences(
+                this.props.selectedCustomer.id
+              )
+            );
+          });
+        }
+      )
+    );
+    this.setState({
+      showAssignLicenceToUser: false
+    });
   };
 
   render() {
@@ -435,20 +546,35 @@ class AddCustomer extends Component {
       statusActive,
       selectedTab
     } = this.state;
-    const { loading, licencesUnAssigned } = this.props;
+    const { loading, selectedCustomer } = this.props;
     const { allLicences } = this.state;
     return (
       <React.Fragment>
         <Loader loading={loading} />
         <Header style={{ marginBottom: "0px" }} />
         <ContentLayout className="addUser">
-          <Text
-            type="extra_bold"
-            size="20px"
-            className="addUser-companyname"
-            text={_.get(this.props.selectedCustomer, "company_name", "")}
-            onClick={this.goBack}
-          />
+          <Popover
+            trigger="click"
+            placement="bottom"
+            content={
+              <PopoverCustomers onCustomerSelected={this.onCustomerSelected} />
+            }
+          >
+            <Row style={{ marginLeft: "auto" }}>
+              <Text
+                type="extra_bold"
+                size="20px"
+                className="userManagement-subheader-title"
+                text={_.get(selectedCustomer, "company_name", "")}
+                // onClick={this.goBack}
+              />
+              <img
+                className="global__cursor-pointer"
+                src="/images/caret-inactive.svg"
+                style={{ marginLeft: "5px" }}
+              />
+            </Row>
+          </Popover>
           <Tabs
             activeKey={selectedTab}
             className="addUser__tabs"
@@ -746,113 +872,25 @@ class AddCustomer extends Component {
                   onClick={this.openAddNewLicence}
                 />
               </Row>
-              <TableHeader
-                columns={TableColumns}
-                style={{ marginTop: "10px" }}
-                sortColumn={this.sortColumn}
-              />
-              {_.map(allLicences, licence => (
-                <Row
-                  key={licence.id}
-                  className="maindashboard__list__item"
-                  style={{ cursor: "auto" }}
-                >
-                  <Column
-                    width={getColumnWidth(TableColumnNames.APPLICATION)}
-                    className="maindashboard__list__item-text-bold"
-                  >
-                    {_.get(licence, "type_name", "")}
-                  </Column>
-                  <Column
-                    width={getColumnWidth(TableColumnNames.DURATION)}
-                    className="maindashboard__list__item-text"
-                  >
-                    {_.get(licence, "duration_name", "")}
-                  </Column>
-                  <Column
-                    width={getColumnWidth(TableColumnNames.EXPIRATION_DATE)}
-                    className="maindashboard__list__item-text"
-                  >
-                    {getFormattedDate(_.get(licence, "expired_date", ""))}
-                  </Column>
-                  <Column
-                    width={getColumnWidth(TableColumnNames.STATUS)}
-                    className="maindashboard__list__item-text"
-                  >
-                    {_.get(licence, "first_name", "")
-                      ? "Assigned"
-                      : "Unassigned"}
-                  </Column>
-                  <Column
-                    width={getColumnWidth(TableColumnNames.USER)}
-                    className="maindashboard__list__item-text"
-                  >
-                    {_.get(licence, "first_name", "") && (
-                      <ImageLoader
-                        style={{ marginRight: "5px" }}
-                        type="circle"
-                        width="20px"
-                        height="20px"
-                        path={licence.profile}
-                      />
-                    )}
-                    {`${_.get(licence, "first_name", "")}  ${_.get(
-                      licence,
-                      "last_name",
-                      ""
-                    )}`}
-                  </Column>
-                  <Column
-                    width={getColumnWidth(TableColumnNames.ACTIONS)}
-                    className="maindashboard__list__item-text maindashboard__list__item-text-link"
-                    style={{ cursor: "not-allowed" }}
-                  >
-                    {_.get(licence, "first_name", "") ? "Remove" : "Assign"}
-                  </Column>
-                </Row>
-              ))}
-              {/* <Pagination
-                containerStyle={
-                  _.get(allLicences, "length", 0) > 4
-                    ? { marginTop: "1%" }
-                    : { marginTop: "20%" }
-                }
-                total={_.get(this.props.allLicences, "length", 0)}
-                showTotal={(total, range) =>
-                  translate("text.pagination", {
-                    top: range[0],
-                    bottom: range[1],
-                    total,
-                    type: translate("label.dashboard.customers")
-                  })
-                }
-                pageSize={this.state.itemsPerPage}
-                current={this.state.pageNo}
-                onPageChange={this.onPageChange}
-                onPageSizeChange={this.onPageSizeChange}
-              /> */}
-              {!_.get(allLicences, "length", 0) && (
-                <Row className="maindashboard__nodata">
-                  <Icon
-                    style={{ fontSize: "20px" }}
-                    type="exclamation-circle"
-                    className="maindashboard__nodata-icon"
-                  />
-                  {translate("error.dashboard.notfound", {
-                    type: translate("text.customer.subslicences")
-                  })}
-                </Row>
-              )}
+              <Subscriptions allLicences={this.props.allLicences} />
             </TabPane>
           </Tabs>
 
-          <DeactivateModal
-            isActive={this.state.statusActive}
-            visible={this.state.showDeactivateModal}
-            title={`${translate("label.usermgmt.deactivateacc")}?`}
-            content={translate("text.customer.deactivate")}
-            closeModal={this.closeModal}
-            deactivate={this.deactivate}
+          {this.state.showUsersModal && (
+            <AssignLicenceWithUsers
+              licence={this.state.assigningLicence}
+              selectedUser={this.state.selectedUser}
+              closeModal={this.closeUsersModal}
+              onUserSelect={this.onUserSelect}
+            />
+          )}
+          <AssignLicence
+            visible={this.state.showAssignLicenceToUser}
+            licence={this.state.assigningLicence}
+            user={this.state.selectedUser}
+            closeModal={this.closeAssignLicenceToUserModal}
+            back={this.goBackToUsersModal}
+            submit={this.assignLicence}
           />
           {this.state.openAddNewLicenceModal && (
             <AddNewLicence
@@ -861,66 +899,19 @@ class AddCustomer extends Component {
               addNewLicence={this.addNewLicence}
             />
           )}
+          <DeactivateModal
+            isActive={this.state.statusActive}
+            visible={this.state.showDeactivateModal}
+            title={`${translate("label.usermgmt.deactivateacc")}?`}
+            content={translate("text.customer.deactivate")}
+            closeModal={this.closeModal}
+            deactivate={this.deactivate}
+          />
         </ContentLayout>
       </React.Fragment>
     );
   }
 }
-
-const getColumnWidth = _.memoize(name => {
-  const col = _.find(TableColumns, col => col.name === name);
-  return _.get(col, "width");
-});
-
-const Column = styled.div`
-  width: ${props => props.width};
-`;
-
-const TableColumnNames = {
-  APPLICATION: translate("label.dashboard.application"),
-  DURATION: translate("label.licence.duration"),
-  EXPIRATION_DATE: translate("label.licence.expirationdate"),
-  STATUS: translate("label.user.status"),
-  USER: translate("label.dashboard.user"),
-  ACTIONS: translate("label.generic.actions")
-};
-
-const TableColumns = [
-  {
-    name: TableColumnNames.APPLICATION,
-    key: "type_name",
-    // sort: true,
-    width: "20%"
-  },
-  {
-    name: TableColumnNames.DURATION,
-    key: "duration",
-    // sort: true,
-    width: "20%"
-  },
-  {
-    name: TableColumnNames.EXPIRATION_DATE,
-    key: "expired_date",
-    // sort: true,
-    width: "20%"
-  },
-  {
-    name: TableColumnNames.STATUS,
-    key: "status",
-    // sort: true,
-    width: "15%"
-  },
-  {
-    name: TableColumnNames.USER,
-    key: "first_name",
-    // sort: true,
-    width: "20%"
-  },
-  {
-    name: TableColumnNames.ACTIONS,
-    width: "10%"
-  }
-];
 
 function mapStateToProps(state) {
   return {

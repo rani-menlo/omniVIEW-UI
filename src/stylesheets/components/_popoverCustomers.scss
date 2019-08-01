@@ -1,4 +1,6 @@
 .popoverCustomers {
+  height: 200px;
+  overflow-y: auto;
   &-text {
     cursor: pointer;
     &:first-child {
