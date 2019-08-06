@@ -10,7 +10,8 @@ const DeactivateModal = ({
   title,
   content,
   closeModal,
-  deactivate
+  submit,
+  submitBtnLabel
 }) => {
   return (
     <Modal visible={visible} closable={false} footer={null} wrapClassName="">
@@ -36,14 +37,19 @@ const DeactivateModal = ({
           />
           <OmniButton
             type="primary"
-            label={translate(
-              `label.usermgmt.${isActive ? "deactivate" : "activate"}`
-            )}
-            className={`deactivate-modal-buttons-${
-              isActive ? "deactivate" : "activate"
-            }`}
+            label={
+              submitBtnLabel
+                ? submitBtnLabel
+                : translate(
+                    `label.usermgmt.${isActive ? "deactivate" : "activate"}`
+                  )
+            }
+            className={
+              !submitBtnLabel &&
+              `deactivate-modal-buttons-${isActive ? "deactivate" : "activate"}`
+            }
             buttonStyle={{ marginLeft: "16px" }}
-            onClick={deactivate}
+            onClick={submit}
           />
         </div>
       </div>

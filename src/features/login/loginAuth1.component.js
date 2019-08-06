@@ -26,6 +26,7 @@ class LoginAuth1 extends Component {
   };
 
   goBack = () => {
+    this.props.dispatch(LoginActions.logOut());
     this.props.actions.setLoggedInStatus(false);
     this.props.history.push("/");
   };
@@ -81,7 +82,8 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ ...LoginActions }, dispatch)
+    actions: bindActionCreators({ ...LoginActions }, dispatch),
+    dispatch
   };
 }
 

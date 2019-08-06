@@ -9,6 +9,7 @@ import {
   Row,
   Toast,
   ImageLoader,
+  DeactivateModal
 } from "../../uikit/components";
 import { Icon } from "antd";
 import { translate } from "../../translations/translator";
@@ -50,8 +51,10 @@ class Subscriptions extends Component {
       showUsersModal: false,
       showAssignLicenceToUser: false,
       assigningLicence: null,
+      removingLicense: null,
       licencesFromProps: [],
-      selectedUser: null
+      selectedUser: null,
+      showRemoveLicenseModal: false
     };
   }
 
@@ -139,32 +142,48 @@ class Subscriptions extends Component {
     });
   };
 
+  refreshLicenses = () => {
+    this.props.dispatch(UsermanagementActions.resetAllLicences());
+    this.setState(
+      {
+        selectedUser: null,
+        allLicences: null,
+        removingLicense: null,
+        showRemoveLicenseModal: false
+      },
+      () => {
+        this.props.dispatch(
+          UsermanagementActions.getAllLicences(this.props.selectedCustomer.id)
+        );
+      }
+    );
+  };
+
   assignLicence = () => {
     const { assigningLicence, selectedUser } = this.state;
+    const licenses = _.map(selectedUser, user => {
+      return {
+        ...(_.includes(assigningLicence.slug, "view")
+          ? { omni_view_license: assigningLicence.id }
+          : { omni_file_license: assigningLicence.id }),
+        user_id: user.user_id
+      };
+    });
     this.props.dispatch(
       UsermanagementActions.assignLicense(
         {
-          ...(_.includes(assigningLicence.type_slug, "view")
-            ? { omni_view_license: assigningLicence.id }
-            : { omni_file_license: assigningLicence.id }),
-          user_id: selectedUser.user_id
+          licenses
         },
         () => {
-          Toast.success(
+          /* Toast.success(
             `License has been assigned to ${_.get(
               selectedUser,
               "first_name",
               ""
             )} ${_.get(selectedUser, "last_name", "")}`
-          );
-          this.props.dispatch(UsermanagementActions.resetAllLicences());
-          this.setState({ selectedUser: null, allLicences: null }, () => {
-            this.props.dispatch(
-              UsermanagementActions.getAllLicences(
-                this.props.selectedCustomer.id
-              )
-            );
-          });
+          ); */
+          Toast.success("License has been assigned.");
+          this.refreshLicenses();
         }
       )
     );
@@ -172,6 +191,25 @@ class Subscriptions extends Component {
       selectedUser: null,
       showAssignLicenceToUser: false
     });
+  };
+
+  removeLicense = () => {
+    this.props.dispatch(
+      UsermanagementActions.removeLicense(
+        {
+          licenses: [this.state.removingLicense.id]
+        },
+        this.refreshLicenses
+      )
+    );
+  };
+
+  openRemoveLicenseModal = license => () => {
+    this.setState({ showRemoveLicenseModal: true, removingLicense: license });
+  };
+
+  closeRemoveLicenseModal = () => {
+    this.setState({ showRemoveLicenseModal: false });
   };
 
   render() {
@@ -236,9 +274,15 @@ class Subscriptions extends Component {
               <Column
                 width={getColumnWidth(TableColumnNames.ACTIONS)}
                 className="maindashboard__list__item-text maindashboard__list__item-text-link global__cursor-pointer"
-                onClick={this.openUsersModal(licence)}
+                onClick={
+                  _.get(licence, "first_name", "")
+                    ? this.openRemoveLicenseModal(licence)
+                    : this.openUsersModal(licence)
+                }
               >
-                {_.get(licence, "first_name", "") ? "Remove" : "Assign"}
+                {_.get(licence, "first_name", "")
+                  ? translate("label.generic.remove")
+                  : translate("label.generic.assign")}
               </Column>
             </Row>
           ))}
@@ -256,7 +300,7 @@ class Subscriptions extends Component {
                 top: range[0],
                 bottom: range[1],
                 total,
-                type: translate("label.dashboard.customers")
+                type: translate("label.licence.licences")
               })
             }
             pageSize={this.state.itemsPerPage}
@@ -279,8 +323,9 @@ class Subscriptions extends Component {
         )}
         {this.state.showUsersModal && (
           <AssignLicenceWithUsers
+            multiSelection={false}
             licence={this.state.assigningLicence}
-            selectedUser={this.state.selectedUser}
+            selectedUsers={this.state.selectedUser}
             closeModal={this.closeUsersModal}
             onUserSelect={this.onUserSelect}
           />
@@ -288,10 +333,29 @@ class Subscriptions extends Component {
         <AssignLicence
           visible={this.state.showAssignLicenceToUser}
           licence={this.state.assigningLicence}
-          user={this.state.selectedUser}
+          users={this.state.selectedUser}
           closeModal={this.closeAssignLicenceToUserModal}
           back={this.goBackToUsersModal}
           submit={this.assignLicence}
+        />
+        <DeactivateModal
+          visible={this.state.showRemoveLicenseModal}
+          submitBtnLabel={translate("label.generic.remove")}
+          title={`${translate("label.licence.removelicence")}?`}
+          content={translate("text.licence.removelicence", {
+            license: `${_.get(
+              this.state.removingLicense,
+              "type_name",
+              ""
+            )} - ${_.get(this.state.removingLicense, "duration_name", "")}`,
+            user: `${_.get(
+              this.state.removingLicense,
+              "first_name",
+              ""
+            )}  ${_.get(this.state.removingLicense, "last_name", "")}`
+          })}
+          closeModal={this.closeRemoveLicenseModal}
+          submit={this.removeLicense}
         />
       </React.Fragment>
     );
@@ -337,7 +401,7 @@ const TableColumns = [
   },
   {
     name: TableColumnNames.STATUS,
-    key: "status",
+    key: "first_name",
     sort: true,
     width: "15%"
   },

@@ -607,7 +607,7 @@ class AddUser extends Component {
             title={`${translate("label.usermgmt.deactivateacc")}?`}
             content={translate("text.usermgmt.deactivatemsg")}
             closeModal={this.closeModal}
-            deactivate={this.deactivate}
+            submit={this.deactivate}
           />
         </ContentLayout>
       </React.Fragment>

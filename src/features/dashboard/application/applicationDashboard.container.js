@@ -9,7 +9,8 @@ import {
   ApplicationActions,
   SubmissionActions,
   UsermanagementActions,
-  CustomerActions
+  CustomerActions,
+  ApiActions
 } from "../../../redux/actions";
 import Header from "../../header/header.component";
 import styled from "styled-components";
@@ -63,7 +64,7 @@ class ApplicationDashboard extends Component {
       showUsersModal: false,
       showAssignLicenceToUser: false,
       assigningLicence: null,
-      selectedUser: null,
+      selectedUsers: null,
       checkedSubmissions: [],
       TableColumns: [
         {
@@ -438,7 +439,7 @@ class ApplicationDashboard extends Component {
 
   closeUsersModal = () => {
     this.setState({
-      selectedUser: null,
+      selectedUsers: null,
       showUsersModal: false,
       assigningLicence: null
     });
@@ -446,42 +447,57 @@ class ApplicationDashboard extends Component {
 
   closeAssignLicenceToUserModal = () => {
     this.setState({
-      selectedUser: null,
+      selectedUsers: null,
       showAssignLicenceToUser: false
     });
   };
 
-  onUserSelect = user => {
+  onUserSelect = users => {
     this.setState({
       showAssignLicenceToUser: true,
       showUsersModal: false,
-      selectedUser: user
+      selectedUsers: users
     });
   };
 
   assignLicence = () => {
-    const { assigningLicence, selectedUser } = this.state;
-    const someLicence = assigningLicence.licences[0];
+    const { assigningLicence, selectedUsers } = this.state;
+    const licenses = _.map(selectedUsers, (user, idx) => {
+      const licence = assigningLicence.licences[idx];
+      return {
+        ...(_.includes(licence.slug, "view")
+          ? { omni_view_license: licence.id }
+          : { omni_file_license: licence.id }),
+        user_id: user.user_id
+      };
+    });
     this.props.dispatch(
       UsermanagementActions.assignLicense(
         {
-          ...(_.includes(someLicence.slug, "view")
-            ? { omni_view_license: someLicence.id }
-            : { omni_file_license: someLicence.id }),
-          user_id: selectedUser.user_id
+          licenses
         },
-        () => {
-          Toast.success(
+        async () => {
+          /* Toast.success(
             `License has been assigned to ${_.get(
-              selectedUser,
+              selectedUsers,
               "first_name",
               ""
-            )} ${_.get(selectedUser, "last_name", "")}`
+            )} ${_.get(selectedUsers, "last_name", "")}`
+          ); */
+          Toast.success("License has been assigned.");
+          this.props.dispatch(ApiActions.requestOnDemand());
+          const res = await CustomerApi.getCustomerById(
+            this.props.selectedCustomer.id
           );
+          this.props.dispatch(
+            CustomerActions.setSelectedCustomer(res.data.data)
+          );
+          this.props.dispatch(ApiActions.successOnDemand());
         }
       )
     );
     this.setState({
+      selectedUsers: null,
       showAssignLicenceToUser: false
     });
   };
@@ -807,7 +823,7 @@ class ApplicationDashboard extends Component {
           {this.state.showUsersModal && (
             <AssignLicenceWithUsers
               licence={this.state.assigningLicence}
-              selectedUser={this.state.selectedUser}
+              selectedUsers={this.state.selectedUsers}
               closeModal={this.closeUsersModal}
               onUserSelect={this.onUserSelect}
             />
@@ -815,7 +831,7 @@ class ApplicationDashboard extends Component {
           <AssignLicence
             visible={this.state.showAssignLicenceToUser}
             licence={this.state.assigningLicence}
-            user={this.state.selectedUser}
+            users={this.state.selectedUsers}
             closeModal={this.closeAssignLicenceToUserModal}
             back={this.goBackToUsersModal}
             submit={this.assignLicence}

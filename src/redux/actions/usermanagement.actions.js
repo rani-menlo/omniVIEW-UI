@@ -157,17 +157,12 @@ export default {
       }
     };
   },
-  activateDeactivateUser: (usr, customerId) => {
+  activateDeactivateUser: (usr, cb) => {
     return async dispatch => {
       ApiActions.request(dispatch);
       try {
-        await UsermanagementApi.activateDeactivateUser(usr);
-        const res = await UsermanagementApi.fetchUsers({ customerId });
-        dispatch({
-          type: UsermanagementActionTypes.FETCH_USERS,
-          data: res.data
-        });
-        !res.data.error && Toast.success("User Status Updated!");
+        const res = await UsermanagementApi.activateDeactivateUser(usr);
+        !res.data.error && cb && cb();
         ApiActions.success(dispatch);
       } catch (err) {
         ApiActions.failure(dispatch);
@@ -199,6 +194,23 @@ export default {
         const res = await UsermanagementApi.assignLicense(data);
         dispatch({
           type: UsermanagementActionTypes.ASSIGN_LICENSE,
+          data: res.data
+        });
+        !res.data.error && callback();
+        ApiActions.success(dispatch);
+      } catch (err) {
+        ApiActions.failure(dispatch);
+      }
+    };
+  },
+
+  removeLicense: (data, callback) => {
+    return async dispatch => {
+      ApiActions.request(dispatch);
+      try {
+        const res = await UsermanagementApi.revokeLicense(data);
+        dispatch({
+          type: UsermanagementActionTypes.REVOKE_LICENSE,
           data: res.data
         });
         !res.data.error && callback();

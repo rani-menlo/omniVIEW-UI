@@ -21,7 +21,12 @@ import {
 import Header from "../header/header.component";
 import { Checkbox, Switch, Tabs, Icon, Popover } from "antd";
 import { UsermanagementActions, CustomerActions } from "../../redux/actions";
-import { isPhone, isEmail, getFormattedDate } from "../../utils";
+import {
+  isPhone,
+  isEmail,
+  getFormattedDate,
+  isLoggedInOmniciaAdmin
+} from "../../utils";
 import { translate } from "../../translations/translator";
 import AddNewLicence from "../license/addNewLicence.component";
 import PopoverCustomers from "./popoverCustomers.component";
@@ -553,28 +558,32 @@ class AddCustomer extends Component {
         <Loader loading={loading} />
         <Header style={{ marginBottom: "0px" }} />
         <ContentLayout className="addUser">
-          <Popover
-            trigger="click"
-            placement="bottom"
-            content={
-              <PopoverCustomers onCustomerSelected={this.onCustomerSelected} />
-            }
-          >
-            <Row style={{ marginLeft: "auto" }}>
-              <Text
-                type="extra_bold"
-                size="20px"
-                className="userManagement-subheader-title"
-                text={_.get(selectedCustomer, "company_name", "")}
-                // onClick={this.goBack}
-              />
-              <img
-                className="global__cursor-pointer"
-                src="/images/caret-inactive.svg"
-                style={{ marginLeft: "5px" }}
-              />
-            </Row>
-          </Popover>
+          {isLoggedInOmniciaAdmin(this.props.role) && editCustomer && (
+            <Popover
+              trigger="click"
+              placement="bottom"
+              content={
+                <PopoverCustomers
+                  onCustomerSelected={this.onCustomerSelected}
+                />
+              }
+            >
+              <Row style={{ marginLeft: "auto" }}>
+                <Text
+                  type="extra_bold"
+                  size="20px"
+                  className="userManagement-subheader-title"
+                  text={_.get(selectedCustomer, "company_name", "")}
+                  // onClick={this.goBack}
+                />
+                <img
+                  className="global__cursor-pointer"
+                  src="/images/caret-inactive.svg"
+                  style={{ marginLeft: "5px" }}
+                />
+              </Row>
+            </Popover>
+          )}
           <Tabs
             activeKey={selectedTab}
             className="addUser__tabs"
@@ -864,13 +873,15 @@ class AddCustomer extends Component {
                   opacity={0.5}
                   text={translate("text.licence.viewallexisting")}
                 />
-                <OmniButton
-                  type="add"
-                  label={translate("label.button.add", {
-                    type: translate("label.licence.licences")
-                  })}
-                  onClick={this.openAddNewLicence}
-                />
+                {isLoggedInOmniciaAdmin(this.props.role) && (
+                  <OmniButton
+                    type="add"
+                    label={translate("label.button.add", {
+                      type: translate("label.licence.licences")
+                    })}
+                    onClick={this.openAddNewLicence}
+                  />
+                )}
               </Row>
               <Subscriptions allLicences={this.props.allLicences} />
             </TabPane>
@@ -905,7 +916,7 @@ class AddCustomer extends Component {
             title={`${translate("label.usermgmt.deactivateacc")}?`}
             content={translate("text.customer.deactivate")}
             closeModal={this.closeModal}
-            deactivate={this.deactivate}
+            submit={this.deactivate}
           />
         </ContentLayout>
       </React.Fragment>
@@ -917,7 +928,8 @@ function mapStateToProps(state) {
   return {
     loading: state.Api.loading,
     allLicences: state.Usermanagement.allLicences,
-    selectedCustomer: state.Customer.selectedCustomer
+    selectedCustomer: state.Customer.selectedCustomer,
+    role: state.Login.role
   };
 }
 

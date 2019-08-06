@@ -106,6 +106,7 @@ export default {
     };
   },
   logOut: () => {
+    LoginApi.logout()
     return {
       type: LoginActionTypes.LOGOUT
     };
