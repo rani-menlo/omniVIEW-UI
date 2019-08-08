@@ -424,15 +424,28 @@ class UserManagementContainer extends Component {
 
   assignLicence = () => {
     const { assigningLicence, selectedUser } = this.state;
-    const licenses = _.map(selectedUser, (user, idx) => {
-      const licence = assigningLicence.licences[idx];
-      return {
-        ...(_.includes(licence.slug, "view")
-          ? { omni_view_license: licence.id }
-          : { omni_file_license: licence.id }),
-        user_id: user.user_id
-      };
-    });
+    let licenses = [];
+    if (_.isArray(selectedUser)) {
+      licenses = _.map(selectedUser, (user, idx) => {
+        const licence = assigningLicence.licences[idx];
+        return {
+          ...(_.includes(licence.slug, "view")
+            ? { omni_view_license: licence.id }
+            : { omni_file_license: licence.id }),
+          user_id: user.user_id
+        };
+      });
+    } else {
+      const licence = assigningLicence.licences[0];
+      licenses = [
+        {
+          ...(_.includes(licence.slug, "view")
+            ? { omni_view_license: licence.id }
+            : { omni_file_license: licence.id }),
+          user_id: selectedUser.user_id
+        }
+      ];
+    }
     this.props.dispatch(
       UsermanagementActions.assignLicense(
         {

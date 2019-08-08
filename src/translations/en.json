@@ -113,6 +113,8 @@
   "label.dashboard.applicationname": "Application Name",
   "label.dashboard.assignglobalpermissions": "Assign Global Permissions",
   "label.dashboard.assignpermissions": "Assign Permissions",
+  "label.dashboard.submissioncenter": "Submission Center",
+  "text.dashboard.editproperties": "Here you can change all existing properties of the application.",
   "error.dashboard.notfound": "No {type} found",
 
   "label.usermgmt.title": "User Management",
@@ -218,5 +220,6 @@
   "label.node.assignuseraccess": "Assign User Access",
   "label.menu.openinomniview": "Open in omniVIEW",
   "label.menu.openinomnifile": "Open in omniFILE",
-  "label.menu.openinnewwindow": "Open in new Window"
+  "label.menu.openinnewwindow": "Open in new Window",
+  "label.menu.editproperties": "Edit Properties"
 }

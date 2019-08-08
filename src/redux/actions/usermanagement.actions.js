@@ -162,8 +162,8 @@ export default {
       ApiActions.request(dispatch);
       try {
         const res = await UsermanagementApi.activateDeactivateUser(usr);
-        !res.data.error && cb && cb();
         ApiActions.success(dispatch);
+        !res.data.error && cb && cb();
       } catch (err) {
         ApiActions.failure(dispatch);
       }
@@ -196,8 +196,8 @@ export default {
           type: UsermanagementActionTypes.ASSIGN_LICENSE,
           data: res.data
         });
-        !res.data.error && callback();
         ApiActions.success(dispatch);
+        !res.data.error && callback();
       } catch (err) {
         ApiActions.failure(dispatch);
       }
@@ -213,8 +213,8 @@ export default {
           type: UsermanagementActionTypes.REVOKE_LICENSE,
           data: res.data
         });
-        !res.data.error && callback();
         ApiActions.success(dispatch);
+        !res.data.error && callback();
       } catch (err) {
         ApiActions.failure(dispatch);
       }

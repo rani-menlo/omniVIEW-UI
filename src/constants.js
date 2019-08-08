@@ -68,6 +68,8 @@ const URI = {
 
   // Submission
   GET_APPLICATIONS: `${path}submission/getSubmissions`,
+  GET_SUBMISSION_CENTERS: `${path}submission/getSubmissionCenters`,
+  UPDATE_SUBMISSION_CENTER: `${path}submission/updateSubmissionCenter`,
 
   // Sequence
   GET_SEQUENCES: `${path}sequence/getSequences`,

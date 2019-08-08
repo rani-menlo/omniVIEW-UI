@@ -160,8 +160,8 @@ export default {
       ApiActions.request(dispatch);
       try {
         const res = await CustomerApi.addNewLicences(data);
-        !res.data.error && callback && callback();
         ApiActions.success(dispatch);
+        !res.data.error && callback && callback();
       } catch (err) {
         ApiActions.failure(dispatch);
       }

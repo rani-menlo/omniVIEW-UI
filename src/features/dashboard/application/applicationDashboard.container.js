@@ -45,6 +45,7 @@ import LicenceInUseUnAssigned from "../../license/licenceInUseUnAssigned.compone
 import AssignLicence from "../../license/assignLicence.component";
 import AssignLicenceWithUsers from "../../license/assignLicenceWithUsers.component";
 import { CustomerApi } from "../../../redux/api";
+import ApplicationProperties from "./applicationProperties.component";
 // import { Customers } from "./sampleCustomers";
 
 class ApplicationDashboard extends Component {
@@ -66,6 +67,8 @@ class ApplicationDashboard extends Component {
       assigningLicence: null,
       selectedUsers: null,
       checkedSubmissions: [],
+      showPropertiesModal: false,
+      editingSubmission: null,
       TableColumns: [
         {
           name: TableColumnNames.CHECKBOX,
@@ -166,9 +169,19 @@ class ApplicationDashboard extends Component {
     };
     return (
       <Menu onClick={this.onMenuClick(submission)}>
+        <Menu.Item key="edit">
+          <div className="global__center-vert">
+            <img src="/images/edit.svg" style={style} />
+            <Text
+              type="regular"
+              size="12px"
+              text={translate("label.menu.editproperties")}
+            />
+          </div>
+        </Menu.Item>
         <Menu.Item key="openinomniview">
           <div className="global__center-vert">
-            <img src="/images/omni-view-cloud.jpg" style={style} />
+            <img src="/images/omni-view-cloud.png" style={style} />
             <Text
               type="regular"
               size="12px"
@@ -316,6 +329,11 @@ class ApplicationDashboard extends Component {
       this.openPermissionsModal();
     } else if (key === "openinomniview") {
       this.onSubmissionSelected(submission)();
+    } else if (key === "edit") {
+      this.props.actions.setSelectedSubmission(submission);
+      this.setState({
+        showPropertiesModal: true
+      });
     }
   };
 
@@ -504,6 +522,25 @@ class ApplicationDashboard extends Component {
 
   openSubscriptions = () => {
     this.props.history.push("/subscriptions");
+  };
+
+  closePropertiesModal = () => {
+    this.setState({ showPropertiesModal: false });
+  };
+
+  updateSubmissionCenter = slug => {
+    this.props.dispatch(
+      ApplicationActions.updateSubmissionCenter(
+        {
+          submission_id: this.props.selectedSubmission.id,
+          center_slug: slug
+        },
+        () => {
+          this.fetchApplications();
+          this.closePropertiesModal();
+        }
+      )
+    );
   };
 
   render() {
@@ -836,6 +873,13 @@ class ApplicationDashboard extends Component {
             back={this.goBackToUsersModal}
             submit={this.assignLicence}
           />
+          {this.state.showPropertiesModal && (
+            <ApplicationProperties
+              visible
+              closeModal={this.closePropertiesModal}
+              submit={this.updateSubmissionCenter}
+            />
+          )}
         </ContentLayout>
       </React.Fragment>
     );
@@ -862,7 +906,8 @@ function mapStateToProps(state) {
     role: state.Login.role,
     submissions: state.Application.submissions, //getSubmissionsByCustomer(state),
     selectedCustomer: state.Customer.selectedCustomer,
-    submissionCount: state.Application.submissionCount
+    submissionCount: state.Application.submissionCount,
+    selectedSubmission: state.Application.selectedSubmission
   };
 }
 

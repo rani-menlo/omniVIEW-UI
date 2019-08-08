@@ -375,9 +375,6 @@ class CustomerDashboard extends Component {
                       opacity: _.get(customer, "is_active", false) ? 1 : 0.5
                     }}
                   >
-                    <Column width={getColumnWidth(TableColumnNames.CHECKBOX)}>
-                      <OmniCheckbox />
-                    </Column>
                     <Column
                       width={getColumnWidth(TableColumnNames.CUSTOMER_NAME)}
                       className="maindashboard__list__item-text-bold"
@@ -568,12 +565,6 @@ const TableColumnNames = {
 
 const TableColumns = [
   {
-    name: TableColumnNames.CHECKBOX,
-    checkbox: true,
-    sort: false,
-    width: "3%"
-  },
-  {
     name: TableColumnNames.CUSTOMER_NAME,
     key: "company_name",
     checkbox: false,
@@ -599,7 +590,7 @@ const TableColumns = [
     key: "max_space",
     checkbox: false,
     sort: true,
-    width: "10%"
+    width: "13%"
   },
   {
     name: TableColumnNames.COMPANY_ADMIN,

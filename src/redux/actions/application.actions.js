@@ -49,10 +49,40 @@ export default {
       }
     };
   },
+  getSubmissionCenters: () => {
+    return async dispatch => {
+      ApiActions.request(dispatch);
+      try {
+        const res = await ApplicationApi.fetchSubmissionCenters();
+        dispatch({
+          type: ApplicationActionTypes.FETCH_SUBMISSION_CENTERS,
+          data: res.data
+        });
+        ApiActions.success(dispatch);
+      } catch (err) {
+        ApiActions.failure(dispatch);
+      }
+    };
+  },
+  updateSubmissionCenter: (data, callback) => {
+    return async dispatch => {
+      ApiActions.request(dispatch);
+      try {
+        const res = await ApplicationApi.updateSubmissionCenter(data);
+        dispatch({
+          type: ApplicationActionTypes.UPDATE_SUBMISSION_CENTER
+        });
+        ApiActions.success(dispatch);
+        !res.data.error && callback && callback();
+      } catch (err) {
+        ApiActions.failure(dispatch);
+      }
+    };
+  },
   resetApplications: () => {
     return {
       type: ApplicationActionTypes.RESET_APPLICATIONS
-    }
+    };
   },
   setSelectedSubmission: submission => {
     return {
