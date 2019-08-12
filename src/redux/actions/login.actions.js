@@ -105,10 +105,11 @@ export default {
       error
     };
   },
-  logOut: () => {
-    LoginApi.logout()
+  logOut: logoutMsg => {
+    LoginApi.logout();
     return {
-      type: LoginActionTypes.LOGOUT
+      type: LoginActionTypes.LOGOUT,
+      logoutMsg
     };
   },
   forgotPassword: (data, callback) => {

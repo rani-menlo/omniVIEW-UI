@@ -476,7 +476,13 @@ class SubmissionView extends Component {
         this.state.selectedView === "current"
           ? "[Current View]"
           : "[Life Cycle View]";
-      return `Submission ${this.getSubmissionLabel()} ${selectedView}`;
+      let submissionCenter = _.get(
+        this.props,
+        "selectedSubmission.submission_center",
+        ""
+      );
+      submissionCenter = submissionCenter ? `[${submissionCenter}]` : "";
+      return `Submission ${this.getSubmissionLabel()} ${selectedView} ${submissionCenter}`;
     }
     return `Sequence ${this.getSequenceLabel()}`;
   };

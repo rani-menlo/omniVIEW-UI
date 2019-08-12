@@ -20,8 +20,12 @@ const RootReducer = (state, action) => {
   if (action.type === LoginActionTypes.LOGOUT) {
     state = undefined;
   }
-
-  return appReducer(state, action);
+  const newReducer = appReducer(state, action);
+  // setting error if any message has to be shown in login page while logging out
+  if (action.type === LoginActionTypes.LOGOUT) {
+    newReducer.Login.login.logoutMsg = action.logoutMsg;
+  }
+  return newReducer;
 };
 
 export default RootReducer;

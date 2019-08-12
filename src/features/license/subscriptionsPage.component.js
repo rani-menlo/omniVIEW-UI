@@ -1,11 +1,15 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { Text, ContentLayout, Loader } from "../../uikit/components";
+import { Text, ContentLayout, Loader, Row } from "../../uikit/components";
 import { translate } from "../../translations/translator";
 import Subscriptions from "./subscriptions.component";
 import Header from "../header/header.component";
 
 class SubscriptionsPage extends Component {
+  goBack = () => {
+    this.props.history.goBack();
+  };
+
   render() {
     return (
       <React.Fragment>
@@ -14,6 +18,15 @@ class SubscriptionsPage extends Component {
         <ContentLayout className="addUser">
           <Text
             type="extra_bold"
+            size="20px"
+            textStyle={{ textAlign: "center" }}
+            className="userManagement-subheader-title"
+            text={this.props.selectedCustomer.company_name}
+            onClick={this.goBack}
+          />
+          <Text
+            type="extra_bold"
+            textStyle={{ marginTop: "20px" }}
             size="24px"
             text={translate("text.licence.subslicencemgmt")}
           />
@@ -34,7 +47,8 @@ class SubscriptionsPage extends Component {
 
 function mapStateToProps(state) {
   return {
-    loading: state.Api.loading
+    loading: state.Api.loading,
+    selectedCustomer: state.Customer.selectedCustomer
   };
 }
 

@@ -111,6 +111,21 @@ export default {
       }
     };
   },
+  fetchCustomerAdmins: data => {
+    return async dispatch => {
+      ApiActions.request(dispatch);
+      try {
+        const res = await UsermanagementApi.fetchUsers(data);
+        dispatch({
+          type: UsermanagementActionTypes.FETCH_CUSTOMER_ADMINS,
+          data: res.data
+        });
+        ApiActions.success(dispatch);
+      } catch (err) {
+        ApiActions.failure(dispatch);
+      }
+    };
+  },
   resetUsers: () => ({
     type: UsermanagementActionTypes.FETCH_USERS,
     data: { data: [] }

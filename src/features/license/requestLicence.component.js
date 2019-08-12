@@ -23,9 +23,18 @@ class RequestLicense extends Component {
     return (
       <React.Fragment>
         <Loader loading={this.props.loading} />
-        <AuthLayout title={translate("label.licence.request")}>
-          <Text type="regular" text={translate("text.licence.request")} />
-          <Row style={{ marginTop: "15%" }}>
+        <AuthLayout
+          title={translate("label.licence.request")}
+          authLayoutStyle={{ height: "unset" }}
+        >
+          <Text
+            size="14px"
+            textStyle={{marginTop: '5%'}}
+            opacity={0.5}
+            type="regular"
+            text={translate("text.licence.request")}
+          />
+          <div style={{ marginTop: "10%", textAlign: "right" }}>
             <OmniButton
               type="secondary"
               label={translate("label.button.cancel")}
@@ -37,7 +46,7 @@ class RequestLicense extends Component {
               label={translate("label.licence.request")}
               onClick={this.requestLicense}
             />
-          </Row>
+          </div>
         </AuthLayout>
       </React.Fragment>
     );

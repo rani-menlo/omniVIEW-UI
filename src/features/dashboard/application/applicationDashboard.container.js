@@ -521,7 +521,11 @@ class ApplicationDashboard extends Component {
   };
 
   openSubscriptions = () => {
-    this.props.history.push("/subscriptions");
+    if (isLoggedInCustomerAdmin(this.props.role)) {
+      this.props.history.push("/subscriptions");
+      return;
+    }
+    this.props.history.push("/usermanagement/customer/edit/subscriptions");
   };
 
   closePropertiesModal = () => {
@@ -641,7 +645,7 @@ class ApplicationDashboard extends Component {
             )}
           </div>
           {(isLoggedInOmniciaAdmin(role) || isLoggedInCustomerAdmin(role)) && (
-            <div className="global__center-vert" sty>
+            <div className="global__center-vert" style={{ marginTop: "10px" }}>
               <img
                 src="/images/key.svg"
                 style={{ marginRight: "8px", opacity: 0.5 }}

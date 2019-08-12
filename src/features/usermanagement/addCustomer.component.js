@@ -19,7 +19,7 @@ import {
   ImageLoader
 } from "../../uikit/components";
 import Header from "../header/header.component";
-import { Checkbox, Switch, Tabs, Icon, Popover } from "antd";
+import { Checkbox, Switch, Tabs, Icon, Popover, Dropdown, Menu } from "antd";
 import { UsermanagementActions, CustomerActions } from "../../redux/actions";
 import {
   isPhone,
@@ -34,6 +34,7 @@ import LicenceInUseUnAssigned from "../license/licenceInUseUnAssigned.component"
 import AssignLicence from "../license/assignLicence.component";
 import AssignLicenceWithUsers from "../license/assignLicenceWithUsers.component";
 import Subscriptions from "../license/subscriptions.component";
+import { ROLE_IDS } from "../../constants";
 
 const TabPane = Tabs.TabPane;
 
@@ -48,6 +49,8 @@ class AddCustomer extends Component {
       showDeactivateModal: false,
       openAddNewLicenceModal: false,
       statusActive: true,
+      selectedPrimaryContact: null,
+      disablePrimaryContactFields: true,
       cname: {
         value: "",
         error: ""
@@ -96,17 +99,32 @@ class AddCustomer extends Component {
   }
 
   static getDerivedStateFromProps(props, state) {
+    let newState = {};
     if (state.allLicences === null && props.allLicences.length) {
-      return {
+      newState = {
         allLicences: AddCustomer.getItemsBasedOnPagination(
           props.allLicences,
           state.pageNo,
           state.itemsPerPage
         )
-        // allLicences: props.allLicences
       };
     }
-    return null;
+    if (
+      props.selectedCustomer &&
+      !state.selectedPrimaryContact &&
+      state.disablePrimaryContactFields &&
+      props.cAdmins.length
+    ) {
+      newState = {
+        ...newState,
+        ...AddCustomer.getPrimaryContactDetailsState(
+          props,
+          state,
+          props.selectedCustomer.primary_user_id
+        )
+      };
+    }
+    return _.size(newState) ? newState : null;
   }
 
   static getItemsBasedOnPagination(array, pageNo, itemsPerPage) {
@@ -117,15 +135,37 @@ class AddCustomer extends Component {
     return newArray;
   }
 
+  static getPrimaryContactDetailsState(props, state, userId) {
+    const admin = _.find(props.cAdmins, admin => admin.user_id == userId);
+    const { fname, lname, email, phone } = state;
+    return {
+      disablePrimaryContactFields: true,
+      selectedPrimaryContact: admin,
+      fname: { ...fname, value: _.get(admin, "first_name", "") },
+      lname: { ...lname, value: _.get(admin, "last_name", "") },
+      email: { ...email, value: _.get(admin, "email", "") },
+      phone: { ...phone, value: _.get(admin, "phone", "") }
+    };
+  }
+
   componentDidMount() {
     const { history, selectedCustomer } = this.props;
     if (history.location.pathname.includes("/edit")) {
+      let newState = { editCustomer: true };
       if (selectedCustomer) {
         const state = this.populateState();
-        this.setState({ ...state, editCustomer: true });
-      } else {
-        this.setState({ editCustomer: true });
+        newState = { ...state, ...newState };
+        this.props.dispatch(
+          UsermanagementActions.fetchCustomerAdmins({
+            customerId: selectedCustomer.id,
+            roles: [ROLE_IDS.CUSTOMER.administrator]
+          })
+        );
       }
+      if (history.location.pathname.endsWith("subscriptions")) {
+        newState.selectedTab = "subscriptionLicences";
+      }
+      this.setState(newState);
     }
   }
 
@@ -323,6 +363,7 @@ class AddCustomer extends Component {
         "selectedCustomer.primary_user_id",
         ""
       );
+      reqObject.primary_user_id = _.get(state, 'selectedPrimaryContact.user_id') || 0;
       reqObject.is_active = state.statusActive ? 1 : 0;
       this.props.dispatch(
         CustomerActions.editCustomer(reqObject, () => {
@@ -534,6 +575,39 @@ class AddCustomer extends Component {
     });
   };
 
+  onPrimaryContactChange = event => {
+    const userId = event.key;
+    this.setState({
+      ...AddCustomer.getPrimaryContactDetailsState(
+        this.props,
+        this.state,
+        userId
+      ),
+      ...(userId === "new" && { disablePrimaryContactFields: false })
+    });
+  };
+
+  getDropdownMenu = () => {
+    return (
+      <Menu
+        selectedKeys={[
+          `${_.get(this.state, "selectedPrimaryContact.user_id", "")}`
+        ]}
+      >
+        <Menu.Item key="new" onClick={this.onPrimaryContactChange}>
+          Add New Contact
+        </Menu.Item>
+        <Menu.Divider />
+        {_.map(this.props.cAdmins, item => (
+          <Menu.Item
+            key={item.user_id}
+            onClick={this.onPrimaryContactChange}
+          >{`${item.first_name} ${item.last_name}`}</Menu.Item>
+        ))}
+      </Menu>
+    );
+  };
+
   render() {
     const {
       cname,
@@ -549,10 +623,11 @@ class AddCustomer extends Component {
       licences,
       editCustomer,
       statusActive,
-      selectedTab
+      selectedTab,
+      selectedPrimaryContact,
+      disablePrimaryContactFields
     } = this.state;
     const { loading, selectedCustomer } = this.props;
-    const { allLicences } = this.state;
     return (
       <React.Fragment>
         <Loader loading={loading} />
@@ -627,11 +702,64 @@ class AddCustomer extends Component {
               />
               <p className="addUser-heading">
                 {translate("label.user.details", {
-                  type: translate("label.dashboard.companyadmin")
+                  type: translate("label.dashboard.companyprimarycontact")
                 })}
               </p>
+              {editCustomer && (
+                <div
+                  className="global__center-vert"
+                  style={{ marginTop: "20px", marginBottom: "20px" }}
+                >
+                  <Text
+                    type="regular"
+                    opacity={0.5}
+                    textStyle={{ marginRight: "4px" }}
+                    size="14px"
+                    text={`${translate(
+                      "label.dashboard.companyprimarycontact"
+                    )}:`}
+                  />
+                  <Dropdown
+                    overlay={this.getDropdownMenu}
+                    trigger={["click"]}
+                    className="global__center-vert global__cursor-pointer"
+                  >
+                    <Row
+                      style={{
+                        border: "solid 1px",
+                        minWidth: "30%",
+                        padding: "4px",
+                        justifyContent: "space-between",
+                        borderRadius: "4px"
+                      }}
+                    >
+                      <Text
+                        type="extra_bold"
+                        opacity={0.5}
+                        textStyle={{ marginRight: "4px" }}
+                        size="14px"
+                        text={
+                          selectedPrimaryContact
+                            ? `${_.get(
+                                this.state,
+                                "selectedPrimaryContact.first_name"
+                              )} ${_.get(
+                                this.state,
+                                "selectedPrimaryContact.last_name"
+                              )}`
+                            : "Add New Contact"
+                        }
+                      />
+                      <Icon type="down" />
+                    </Row>
+                  </Dropdown>
+                </div>
+              )}
               <Row className="addUser__fields">
                 <InputField
+                  disabled={
+                    !!selectedPrimaryContact && disablePrimaryContactFields
+                  }
                   className="addUser__fields-field"
                   style={{ marginRight: "14px" }}
                   label={`${translate("label.form.fname")}*`}
@@ -641,6 +769,9 @@ class AddCustomer extends Component {
                   onChange={this.onInputChange("fname")}
                 />
                 <InputField
+                  disabled={
+                    !!selectedPrimaryContact && disablePrimaryContactFields
+                  }
                   className="addUser__fields-field"
                   label={`${translate("label.form.lname")}*`}
                   value={lname.value}
@@ -651,6 +782,9 @@ class AddCustomer extends Component {
               </Row>
               <Row className="addUser__fields">
                 <InputField
+                  disabled={
+                    !!selectedPrimaryContact && disablePrimaryContactFields
+                  }
                   className="addUser__fields-field"
                   style={{ marginRight: "14px" }}
                   label={`${translate("label.form.email")}*`}
@@ -660,6 +794,9 @@ class AddCustomer extends Component {
                   onChange={this.onInputChange("email")}
                 />
                 <PhoneField
+                  disabled={
+                    !!selectedPrimaryContact && disablePrimaryContactFields
+                  }
                   className="addUser__fields-field"
                   error={phone.error}
                   label={`${translate("label.form.phone")}*`}
@@ -929,6 +1066,7 @@ function mapStateToProps(state) {
     loading: state.Api.loading,
     allLicences: state.Usermanagement.allLicences,
     selectedCustomer: state.Customer.selectedCustomer,
+    cAdmins: state.Usermanagement.cAdmins,
     role: state.Login.role
   };
 }

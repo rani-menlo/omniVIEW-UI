@@ -63,10 +63,17 @@ const Routes = () => {
             <PrivateRoute path="/usermanagement/edit" component={AddUser} />
             <PrivateRoute
               path="/usermanagement/customer/add"
+              exact
               component={AddCustomer}
             />
             <PrivateRoute
               path="/usermanagement/customer/edit"
+              exact
+              component={AddCustomer}
+            />
+            <PrivateRoute
+              path="/usermanagement/customer/edit/subscriptions"
+              exact
               component={AddCustomer}
             />
             <PrivateRoute exact path="/profile" component={CreateProfile} />

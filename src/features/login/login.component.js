@@ -156,7 +156,7 @@ class Login extends Component {
 function mapStateToProps(state) {
   return {
     loading: state.Api.loading,
-    error: state.Login.login.error
+    error: state.Login.login.error || state.Login.login.logoutMsg
   };
 }
 

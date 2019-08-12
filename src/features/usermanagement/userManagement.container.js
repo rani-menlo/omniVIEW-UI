@@ -20,16 +20,26 @@ import {
   OmniCheckbox
 } from "../../uikit/components";
 import { DEBOUNCE_TIME, ROLES } from "../../constants";
-import { UsermanagementActions, CustomerActions } from "../../redux/actions";
+import {
+  UsermanagementActions,
+  CustomerActions,
+  ApiActions
+} from "../../redux/actions";
 import { Avatar, Dropdown, Menu, Icon, Popover, Modal } from "antd";
 import { translate } from "../../translations/translator";
-import { getRoleName, getFormattedDate } from "../../utils";
+import {
+  getRoleName,
+  getFormattedDate,
+  isLoggedInOmniciaRole,
+  isLoggedInOmniciaAdmin
+} from "../../utils";
 import PopoverUsersFilter from "./popoverUsersFilter";
 import UserCard from "./userCard.component";
 import UserProfileCard from "./userProfileCard.component";
 import PopoverCustomers from "./popoverCustomers.component";
 import LicenceInUseUnAssigned from "../license/licenceInUseUnAssigned.component";
 import AssignLicence from "../license/assignLicence.component";
+import { CustomerApi } from "../../redux/api";
 
 class UserManagementContainer extends Component {
   static getDerivedStateFromProps(props, state) {
@@ -55,6 +65,7 @@ class UserManagementContainer extends Component {
       pageNo: 1,
       itemsPerPage: 5,
       showLicenceUnAssignedModal: false,
+      showLicenceUnAssignedModalError: "",
       assigningLicence: null,
       deactivateAll: false,
       showAssignLicenceToUser: false,
@@ -345,7 +356,7 @@ class UserManagementContainer extends Component {
           ]
         : _.map(this.state.checkedUsers, user => ({
             userId: user.user_id,
-            is_active: +!_.get(user, "is_active", false)
+            is_active: this.state.deactivateAll ? 0 : 1
           }))
     };
 
@@ -378,6 +389,13 @@ class UserManagementContainer extends Component {
       sortBy: filters.sortBy && [filters.sortBy]
     };
 
+    // if filters applied in the middle of the pagination
+    // then take user to first page
+    if (this.state.pageNo > 1) {
+      this.onPageChange(1);
+      return;
+    }
+
     this.fetchUsers();
   };
 
@@ -405,12 +423,24 @@ class UserManagementContainer extends Component {
   };
 
   closeLicenseUnAssignedModal = () => {
-    this.setState({ showLicenceUnAssignedModal: false });
+    this.setState({
+      showLicenceUnAssignedModal: false,
+      showLicenceUnAssignedModalError: ""
+    });
   };
 
   onAssignLicenseClick = license => {
+    if (license.licences.length < this.state.selectedUser.length) {
+      this.setState({
+        showLicenceUnAssignedModalError: translate(
+          "error.licence.maxuserselected"
+        )
+      });
+      return;
+    }
     this.setState({
       showLicenceUnAssignedModal: false,
+      showLicenceUnAssignedModalError: "",
       showAssignLicenceToUser: true,
       assigningLicence: license
     });
@@ -425,6 +455,7 @@ class UserManagementContainer extends Component {
   assignLicence = () => {
     const { assigningLicence, selectedUser } = this.state;
     let licenses = [];
+    let toastMsg = "Licenses have been assigned.";
     if (_.isArray(selectedUser)) {
       licenses = _.map(selectedUser, (user, idx) => {
         const licence = assigningLicence.licences[idx];
@@ -445,15 +476,24 @@ class UserManagementContainer extends Component {
           user_id: selectedUser.user_id
         }
       ];
+      toastMsg = "License has been assigned.";
     }
     this.props.dispatch(
       UsermanagementActions.assignLicense(
         {
           licenses
         },
-        () => {
-          Toast.success("License has been assigned.");
+        async () => {
+          Toast.success(toastMsg);
           this.fetchUsers();
+          this.props.dispatch(ApiActions.requestOnDemand());
+          const res = await CustomerApi.getCustomerById(
+            this.props.selectedCustomer.id
+          );
+          this.props.dispatch(
+            CustomerActions.setSelectedCustomer(res.data.data)
+          );
+          this.props.dispatch(ApiActions.successOnDemand());
         }
       )
     );
@@ -475,6 +515,7 @@ class UserManagementContainer extends Component {
       pageNo,
       itemsPerPage,
       showLicenceUnAssignedModal,
+      showLicenceUnAssignedModalError,
       showAssignLicenceToUser,
       assigningLicence
     } = this.state;
@@ -512,28 +553,43 @@ class UserManagementContainer extends Component {
             onFiltersUpdate={this.onFiltersUpdate}
             selectedCustomer={selectedCustomer}
           />
-          <Popover
-            trigger="click"
-            placement="bottom"
-            content={
-              <PopoverCustomers onCustomerSelected={this.onCustomerSelected} />
-            }
-          >
+          {!isLoggedInOmniciaAdmin(this.props.role) && (
             <Row style={{ marginLeft: "auto" }}>
               <Text
                 type="extra_bold"
                 size="20px"
                 className="userManagement-subheader-title"
                 text={selectedCustomer.company_name}
-                // onClick={this.goBack}
-              />
-              <img
-                className="global__cursor-pointer"
-                src="/images/caret-inactive.svg"
-                style={{ marginLeft: "5px" }}
+                onClick={this.goBack}
               />
             </Row>
-          </Popover>
+          )}
+          {isLoggedInOmniciaAdmin(this.props.role) && (
+            <Popover
+              trigger="click"
+              placement="bottom"
+              content={
+                <PopoverCustomers
+                  onCustomerSelected={this.onCustomerSelected}
+                />
+              }
+            >
+              <Row style={{ marginLeft: "auto" }}>
+                <Text
+                  type="extra_bold"
+                  size="20px"
+                  className="userManagement-subheader-title"
+                  text={selectedCustomer.company_name}
+                  // onClick={this.goBack}
+                />
+                <img
+                  className="global__cursor-pointer"
+                  src="/images/caret-inactive.svg"
+                  style={{ marginLeft: "5px" }}
+                />
+              </Row>
+            </Popover>
+          )}
           <div style={{ marginLeft: "auto" }}>
             <SearchBox
               placeholder={translate("text.header.search", {
@@ -773,6 +829,7 @@ class UserManagementContainer extends Component {
           {showLicenceUnAssignedModal && (
             <LicenceInUseUnAssigned
               type="unassigned"
+              error={showLicenceUnAssignedModalError}
               visible={showLicenceUnAssignedModal}
               closeModal={this.closeLicenseUnAssignedModal}
               customer={this.props.selectedCustomer}
@@ -811,6 +868,7 @@ const Column = styled.div`
 function mapStateToProps(state) {
   return {
     loading: state.Api.loading,
+    role: state.Login.role,
     selectedCustomer: state.Customer.selectedCustomer,
     users: state.Usermanagement.users,
     usersCount: state.Usermanagement.usersCount

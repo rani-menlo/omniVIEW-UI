@@ -10,7 +10,8 @@ const PhoneField = ({
   placeholder,
   error,
   style,
-  className
+  className,
+  disabled
 }) => {
   return (
     <div style={style} className={className}>
@@ -18,6 +19,7 @@ const PhoneField = ({
         <p className="global__field-label omniField-phone-label">{label}</p>
       )}
       <PhoneInput
+        disabled={disabled}
         country={"US"}
         value={value}
         onChange={onChange}
@@ -40,7 +42,8 @@ PhoneField.propTypes = {
   placeholder: PropTypes.string,
   error: PropTypes.string,
   style: PropTypes.object,
-  className: PropTypes.string
+  className: PropTypes.string,
+  disabled: PropTypes.bool
 };
 
 export default React.memo(PhoneField);

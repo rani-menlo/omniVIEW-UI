@@ -75,7 +75,7 @@ const UserProfileCard = ({
             type="regular"
             size="14px"
             opacity={0.5}
-            text={`${_.get(user, "is_active", false) &&
+            text={`${(_.get(user, "is_active") || "") &&
               ` ${translate("label.usermgmt.expires")}`} ${getFormattedDate(
               _.get(user, "expiryDate")
             )}`}

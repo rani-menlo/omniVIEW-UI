@@ -30,7 +30,8 @@ const Columns = [
           )}`}
         />
       </div>
-    )
+    ),
+    width: 200
   },
   {
     title: translate("label.user.status"),
@@ -50,7 +51,8 @@ const Columns = [
             : translate("label.user.inactive")
         }
       />
-    )
+    ),
+    width: 100
   },
   {
     title: translate("label.licence.expirationdate"),
@@ -66,7 +68,8 @@ const Columns = [
           "-"
         }
       />
-    )
+    ),
+    width: 150
   }
 ];
 
@@ -142,6 +145,7 @@ const AssignLicence = ({
             columns={Columns}
             dataSource={users}
             pagination={false}
+            scroll={{ y: 200 }}
             style={{ marginTop: "20px" }}
           />
         </React.Fragment>

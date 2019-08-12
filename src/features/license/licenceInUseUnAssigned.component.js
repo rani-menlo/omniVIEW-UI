@@ -34,6 +34,7 @@ class LicenceInUseUnAssigned extends Component {
     visible: PropTypes.bool,
     closeModal: PropTypes.func,
     onAssignLicenseClick: PropTypes.func,
+    error: PropTypes.string,
     type: PropTypes.oneOf(["inuse, unassigned"])
   };
 
@@ -186,9 +187,9 @@ class LicenceInUseUnAssigned extends Component {
   };
 
   render() {
-    const { visible, closeModal, type } = this.props;
+    const { visible, closeModal, type, error } = this.props;
     const { subscriptions, licencesUnAssigned, selectedMenuItem } = this.state;
-    const error = (
+    const noLicences = (
       <Row style={{ flexDirection: "column" }}>
         <img
           src="/images/alert-low.svg"
@@ -389,8 +390,16 @@ class LicenceInUseUnAssigned extends Component {
             </div>
           </React.Fragment>
         )}
-        {type === "inuse" && !subscriptions.length && error}
-        {type === "unassigned" && !licencesUnAssigned.length && error}
+        {type === "inuse" && !subscriptions.length && noLicences}
+        {type === "unassigned" && !licencesUnAssigned.length && noLicences}
+        {error && (
+          <p
+            className="global__field__error-text"
+            style={{ marginTop: "10px" }}
+          >
+            {error}
+          </p>
+        )}
 
         <div style={{ marginTop: "12px", textAlign: "right" }}>
           <OmniButton

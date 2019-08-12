@@ -199,7 +199,10 @@ class Subscriptions extends Component {
         {
           licenses: [this.state.removingLicense.id]
         },
-        this.refreshLicenses
+        () => {
+          Toast.success(translate("text.licence.removed"));
+          this.refreshLicenses();
+        }
       )
     );
   };
@@ -247,12 +250,6 @@ class Subscriptions extends Component {
                 {getFormattedDate(_.get(licence, "expired_date", ""))}
               </Column>
               <Column
-                width={getColumnWidth(TableColumnNames.STATUS)}
-                className="maindashboard__list__item-text"
-              >
-                {_.get(licence, "first_name", "") ? "Assigned" : "Unassigned"}
-              </Column>
-              <Column
                 width={getColumnWidth(TableColumnNames.USER)}
                 className="maindashboard__list__item-text"
               >
@@ -270,6 +267,12 @@ class Subscriptions extends Component {
                   "last_name",
                   ""
                 )}`}
+              </Column>
+              <Column
+                width={getColumnWidth(TableColumnNames.STATUS)}
+                className="maindashboard__list__item-text"
+              >
+                {_.get(licence, "first_name", "") ? "Assigned" : "Unassigned"}
               </Column>
               <Column
                 width={getColumnWidth(TableColumnNames.ACTIONS)}
@@ -400,16 +403,15 @@ const TableColumns = [
     width: "20%"
   },
   {
-    name: TableColumnNames.STATUS,
-    key: "first_name",
-    sort: true,
-    width: "15%"
-  },
-  {
     name: TableColumnNames.USER,
     key: "first_name",
     sort: true,
     width: "20%"
+  },
+  {
+    name: TableColumnNames.STATUS,
+    key: "first_name",
+    width: "15%"
   },
   {
     name: TableColumnNames.ACTIONS,

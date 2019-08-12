@@ -544,6 +544,7 @@ class AddUser extends Component {
                             key={licence.id}
                             className="addUser__licences__box-warning"
                             size="12px"
+                            textStyle={{ padding: "5px" }}
                             text={translate("error.user.licenceassigned", {
                               product: licence.licenceType,
                               remain: licence.validDays,

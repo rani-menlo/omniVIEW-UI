@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import _ from "lodash";
 import { Redirect } from "react-router-dom";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
@@ -13,7 +14,11 @@ class LoginContainer extends Component {
     const {
       login: { login, otp }
     } = this.props;
-    if (login.loggedIn && otp.otpReceived && otp.verified) {
+    if (
+      _.get(login, "loggedIn") &&
+      _.get(otp, "otpReceived") &&
+      _.get(otp, "verified")
+    ) {
       return <Redirect to="/customers" />;
     } else if (login.loggedIn) {
       return <Redirect to="/auth" />;

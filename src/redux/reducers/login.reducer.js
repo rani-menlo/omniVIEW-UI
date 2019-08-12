@@ -8,7 +8,8 @@ const initialState = {
   role: null,
   login: {
     loggedIn: false,
-    error: ""
+    error: "",
+    logoutMsg: ""
   },
   otp: {
     error: "",
@@ -30,7 +31,8 @@ export default (state = initialState, action) => {
           ...state,
           login: {
             ...state.login,
-            error: message
+            error: message,
+            logoutMsg: ""
           }
         };
       }
@@ -39,6 +41,7 @@ export default (state = initialState, action) => {
         login: {
           ...state.login,
           error: "",
+          logoutMsg: "",
           loggedIn: true
         },
         userId: data.userId,
