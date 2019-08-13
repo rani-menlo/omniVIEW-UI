@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { Loader, Text, Row, OmniButton } from "../../uikit/components";
+import { Loader, Text, Row, OmniButton, Toast } from "../../uikit/components";
 import { LoginActions, ApiActions } from "../../redux/actions";
 import { translate } from "../../translations/translator";
 import AuthLayout from "../login/authLayout.component";
@@ -9,9 +9,14 @@ import { UsermanagementApi } from "../../redux/api";
 class RequestLicense extends Component {
   requestLicense = async () => {
     this.props.dispatch(ApiActions.requestOnDemand());
-    await UsermanagementApi.requestLicense();
-    this.props.dispatch(ApiActions.successOnDemand());
-    this.cancel();
+    const res = await UsermanagementApi.requestLicense();
+    if (!res.data.error) {
+      Toast.success(res.data.message);
+      this.props.dispatch(ApiActions.successOnDemand());
+      this.cancel();
+    } else {
+      Toast.error(res.data.message);
+    }
   };
 
   cancel = () => {
@@ -29,7 +34,7 @@ class RequestLicense extends Component {
         >
           <Text
             size="14px"
-            textStyle={{marginTop: '5%'}}
+            textStyle={{ marginTop: "5%" }}
             opacity={0.5}
             type="regular"
             text={translate("text.licence.request")}

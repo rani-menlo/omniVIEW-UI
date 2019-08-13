@@ -363,7 +363,8 @@ class AddCustomer extends Component {
         "selectedCustomer.primary_user_id",
         ""
       );
-      reqObject.primary_user_id = _.get(state, 'selectedPrimaryContact.user_id') || 0;
+      reqObject.primary_user_id =
+        _.get(state, "selectedPrimaryContact.user_id") || 0;
       reqObject.is_active = state.statusActive ? 1 : 0;
       this.props.dispatch(
         CustomerActions.editCustomer(reqObject, () => {
@@ -491,6 +492,11 @@ class AddCustomer extends Component {
     this.setState(
       {
         ...newState,
+        ...AddCustomer.getPrimaryContactDetailsState(
+          this.props,
+          this.state,
+          customer.primary_user_id
+        ),
         allLicences: null
       },
       () => {
