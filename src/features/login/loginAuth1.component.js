@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import _ from 'lodash';
 import { Radio, Button } from "antd";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
@@ -26,6 +27,7 @@ class LoginAuth1 extends Component {
   };
 
   goBack = () => {
+    this.props.dispatch(LoginActions.logOut());
     this.props.actions.setLoggedInStatus(false);
     this.props.history.push("/");
   };
@@ -75,13 +77,14 @@ class LoginAuth1 extends Component {
 function mapStateToProps(state) {
   return {
     loading: state.Api.loading,
-    otpReceived: state.Login.otp.otpReceived
+    otpReceived: _.get(state, "Login.otp.otpReceived")
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ ...LoginActions }, dispatch)
+    actions: bindActionCreators({ ...LoginActions }, dispatch),
+    dispatch
   };
 }
 

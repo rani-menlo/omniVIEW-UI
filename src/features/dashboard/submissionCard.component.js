@@ -79,8 +79,19 @@ class SubmissionCard extends Component {
                 "12/01/2018"}
             </span>
           </div>
-          <div className="global__hr-line" style={{ marginTop: "20px" }} />
           <div className="submissioncard__content__item">
+            <span className="submissioncard__content__item-label">
+              {translate("label.dashboard.submissioncenter")}:
+            </span>
+            <span className="submissioncard__content__item-text">
+              {_.get(submission, "submission_center", "")}
+            </span>
+          </div>
+          <div className="global__hr-line" style={{ marginTop: "20px" }} />
+          <div
+            className="submissioncard__content__item"
+            style={{ paddingTop: "4px" }}
+          >
             <span className="submissioncard__content__item-label">
               {translate("label.dashboard.users")}:
             </span>

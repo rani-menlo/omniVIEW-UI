@@ -3,7 +3,8 @@ import { ApplicationActionTypes } from "../actionTypes";
 const initialState = {
   submissions: [],
   selectedSubmission: null,
-  submissionCount: 0
+  submissionCount: 0,
+  submissionCenters: []
 };
 
 export default (state = initialState, action) => {
@@ -13,6 +14,12 @@ export default (state = initialState, action) => {
         ...state,
         submissions: action.data.data,
         submissionCount: action.data.submissionCount
+      };
+    }
+    case ApplicationActionTypes.FETCH_SUBMISSION_CENTERS: {
+      return {
+        ...state,
+        submissionCenters: action.data.data
       };
     }
     case ApplicationActionTypes.RESET_APPLICATIONS: {

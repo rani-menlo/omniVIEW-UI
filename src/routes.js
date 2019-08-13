@@ -18,6 +18,8 @@ import AddCustomer from "./features/usermanagement/addCustomer.component";
 import CreateProfile from "./features/profile/createProfile.component";
 import ForgotPassword from "./features/forgotpwd/forgotpwd.component";
 import ResetPassword from "./features/forgotpwd/resetPassword.component";
+import SubscriptionsPage from "./features/license/subscriptionsPage.component";
+import RequestLicense from "./features/license/requestLicence.component";
 
 const Routes = () => {
   return (
@@ -27,11 +29,8 @@ const Routes = () => {
           <Switch>
             <Route exact path="/" component={LoginContainer} />
             <Route exact path="/forgotpwd" component={ForgotPassword} />
-            <Route
-              exact
-              path="/resetPassword/:key"
-              component={ResetPassword}
-            />
+            <Route exact path="/resetPassword/:key" component={ResetPassword} />
+            <Route exact path="/requestlicense" component={RequestLicense} />
             <PrivateRoute
               exact
               path="/viewer/:type/:fileId?"
@@ -64,10 +63,17 @@ const Routes = () => {
             <PrivateRoute path="/usermanagement/edit" component={AddUser} />
             <PrivateRoute
               path="/usermanagement/customer/add"
+              exact
               component={AddCustomer}
             />
             <PrivateRoute
               path="/usermanagement/customer/edit"
+              exact
+              component={AddCustomer}
+            />
+            <PrivateRoute
+              path="/usermanagement/customer/edit/subscriptions"
+              exact
               component={AddCustomer}
             />
             <PrivateRoute exact path="/profile" component={CreateProfile} />
@@ -75,6 +81,11 @@ const Routes = () => {
               exact
               path="/profile/edit"
               component={CreateProfile}
+            />
+            <PrivateRoute
+              exact
+              path="/subscriptions"
+              component={SubscriptionsPage}
             />
             <Redirect to="/" />
           </Switch>

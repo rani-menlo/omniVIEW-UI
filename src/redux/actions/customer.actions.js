@@ -1,7 +1,7 @@
 import _ from "lodash";
-import { CustomerActionTypes, UsermanagementActionTypes } from "../actionTypes";
+import { CustomerActionTypes } from "../actionTypes";
 import { CustomerApi, UsermanagementApi } from "../api";
-import { ApiActions, CustomerActions } from ".";
+import { ApiActions } from ".";
 import { Toast } from "../../uikit/components";
 
 export default {
@@ -69,14 +69,17 @@ export default {
       ApiActions.request(dispatch);
       try {
         const res = await CustomerApi.editCustomer(customer);
-        dispatch({
-          type: CustomerActionTypes.EDIT_CUSTOMER,
-          data: res.data
-        });
-        if (!res.data.error) {
+        if (res.data.error) {
+          Toast.error(res.data.message);
+          ApiActions.failure(dispatch);
+        } else {
+          dispatch({
+            type: CustomerActionTypes.EDIT_CUSTOMER,
+            data: res.data
+          });
           callback && callback();
+          ApiActions.success(dispatch);
         }
-        ApiActions.success(dispatch);
       } catch (err) {
         ApiActions.failure(dispatch);
       }
@@ -160,8 +163,8 @@ export default {
       ApiActions.request(dispatch);
       try {
         const res = await CustomerApi.addNewLicences(data);
-        !res.data.error && callback && callback();
         ApiActions.success(dispatch);
+        !res.data.error && callback && callback();
       } catch (err) {
         ApiActions.failure(dispatch);
       }

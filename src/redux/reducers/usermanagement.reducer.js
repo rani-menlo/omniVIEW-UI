@@ -5,6 +5,7 @@ import { Toast } from "../../uikit/components";
 
 const initialState = {
   users: [],
+  cAdmins: [],
   usersOfFileOrSubmission: [],
   usersCount: 0,
   departments: [],
@@ -45,6 +46,14 @@ export default (state = initialState, action) => {
           ...state,
           users: action.data.data,
           usersCount: action.data.usercount
+        };
+      }
+    }
+    case UsermanagementActionTypes.FETCH_CUSTOMER_ADMINS: {
+      if (!action.data.error) {
+        return {
+          ...state,
+          cAdmins: action.data.data
         };
       }
     }

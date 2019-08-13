@@ -9,7 +9,8 @@ import {
   ApplicationActions,
   SubmissionActions,
   UsermanagementActions,
-  CustomerActions
+  CustomerActions,
+  ApiActions
 } from "../../../redux/actions";
 import Header from "../../header/header.component";
 import styled from "styled-components";
@@ -44,6 +45,7 @@ import LicenceInUseUnAssigned from "../../license/licenceInUseUnAssigned.compone
 import AssignLicence from "../../license/assignLicence.component";
 import AssignLicenceWithUsers from "../../license/assignLicenceWithUsers.component";
 import { CustomerApi } from "../../../redux/api";
+import ApplicationProperties from "./applicationProperties.component";
 // import { Customers } from "./sampleCustomers";
 
 class ApplicationDashboard extends Component {
@@ -63,8 +65,10 @@ class ApplicationDashboard extends Component {
       showUsersModal: false,
       showAssignLicenceToUser: false,
       assigningLicence: null,
-      selectedUser: null,
+      selectedUsers: null,
       checkedSubmissions: [],
+      showPropertiesModal: false,
+      editingSubmission: null,
       TableColumns: [
         {
           name: TableColumnNames.CHECKBOX,
@@ -165,9 +169,19 @@ class ApplicationDashboard extends Component {
     };
     return (
       <Menu onClick={this.onMenuClick(submission)}>
+        <Menu.Item key="edit">
+          <div className="global__center-vert">
+            <img src="/images/edit.svg" style={style} />
+            <Text
+              type="regular"
+              size="12px"
+              text={translate("label.menu.editproperties")}
+            />
+          </div>
+        </Menu.Item>
         <Menu.Item key="openinomniview">
           <div className="global__center-vert">
-            <img src="/images/omni-view-cloud.jpg" style={style} />
+            <img src="/images/omni-view-cloud.png" style={style} />
             <Text
               type="regular"
               size="12px"
@@ -315,6 +329,11 @@ class ApplicationDashboard extends Component {
       this.openPermissionsModal();
     } else if (key === "openinomniview") {
       this.onSubmissionSelected(submission)();
+    } else if (key === "edit") {
+      this.props.actions.setSelectedSubmission(submission);
+      this.setState({
+        showPropertiesModal: true
+      });
     }
   };
 
@@ -438,7 +457,7 @@ class ApplicationDashboard extends Component {
 
   closeUsersModal = () => {
     this.setState({
-      selectedUser: null,
+      selectedUsers: null,
       showUsersModal: false,
       assigningLicence: null
     });
@@ -446,44 +465,86 @@ class ApplicationDashboard extends Component {
 
   closeAssignLicenceToUserModal = () => {
     this.setState({
-      selectedUser: null,
+      selectedUsers: null,
       showAssignLicenceToUser: false
     });
   };
 
-  onUserSelect = user => {
+  onUserSelect = users => {
     this.setState({
       showAssignLicenceToUser: true,
       showUsersModal: false,
-      selectedUser: user
+      selectedUsers: users
     });
   };
 
   assignLicence = () => {
-    const { assigningLicence, selectedUser } = this.state;
-    const someLicence = assigningLicence.licences[0];
+    const { assigningLicence, selectedUsers } = this.state;
+    const licenses = _.map(selectedUsers, (user, idx) => {
+      const licence = assigningLicence.licences[idx];
+      return {
+        ...(_.includes(licence.slug, "view")
+          ? { omni_view_license: licence.id }
+          : { omni_file_license: licence.id }),
+        user_id: user.user_id
+      };
+    });
     this.props.dispatch(
       UsermanagementActions.assignLicense(
         {
-          ...(_.includes(someLicence.slug, "view")
-            ? { omni_view_license: someLicence.id }
-            : { omni_file_license: someLicence.id }),
-          user_id: selectedUser.user_id
+          licenses
         },
-        () => {
-          Toast.success(
+        async () => {
+          /* Toast.success(
             `License has been assigned to ${_.get(
-              selectedUser,
+              selectedUsers,
               "first_name",
               ""
-            )} ${_.get(selectedUser, "last_name", "")}`
+            )} ${_.get(selectedUsers, "last_name", "")}`
+          ); */
+          Toast.success("License has been assigned.");
+          this.props.dispatch(ApiActions.requestOnDemand());
+          const res = await CustomerApi.getCustomerById(
+            this.props.selectedCustomer.id
           );
+          this.props.dispatch(
+            CustomerActions.setSelectedCustomer(res.data.data)
+          );
+          this.props.dispatch(ApiActions.successOnDemand());
         }
       )
     );
     this.setState({
+      selectedUsers: null,
       showAssignLicenceToUser: false
     });
+  };
+
+  openSubscriptions = () => {
+    if (isLoggedInCustomerAdmin(this.props.role)) {
+      this.props.history.push("/subscriptions");
+      return;
+    }
+    this.props.history.push("/usermanagement/customer/edit/subscriptions");
+  };
+
+  closePropertiesModal = () => {
+    this.setState({ showPropertiesModal: false });
+  };
+
+  updateSubmissionCenter = slug => {
+    this.props.dispatch(
+      ApplicationActions.updateSubmissionCenter(
+        {
+          submission_id: this.props.selectedSubmission.id,
+          center_slug: slug
+        },
+        () => {
+          this.fetchApplications();
+          this.closePropertiesModal();
+        }
+      )
+    );
   };
 
   render() {
@@ -584,17 +645,19 @@ class ApplicationDashboard extends Component {
             )}
           </div>
           {(isLoggedInOmniciaAdmin(role) || isLoggedInCustomerAdmin(role)) && (
-            <div className="global__center-vert" sty>
+            <div className="global__center-vert" style={{ marginTop: "10px" }}>
               <img
                 src="/images/key.svg"
                 style={{ marginRight: "8px", opacity: 0.5 }}
               />
               <Text
+                className="global__cursor-pointer"
                 type="bold"
                 size="14px"
                 opacity={0.5}
                 text={`${translate("text.customer.subslicences")}:`}
                 textStyle={{ marginRight: "4px" }}
+                onClick={this.openSubscriptions}
               />
               <Text
                 type="regular"
@@ -801,7 +864,7 @@ class ApplicationDashboard extends Component {
           {this.state.showUsersModal && (
             <AssignLicenceWithUsers
               licence={this.state.assigningLicence}
-              selectedUser={this.state.selectedUser}
+              selectedUsers={this.state.selectedUsers}
               closeModal={this.closeUsersModal}
               onUserSelect={this.onUserSelect}
             />
@@ -809,11 +872,18 @@ class ApplicationDashboard extends Component {
           <AssignLicence
             visible={this.state.showAssignLicenceToUser}
             licence={this.state.assigningLicence}
-            user={this.state.selectedUser}
+            users={this.state.selectedUsers}
             closeModal={this.closeAssignLicenceToUserModal}
             back={this.goBackToUsersModal}
             submit={this.assignLicence}
           />
+          {this.state.showPropertiesModal && (
+            <ApplicationProperties
+              visible
+              closeModal={this.closePropertiesModal}
+              submit={this.updateSubmissionCenter}
+            />
+          )}
         </ContentLayout>
       </React.Fragment>
     );
@@ -840,7 +910,8 @@ function mapStateToProps(state) {
     role: state.Login.role,
     submissions: state.Application.submissions, //getSubmissionsByCustomer(state),
     selectedCustomer: state.Customer.selectedCustomer,
-    submissionCount: state.Application.submissionCount
+    submissionCount: state.Application.submissionCount,
+    selectedSubmission: state.Application.selectedSubmission
   };
 }
 

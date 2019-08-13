@@ -8,6 +8,8 @@ export default {
   fetchAllLicences: customerId =>
     api.get(URI.GET_ALL_LICENCES.replace(":customer_id", customerId)),
   assignLicense: data => api.post(URI.ASSIGN_LICENSE, data),
+  revokeLicense: data => api.post(URI.REVOKE_LICENSE, data),
+  requestLicense: () => api.post(URI.REQUEST_LICENSE),
   addUser: user => api.post(URI.ADD_USER, user),
   updateUser: user => api.post(URI.UPDATE_USER, user),
   activateDeactivateUser: user => api.post(URI.ACTIVATE_DEACTIVATE, user),

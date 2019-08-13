@@ -82,6 +82,36 @@ class ValidationResults extends Component {
     onItemSelected && onItemSelected(item);
   };
 
+  getValidationGroupIcon = group => {
+    let img = (
+      <Icon type="folder" theme="filled" className="global__file-folder" />
+    );
+    switch (group) {
+      case "File Checks":
+      case "PDF":
+        img = (
+          <img
+            src="/images/file-new.svg"
+            className="global__file-folder"
+            style={{ width: "18px", height: "22px" }}
+          />
+        );
+        break;
+      case "STF":
+        img = (
+          <img
+            src="/images/file-stf.svg"
+            className="global__file-folder"
+            style={{ width: "18px", height: "22px" }}
+          />
+        );
+        break;
+      default:
+        return img;
+    }
+    return img;
+  };
+
   render() {
     const { onClose, label, sequence } = this.props;
     const { validationResults, sort, selected } = this.state;
@@ -166,20 +196,7 @@ class ValidationResults extends Component {
                             style={{ display: "flex", alignItems: "center" }}
                           >
                             <span>
-                              {validation.group === "File Checks" ||
-                              validation.group === "PDF" ? (
-                                <img
-                                  src="/images/file-new.svg"
-                                  className="global__file-folder"
-                                  style={{ width: "18px", height: "22px" }}
-                                />
-                              ) : (
-                                <Icon
-                                  type="folder"
-                                  theme="filled"
-                                  className="global__file-folder"
-                                />
-                              )}
+                              {this.getValidationGroupIcon(validation.group)}
                             </span>
                             <span
                               style={{

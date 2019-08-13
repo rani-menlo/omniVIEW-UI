@@ -16,21 +16,41 @@ import {
   Row,
   Pagination,
   Text,
-  Toast
+  Toast,
+  OmniCheckbox
 } from "../../uikit/components";
 import { DEBOUNCE_TIME, ROLES } from "../../constants";
-import { UsermanagementActions, CustomerActions } from "../../redux/actions";
+import {
+  UsermanagementActions,
+  CustomerActions,
+  ApiActions
+} from "../../redux/actions";
 import { Avatar, Dropdown, Menu, Icon, Popover, Modal } from "antd";
 import { translate } from "../../translations/translator";
-import { getRoleName, getFormattedDate } from "../../utils";
+import {
+  getRoleName,
+  getFormattedDate,
+  isLoggedInOmniciaRole,
+  isLoggedInOmniciaAdmin
+} from "../../utils";
 import PopoverUsersFilter from "./popoverUsersFilter";
 import UserCard from "./userCard.component";
 import UserProfileCard from "./userProfileCard.component";
 import PopoverCustomers from "./popoverCustomers.component";
 import LicenceInUseUnAssigned from "../license/licenceInUseUnAssigned.component";
 import AssignLicence from "../license/assignLicence.component";
+import { CustomerApi } from "../../redux/api";
 
 class UserManagementContainer extends Component {
+  static getDerivedStateFromProps(props, state) {
+    if (_.get(props, "users.length") && !_.get(state, "users.length")) {
+      return {
+        users: props.users
+      };
+    }
+    return null;
+  }
+
   constructor(props) {
     super(props);
     this.selectedFilters = {};
@@ -40,14 +60,125 @@ class UserManagementContainer extends Component {
       showDeactivateModal: false,
       showUserCard: false,
       selectedUser: null,
+      users: [],
+      checkedUsers: [],
       pageNo: 1,
       itemsPerPage: 5,
       showLicenceUnAssignedModal: false,
+      showLicenceUnAssignedModalError: "",
       assigningLicence: null,
-      showAssignLicenceToUser: false
+      deactivateAll: false,
+      showAssignLicenceToUser: false,
+      TableColumns: [
+        {
+          name: TableColumnNames.CHECKBOX,
+          checkbox: true,
+          checked: false,
+          sort: false,
+          width: "4%",
+          onCheckboxChange: this.checkAll
+        },
+        {
+          name: TableColumnNames.NAME,
+          key: "first_name",
+          checkbox: false,
+          sort: true,
+          width: "20%"
+        },
+        {
+          name: TableColumnNames.USER_ROLE,
+          key: "role_name",
+          checkbox: false,
+          sort: true,
+          width: "11%"
+        },
+        {
+          name: TableColumnNames.DEPARTMENT,
+          key: "department_name",
+          checkbox: false,
+          sort: true,
+          width: "17%"
+        },
+        {
+          name: TableColumnNames.EMAIl,
+          key: "email",
+          checkbox: false,
+          sort: true,
+          width: "25%"
+        },
+        {
+          name: TableColumnNames.STATUS,
+          key: "is_active",
+          checkbox: false,
+          sort: true,
+          width: "8%"
+        },
+        {
+          name: TableColumnNames.EXP_DATE,
+          key: "expired_date",
+          checkbox: false,
+          // sort: true,
+          width: "15%"
+        }
+      ]
     };
     this.searchUsers = _.debounce(this.searchUsers, DEBOUNCE_TIME);
   }
+
+  checkAll = e => {
+    const checked = _.get(e, "target.checked", false);
+    if (!this.state.users.length) {
+      e.preventDefault();
+      return;
+    }
+    let checkedUsers = [];
+    let users = this.state.users.slice(0, this.state.itemsPerPage);
+    users = _.map(users, submission => ({
+      ...submission,
+      checked
+    }));
+    if (checked) {
+      checkedUsers = [...users];
+    } else {
+      checkedUsers.length = 0;
+    }
+    const TableColumns = [...this.state.TableColumns];
+    TableColumns[0].checked = checked;
+    const allRnotActive = _.every(checkedUsers, ["is_active", false]);
+    this.setState({
+      users,
+      TableColumns,
+      showGlobalButtons: checkedUsers.length !== 0,
+      checkedUsers,
+      deactivateAll: !allRnotActive
+    });
+  };
+
+  onCheckboxChange = user => e => {
+    const checked = e.target.checked;
+    const users = this.state.users.slice(0, this.state.itemsPerPage);
+    user.checked = checked;
+
+    const TableColumns = [...this.state.TableColumns];
+    let showGlobalButtons = false;
+    const checkedUsers = [...this.state.checkedUsers];
+    if (checked) {
+      showGlobalButtons = true;
+      checkedUsers.push(user);
+    } else {
+      _.remove(checkedUsers, user);
+      showGlobalButtons = !!checkedUsers.length;
+    }
+    TableColumns[0].checked = _.every(users, ["checked", true]);
+    const allRnotActive = _.every(checkedUsers, ["is_active", false]);
+    this.setState({
+      users,
+      TableColumns,
+      showGlobalButtons,
+      checkedUsers,
+      deactivateAll: !allRnotActive
+    });
+  };
 
   getMenu = usr => () => {
     return (
@@ -104,27 +235,35 @@ class UserManagementContainer extends Component {
 
   fetchUsers = (selectedCustomer = this.props.selectedCustomer) => {
     const { viewBy, pageNo, itemsPerPage, searchText } = this.state;
-    if (selectedCustomer) {
-      if (viewBy === "lists") {
-        this.props.dispatch(
-          UsermanagementActions.fetchUsers({
-            customerId: selectedCustomer.id,
-            search: searchText,
-            page: pageNo,
-            limit: itemsPerPage,
-            ...this.selectedFilters
-          })
-        );
-      } else {
-        this.props.dispatch(
-          UsermanagementActions.fetchUsers({
-            customerId: selectedCustomer.id,
-            search: searchText,
-            ...this.selectedFilters
-          })
-        );
+    this.props.dispatch(UsermanagementActions.resetUsers());
+    const TableColumns = [...this.state.TableColumns];
+    TableColumns[0].checked = false;
+    this.setState(
+      { users: [], checkedUsers: [], showGlobalButtons: false, TableColumns },
+      () => {
+        if (selectedCustomer) {
+          if (viewBy === "lists") {
+            this.props.dispatch(
+              UsermanagementActions.fetchUsers({
+                customerId: selectedCustomer.id,
+                search: searchText,
+                page: pageNo,
+                limit: itemsPerPage,
+                ...this.selectedFilters
+              })
+            );
+          } else {
+            this.props.dispatch(
+              UsermanagementActions.fetchUsers({
+                customerId: selectedCustomer.id,
+                search: searchText,
+                ...this.selectedFilters
+              })
+            );
+          }
+        }
       }
-    }
+    );
   };
 
   onCustomerSelected = customer => {
@@ -205,15 +344,27 @@ class UserManagementContainer extends Component {
   };
 
   activateDeactivate = () => {
-    const { selectedCustomer } = this.props;
+    const users = {
+      users: this.state.selectedUser
+        ? [
+            {
+              userId: this.state.selectedUser.user_id,
+              is_active: Number(
+                !_.get(this.state.selectedUser, "is_active", false)
+              )
+            }
+          ]
+        : _.map(this.state.checkedUsers, user => ({
+            userId: user.user_id,
+            is_active: this.state.deactivateAll ? 0 : 1
+          }))
+    };
+
     this.props.dispatch(
-      UsermanagementActions.activateDeactivateUser(
-        {
-          userId: this.state.selectedUser.user_id,
-          is_active: Number(!_.get(this.state.selectedUser, "is_active", false))
-        },
-        selectedCustomer.id
-      )
+      UsermanagementActions.activateDeactivateUser(users, () => {
+        Toast.success("User Status Updated!");
+        this.fetchUsers();
+      })
     );
     this.closeActivateDeactivateModal();
     this.closeUserCard();
@@ -221,6 +372,10 @@ class UserManagementContainer extends Component {
 
   openActivateDeactivateModal = usr => () => {
     this.setState({ showDeactivateModal: true, selectedUser: usr });
+  };
+
+  openOnlyDeactivateModal = () => {
+    this.setState({ showDeactivateModal: true, selectedUser: null });
   };
 
   openStatusModal = () => {
@@ -233,6 +388,13 @@ class UserManagementContainer extends Component {
       ...filters,
       sortBy: filters.sortBy && [filters.sortBy]
     };
+
+    // if filters applied in the middle of the pagination
+    // then take user to first page
+    if (this.state.pageNo > 1) {
+      this.onPageChange(1);
+      return;
+    }
 
     this.fetchUsers();
   };
@@ -261,12 +423,24 @@ class UserManagementContainer extends Component {
   };
 
   closeLicenseUnAssignedModal = () => {
-    this.setState({ showLicenceUnAssignedModal: false });
+    this.setState({
+      showLicenceUnAssignedModal: false,
+      showLicenceUnAssignedModalError: ""
+    });
   };
 
   onAssignLicenseClick = license => {
+    if (license.licences.length < this.state.selectedUser.length) {
+      this.setState({
+        showLicenceUnAssignedModalError: translate(
+          "error.licence.maxuserselected"
+        )
+      });
+      return;
+    }
     this.setState({
       showLicenceUnAssignedModal: false,
+      showLicenceUnAssignedModalError: "",
       showAssignLicenceToUser: true,
       assigningLicence: license
     });
@@ -280,24 +454,46 @@ class UserManagementContainer extends Component {
 
   assignLicence = () => {
     const { assigningLicence, selectedUser } = this.state;
-    const someLicence = assigningLicence.licences[0];
+    let licenses = [];
+    let toastMsg = "Licenses have been assigned.";
+    if (_.isArray(selectedUser)) {
+      licenses = _.map(selectedUser, (user, idx) => {
+        const licence = assigningLicence.licences[idx];
+        return {
+          ...(_.includes(licence.slug, "view")
+            ? { omni_view_license: licence.id }
+            : { omni_file_license: licence.id }),
+          user_id: user.user_id
+        };
+      });
+    } else {
+      const licence = assigningLicence.licences[0];
+      licenses = [
+        {
+          ...(_.includes(licence.slug, "view")
+            ? { omni_view_license: licence.id }
+            : { omni_file_license: licence.id }),
+          user_id: selectedUser.user_id
+        }
+      ];
+      toastMsg = "License has been assigned.";
+    }
     this.props.dispatch(
       UsermanagementActions.assignLicense(
         {
-          ...(_.includes(someLicence.slug, "view")
-            ? { omni_view_license: someLicence.id }
-            : { omni_file_license: someLicence.id }),
-          user_id: selectedUser.user_id
+          licenses
         },
-        () => {
-          Toast.success(
-            `License has been assigned to ${_.get(
-              selectedUser,
-              "first_name",
-              ""
-            )} ${_.get(selectedUser, "last_name", "")}`
-          );
+        async () => {
+          Toast.success(toastMsg);
           this.fetchUsers();
+          this.props.dispatch(ApiActions.requestOnDemand());
+          const res = await CustomerApi.getCustomerById(
+            this.props.selectedCustomer.id
+          );
+          this.props.dispatch(
+            CustomerActions.setSelectedCustomer(res.data.data)
+          );
+          this.props.dispatch(ApiActions.successOnDemand());
         }
       )
     );
@@ -307,6 +503,11 @@ class UserManagementContainer extends Component {
     });
   };
 
+  getColumnWidth = _.memoize(name => {
+    const col = _.find(this.state.TableColumns, col => col.name === name);
+    return _.get(col, "width");
+  });
+
   render() {
     const {
       searchText,
@@ -314,6 +515,7 @@ class UserManagementContainer extends Component {
       pageNo,
       itemsPerPage,
       showLicenceUnAssignedModal,
+      showLicenceUnAssignedModalError,
       showAssignLicenceToUser,
       assigningLicence
     } = this.state;
@@ -322,7 +524,7 @@ class UserManagementContainer extends Component {
       return <Redirect to="/customers" />;
     }
 
-    let users = this.props.users;
+    let users = this.state.users;
     if (viewBy === "cards") {
       const usersByRole = _.groupBy(users, "role_name");
       let mergedRoles = {};
@@ -351,28 +553,43 @@ class UserManagementContainer extends Component {
             onFiltersUpdate={this.onFiltersUpdate}
             selectedCustomer={selectedCustomer}
           />
-          <Popover
-            trigger="click"
-            placement="bottom"
-            content={
-              <PopoverCustomers onCustomerSelected={this.onCustomerSelected} />
-            }
-          >
+          {!isLoggedInOmniciaAdmin(this.props.role) && (
             <Row style={{ marginLeft: "auto" }}>
               <Text
                 type="extra_bold"
                 size="20px"
                 className="userManagement-subheader-title"
                 text={selectedCustomer.company_name}
-                // onClick={this.goBack}
-              />
-              <img
-                className="global__cursor-pointer"
-                src="/images/caret-inactive.svg"
-                style={{ marginLeft: "5px" }}
+                onClick={this.goBack}
               />
             </Row>
-          </Popover>
+          )}
+          {isLoggedInOmniciaAdmin(this.props.role) && (
+            <Popover
+              trigger="click"
+              placement="bottom"
+              content={
+                <PopoverCustomers
+                  onCustomerSelected={this.onCustomerSelected}
+                />
+              }
+            >
+              <Row style={{ marginLeft: "auto" }}>
+                <Text
+                  type="extra_bold"
+                  size="20px"
+                  className="userManagement-subheader-title"
+                  text={selectedCustomer.company_name}
+                  // onClick={this.goBack}
+                />
+                <img
+                  className="global__cursor-pointer"
+                  src="/images/caret-inactive.svg"
+                  style={{ marginLeft: "5px" }}
+                />
+              </Row>
+            </Popover>
+          )}
           <div style={{ marginLeft: "auto" }}>
             <SearchBox
               placeholder={translate("text.header.search", {
@@ -394,6 +611,33 @@ class UserManagementContainer extends Component {
               })}
               className="userManagement__header-addButton"
               onClick={this.openAdduser}
+            />
+          </div>
+          <div className="global__center-vert">
+            <OmniButton
+              type="add"
+              className="maindashboard-assignpermissions"
+              image={<img src="/images/key.svg" />}
+              label={translate("label.usermgmt.assignlicence")}
+              buttonStyle={{
+                marginRight: "4px",
+                visibility: this.state.showGlobalButtons ? "visible" : "hidden"
+              }}
+              onClick={this.showLicenceUnAssignedModal(this.state.checkedUsers)}
+            />
+            <OmniButton
+              type="add"
+              className="maindashboard-assignpermissions"
+              image={<img src="/images/deactivate.svg" />}
+              buttonStyle={{
+                visibility: this.state.showGlobalButtons ? "visible" : "hidden"
+              }}
+              label={
+                this.state.deactivateAll
+                  ? translate("label.usermgmt.deactivate")
+                  : translate("label.usermgmt.activate")
+              }
+              onClick={this.openOnlyDeactivateModal}
             />
           </div>
           {viewBy === "cards" && (
@@ -439,7 +683,7 @@ class UserManagementContainer extends Component {
             <React.Fragment>
               <div className="maindashboard__list">
                 <TableHeader
-                  columns={TableColumns}
+                  columns={this.state.TableColumns}
                   sortColumn={this.sortColumn}
                 />
                 {_.map(users, usr => (
@@ -449,7 +693,15 @@ class UserManagementContainer extends Component {
                     style={{ justifyContent: "normal" }}
                   >
                     <Column
-                      width={getColumnWidth(TableColumnNames.NAME)}
+                      width={this.getColumnWidth(TableColumnNames.CHECKBOX)}
+                    >
+                      <OmniCheckbox
+                        checked={usr.checked}
+                        onCheckboxChange={this.onCheckboxChange(usr)}
+                      />
+                    </Column>
+                    <Column
+                      width={this.getColumnWidth(TableColumnNames.NAME)}
                       className="maindashboard__list__item-text-bold"
                     >
                       {`${_.get(usr, "first_name", "")} ${_.get(
@@ -459,25 +711,25 @@ class UserManagementContainer extends Component {
                       )}`}
                     </Column>
                     <Column
-                      width={getColumnWidth(TableColumnNames.USER_ROLE)}
+                      width={this.getColumnWidth(TableColumnNames.USER_ROLE)}
                       className="maindashboard__list__item-text"
                     >
                       {getRoleName(_.get(usr, "role_name", ""))}
                     </Column>
                     <Column
-                      width={getColumnWidth(TableColumnNames.DEPARTMENT)}
+                      width={this.getColumnWidth(TableColumnNames.DEPARTMENT)}
                       className="maindashboard__list__item-text"
                     >
                       {_.get(usr, "department_name", "")}
                     </Column>
                     <Column
-                      width={getColumnWidth(TableColumnNames.EMAIl)}
+                      width={this.getColumnWidth(TableColumnNames.EMAIl)}
                       className="maindashboard__list__item-text"
                     >
                       {_.get(usr, "email", "")}
                     </Column>
                     <Column
-                      width={getColumnWidth(TableColumnNames.STATUS)}
+                      width={this.getColumnWidth(TableColumnNames.STATUS)}
                       className="maindashboard__list__item-text"
                     >
                       {_.get(usr, "is_active", false) ? (
@@ -491,7 +743,7 @@ class UserManagementContainer extends Component {
                       )}
                     </Column>
                     <Column
-                      width={getColumnWidth(TableColumnNames.EXP_DATE)}
+                      width={this.getColumnWidth(TableColumnNames.EXP_DATE)}
                       className="maindashboard__list__item__row maindashboard__list__item-text"
                     >
                       {getFormattedDate(_.get(usr, "expiryDate")) ||
@@ -543,20 +795,25 @@ class UserManagementContainer extends Component {
             </React.Fragment>
           )}
           <DeactivateModal
-            isActive={_.get(this.state, "selectedUser.is_active", false)}
+            isActive={
+              _.get(this.state, "selectedUser.is_active") ||
+              this.state.deactivateAll
+            }
             visible={this.state.showDeactivateModal}
             title={
-              _.get(this.state, "selectedUser.is_active", false)
+              _.get(this.state, "selectedUser.is_active") ||
+              this.state.deactivateAll
                 ? `${translate("label.usermgmt.deactivateacc")}?`
                 : `${translate("label.usermgmt.activateacc")}?`
             }
             content={
-              _.get(this.state, "selectedUser.is_active", false)
+              _.get(this.state, "selectedUser.is_active") ||
+              this.state.deactivateAll
                 ? translate("text.usermgmt.deactivatemsg")
                 : translate("text.usermgmt.activatemsg")
             }
             closeModal={this.closeActivateDeactivateModal}
-            deactivate={this.activateDeactivate}
+            submit={this.activateDeactivate}
           />
           <UserProfileCard
             key={_.get(this.state, "selectedUser.profile")}
@@ -572,6 +829,7 @@ class UserManagementContainer extends Component {
           {showLicenceUnAssignedModal && (
             <LicenceInUseUnAssigned
               type="unassigned"
+              error={showLicenceUnAssignedModalError}
               visible={showLicenceUnAssignedModal}
               closeModal={this.closeLicenseUnAssignedModal}
               customer={this.props.selectedCustomer}
@@ -581,7 +839,7 @@ class UserManagementContainer extends Component {
           <AssignLicence
             visible={showAssignLicenceToUser}
             licence={assigningLicence}
-            user={this.state.selectedUser}
+            users={this.state.selectedUser}
             closeModal={this.closeAssignLicenceToUserModal}
             back={this.goBackToUnAssignedModal}
             submit={this.assignLicence}
@@ -593,6 +851,7 @@ class UserManagementContainer extends Component {
 }
 
 const TableColumnNames = {
+  CHECKBOX: "",
   NAME: translate("label.user.name"),
   USER_ROLE: translate("label.user.userrole"),
   DEPARTMENT: translate("label.user.department"),
@@ -600,56 +859,6 @@ const TableColumnNames = {
   STATUS: translate("label.user.status"),
   EXP_DATE: translate("label.user.expdate")
 };
-
-const TableColumns = [
-  {
-    name: TableColumnNames.NAME,
-    key: "first_name",
-    checkbox: false,
-    sort: true,
-    width: "22%"
-  },
-  {
-    name: TableColumnNames.USER_ROLE,
-    key: "role_name",
-    checkbox: false,
-    sort: true,
-    width: "11%"
-  },
-  {
-    name: TableColumnNames.DEPARTMENT,
-    key: "department_name",
-    checkbox: false,
-    sort: true,
-    width: "17%"
-  },
-  {
-    name: TableColumnNames.EMAIl,
-    key: "email",
-    checkbox: false,
-    sort: true,
-    width: "27%"
-  },
-  {
-    name: TableColumnNames.STATUS,
-    key: "is_active",
-    checkbox: false,
-    sort: true,
-    width: "8%"
-  },
-  {
-    name: TableColumnNames.EXP_DATE,
-    key: "expired_date",
-    checkbox: false,
-    // sort: true,
-    width: "15%"
-  }
-];
-
-const getColumnWidth = _.memoize(name => {
-  const col = _.find(TableColumns, col => col.name === name);
-  return _.get(col, "width");
-});
 
 const Column = styled.div`
   width: ${props => props.width};
@@ -659,6 +868,7 @@ const Column = styled.div`
 function mapStateToProps(state) {
   return {
     loading: state.Api.loading,
+    role: state.Login.role,
     selectedCustomer: state.Customer.selectedCustomer,
     users: state.Usermanagement.users,
     usersCount: state.Usermanagement.usersCount

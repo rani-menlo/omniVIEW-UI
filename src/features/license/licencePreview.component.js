@@ -9,18 +9,21 @@ const Columns = [
     title: translate("label.dashboard.application"),
     dataIndex: "application.name",
     key: "application",
+    width: 200,
     render: text => <Text type="medium" size="12px" text={text} />
   },
   {
     title: translate("label.licence.duration"),
     dataIndex: "duration.name",
     key: "duration",
+    width: 200,
     render: text => <Text type="medium" size="12px" text={text} />
   },
   {
     title: translate("label.licence.expirationdate"),
     dataIndex: "expirationdate",
     key: "expirationdate",
+    width: 150,
     render: (text, record) => (
       <Text
         type="medium"
@@ -35,6 +38,7 @@ const Columns = [
     title: translate("label.generic.quantity"),
     dataIndex: "quantity",
     key: "quantity",
+    width: 100,
     render: text => <Text type="medium" size="12px" text={text} />
   }
 ];
@@ -69,7 +73,12 @@ const LicencePreview = ({ closeModal, back, licences, visible, submit }) => {
         text={`${translate("text.licence.belowarecorrect")}`}
       />
       <div style={{ marginTop: "20px" }}>
-        <Table columns={Columns} dataSource={licences} pagination={false} />
+        <Table
+          columns={Columns}
+          dataSource={licences}
+          pagination={false}
+          scroll={{ y: 200 }}
+        />
       </div>
       <div style={{ marginTop: "20px", textAlign: "right" }}>
         <OmniButton

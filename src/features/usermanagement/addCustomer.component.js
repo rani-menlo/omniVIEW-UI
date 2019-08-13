@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import styled from "styled-components";
 import _ from "lodash";
+import uuidv4 from "uuid/v4";
 import { connect } from "react-redux";
 import {
   Loader,
@@ -18,11 +19,22 @@ import {
   ImageLoader
 } from "../../uikit/components";
 import Header from "../header/header.component";
-import { Checkbox, Switch, Tabs, Icon } from "antd";
+import { Checkbox, Switch, Tabs, Icon, Popover, Dropdown, Menu } from "antd";
 import { UsermanagementActions, CustomerActions } from "../../redux/actions";
-import { isPhone, isEmail, getFormattedDate } from "../../utils";
+import {
+  isPhone,
+  isEmail,
+  getFormattedDate,
+  isLoggedInOmniciaAdmin
+} from "../../utils";
 import { translate } from "../../translations/translator";
 import AddNewLicence from "../license/addNewLicence.component";
+import PopoverCustomers from "./popoverCustomers.component";
+import LicenceInUseUnAssigned from "../license/licenceInUseUnAssigned.component";
+import AssignLicence from "../license/assignLicence.component";
+import AssignLicenceWithUsers from "../license/assignLicenceWithUsers.component";
+import Subscriptions from "../license/subscriptions.component";
+import { ROLE_IDS } from "../../constants";
 
 const TabPane = Tabs.TabPane;
 
@@ -37,6 +49,8 @@ class AddCustomer extends Component {
       showDeactivateModal: false,
       openAddNewLicenceModal: false,
       statusActive: true,
+      selectedPrimaryContact: null,
+      disablePrimaryContactFields: true,
       cname: {
         value: "",
         error: ""
@@ -74,47 +88,88 @@ class AddCustomer extends Component {
         omniViewError: "",
         omniFileError: ""
       },
+      disableCustomerDetailsTab: false,
       allLicences: null,
-      disableCustomerDetailsTab: false
+      showLicenceUnAssigned: false,
+      showUsersModal: false,
+      showAssignLicenceToUser: false,
+      assigningLicence: null,
+      selectedUser: null
     };
   }
 
   static getDerivedStateFromProps(props, state) {
+    let newState = {};
     if (state.allLicences === null && props.allLicences.length) {
-      return {
-        /* allLicences: AddCustomer.getItemsBasedOnPagination(
+      newState = {
+        allLicences: AddCustomer.getItemsBasedOnPagination(
           props.allLicences,
           state.pageNo,
           state.itemsPerPage
-        ) */
-        allLicences: props.allLicences
+        )
       };
     }
-    return null;
+    if (
+      props.selectedCustomer &&
+      !state.selectedPrimaryContact &&
+      state.disablePrimaryContactFields &&
+      props.cAdmins.length
+    ) {
+      newState = {
+        ...newState,
+        ...AddCustomer.getPrimaryContactDetailsState(
+          props,
+          state,
+          props.selectedCustomer.primary_user_id
+        )
+      };
+    }
+    return _.size(newState) ? newState : null;
   }
 
   static getItemsBasedOnPagination(array, pageNo, itemsPerPage) {
-    return _.slice(
-      array,
-      (pageNo - 1) * itemsPerPage,
-      pageNo * itemsPerPage - 1
-    );
+    const from = (pageNo - 1) * itemsPerPage;
+    const to = pageNo * itemsPerPage;
+    const newArray = _.slice(array, from, to);
+
+    return newArray;
+  }
+
+  static getPrimaryContactDetailsState(props, state, userId) {
+    const admin = _.find(props.cAdmins, admin => admin.user_id == userId);
+    const { fname, lname, email, phone } = state;
+    return {
+      disablePrimaryContactFields: true,
+      selectedPrimaryContact: admin,
+      fname: { ...fname, value: _.get(admin, "first_name", "") },
+      lname: { ...lname, value: _.get(admin, "last_name", "") },
+      email: { ...email, value: _.get(admin, "email", "") },
+      phone: { ...phone, value: _.get(admin, "phone", "") }
+    };
   }
 
   componentDidMount() {
     const { history, selectedCustomer } = this.props;
     if (history.location.pathname.includes("/edit")) {
+      let newState = { editCustomer: true };
       if (selectedCustomer) {
         const state = this.populateState();
-        this.setState({ ...state, editCustomer: true });
-      } else {
-        this.setState({ editCustomer: true });
+        newState = { ...state, ...newState };
+        this.props.dispatch(
+          UsermanagementActions.fetchCustomerAdmins({
+            customerId: selectedCustomer.id,
+            roles: [ROLE_IDS.CUSTOMER.administrator]
+          })
+        );
       }
+      if (history.location.pathname.endsWith("subscriptions")) {
+        newState.selectedTab = "subscriptionLicences";
+      }
+      this.setState(newState);
     }
   }
 
-  populateState = () => {
-    const { selectedCustomer } = this.props;
+  populateState = (selectedCustomer = this.props.selectedCustomer) => {
     const state = { ...this.state };
     state.cname.value = selectedCustomer.company_name;
     state.fname.value = selectedCustomer.first_name;
@@ -308,6 +363,8 @@ class AddCustomer extends Component {
         "selectedCustomer.primary_user_id",
         ""
       );
+      reqObject.primary_user_id =
+        _.get(state, "selectedPrimaryContact.user_id") || 0;
       reqObject.is_active = state.statusActive ? 1 : 0;
       this.props.dispatch(
         CustomerActions.editCustomer(reqObject, () => {
@@ -413,9 +470,148 @@ class AddCustomer extends Component {
   };
 
   sortColumn = (sortBy, orderBy) => {
-    const { allLicences } = this.state;
-    const sortedLicences = _.orderBy(allLicences, [sortBy], [orderBy]);
-    this.setState({ allLicences: sortedLicences });
+    const { allLicences } = this.props;
+    const sortedLicences = _.orderBy(
+      allLicences,
+      [sortBy],
+      [_.toLower(orderBy)]
+    );
+    this.setState({
+      allLicences: AddCustomer.getItemsBasedOnPagination(
+        sortedLicences,
+        this.state.pageNo,
+        this.state.itemsPerPage
+      )
+    });
+  };
+
+  onCustomerSelected = customer => {
+    this.props.dispatch(CustomerActions.setSelectedCustomer(customer));
+    this.props.dispatch(UsermanagementActions.resetAllLicences());
+    const newState = this.populateState(customer);
+    this.setState(
+      {
+        ...newState,
+        ...AddCustomer.getPrimaryContactDetailsState(
+          this.props,
+          this.state,
+          customer.primary_user_id
+        ),
+        allLicences: null
+      },
+      () => {
+        if (this.state.selectedTab === "subscriptionLicences") {
+          this.props.dispatch(
+            UsermanagementActions.getAllLicences(customer.id)
+          );
+        }
+      }
+    );
+  };
+
+  openUsersModal = license => () => {
+    this.setState({
+      showAssignLicenceToUser: false,
+      showUsersModal: true,
+      assigningLicence: license
+    });
+  };
+
+  goBackToUsersModal = () => {
+    this.setState({
+      showAssignLicenceToUser: false,
+      showUsersModal: true
+    });
+  };
+
+  closeUsersModal = () => {
+    this.setState({
+      selectedUser: null,
+      showUsersModal: false,
+      assigningLicence: null
+    });
+  };
+
+  closeAssignLicenceToUserModal = () => {
+    this.setState({
+      selectedUser: null,
+      showAssignLicenceToUser: false
+    });
+  };
+
+  onUserSelect = user => {
+    this.setState({
+      showAssignLicenceToUser: true,
+      showUsersModal: false,
+      selectedUser: user
+    });
+  };
+
+  assignLicence = () => {
+    const { assigningLicence, selectedUser } = this.state;
+    this.props.dispatch(
+      UsermanagementActions.assignLicense(
+        {
+          ...(_.includes(assigningLicence.type_slug, "view")
+            ? { omni_view_license: assigningLicence.id }
+            : { omni_file_license: assigningLicence.id }),
+          user_id: selectedUser.user_id
+        },
+        () => {
+          Toast.success(
+            `License has been assigned to ${_.get(
+              selectedUser,
+              "first_name",
+              ""
+            )} ${_.get(selectedUser, "last_name", "")}`
+          );
+          this.props.dispatch(UsermanagementActions.resetAllLicences());
+          this.setState({ selectedUser: null, allLicences: null }, () => {
+            this.props.dispatch(
+              UsermanagementActions.getAllLicences(
+                this.props.selectedCustomer.id
+              )
+            );
+          });
+        }
+      )
+    );
+    this.setState({
+      showAssignLicenceToUser: false
+    });
+  };
+
+  onPrimaryContactChange = event => {
+    const userId = event.key;
+    this.setState({
+      ...AddCustomer.getPrimaryContactDetailsState(
+        this.props,
+        this.state,
+        userId
+      ),
+      ...(userId === "new" && { disablePrimaryContactFields: false })
+    });
+  };
+
+  getDropdownMenu = () => {
+    return (
+      <Menu
+        selectedKeys={[
+          `${_.get(this.state, "selectedPrimaryContact.user_id", "")}`
+        ]}
+      >
+        <Menu.Item key="new" onClick={this.onPrimaryContactChange}>
+          Add New Contact
+        </Menu.Item>
+        <Menu.Divider />
+        {_.map(this.props.cAdmins, item => (
+          <Menu.Item
+            key={item.user_id}
+            onClick={this.onPrimaryContactChange}
+          >{`${item.first_name} ${item.last_name}`}</Menu.Item>
+        ))}
+      </Menu>
+    );
   };
 
   render() {
@@ -433,22 +629,42 @@ class AddCustomer extends Component {
       licences,
       editCustomer,
       statusActive,
-      selectedTab
+      selectedTab,
+      selectedPrimaryContact,
+      disablePrimaryContactFields
     } = this.state;
-    const { loading, licencesUnAssigned } = this.props;
-    const { allLicences } = this.state;
+    const { loading, selectedCustomer } = this.props;
     return (
       <React.Fragment>
         <Loader loading={loading} />
         <Header style={{ marginBottom: "0px" }} />
         <ContentLayout className="addUser">
-          <Text
-            type="extra_bold"
-            size="20px"
-            className="addUser-companyname"
-            text={_.get(this.props.selectedCustomer, "company_name", "")}
-            onClick={this.goBack}
-          />
+          {isLoggedInOmniciaAdmin(this.props.role) && editCustomer && (
+            <Popover
+              trigger="click"
+              placement="bottom"
+              content={
+                <PopoverCustomers
+                  onCustomerSelected={this.onCustomerSelected}
+                />
+              }
+            >
+              <Row style={{ marginLeft: "auto" }}>
+                <Text
+                  type="extra_bold"
+                  size="20px"
+                  className="userManagement-subheader-title"
+                  text={_.get(selectedCustomer, "company_name", "")}
+                  // onClick={this.goBack}
+                />
+                <img
+                  className="global__cursor-pointer"
+                  src="/images/caret-inactive.svg"
+                  style={{ marginLeft: "5px" }}
+                />
+              </Row>
+            </Popover>
+          )}
           <Tabs
             activeKey={selectedTab}
             className="addUser__tabs"
@@ -492,11 +708,64 @@ class AddCustomer extends Component {
               />
               <p className="addUser-heading">
                 {translate("label.user.details", {
-                  type: translate("label.dashboard.companyadmin")
+                  type: translate("label.dashboard.companyprimarycontact")
                 })}
               </p>
+              {editCustomer && (
+                <div
+                  className="global__center-vert"
+                  style={{ marginTop: "20px", marginBottom: "20px" }}
+                >
+                  <Text
+                    type="regular"
+                    opacity={0.5}
+                    textStyle={{ marginRight: "4px" }}
+                    size="14px"
+                    text={`${translate(
+                      "label.dashboard.companyprimarycontact"
+                    )}:`}
+                  />
+                  <Dropdown
+                    overlay={this.getDropdownMenu}
+                    trigger={["click"]}
+                    className="global__center-vert global__cursor-pointer"
+                  >
+                    <Row
+                      style={{
+                        border: "solid 1px",
+                        minWidth: "30%",
+                        padding: "4px",
+                        justifyContent: "space-between",
+                        borderRadius: "4px"
+                      }}
+                    >
+                      <Text
+                        type="extra_bold"
+                        opacity={0.5}
+                        textStyle={{ marginRight: "4px" }}
+                        size="14px"
+                        text={
+                          selectedPrimaryContact
+                            ? `${_.get(
+                                this.state,
+                                "selectedPrimaryContact.first_name"
+                              )} ${_.get(
+                                this.state,
+                                "selectedPrimaryContact.last_name"
+                              )}`
+                            : "Add New Contact"
+                        }
+                      />
+                      <Icon type="down" />
+                    </Row>
+                  </Dropdown>
+                </div>
+              )}
               <Row className="addUser__fields">
                 <InputField
+                  disabled={
+                    !!selectedPrimaryContact && disablePrimaryContactFields
+                  }
                   className="addUser__fields-field"
                   style={{ marginRight: "14px" }}
                   label={`${translate("label.form.fname")}*`}
@@ -506,6 +775,9 @@ class AddCustomer extends Component {
                   onChange={this.onInputChange("fname")}
                 />
                 <InputField
+                  disabled={
+                    !!selectedPrimaryContact && disablePrimaryContactFields
+                  }
                   className="addUser__fields-field"
                   label={`${translate("label.form.lname")}*`}
                   value={lname.value}
@@ -516,6 +788,9 @@ class AddCustomer extends Component {
               </Row>
               <Row className="addUser__fields">
                 <InputField
+                  disabled={
+                    !!selectedPrimaryContact && disablePrimaryContactFields
+                  }
                   className="addUser__fields-field"
                   style={{ marginRight: "14px" }}
                   label={`${translate("label.form.email")}*`}
@@ -525,6 +800,9 @@ class AddCustomer extends Component {
                   onChange={this.onInputChange("email")}
                 />
                 <PhoneField
+                  disabled={
+                    !!selectedPrimaryContact && disablePrimaryContactFields
+                  }
                   className="addUser__fields-field"
                   error={phone.error}
                   label={`${translate("label.form.phone")}*`}
@@ -738,121 +1016,35 @@ class AddCustomer extends Component {
                   opacity={0.5}
                   text={translate("text.licence.viewallexisting")}
                 />
-                <OmniButton
-                  type="add"
-                  label={translate("label.button.add", {
-                    type: translate("label.licence.licences")
-                  })}
-                  onClick={this.openAddNewLicence}
-                />
-              </Row>
-              <TableHeader
-                columns={TableColumns}
-                style={{ marginTop: "10px" }}
-                sortColumn={this.sortColumn}
-              />
-              {_.map(allLicences, licence => (
-                <Row
-                  key={licence.id}
-                  className="maindashboard__list__item"
-                  style={{ cursor: "auto" }}
-                >
-                  <Column
-                    width={getColumnWidth(TableColumnNames.APPLICATION)}
-                    className="maindashboard__list__item-text-bold"
-                  >
-                    {_.get(licence, "type_name", "")}
-                  </Column>
-                  <Column
-                    width={getColumnWidth(TableColumnNames.DURATION)}
-                    className="maindashboard__list__item-text"
-                  >
-                    {_.get(licence, "duration_name", "")}
-                  </Column>
-                  <Column
-                    width={getColumnWidth(TableColumnNames.EXPIRATION_DATE)}
-                    className="maindashboard__list__item-text"
-                  >
-                    {getFormattedDate(_.get(licence, "expired_date", ""))}
-                  </Column>
-                  <Column
-                    width={getColumnWidth(TableColumnNames.STATUS)}
-                    className="maindashboard__list__item-text"
-                  >
-                    {_.get(licence, "first_name", "")
-                      ? "Assigned"
-                      : "Unassigned"}
-                  </Column>
-                  <Column
-                    width={getColumnWidth(TableColumnNames.USER)}
-                    className="maindashboard__list__item-text"
-                  >
-                    {_.get(licence, "first_name", "") && (
-                      <ImageLoader
-                        style={{ marginRight: "5px" }}
-                        type="circle"
-                        width="20px"
-                        height="20px"
-                        path={licence.profile}
-                      />
-                    )}
-                    {`${_.get(licence, "first_name", "")}  ${_.get(
-                      licence,
-                      "last_name",
-                      ""
-                    )}`}
-                  </Column>
-                  <Column
-                    width={getColumnWidth(TableColumnNames.ACTIONS)}
-                    className="maindashboard__list__item-text maindashboard__list__item-text-link"
-                    style={{ cursor: "not-allowed" }}
-                  >
-                    {_.get(licence, "first_name", "") ? "Remove" : "Assign"}
-                  </Column>
-                </Row>
-              ))}
-              {/* <Pagination
-                containerStyle={
-                  _.get(allLicences, "length", 0) > 4
-                    ? { marginTop: "1%" }
-                    : { marginTop: "20%" }
-                }
-                total={_.get(this.props.allLicences, "length", 0)}
-                showTotal={(total, range) =>
-                  translate("text.pagination", {
-                    top: range[0],
-                    bottom: range[1],
-                    total,
-                    type: translate("label.dashboard.customers")
-                  })
-                }
-                pageSize={this.state.itemsPerPage}
-                current={this.state.pageNo}
-                onPageChange={this.onPageChange}
-                onPageSizeChange={this.onPageSizeChange}
-              /> */}
-              {!_.get(allLicences, "length", 0) && (
-                <Row className="maindashboard__nodata">
-                  <Icon
-                    style={{ fontSize: "20px" }}
-                    type="exclamation-circle"
-                    className="maindashboard__nodata-icon"
+                {isLoggedInOmniciaAdmin(this.props.role) && (
+                  <OmniButton
+                    type="add"
+                    label={translate("label.button.add", {
+                      type: translate("label.licence.licences")
+                    })}
+                    onClick={this.openAddNewLicence}
                   />
-                  {translate("error.dashboard.notfound", {
-                    type: translate("text.customer.subslicences")
-                  })}
-                </Row>
-              )}
+                )}
+              </Row>
+              <Subscriptions allLicences={this.props.allLicences} />
             </TabPane>
           </Tabs>
 
-          <DeactivateModal
-            isActive={this.state.statusActive}
-            visible={this.state.showDeactivateModal}
-            title={`${translate("label.usermgmt.deactivateacc")}?`}
-            content={translate("text.customer.deactivate")}
-            closeModal={this.closeModal}
-            deactivate={this.deactivate}
+          {this.state.showUsersModal && (
+            <AssignLicenceWithUsers
+              licence={this.state.assigningLicence}
+              selectedUser={this.state.selectedUser}
+              closeModal={this.closeUsersModal}
+              onUserSelect={this.onUserSelect}
+            />
+          )}
+          <AssignLicence
+            visible={this.state.showAssignLicenceToUser}
+            licence={this.state.assigningLicence}
+            user={this.state.selectedUser}
+            closeModal={this.closeAssignLicenceToUserModal}
+            back={this.goBackToUsersModal}
+            submit={this.assignLicence}
           />
           {this.state.openAddNewLicenceModal && (
             <AddNewLicence
@@ -861,72 +1053,27 @@ class AddCustomer extends Component {
               addNewLicence={this.addNewLicence}
             />
           )}
+          <DeactivateModal
+            isActive={this.state.statusActive}
+            visible={this.state.showDeactivateModal}
+            title={`${translate("label.usermgmt.deactivateacc")}?`}
+            content={translate("text.customer.deactivate")}
+            closeModal={this.closeModal}
+            submit={this.deactivate}
+          />
         </ContentLayout>
       </React.Fragment>
     );
   }
 }
 
-const getColumnWidth = _.memoize(name => {
-  const col = _.find(TableColumns, col => col.name === name);
-  return _.get(col, "width");
-});
-
-const Column = styled.div`
-  width: ${props => props.width};
-`;
-
-const TableColumnNames = {
-  APPLICATION: translate("label.dashboard.application"),
-  DURATION: translate("label.licence.duration"),
-  EXPIRATION_DATE: translate("label.licence.expirationdate"),
-  STATUS: translate("label.user.status"),
-  USER: translate("label.dashboard.user"),
-  ACTIONS: translate("label.generic.actions")
-};
-
-const TableColumns = [
-  {
-    name: TableColumnNames.APPLICATION,
-    key: "type_name",
-    // sort: true,
-    width: "20%"
-  },
-  {
-    name: TableColumnNames.DURATION,
-    key: "duration",
-    // sort: true,
-    width: "20%"
-  },
-  {
-    name: TableColumnNames.EXPIRATION_DATE,
-    key: "expired_date",
-    // sort: true,
-    width: "20%"
-  },
-  {
-    name: TableColumnNames.STATUS,
-    key: "status",
-    // sort: true,
-    width: "15%"
-  },
-  {
-    name: TableColumnNames.USER,
-    key: "first_name",
-    // sort: true,
-    width: "20%"
-  },
-  {
-    name: TableColumnNames.ACTIONS,
-    width: "10%"
-  }
-];
-
 function mapStateToProps(state) {
   return {
     loading: state.Api.loading,
     allLicences: state.Usermanagement.allLicences,
-    selectedCustomer: state.Customer.selectedCustomer
+    selectedCustomer: state.Customer.selectedCustomer,
+    cAdmins: state.Usermanagement.cAdmins,
+    role: state.Login.role
   };
 }
 

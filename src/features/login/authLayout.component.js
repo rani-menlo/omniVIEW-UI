@@ -9,7 +9,7 @@ const AuthLayout = ({ title, heading, children, authLayoutStyle }) => {
         <p className="authlayout-login">
           {title || translate("text.login.title")}
         </p>
-        <div className="authlayout__text">{heading}</div>
+        {heading && <div className="authlayout__text">{heading}</div>}
         {children}
       </div>
     </div>

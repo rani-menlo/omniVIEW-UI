@@ -47,13 +47,13 @@ const UserCard = ({
               : ` ${translate("label.user.inactive")}`}
           </span>
         </p>
-        {user.role_id !== 1 && (_.get(user, "license_status") || "") && (
-          <p className="userManagement__group__users__user__info-text">
-            {`${translate("label.usermgmt.expires")} ${getFormattedDate(
-              _.get(user, "expiryDate")
-            )}`}
-          </p>
-        )}
+        <p className="userManagement__group__users__user__info-text">
+          {`${translate("label.usermgmt.expires")} ${
+            _.get(user, "license_status")
+              ? getFormattedDate(_.get(user, "expiryDate"))
+              : "N/A"
+          }`}
+        </p>
         <p className="userManagement__group__users__user__info-text">
           {_.get(user, "email", "")}
         </p>

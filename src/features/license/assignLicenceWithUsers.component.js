@@ -18,21 +18,27 @@ import { getFormattedDate } from "../../utils";
 class AssignLicenceWithUsers extends Component {
   static propTypes = {
     licence: PropTypes.object,
-    selectedUser: PropTypes.object,
+    selectedUsers: PropTypes.arrayOf(PropTypes.object),
     closeModal: PropTypes.func,
-    onUserSelect: PropTypes.func
+    onUserSelect: PropTypes.func,
+    multiSelection: PropTypes.bool
+  };
+
+  static defaultProps = {
+    multiSelection: true
   };
 
   constructor(props) {
     super(props);
     this.state = {
-      selected: ""
+      selected: new Set()
     };
   }
 
   componentDidMount() {
-    const { selectedCustomer, selectedUser } = this.props;
-    selectedUser && this.select(selectedUser)();
+    const { selectedCustomer, selectedUsers } = this.props;
+    selectedUsers &&
+      this.setState({ selected: new Set(_.map(selectedUsers, "user_id")) });
     this.props.dispatch(
       UsermanagementActions.fetchUsers({
         customerId: selectedCustomer.id,
@@ -42,15 +48,29 @@ class AssignLicenceWithUsers extends Component {
   }
 
   select = user => () => {
-    this.setState({ selected: user });
+    const { selected } = this.state;
+    const { multiSelection } = this.props;
+    if (selected.has(user.user_id)) {
+      selected.delete(user.user_id);
+    } else {
+      multiSelection && selected.add(user.user_id);
+      if (!multiSelection) {
+        selected.clear();
+        selected.add(user.user_id);
+      }
+    }
+    this.setState({ selected });
   };
 
   next = () => {
-    this.props.onUserSelect && this.props.onUserSelect(this.state.selected);
+    const users = _.map([...this.state.selected], userId => {
+      return _.find(this.props.users, { user_id: userId });
+    });
+    this.props.onUserSelect && this.props.onUserSelect(users);
   };
 
   render() {
-    const { licence, users, closeModal } = this.props;
+    const { licence, users, closeModal, multiSelection } = this.props;
     return (
       <Modal
         destroyOnClose
@@ -70,7 +90,11 @@ class AssignLicenceWithUsers extends Component {
               licence,
               "licenceType",
               ""
-            )} - ${_.get(licence, "name", "")}`}
+            ) || _.get(licence, "type_name", "")} - ${_.get(
+              licence,
+              "name",
+              ""
+            ) || _.get(licence, "duration_name", "")}`}
           />
           <img
             src="/images/close.svg"
@@ -95,15 +119,13 @@ class AssignLicenceWithUsers extends Component {
         {(_.get(users, "length") || "") && (
           <div className="licence-modal__content" style={{ marginTop: "15px" }}>
             {_.map(users, user => {
+              console.log(user.user_id, this.state.selected.has(user.user_id));
               return (
                 <div
                   key={user.user_id}
-                  className={`licence-modal__content__row global__cursor-pointer ${_.get(
-                    this.state,
-                    "selected.user_id",
-                    ""
-                  ) === user.user_id &&
-                    "licence-modal__content__row-selected"}`}
+                  className={`licence-modal__content__row global__cursor-pointer ${this.state.selected.has(
+                    user.user_id
+                  ) && "licence-modal__content__row-selected"}`}
                   style={{ justifyContent: "unset" }}
                   onClick={this.select(user)}
                 >
@@ -149,9 +171,7 @@ class AssignLicenceWithUsers extends Component {
                     />
                   </div>
                   <Checkbox
-                    checked={
-                      _.get(this.state, "selected.user_id", "") === user.user_id
-                    }
+                    checked={this.state.selected.has(user.user_id)}
                     style={{ marginLeft: "auto" }}
                   />
                 </div>
@@ -171,6 +191,16 @@ class AssignLicenceWithUsers extends Component {
             })}
           </Row>
         )}
+        {multiSelection &&
+          _.get(this.state, "selected.size", 0) >
+            _.get(licence, "licences.length", 0) && (
+            <p
+              className="global__field__error-text"
+              style={{ marginTop: "10px" }}
+            >
+              {translate("error.licence.choosenmax")}
+            </p>
+          )}
         <div style={{ marginTop: "20px", textAlign: "right" }}>
           <OmniButton
             type="secondary"
@@ -179,7 +209,12 @@ class AssignLicenceWithUsers extends Component {
             buttonStyle={{ width: "120px", marginRight: "12px" }}
           />
           <OmniButton
-            disabled={this.state.selected ? false : true}
+            disabled={
+              _.get(this.state, "selected.size", 0) === 0 ||
+              (multiSelection &&
+                _.get(this.state, "selected.size", 0) >
+                  _.get(licence, "licences.length", 0))
+            }
             label={translate("label.pagination.next")}
             buttonStyle={{ width: "120px", marginRight: "10px" }}
             onClick={this.next}

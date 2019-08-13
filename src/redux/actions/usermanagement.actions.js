@@ -111,6 +111,21 @@ export default {
       }
     };
   },
+  fetchCustomerAdmins: data => {
+    return async dispatch => {
+      ApiActions.request(dispatch);
+      try {
+        const res = await UsermanagementApi.fetchUsers(data);
+        dispatch({
+          type: UsermanagementActionTypes.FETCH_CUSTOMER_ADMINS,
+          data: res.data
+        });
+        ApiActions.success(dispatch);
+      } catch (err) {
+        ApiActions.failure(dispatch);
+      }
+    };
+  },
   resetUsers: () => ({
     type: UsermanagementActionTypes.FETCH_USERS,
     data: { data: [] }
@@ -157,18 +172,13 @@ export default {
       }
     };
   },
-  activateDeactivateUser: (usr, customerId) => {
+  activateDeactivateUser: (usr, cb) => {
     return async dispatch => {
       ApiActions.request(dispatch);
       try {
-        await UsermanagementApi.activateDeactivateUser(usr);
-        const res = await UsermanagementApi.fetchUsers({ customerId });
-        dispatch({
-          type: UsermanagementActionTypes.FETCH_USERS,
-          data: res.data
-        });
-        !res.data.error && Toast.success("User Status Updated!");
+        const res = await UsermanagementApi.activateDeactivateUser(usr);
         ApiActions.success(dispatch);
+        !res.data.error && cb && cb();
       } catch (err) {
         ApiActions.failure(dispatch);
       }
@@ -201,8 +211,25 @@ export default {
           type: UsermanagementActionTypes.ASSIGN_LICENSE,
           data: res.data
         });
-        !res.data.error && callback();
         ApiActions.success(dispatch);
+        !res.data.error && callback();
+      } catch (err) {
+        ApiActions.failure(dispatch);
+      }
+    };
+  },
+
+  removeLicense: (data, callback) => {
+    return async dispatch => {
+      ApiActions.request(dispatch);
+      try {
+        const res = await UsermanagementApi.revokeLicense(data);
+        dispatch({
+          type: UsermanagementActionTypes.REVOKE_LICENSE,
+          data: res.data
+        });
+        ApiActions.success(dispatch);
+        !res.data.error && callback();
       } catch (err) {
         ApiActions.failure(dispatch);
       }

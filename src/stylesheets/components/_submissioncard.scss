@@ -1,6 +1,6 @@
 .submissioncard {
   width: 230px;
-  height: 230px;
+  height: 250px;
   display: flex;
   flex-direction: column;
   border-radius: 8px;
@@ -55,7 +55,7 @@
       padding: 10px;
       margin-bottom: 10px;
       &-label {
-        width: 45%;
+        // width: 45%;
         @include text-bold-active;
         color: lighten($black, 50%);
       }

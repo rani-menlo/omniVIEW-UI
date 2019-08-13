@@ -46,6 +46,7 @@ const CHECKBOX = {
 const URI = {
   // Auth
   LOGIN: `${path}auth/login`,
+  LOGOUT: `${path}auth/logout`,
   OTP: `${path}auth/otpgeneration`,
   OTP_VERIFY: `${path}auth/otpverification`,
   FORGOT_PWD: `${path}auth/forgotPassword`,
@@ -67,6 +68,8 @@ const URI = {
 
   // Submission
   GET_APPLICATIONS: `${path}submission/getSubmissions`,
+  GET_SUBMISSION_CENTERS: `${path}submission/getSubmissionCenters`,
+  UPDATE_SUBMISSION_CENTER: `${path}submission/updateSubmissionCenter`,
 
   // Sequence
   GET_SEQUENCES: `${path}sequence/getSequences`,
@@ -83,6 +86,8 @@ const URI = {
   CREATE_UPDATE_PROFILE: `${path}user/updateProfile`,
   ACTIVATE_DEACTIVATE: `${path}user/activateOrDeactivateUser`,
   ASSIGN_LICENSE: `${path}user/assignLicense`,
+  REVOKE_LICENSE: `${path}user/revokeLicense`,
+  REQUEST_LICENSE: `${path}user/requestLicense`,
 
   // File
   GET_FILE_SIZE: `${path}file/getFileSize`,

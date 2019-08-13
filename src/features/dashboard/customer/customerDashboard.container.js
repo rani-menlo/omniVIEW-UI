@@ -43,7 +43,7 @@ class CustomerDashboard extends Component {
       showUsersModal: false,
       showAssignLicenceToUser: false,
       assigningLicence: null,
-      selectedUser: null
+      selectedUsers: null
     };
     this.searchCustomers = _.debounce(this.searchCustomers, DEBOUNCE_TIME);
   }
@@ -246,7 +246,7 @@ class CustomerDashboard extends Component {
 
   closeUsersModal = () => {
     this.setState({
-      selectedUser: null,
+      selectedUsers: null,
       showUsersModal: false,
       assigningLicence: null
     });
@@ -254,43 +254,50 @@ class CustomerDashboard extends Component {
 
   closeAssignLicenceToUserModal = () => {
     this.setState({
-      selectedUser: null,
+      selectedUsers: null,
       showAssignLicenceToUser: false
     });
   };
 
-  onUserSelect = user => {
+  onUserSelect = users => {
     this.setState({
       showAssignLicenceToUser: true,
       showUsersModal: false,
-      selectedUser: user
+      selectedUsers: users
     });
   };
 
   assignLicence = () => {
-    const { assigningLicence, selectedUser } = this.state;
-    const someLicence = assigningLicence.licences[0];
+    const { assigningLicence, selectedUsers } = this.state;
+    const licenses = _.map(selectedUsers, (user, idx) => {
+      const licence = assigningLicence.licences[idx];
+      return {
+        ...(_.includes(licence.slug, "view")
+          ? { omni_view_license: licence.id }
+          : { omni_file_license: licence.id }),
+        user_id: user.user_id
+      };
+    });
     this.props.dispatch(
       UsermanagementActions.assignLicense(
         {
-          ...(_.includes(someLicence.slug, "view")
-            ? { omni_view_license: someLicence.id }
-            : { omni_file_license: someLicence.id }),
-          user_id: selectedUser.user_id
+          licenses
         },
         () => {
-          Toast.success(
+          /* Toast.success(
             `License has been assigned to ${_.get(
-              selectedUser,
+              selectedUsers,
               "first_name",
               ""
-            )} ${_.get(selectedUser, "last_name", "")}`
-          );
+            )} ${_.get(selectedUsers, "last_name", "")}`
+          ); */
+          Toast.success("License has been assigned.");
           this.fetchCustomers();
         }
       )
     );
     this.setState({
+      selectedUsers: null,
       showAssignLicenceToUser: false
     });
   };
@@ -368,9 +375,6 @@ class CustomerDashboard extends Component {
                       opacity: _.get(customer, "is_active", false) ? 1 : 0.5
                     }}
                   >
-                    <Column width={getColumnWidth(TableColumnNames.CHECKBOX)}>
-                      <OmniCheckbox />
-                    </Column>
                     <Column
                       width={getColumnWidth(TableColumnNames.CUSTOMER_NAME)}
                       className="maindashboard__list__item-text-bold"
@@ -516,7 +520,7 @@ class CustomerDashboard extends Component {
                 : translate("text.customer.activate")
             }
             closeModal={this.closeActivateDeactivateModal}
-            deactivate={this.activateDeactivate}
+            submit={this.activateDeactivate}
           />
           {(showSubscriptionsInUse || showLicenceUnAssigned) && (
             <LicenceInUseUnAssigned
@@ -530,7 +534,7 @@ class CustomerDashboard extends Component {
           {showUsersModal && (
             <AssignLicenceWithUsers
               licence={this.state.assigningLicence}
-              selectedUser={this.state.selectedUser}
+              selectedUsers={this.state.selectedUsers}
               closeModal={this.closeUsersModal}
               onUserSelect={this.onUserSelect}
             />
@@ -538,7 +542,7 @@ class CustomerDashboard extends Component {
           <AssignLicence
             visible={this.state.showAssignLicenceToUser}
             licence={this.state.assigningLicence}
-            user={this.state.selectedUser}
+            users={this.state.selectedUsers}
             closeModal={this.closeAssignLicenceToUserModal}
             back={this.goBackToUsersModal}
             submit={this.assignLicence}
@@ -560,12 +564,6 @@ const TableColumnNames = {
 };
 
 const TableColumns = [
-  {
-    name: TableColumnNames.CHECKBOX,
-    checkbox: true,
-    sort: false,
-    width: "3%"
-  },
   {
     name: TableColumnNames.CUSTOMER_NAME,
     key: "company_name",
@@ -592,7 +590,7 @@ const TableColumns = [
     key: "max_space",
     checkbox: false,
     sort: true,
-    width: "10%"
+    width: "13%"
   },
   {
     name: TableColumnNames.COMPANY_ADMIN,
