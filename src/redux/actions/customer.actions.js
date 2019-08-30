@@ -85,10 +85,13 @@ export default {
       }
     };
   },
-  setSelectedCustomer: customer => {
-    return {
-      type: CustomerActionTypes.SET_SELECTED_CUSTOMER,
-      customer
+  setSelectedCustomer: (customer, cb) => {
+    return dispatch => {
+      dispatch({
+        type: CustomerActionTypes.SET_SELECTED_CUSTOMER,
+        customer
+      });
+      cb && cb();
     };
   },
   activateDeactivateCustomer: (customer, search) => {

@@ -1,8 +1,10 @@
 import { UsermanagementActionTypes } from "../actionTypes";
 import _ from "lodash";
+import moment from "moment";
 import ApiActions from "./api.actions";
 import { UsermanagementApi } from "../api";
 import { Toast } from "../../uikit/components";
+import { getCombinedLicences } from "../../utils";
 
 export default {
   getDepartments: () => {
@@ -34,33 +36,7 @@ export default {
       try {
         const res = await UsermanagementApi.fetchAvailableLicences(customerId);
         let licences = _.get(res, "data.licences", {});
-        const licencesByType = _.groupBy(licences, "licenceType");
-        let newLicences = [];
-        _.map(licencesByType, appLicences => {
-          const licencesByName = _.groupBy(appLicences, "name");
-          _.map(licencesByName, (licences, name) => {
-            const revokedLicences = _.filter(licences, "revoked_date");
-            if (licences.length !== revokedLicences.length) {
-              licences = _.difference(licences, revokedLicences);
-            }
-            const licencesByDate = _.groupBy(licences, "purchase_date");
-            _.map(licencesByDate, licences => {
-              licences[0].remaining = licences.length;
-              newLicences.push(licences[0]);
-            });
-            if (licences.length !== revokedLicences.length) {
-              const revokedLicencesByDate = _.groupBy(
-                revokedLicences,
-                "purchase_date"
-              );
-              _.map(revokedLicencesByDate, licences => {
-                licences[0].remaining = licences.length;
-                newLicences.push(licences[0]);
-              });
-            }
-          });
-        });
-        newLicences = _.sortBy(newLicences, ["duration", "licenceType"]);
+        const newLicences = getCombinedLicences(licences);
         dispatch({
           type: UsermanagementActionTypes.FETCH_LICENCES,
           data: newLicences
@@ -111,7 +87,7 @@ export default {
       }
     };
   },
-  fetchCustomerAdmins: data => {
+  fetchCustomerAdmins: (data, cb) => {
     return async dispatch => {
       ApiActions.request(dispatch);
       try {
@@ -121,6 +97,7 @@ export default {
           data: res.data
         });
         ApiActions.success(dispatch);
+        cb && cb();
       } catch (err) {
         ApiActions.failure(dispatch);
       }
@@ -177,6 +154,18 @@ export default {
       ApiActions.request(dispatch);
       try {
         const res = await UsermanagementApi.activateDeactivateUser(usr);
+        ApiActions.success(dispatch);
+        !res.data.error && cb && cb();
+      } catch (err) {
+        ApiActions.failure(dispatch);
+      }
+    };
+  },
+  updateSecondaryContacts: (data, cb) => {
+    return async dispatch => {
+      ApiActions.request(dispatch);
+      try {
+        const res = await UsermanagementApi.updateSecondaryContacts(data);
         ApiActions.success(dispatch);
         !res.data.error && cb && cb();
       } catch (err) {

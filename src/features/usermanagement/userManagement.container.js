@@ -55,7 +55,7 @@ class UserManagementContainer extends Component {
     super(props);
     this.selectedFilters = {};
     this.state = {
-      viewBy: "cards",
+      viewBy: "lists",
       searchText: "",
       showDeactivateModal: false,
       showUserCard: false,
@@ -68,6 +68,7 @@ class UserManagementContainer extends Component {
       showLicenceUnAssignedModalError: "",
       assigningLicence: null,
       deactivateAll: false,
+      markAllSecondary: false,
       showAssignLicenceToUser: false,
       TableColumns: [
         {
@@ -104,7 +105,7 @@ class UserManagementContainer extends Component {
           key: "email",
           checkbox: false,
           sort: true,
-          width: "25%"
+          width: "22%"
         },
         {
           name: TableColumnNames.STATUS,
@@ -114,11 +115,17 @@ class UserManagementContainer extends Component {
           width: "8%"
         },
         {
+          name: TableColumnNames.CONTACT,
+          key: "is_secondary_contact",
+          checkbox: false,
+          width: "8%"
+        },
+        {
           name: TableColumnNames.EXP_DATE,
           key: "expired_date",
           checkbox: false,
           // sort: true,
-          width: "15%"
+          width: "10%"
         }
       ]
     };
@@ -145,12 +152,17 @@ class UserManagementContainer extends Component {
     const TableColumns = [...this.state.TableColumns];
     TableColumns[0].checked = checked;
     const allRnotActive = _.every(checkedUsers, ["is_active", false]);
+    const allRnotSecondary = _.every(checkedUsers, [
+      "is_secondary_contact",
+      false
+    ]);
     this.setState({
       users,
       TableColumns,
       showGlobalButtons: checkedUsers.length !== 0,
       checkedUsers,
-      deactivateAll: !allRnotActive
+      deactivateAll: !allRnotActive,
+      markAllSecondary: allRnotSecondary
     });
   };
 
@@ -171,12 +183,17 @@ class UserManagementContainer extends Component {
     }
     TableColumns[0].checked = _.every(users, ["checked", true]);
     const allRnotActive = _.every(checkedUsers, ["is_active", false]);
+    const allRnotSecondary = _.every(checkedUsers, [
+      "is_secondary_contact",
+      false
+    ]);
     this.setState({
       users,
       TableColumns,
       showGlobalButtons,
       checkedUsers,
-      deactivateAll: !allRnotActive
+      deactivateAll: !allRnotActive,
+      markAllSecondary: allRnotSecondary
     });
   };
 
@@ -375,7 +392,8 @@ class UserManagementContainer extends Component {
   };
 
   openOnlyDeactivateModal = () => {
-    this.setState({ showDeactivateModal: true, selectedUser: null });
+    this.state.showGlobalButtons &&
+      this.setState({ showDeactivateModal: true, selectedUser: null });
   };
 
   openStatusModal = () => {
@@ -508,6 +526,36 @@ class UserManagementContainer extends Component {
     return _.get(col, "width");
   });
 
+  openSecondaryContact = () => {
+    this.state.showGlobalButtons &&
+      Modal.confirm({
+        className: "omnimodal",
+        title: translate("label.user.seccontact"),
+        content: this.state.markAllSecondary
+          ? translate("label.user.areyousuremarkseccontact")
+          : translate("label.user.areyousureunmarkseccontact"),
+        okText: translate("label.button.continue"),
+        cancelText: translate("label.button.cancel"),
+        onOk: () => {
+          this.updateSecondaryContact();
+        }
+      });
+  };
+
+  updateSecondaryContact = () => {
+    const users = _.map(this.state.checkedUsers, user => ({
+      userId: user.user_id,
+      is_secondary_contact: this.state.markAllSecondary ? 1 : 0
+    }));
+
+    this.props.dispatch(
+      UsermanagementActions.updateSecondaryContacts({ users }, () => {
+        Toast.success("Updated Sceondary Contact list!");
+        this.fetchUsers();
+      })
+    );
+  };
+
   render() {
     const {
       searchText,
@@ -613,33 +661,6 @@ class UserManagementContainer extends Component {
               onClick={this.openAdduser}
             />
           </div>
-          <div className="global__center-vert">
-            <OmniButton
-              type="add"
-              className="maindashboard-assignpermissions"
-              image={<img src="/images/key.svg" />}
-              label={translate("label.usermgmt.assignlicence")}
-              buttonStyle={{
-                marginRight: "4px",
-                visibility: this.state.showGlobalButtons ? "visible" : "hidden"
-              }}
-              onClick={this.showLicenceUnAssignedModal(this.state.checkedUsers)}
-            />
-            <OmniButton
-              type="add"
-              className="maindashboard-assignpermissions"
-              image={<img src="/images/deactivate.svg" />}
-              buttonStyle={{
-                visibility: this.state.showGlobalButtons ? "visible" : "hidden"
-              }}
-              label={
-                this.state.deactivateAll
-                  ? translate("label.usermgmt.deactivate")
-                  : translate("label.usermgmt.activate")
-              }
-              onClick={this.openOnlyDeactivateModal}
-            />
-          </div>
           {viewBy === "cards" && (
             <div>
               {_.map(users, (user, key) => {
@@ -681,6 +702,42 @@ class UserManagementContainer extends Component {
           )}
           {viewBy === "lists" && (
             <React.Fragment>
+              <div className="global__center-vert">
+                <OmniButton
+                  type="primary"
+                  disabled={!this.state.showGlobalButtons}
+                  label={translate("label.usermgmt.assignlicence")}
+                  buttonStyle={{
+                    marginRight: "8px"
+                  }}
+                  onClick={this.showLicenceUnAssignedModal(
+                    this.state.checkedUsers
+                  )}
+                />
+                <OmniButton
+                  type="primary"
+                  disabled={!this.state.showGlobalButtons}
+                  buttonStyle={{
+                    marginRight: "8px"
+                  }}
+                  label={
+                    this.state.deactivateAll
+                      ? translate("label.usermgmt.deactivate")
+                      : translate("label.usermgmt.activate")
+                  }
+                  onClick={this.openOnlyDeactivateModal}
+                />
+                <OmniButton
+                  type="primary"
+                  disabled={!this.state.showGlobalButtons}
+                  label={`${
+                    this.state.markAllSecondary
+                      ? translate("label.generic.tag")
+                      : translate("label.generic.untag")
+                  } ${translate("label.user.seccontact")}`}
+                  onClick={this.openSecondaryContact}
+                />
+              </div>
               <div className="maindashboard__list">
                 <TableHeader
                   columns={this.state.TableColumns}
@@ -690,7 +747,7 @@ class UserManagementContainer extends Component {
                   <Row
                     key={usr.id}
                     className="maindashboard__list__item"
-                    style={{ justifyContent: "normal" }}
+                    style={{ justifyContent: "normal", cursor: "default" }}
                   >
                     <Column
                       width={this.getColumnWidth(TableColumnNames.CHECKBOX)}
@@ -702,7 +759,8 @@ class UserManagementContainer extends Component {
                     </Column>
                     <Column
                       width={this.getColumnWidth(TableColumnNames.NAME)}
-                      className="maindashboard__list__item-text-bold"
+                      className="maindashboard__list__item-text-bold global__cursor-pointer"
+                      onClick={this.openUserCard(usr)}
                     >
                       {`${_.get(usr, "first_name", "")} ${_.get(
                         usr,
@@ -731,6 +789,7 @@ class UserManagementContainer extends Component {
                     <Column
                       width={this.getColumnWidth(TableColumnNames.STATUS)}
                       className="maindashboard__list__item-text"
+                      style={{paddingLeft: '5px'}}
                     >
                       {_.get(usr, "is_active", false) ? (
                         <span className="maindashboard__list__item-text-active">
@@ -741,6 +800,14 @@ class UserManagementContainer extends Component {
                           {translate("label.user.inactive")}
                         </span>
                       )}
+                    </Column>
+                    <Column
+                      width={this.getColumnWidth(TableColumnNames.CONTACT)}
+                      className="maindashboard__list__item-text"
+                    >
+                      {_.get(usr, "is_secondary_contact")
+                        ? translate("label.generic.yes")
+                        : translate("label.generic.no")}
                     </Column>
                     <Column
                       width={this.getColumnWidth(TableColumnNames.EXP_DATE)}
@@ -856,6 +923,7 @@ const TableColumnNames = {
   USER_ROLE: translate("label.user.userrole"),
   DEPARTMENT: translate("label.user.department"),
   EMAIl: translate("label.user.email"),
+  CONTACT: translate("label.user.seccontact"),
   STATUS: translate("label.user.status"),
   EXP_DATE: translate("label.user.expdate")
 };

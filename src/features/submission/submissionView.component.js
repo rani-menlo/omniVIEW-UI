@@ -42,6 +42,7 @@ import {
   isAdmin
 } from "../../utils";
 import usermanagementActions from "../../redux/actions/usermanagement.actions";
+import FindNode from "./findNode.component";
 
 const TabPane = Tabs.TabPane;
 
@@ -59,6 +60,7 @@ class SubmissionView extends Component {
       nodeProperties: null,
       treePanelWidth: 50,
       openValidationModal: false,
+      openFindModal: false,
       parentHeaderHeight: 0,
       showUsersSection: false,
       selectedUser: null,
@@ -842,6 +844,18 @@ class SubmissionView extends Component {
     return formFile;
   };
 
+  onFullyExpand = () => {
+    this.toggle();
+  };
+
+  openFindModal = () => {
+    this.setState({ openFindModal: true });
+  };
+
+  closeFindModal = () => {
+    this.setState({ openFindModal: false });
+  };
+
   render() {
     const {
       loading,
@@ -956,7 +970,7 @@ class SubmissionView extends Component {
                   {this.state.treeExpand ? "Collapse All" : "Expand All"}
                 </span>
               </FlexBox>
-              <FlexBox style={{ opacity: 0.2, cursor: "not-allowed" }}>
+              <FlexBox onClick={this.openFindModal}>
                 <Icon type="search" className="global__icon" />
                 <span className="icon-label">Find</span>
               </FlexBox>
@@ -964,18 +978,18 @@ class SubmissionView extends Component {
                 className={`submissionview__header__validate icon_text_border ${selectedSequence &&
                   "global__cursor-pointer"}`}
                 style={{
-                  ...(!(
+                  /* ...(!(
                     isLoggedInOmniciaAdmin(role) || this.props["omniview-pro"]
                   ) && {
                     opacity: 0.2,
                     cursor: "not-allowed"
-                  }),
+                  }), */
                   ...(!selectedSequence && { border: 0 })
                 }}
                 onClick={
                   selectedSequence &&
-                  (isLoggedInOmniciaAdmin(role) ||
-                    this.props["omniview-pro"]) &&
+                  /* (isLoggedInOmniciaAdmin(role) ||
+                    this.props["omniview-pro"]) && */
                   this.validate
                 }
               >
@@ -1161,7 +1175,7 @@ class SubmissionView extends Component {
                     <Row>
                       <OmniButton
                         type="secondary"
-                        label={translate("label.button.cancel")}
+                        label={translate("label.button.close")}
                         buttonStyle={{ marginRight: "8px" }}
                         onClick={this.hidePermissions}
                       />
@@ -1255,6 +1269,7 @@ class SubmissionView extends Component {
                   label={this.getTreeLabel()}
                   content={this.getContent()}
                   expand={this.state.treeExpand}
+                  fullyExpanded={this.onFullyExpand}
                   onNodeSelected={this.onNodeSelected}
                   selectedNodeId={this.state.selectedNodeId}
                   mode={selectedMode}
@@ -1305,6 +1320,17 @@ class SubmissionView extends Component {
               sequence={selectedSequence}
               label={_.get(selectedSubmission, "name", "")}
               onClose={this.closeValidationModal}
+              onItemSelected={this.onValidationResultItemClick}
+            />
+          </DraggableModal>
+          <DraggableModal
+            minWidth="35%"
+            minHeight="30%"
+            visible={this.state.openFindModal}
+            draggableAreaClass=".validationResults__header"
+          >
+            <FindNode
+              onClose={this.closeFindModal}
               onItemSelected={this.onValidationResultItemClick}
             />
           </DraggableModal>

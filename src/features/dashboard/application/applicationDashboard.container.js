@@ -689,14 +689,14 @@ class ApplicationDashboard extends Component {
             <React.Fragment>
               {(isLoggedInOmniciaAdmin(this.props.role) ||
                 isLoggedInCustomerAdmin(this.props.role)) && (
-                <div className="global__center-vert" style={{ height: "40px" }}>
+                <div
+                  className="global__center-vert"
+                  style={{ height: "40px", marginTop: "12px" }}
+                >
                   <OmniButton
-                    type="add"
-                    image={<img src="/images/assign.svg" />}
+                    type="primary"
+                    disabled={!assignPermissions}
                     label={translate("label.dashboard.assignpermissions")}
-                    className={`maindashboard-assignpermissions maindashboard-assignpermissions_${
-                      assignPermissions ? "visible" : "hidden"
-                    }`}
                     onClick={this.openPermissionsModal}
                   />
                 </div>

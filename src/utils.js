@@ -53,6 +53,42 @@ const getFormattedDate = date => {
   return moment(date).format(DATE_FORMAT);
 };
 
+const getCombinedLicences = licences => {
+  let combinedLicences = [];
+  const licencesByName = _.groupBy(licences, "name");
+  _.map(licencesByName, (licences, name) => {
+    const licencesByPurchasedDate = _.groupBy(licences, "purchase_date");
+    _.map(licencesByPurchasedDate, (licencesByDate, purchaseDate) => {
+      const licencesByType = _.groupBy(licencesByDate, "licenceType");
+      _.map(licencesByType, (typedLicences, licenceType) => {
+        const licencesByExpiredDate = _.groupBy(typedLicences, "expired_date");
+        _.map(licencesByExpiredDate, (licenceList, expiryDate) => {
+          const diff = moment(expiryDate).diff(new Date(), "days");
+          const licencesWithRevokedDate = _.groupBy(
+            licenceList,
+            "revoked_date"
+          );
+          _.map(licencesWithRevokedDate, (licenceList, revokedDate) => {
+            combinedLicences.push({
+              id: licenceList[0].id,
+              name,
+              licenceType,
+              purchaseDate,
+              revokedDate,
+              duration: licenceList[0].duration,
+              expiryDate,
+              ...(diff <= 30 && { expireInDays: diff }),
+              licences: licenceList
+            });
+          });
+        });
+      });
+    });
+  });
+  combinedLicences = _.sortBy(combinedLicences, ["duration", "licenceType"]);
+  return combinedLicences;
+};
+
 export {
   isLoggedInOmniciaRole,
   isAdmin,
@@ -64,5 +100,6 @@ export {
   isPhone,
   getRoleName,
   getRoleNameByRoleId,
-  getFormattedDate
+  getFormattedDate,
+  getCombinedLicences
 };

@@ -82,10 +82,20 @@ class ValidationResults extends Component {
     onItemSelected && onItemSelected(item);
   };
 
-  getValidationGroupIcon = group => {
+  getValidationGroupIcon = validation => {
+    const { group, isFile } = validation;
     let img = (
       <Icon type="folder" theme="filled" className="global__file-folder" />
     );
+    if (group === "M1" && isFile) {
+      return (
+        <img
+          src="/images/file-new.svg"
+          className="global__file-folder"
+          style={{ width: "18px", height: "22px" }}
+        />
+      );
+    }
     switch (group) {
       case "File Checks":
       case "PDF":
@@ -196,7 +206,7 @@ class ValidationResults extends Component {
                             style={{ display: "flex", alignItems: "center" }}
                           >
                             <span>
-                              {this.getValidationGroupIcon(validation.group)}
+                              {this.getValidationGroupIcon(validation)}
                             </span>
                             <span
                               style={{
@@ -204,7 +214,7 @@ class ValidationResults extends Component {
                               }}
                             >
                               {_.size(validation.title) > 0
-                                ? validation.title
+                                ? _.replace(validation.title, " [ ]", "")
                                 : ""}
                             </span>
                           </div>

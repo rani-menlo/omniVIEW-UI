@@ -8,7 +8,9 @@ const SearchBox = ({
   clearSearch,
   onChange,
   className,
-  style
+  style,
+  suffixIcon,
+  onPressEnter
 }) => {
   return (
     <Input
@@ -18,19 +20,24 @@ const SearchBox = ({
       prefix={<img src="/images/search.svg" style={{ marginLeft: "5px" }} />}
       suffix={
         searchText ? (
-          <img
-            src="/images/close.svg"
-            style={{
-              width: "20px",
-              height: "20px",
-              cursor: "pointer"
-            }}
-            onClick={clearSearch}
-          />
+          suffixIcon ? (
+            suffixIcon
+          ) : (
+            <img
+              src="/images/close.svg"
+              style={{
+                width: "20px",
+                height: "20px",
+                cursor: "pointer"
+              }}
+              onClick={clearSearch}
+            />
+          )
         ) : (
           ""
         )
       }
+      onPressEnter={onPressEnter}
       placeholder={placeholder}
       onChange={onChange}
     />

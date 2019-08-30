@@ -4,11 +4,16 @@ import { Redirect } from "react-router-dom";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import LoginComponent from "./login.component";
+import { translate } from "../../translations/translator";
 
 class LoginContainer extends Component {
   static propTypes = {
     login: PropTypes.object
   };
+
+  componentDidMount() {
+    window.document.title = translate("label.product.omnicia");
+  }
 
   render() {
     const {
