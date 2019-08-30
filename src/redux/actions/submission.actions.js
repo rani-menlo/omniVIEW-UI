@@ -336,5 +336,25 @@ export default {
         ApiActions.failure(dispatch);
       }
     };
+  },
+  findText: data => {
+    return async dispatch => {
+      ApiActions.request(dispatch);
+      try {
+        const res = await SubmissionApi.findText(data);
+        dispatch({
+          type: SubmissionActionTypes.FIND_TEXT,
+          data: res.data
+        });
+        ApiActions.success(dispatch);
+      } catch (err) {
+        ApiActions.failure(dispatch);
+      }
+    };
+  },
+  clearSearchResults: () => {
+    return {
+      type: SubmissionActionTypes.CLEAR_SEARCH_RESULTS
+    };
   }
 };

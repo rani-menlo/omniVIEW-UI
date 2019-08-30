@@ -6,19 +6,6 @@ const ListViewGridView = ({ viewBy, changeView }) => {
   return (
     <div className="listViewGridView">
       <div
-        className={`listViewGridView__icon listViewGridView__cards ${viewBy ===
-          "cards" && "listViewGridView__selected"}`}
-        onClick={onViewChange("cards", changeView)}
-        title="Cards"
-      >
-        <Icon
-          type="appstore"
-          theme="filled"
-          className={`listViewGridView__cards-icon ${viewBy === "cards" &&
-            "listViewGridView__cards-icon-colored"}`}
-        />
-      </div>
-      <div
         className={`listViewGridView__icon listViewGridView__lists ${viewBy ===
           "lists" && "listViewGridView__selected"}`}
         onClick={onViewChange("lists", changeView)}
@@ -30,6 +17,19 @@ const ListViewGridView = ({ viewBy, changeView }) => {
               ? "/images/list-view-active.svg"
               : "/images/list-view.svg"
           }
+        />
+      </div>
+      <div
+        className={`listViewGridView__icon listViewGridView__cards ${viewBy ===
+          "cards" && "listViewGridView__selected"}`}
+        onClick={onViewChange("cards", changeView)}
+        title="Cards"
+      >
+        <Icon
+          type="appstore"
+          theme="filled"
+          className={`listViewGridView__cards-icon ${viewBy === "cards" &&
+            "listViewGridView__cards-icon-colored"}`}
         />
       </div>
     </div>

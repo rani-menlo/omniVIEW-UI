@@ -31,5 +31,8 @@ export default {
   },
   assignGlobalPermissions: data => {
     return api.post(URI.ASSIGN_GLOBAL_PERMISSIONS, data);
+  },
+  findText: data => {
+    return api.post(URI.FIND_TEXT, data);
   }
 };

@@ -110,7 +110,7 @@ class AddNewLicence extends Component {
           opacity={0.5}
           text={`${translate("text.licence.selectlicenceparams")}`}
         />
-        <div style={{ marginTop: "20px" }}>
+        <div className="licence-modal__rows" style={{ marginTop: "20px" }}>
           {_.map(this.state.rows, row => (
             <NewLicenceRow
               ref={row.ref}

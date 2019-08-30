@@ -85,6 +85,7 @@ const URI = {
   UPDATE_USER: `${path}user/updateUsers`,
   CREATE_UPDATE_PROFILE: `${path}user/updateProfile`,
   ACTIVATE_DEACTIVATE: `${path}user/activateOrDeactivateUser`,
+  UPDATE_SECONDARY_CONTACTS: `${path}user/updateSecondaryContacts`,
   ASSIGN_LICENSE: `${path}user/assignLicense`,
   REVOKE_LICENSE: `${path}user/revokeLicense`,
   REQUEST_LICENSE: `${path}user/requestLicense`,
@@ -95,6 +96,7 @@ const URI = {
   GET_JSON_WITH_PERMISSION: `${path}file/getSequenceJsonFile`,
   GET_NEW_PATH: `${path}file/getNewPath`,
   GET_RESOURCE_FILE: `${path}file/getResourceFile`,
+  FIND_TEXT: `${path}file/findText`,
 
   // access
   ASSIGN_FILE_PERMISSIONS: `${path}access/assignFilePermissions`,

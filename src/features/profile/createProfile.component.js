@@ -15,7 +15,7 @@ import Header from "../header/header.component";
 import { translate } from "../../translations/translator";
 import { isEmail, isPhone, isValidPwd } from "../../utils";
 import { LoginActions } from "../../redux/actions";
-import { Upload, Avatar } from "antd";
+import { Upload, Avatar, Checkbox } from "antd";
 import { IMAGE_SUPPORT_TYPES } from "../../constants";
 
 class CreateProfile extends Component {
@@ -480,6 +480,19 @@ class CreateProfile extends Component {
                 onChange={this.onPhoneChange}
               />
             </div>
+            <Checkbox
+              key={0}
+              style={{ marginBottom: "24px" }}
+              checked={this.props.user.is_secondary_contact}
+              disabled
+            >
+              <p
+                className="addUser__section-label"
+                style={{ display: "inline" }}
+              >
+                {translate("label.user.seccontact")}
+              </p>
+            </Checkbox>
             <Text
               textStyle={{ marginBottom: "12px" }}
               type="regular"

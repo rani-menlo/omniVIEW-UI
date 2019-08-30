@@ -29,12 +29,12 @@
   }
   &__table {
     height: calc(100% - 65px);
-    table {
-      width: 100%;
-    }
     border: 1px solid $shadowed-steel;
     border-radius: 4px;
     margin-top: 10px;
+    table {
+      width: 100%;
+    }
     &__header {
       width: 100%;
     }
@@ -44,6 +44,31 @@
       > table > tbody {
         overflow: auto;
         width: 100%;
+      }
+      &__find {
+        height: 30px;
+        display: flex;
+        align-items: center;
+        background-color: $froasted-glass;
+        border-bottom: solid 1px $ash-blue;
+        &__header {
+          width: 50%;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          border-right: solid 1px $ash-blue;
+          padding: 2px 8px;
+        }
+        &__results {
+          height: calc(100% - 30px);
+          overflow: auto;
+        }
+        &__result {
+          height: 35px;
+          &:nth-child(even) {
+            background-color: $froasted-glass;
+          }
+        }
       }
     }
     .col {
@@ -109,6 +134,11 @@
       display: flex;
       justify-content: center;
       align-items: center;
+    }
+  }
+  &-find {
+    > .ant-input-suffix {
+      right: 0px !important;
     }
   }
 }

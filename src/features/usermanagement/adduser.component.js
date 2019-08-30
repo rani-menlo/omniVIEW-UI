@@ -15,7 +15,13 @@ import {
 import { Radio, Icon, Switch, Checkbox } from "antd";
 import Header from "../header/header.component";
 import { UsermanagementActions } from "../../redux/actions";
-import { isEmail, isPhone, getFormattedDate } from "../../utils";
+import {
+  isEmail,
+  isPhone,
+  getFormattedDate,
+  isLoggedInOmniciaAdmin,
+  isLoggedInCustomerAdmin
+} from "../../utils";
 import { translate } from "../../translations/translator";
 import { ROLES } from "../../constants";
 
@@ -56,6 +62,7 @@ class AddUser extends Component {
       selectedLicenceError: "",
       showDeactivateModal: false,
       statusActive: true,
+      secondaryContact: false,
       licences: []
     };
   }
@@ -105,6 +112,7 @@ class AddUser extends Component {
     state.selectedRole = selectedUser.role_id;
     state.selectedDept = selectedUser.department_id;
     state.statusActive = selectedUser.is_active;
+    state.secondaryContact = selectedUser.is_secondary_contact;
     return state;
   };
 
@@ -206,6 +214,7 @@ class AddUser extends Component {
       phonenumber: state.phone.value,
       roleid: state.selectedRole,
       department_id: state.selectedDept,
+      is_secondary_contact: +state.secondaryContact,
       customer_id: this.props.selectedCustomer.id
     };
 
@@ -217,13 +226,13 @@ class AddUser extends Component {
       );
     } else {
       _.map(state.selectedLicences, licence => {
-        if (_.includes(licence.slug, "omniview")) {
+        if (_.includes(_.get(licence, 'licences[0].slug'), "omniview")) {
           reqObject["subscriptions"] = {
             ...reqObject["subscriptions"],
             "omni-view": licence.id
           };
         }
-        if (_.includes(licence.slug, "omnifile")) {
+        if (_.includes(_.get(licence, 'licences[0].slug'), "omnifile")) {
           reqObject["subscriptions"] = {
             ...reqObject["subscriptions"],
             "omni-file": licence.id
@@ -288,6 +297,10 @@ class AddUser extends Component {
     }
   };
 
+  onSecondaryContactChecked = e => {
+    this.setState({ secondaryContact: e.target.checked });
+  };
+
   render() {
     const { departments, loading, selectedUser, selectedCustomer } = this.props;
     const {
@@ -301,7 +314,8 @@ class AddUser extends Component {
       statusActive,
       editUser,
       selectedLicences,
-      selectedLicenceError
+      selectedLicenceError,
+      secondaryContact
     } = this.state;
     return (
       <React.Fragment>
@@ -387,6 +401,22 @@ class AddUser extends Component {
               onChange={this.onPhoneChange}
             />
           </Row>
+          {(isLoggedInOmniciaAdmin(this.props.role) ||
+            isLoggedInCustomerAdmin(this.props.role)) && (
+            <Checkbox
+              key={0}
+              style={{ marginTop: "24px" }}
+              checked={secondaryContact}
+              onChange={this.onSecondaryContactChecked}
+            >
+              <p
+                className="addUser__section-label"
+                style={{ display: "inline" }}
+              >
+                {translate("label.user.seccontact")}
+              </p>
+            </Checkbox>
+          )}
           <div className="addUser__section">
             <p className="addUser__section-label">
               {translate("text.user.selectrolemsg")}
@@ -484,8 +514,7 @@ class AddUser extends Component {
                       {_.map(licences, licence => (
                         <div
                           className="addUser__licences__box__scroll-item"
-                          key={licence.id}
-                          value={licence.id}
+                          key={_.get(licence, "licences[0].id")}
                         >
                           <div style={{ width: "90%" }}>
                             <div className="global__center-vert">
@@ -500,7 +529,7 @@ class AddUser extends Component {
                                 opacity={0.75}
                                 text={`${translate(
                                   "label.user.available"
-                                )}  ${licence.remaining || 0}`}
+                                )}  ${_.get(licence, "licences.length", 0)}`}
                               />
                             </div>
                             <div className="global__center-vert">
@@ -516,7 +545,7 @@ class AddUser extends Component {
                                 size="12px"
                                 opacity={0.75}
                                 text={` - Purchased on ${getFormattedDate(
-                                  _.get(licence, "purchase_date")
+                                  _.get(licence, "purchaseDate")
                                 )}`}
                               />
                             </div>
@@ -538,17 +567,23 @@ class AddUser extends Component {
                     </div>
 
                     {_.map(selectedLicences, licence => {
-                      if (licence.revoked_date) {
+                      if (
+                        licence.revokedDate &&
+                        licence.revokedDate !== "null"
+                      ) {
                         return (
                           <Text
-                            key={licence.id}
+                            key={_.get(licence, "licences[0].id")}
                             className="addUser__licences__box-warning"
                             size="12px"
                             textStyle={{ padding: "5px" }}
                             text={translate("error.user.licenceassigned", {
                               product: licence.licenceType,
-                              remain: licence.validDays,
-                              expire: licence.unassignValidity
+                              remain: _.get(licence, "licences[0].validDays"),
+                              expire: _.get(
+                                licence,
+                                "licences[0].unassignValidity"
+                              )
                             })}
                           />
                         );

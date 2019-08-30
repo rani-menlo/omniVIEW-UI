@@ -19,7 +19,17 @@ import {
   ImageLoader
 } from "../../uikit/components";
 import Header from "../header/header.component";
-import { Checkbox, Switch, Tabs, Icon, Popover, Dropdown, Menu } from "antd";
+import {
+  Checkbox,
+  Switch,
+  Tabs,
+  Icon,
+  Popover,
+  Dropdown,
+  Menu,
+  Table,
+  Modal
+} from "antd";
 import { UsermanagementActions, CustomerActions } from "../../redux/actions";
 import {
   isPhone,
@@ -96,6 +106,70 @@ class AddCustomer extends Component {
       assigningLicence: null,
       selectedUser: null
     };
+    this.Columns = [
+      {
+        title: translate("label.dashboard.user"),
+        dataIndex: "name",
+        key: "name",
+        render: (text, user) => (
+          <div className="global__center-vert">
+            <ImageLoader
+              type="circle"
+              path={_.get(user, "profile", null)}
+              width="35px"
+              height="35px"
+              style={{ marginRight: "10px" }}
+            />
+            <Text
+              type="regular"
+              size="14px"
+              text={`${_.get(user, "first_name", "")} ${_.get(
+                user,
+                "last_name",
+                ""
+              )}`}
+            />
+          </div>
+        ),
+        width: 200
+      },
+      {
+        title: translate("label.user.status"),
+        dataIndex: "status",
+        key: "status",
+        render: (text, user) => (
+          <Text
+            type="regular"
+            size="14px"
+            opacity={0.75}
+            className={`global__text-${
+              _.get(user, "license_status", 0) ? "green" : "red"
+            }`}
+            text={
+              _.get(user, "license_status", 0)
+                ? translate("label.user.active")
+                : translate("label.user.inactive")
+            }
+          />
+        ),
+        width: 100
+      },
+      {
+        title: translate("label.generic.actions"),
+        dataIndex: "",
+        key: "actions",
+        render: (text, user) => (
+          <Text
+            type="medium"
+            size="12px"
+            text="Remove"
+            className="global__cursor-pointer global__color-blue"
+            onClick={this.removeSecContact(user)}
+          />
+        ),
+        width: 100
+      }
+    ];
   }
 
   static getDerivedStateFromProps(props, state) {
@@ -155,12 +229,8 @@ class AddCustomer extends Component {
       if (selectedCustomer) {
         const state = this.populateState();
         newState = { ...state, ...newState };
-        this.props.dispatch(
-          UsermanagementActions.fetchCustomerAdmins({
-            customerId: selectedCustomer.id,
-            roles: [ROLE_IDS.CUSTOMER.administrator]
-          })
-        );
+        this.fetchCustomerAdmins();
+        this.fetchUsers();
       }
       if (history.location.pathname.endsWith("subscriptions")) {
         newState.selectedTab = "subscriptionLicences";
@@ -168,6 +238,27 @@ class AddCustomer extends Component {
       this.setState(newState);
     }
   }
+
+  fetchCustomerAdmins = (customer = this.props.selectedCustomer, cb) => {
+    this.props.dispatch(
+      UsermanagementActions.fetchCustomerAdmins(
+        {
+          customerId: customer.id,
+          roles: [ROLE_IDS.CUSTOMER.administrator]
+        },
+        cb
+      )
+    );
+  };
+
+  fetchUsers = () => {
+    this.props.dispatch(
+      UsermanagementActions.fetchUsers({
+        customerId: this.props.selectedCustomer.id,
+        roles: _.values(ROLE_IDS.CUSTOMER)
+      })
+    );
+  };
 
   populateState = (selectedCustomer = this.props.selectedCustomer) => {
     const state = { ...this.state };
@@ -486,26 +577,32 @@ class AddCustomer extends Component {
   };
 
   onCustomerSelected = customer => {
-    this.props.dispatch(CustomerActions.setSelectedCustomer(customer));
     this.props.dispatch(UsermanagementActions.resetAllLicences());
-    const newState = this.populateState(customer);
-    this.setState(
-      {
-        ...newState,
-        ...AddCustomer.getPrimaryContactDetailsState(
-          this.props,
-          this.state,
-          customer.primary_user_id
-        ),
-        allLicences: null
-      },
-      () => {
-        if (this.state.selectedTab === "subscriptionLicences") {
-          this.props.dispatch(
-            UsermanagementActions.getAllLicences(customer.id)
+    this.props.dispatch(
+      CustomerActions.setSelectedCustomer(customer, () => {
+        this.fetchCustomerAdmins(customer, () => {
+          const newState = this.populateState(customer);
+          const primaryContact = AddCustomer.getPrimaryContactDetailsState(
+            this.props,
+            this.state,
+            customer.primary_user_id
           );
-        }
-      }
+          this.setState(
+            {
+              ...newState,
+              ...primaryContact,
+              allLicences: null
+            },
+            () => {
+              if (this.state.selectedTab === "subscriptionLicences") {
+                this.props.dispatch(
+                  UsermanagementActions.getAllLicences(customer.id)
+                );
+              }
+            }
+          );
+        });
+      })
     );
   };
 
@@ -593,6 +690,34 @@ class AddCustomer extends Component {
     });
   };
 
+  removeSecContact = user => () => {
+    Modal.confirm({
+      className: "omnimodal",
+      title: translate("label.user.seccontact"),
+      content: translate("label.user.areyousureremoveseccontact"),
+      okText: translate("label.generic.remove"),
+      cancelText: translate("label.button.cancel"),
+      onOk: () => {
+        this.props.dispatch(
+          UsermanagementActions.updateSecondaryContacts(
+            {
+              users: [
+                {
+                  userId: user.user_id,
+                  is_secondary_contact: 0
+                }
+              ]
+            },
+            () => {
+              Toast.success("Updated Sceondary Contacts list!");
+              this.fetchUsers();
+            }
+          )
+        );
+      }
+    });
+  };
+
   getDropdownMenu = () => {
     return (
       <Menu
@@ -633,7 +758,8 @@ class AddCustomer extends Component {
       selectedPrimaryContact,
       disablePrimaryContactFields
     } = this.state;
-    const { loading, selectedCustomer } = this.props;
+    const { loading, selectedCustomer, users } = this.props;
+    const secContacts = _.filter(users, ["is_secondary_contact", true]);
     return (
       <React.Fragment>
         <Loader loading={loading} />
@@ -810,6 +936,29 @@ class AddCustomer extends Component {
                   onChange={this.onPhoneChange}
                 />
               </Row>
+              {editCustomer && (
+                <React.Fragment>
+                  <p className="addUser-heading">
+                    {translate("label.user.details", {
+                      type: translate(
+                        "label.dashboard.companysecondarycontacts"
+                      )
+                    })}
+                  </p>
+                  <Table
+                    columns={this.Columns}
+                    dataSource={secContacts}
+                    pagination={false}
+                    style={{
+                      marginBottom: "40px",
+                      width: "60%",
+                      borderTop: "1px solid grey",
+                      borderBottom: "1px solid grey"
+                    }}
+                    scroll={{ y: 200 }}
+                  />
+                </React.Fragment>
+              )}
               <p className="addUser-heading">
                 {translate("text.customer.subsoptions")}
               </p>
@@ -1073,7 +1222,8 @@ function mapStateToProps(state) {
     allLicences: state.Usermanagement.allLicences,
     selectedCustomer: state.Customer.selectedCustomer,
     cAdmins: state.Usermanagement.cAdmins,
-    role: state.Login.role
+    role: state.Login.role,
+    users: state.Usermanagement.users
   };
 }
 

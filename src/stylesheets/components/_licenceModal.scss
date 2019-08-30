@@ -42,7 +42,13 @@
       border-top: 1px solid $shadowed-steel;
       border-bottom: 1px solid $shadowed-steel;
       padding: 10px;
-      margin: 20px 0px
+      margin: 20px 0px;
     }
+  }
+  &__rows {
+    margin-top: 20px;
+    max-height: 200px;
+    overflow: auto;
+    margin-bottom: 10px;
   }
 }

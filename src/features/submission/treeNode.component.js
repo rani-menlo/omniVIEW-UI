@@ -39,6 +39,7 @@ class TreeNode extends Component {
     mode: PropTypes.oneOf(["standard", "qc"]),
     view: PropTypes.oneOf(["current", "lifeCycle"]),
     defaultExpand: PropTypes.bool,
+    fullyExpanded: PropTypes.func,
     leafParent: PropTypes.oneOfType([
       PropTypes.object,
       PropTypes.arrayOf(PropTypes.object)
@@ -631,7 +632,10 @@ class TreeNode extends Component {
   };
 
   fullyExpand = () => {
-    this.setState({ fullyExpand: true, expand: true });
+    const hash = _.get(this.state, "properties.hash");
+    hash
+      ? this.props.fullyExpanded()
+      : this.setState({ fullyExpand: true, expand: true });
   };
 
   setCheckboxValue = checkboxValue => {

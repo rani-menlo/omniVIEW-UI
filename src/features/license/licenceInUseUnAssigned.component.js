@@ -12,7 +12,7 @@ import {
 } from "../../uikit/components";
 import { translate } from "../../translations/translator";
 import { CustomerActions } from "../../redux/actions";
-import { getFormattedDate } from "../../utils";
+import { getFormattedDate, getCombinedLicences } from "../../utils";
 import moment from "moment";
 
 class LicenceInUseUnAssigned extends Component {
@@ -75,33 +75,7 @@ class LicenceInUseUnAssigned extends Component {
   // grouping all licesnces by name, paurchased date, licence type
   // either standard or pro and by expired date.
   static combineLicences(licences) {
-    const combinedLicences = [];
-    const licencesByName = _.groupBy(licences, "name");
-    _.map(licencesByName, (licences, name) => {
-      const licencesByPurchasedDate = _.groupBy(licences, "purchase_date");
-      _.map(licencesByPurchasedDate, (licencesByDate, purchaseDate) => {
-        const licencesByType = _.groupBy(licencesByDate, "licenceType");
-        _.map(licencesByType, (typedLicences, licenceType) => {
-          const licencesByExpiredDate = _.groupBy(
-            typedLicences,
-            "expired_date"
-          );
-          _.map(licencesByExpiredDate, (licenceList, expiryDate) => {
-            const diff = moment(expiryDate).diff(new Date(), "days");
-            combinedLicences.push({
-              name,
-              licenceType,
-              purchaseDate,
-              duration: licenceList[0].duration,
-              expiryDate,
-              ...(diff <= 30 && { expireInDays: diff }),
-              licences: licenceList
-            });
-          });
-        });
-      });
-    });
-    return _.orderBy(combinedLicences, ["duration"]);
+    return getCombinedLicences(licences);
   }
 
   static getMenu = arrayItems => {
@@ -147,11 +121,11 @@ class LicenceInUseUnAssigned extends Component {
   };
 
   orderByExpireDate = () => {
-    const order = this.state.duration === "asc" ? "desc" : "asc";
+    const order = this.state.expireDate === "asc" ? "desc" : "asc";
     const orderedArray = _.orderBy(this.state.subscriptions, "expired_date", [
       order
     ]);
-    this.setState({ subscriptions: orderedArray, duration: order });
+    this.setState({ subscriptions: orderedArray, expireDate: order });
   };
 
   onMenuClick = item => () => {
@@ -277,14 +251,14 @@ class LicenceInUseUnAssigned extends Component {
               <IconText
                 containerStyle={{ marginLeft: "auto", marginRight: "20px" }}
                 text={translate("label.licence.duration")}
-                image="/images/sort-result.svg"
+                image={`/images/sort_${this.state.duration}.svg`}
                 imageStyle={{ width: "12px", height: "12px" }}
                 onClick={this.orderByDuration}
               />
               {type === "inuse" && (
                 <IconText
                   text={translate("label.licence.expirationdate")}
-                  image="/images/sort-result.svg"
+                  image={`/images/sort_${this.state.expireDate}.svg`}
                   imageStyle={{ width: "12px", height: "12px" }}
                   onClick={this.orderByExpireDate}
                 />
@@ -348,9 +322,7 @@ class LicenceInUseUnAssigned extends Component {
                         <Text
                           type="bold"
                           size="14px"
-                          text={`${licence.licenceType} ${licence.name} (x${
-                            licence.licences.length
-                          })`}
+                          text={`${licence.licenceType} ${licence.name} (x${licence.licences.length})`}
                         />
                         <Text
                           type="regular"
@@ -378,6 +350,15 @@ class LicenceInUseUnAssigned extends Component {
                           }`}
                           className="licence-modal__content__row-textred"
                         />
+                        {!_.isEqual(licence.revokedDate, "null") && (
+                          <Text
+                            type="regular"
+                            opacity={0.75}
+                            size="12px"
+                            className="global__text-red"
+                            text="Partial/Revoked License"
+                          />
+                        )}
                       </div>
                       <OmniButton
                         type="secondary"

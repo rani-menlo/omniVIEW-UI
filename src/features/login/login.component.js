@@ -30,8 +30,27 @@ class Login extends Component {
     form: PropTypes.object
   };
 
+  componentDidMount() {
+    window.addEventListener("load", this.setDocumentTitle);
+    window.addEventListener("beforeunload", this.resetErrors);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("load", this.setDocumentTitle);
+    window.removeEventListener("beforeunload", this.resetErrors);
+  }
+
+  setDocumentTitle = () => {
+    window.document.title = translate("label.product.omnicia");
+  };
+
+  resetErrors = () => {
+    this.props.actions.resetLoginError();
+  };
+
   handleSubmit = e => {
     e.preventDefault();
+    // this.props.actions.resetLoginError();
     let { username, password } = this.state;
     if (!username.value) {
       this.setState({
@@ -97,12 +116,13 @@ class Login extends Component {
             <p className="login-text">{translate("text.login.title")}</p>
             <div className="login__hr-line global__hr-line" />
             {error && <p className="login-error">{error}</p>}
-            <Form onSubmit={this.handleSubmit}>
+            <Form onSubmit={this.handleSubmit} autoComplete="new-password">
               <p className="global__field-label">
                 {translate("label.form.username")}
               </p>
               <FormItem>
                 <Input
+                  autoComplete="off"
                   placeholder={translate("label.form.username")}
                   onChange={this.onUsernameChange}
                   value={username.value}

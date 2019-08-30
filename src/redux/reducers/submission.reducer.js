@@ -6,7 +6,8 @@ const initialState = {
   selectedSequence: null,
   sequenceJson: {},
   lifeCycleJson: {},
-  validations: {}
+  validations: {},
+  searchResults: []
 };
 
 export default (state = initialState, action) => {
@@ -47,6 +48,18 @@ export default (state = initialState, action) => {
           ...state.validations,
           [action.id]: action.data.data
         }
+      };
+    }
+    case SubmissionActionTypes.FIND_TEXT: {
+      return {
+        ...state,
+        searchResults: action.data.data
+      };
+    }
+    case SubmissionActionTypes.CLEAR_SEARCH_RESULTS: {
+      return {
+        ...state,
+        searchResults: []
       };
     }
     default:

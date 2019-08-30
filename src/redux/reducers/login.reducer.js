@@ -111,7 +111,8 @@ export default (state = initialState, action) => {
         ...state,
         login: {
           ...state.login,
-          error: ""
+          error: "",
+          logoutMsg: ""
         }
       };
     }

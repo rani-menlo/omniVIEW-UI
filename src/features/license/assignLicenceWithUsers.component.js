@@ -119,7 +119,6 @@ class AssignLicenceWithUsers extends Component {
         {(_.get(users, "length") || "") && (
           <div className="licence-modal__content" style={{ marginTop: "15px" }}>
             {_.map(users, user => {
-              console.log(user.user_id, this.state.selected.has(user.user_id));
               return (
                 <div
                   key={user.user_id}
