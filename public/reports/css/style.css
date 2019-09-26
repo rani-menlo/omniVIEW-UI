@@ -1,0 +1,202 @@
+body{
+    font-family: 'Heebo', sans-serif !important;
+}
+.omnheader h1 {
+    font-size: 21px;
+    font-weight: 500;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: normal;
+    letter-spacing: normal;
+    color: #ffffff;
+    margin: 0;
+}
+
+.omnheader {
+    background-color: #0a6fc2;
+    padding: 10px;
+    /* height: 80px; */
+}
+
+
+.omnheader img {
+    width: 271px;
+    height: 64px;
+    float: right;
+}
+.padi{
+    padding: 0px;
+}
+.bord {
+    border: solid 1px rgba(74, 74, 74, 0.25);
+    margin: 0px;
+    border-radius: 4px;
+    padding: 5px;
+}
+.inbor {
+    border-radius: 4px;
+    border: solid 1px rgba(74, 74, 74, 0.25);
+    padding: 15px;
+}
+span.lcounts {
+    float: right;
+}
+
+span.alrtimg img {
+    width: 20px;
+    margin-right: 6%;
+}
+
+.inbor p {
+    font-size: 16px;
+    font-weight: 500;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: 1;
+    letter-spacing: normal;
+    color: #000000;
+    opacity: 0.75;
+}
+.mar {
+    margin-top: 15px;
+}
+.inbor h1 {
+    opacity: 0.75;
+    font-size: 16px;
+    font-weight: 600;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: normal;
+    letter-spacing: normal;
+    color: #000000;
+}
+.omnsqu p {
+    font-size: 16px;
+    font-weight: 500;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: 1;
+    letter-spacing: normal;
+    color: #000000;
+    opacity: 0.75;
+}
+
+.omnsqu {
+    padding: 15px;
+    margin-left: 8%;
+}
+
+span.omn-left {width: 300px;display: inline-block;}
+div#accordion h3 {
+    border-radius: 4px;
+    border: solid 1px rgba(74, 74, 74, 0.25);
+    background-color: #eceff1;
+    opacity: 0.5;
+    font-family: Heebo;
+    font-size: 16px;
+    font-weight: 600;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: normal;
+    letter-spacing: normal;
+    color: #000000;
+    padding: 15px;
+    cursor: pointer;
+}
+/* .ui-accordion-content {
+   
+
+} */
+.inside-padi{
+    padding: 15px;
+    border-radius: 4px;
+    border: solid 1px rgba(74, 74, 74, 0.25);
+    margin-bottom: 10px;
+}
+.leftpan{
+    width: 400px;
+    display: inline-block;
+    vertical-align: top;
+}
+.accordion-header:after {
+  content: '\2212';
+  color: #777;
+  font-weight: bold;
+  float: left;
+  margin-right: 5px;
+}
+
+.active:after {
+  content: "\002B";
+}
+.ui-accordion-content p {
+    font-size: 15px;
+    font-weight: 500;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: 1;
+    letter-spacing: normal;
+    color: #000000;
+    opacity: 0.75;
+}
+hr.hrbtm {
+    margin: 0;
+    border-top: solid 1px rgba(74, 74, 74, 0.25);
+}
+.rightpans{
+    display: inline-block;
+    line-height: 24px;
+}
+span.alrtimgs img {
+    width: 20px;
+    margin-right: 1%;
+}
+h2.accordion-header {
+    font-size: 16px;
+    font-weight: 600;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: 1.5;
+    letter-spacing: normal;
+    color: #000000;
+    cursor: pointer;
+}
+table.custemtable{
+    /* border: solid 1px rgba(74, 74, 74, 0.25); */
+
+}
+table.custemtable tr th {
+    font-size: 13px;
+    font-weight: 500;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: 1.43;
+    letter-spacing: normal;
+    color: #000000;
+    width: 50%;
+    padding: 12px;
+    background-color: #eceff1;
+    border: 1px solid rgba(74, 74, 74, 0.25);
+}
+
+table.custemtable tr td {
+    font-size: 13px;
+    font-weight: normal;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: 1.43;
+    letter-spacing: normal;
+    color: #000000;
+    width: 50%;
+    padding: 12px;
+    border: 1px solid rgba(74, 74, 74, 0.25);
+}
+
+
+table.custemtable tr:nth-child(even) {
+    background-color: #eceff1
+  }
+
+  table.custemtable tr:nth-child(odd) {
+    background-color: #fff;
+  }

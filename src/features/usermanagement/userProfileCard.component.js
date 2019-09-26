@@ -58,12 +58,12 @@ const UserProfileCard = ({
           />
           <Text
             className={`userProfileCard-${
-              _.get(user, "is_active", false) ? "active" : "inactive"
+              _.get(user, "license_status", false) ? "active" : "inactive"
             }`}
             type="regular"
             size="16px"
             text={
-              _.get(user, "is_active", false)
+              _.get(user, "license_status", false)
                 ? ` ${translate("label.user.active")}`
                 : ` ${translate("label.user.inactive")}`
             }

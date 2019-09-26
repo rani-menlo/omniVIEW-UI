@@ -1,0 +1,29 @@
+.addnewapplication {
+  padding: 25px 5%;
+  &__cloud {
+    display: flex;
+    justify-content: space-evenly;
+    width: 100%;
+    &__item {
+      border-radius: 4px;
+      padding: 20px;
+      background-color: $blue;
+      cursor: pointer;
+    }
+  }
+  &__remote {
+    width: 30%;
+  }
+  &__remotefiles {
+    height: 320px;
+    border-top: 1px solid $shadowed-steel;
+    border-bottom: 1px solid $shadowed-steel;
+    overflow-y: auto;
+    &-file {
+      height: 30px;
+      &:nth-child(even) {
+        background-color: $froasted-glass;
+      }
+    }
+  }
+}

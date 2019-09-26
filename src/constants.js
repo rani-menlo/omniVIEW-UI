@@ -77,6 +77,7 @@ const URI = {
 
   // Validation
   VALIDATE_SEQUENCE: `${path}validation/sequenceValidation`,
+  VALIDATION_REPORT: `${path}validation/generateValidationReport?id={sequenceId}&authToken={authToken}`,
 
   // User
   PROFILE_IMAGE: `${path}user/getProfileImage`,
@@ -89,6 +90,7 @@ const URI = {
   ASSIGN_LICENSE: `${path}user/assignLicense`,
   REVOKE_LICENSE: `${path}user/revokeLicense`,
   REQUEST_LICENSE: `${path}user/requestLicense`,
+  GET_LICENSE_INFO: `${path}user/getLicenseInfo`,
 
   // File
   GET_FILE_SIZE: `${path}file/getFileSize`,
@@ -105,7 +107,16 @@ const URI = {
   GET_USERS_OF_SUBMISSIONS: `${path}access/getSubmissionAccessedUsers`,
   GET_USERS_OF_FILES: `${path}access/getFolderAccessedUsers`,
   ASSIGN_FOLDER_PERMISSIONS: `${path}access/assignFolderPermissions`,
-  ASSIGN_GLOBAL_PERMISSIONS: `${path}access/updateGlobalPermissions`
+  ASSIGN_GLOBAL_PERMISSIONS: `${path}access/updateGlobalPermissions`,
+  GET_ACCESSED_CUSTOMERS: `${path}access/getUserAccessedCustomers`,
+  GET_ACCESSED_SUBMISSIONS: `${path}access/getAccessedSubmissions`,
+  UPDATE_PERMISSIONS: `${path}access/updatePermissions`,
+
+  //upload
+  SAVE_FTP_DETAILS: `${path}upload/checkAndSaveFTPDetails`,
+  GET_FTP_DETAILS: `${path}upload/getSavedFTPDetails/{customerId}`,
+  GET_FTP_CONTENTS: `${path}upload/getContentsOfFTPPath`,
+  IS_VALID_FOLDER: `${path}upload/isValidFTPSubmissionFolder`
 };
 
 const DATE_FORMAT = "MM/DD/YYYY";
@@ -118,6 +129,12 @@ const VIEWER = {
 
 const IMAGE_SUPPORT_TYPES = ".JPG, .JPEG, .PNG";
 
+const CLOUDS = {
+  FTP: "FTP",
+  ONE_DRIVE: "ONE DRIVE",
+  BOX: "BOX"
+};
+
 export {
   URI,
   SERVER_URL,
@@ -127,5 +144,6 @@ export {
   ROLES,
   ROLE_IDS,
   CHECKBOX,
-  IMAGE_SUPPORT_TYPES
+  IMAGE_SUPPORT_TYPES,
+  CLOUDS
 };

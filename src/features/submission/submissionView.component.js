@@ -33,7 +33,7 @@ import {
 import ProfileMenu from "../header/profileMenu.component";
 import SubmissionViewUsers from "./submissionViewUsers.component";
 import { translate } from "../../translations/translator";
-import { CHECKBOX } from "../../constants";
+import { CHECKBOX, ROLE_IDS } from "../../constants";
 import { Permissions } from "./permissions";
 import {
   isLoggedInAuthor,
@@ -82,7 +82,7 @@ class SubmissionView extends Component {
     this.treeNodesMap = new Map();
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     let state = {};
     if (this.parentHeaderRef.current) {
       state.parentHeaderHeight = this.parentHeaderRef.current.clientHeight + 28;
@@ -98,6 +98,8 @@ class SubmissionView extends Component {
       this.setState({ ...state });
     }
     this.initData();
+    const res = await UsermanagementActions.getLicenseInfo();
+    console.log(res.data);
   }
 
   static getDerivedStateFromProps(props, state) {
@@ -542,11 +544,22 @@ class SubmissionView extends Component {
   };
 
   fetchUsers = (filters = "") => {
+    let roles = [];
+    // adding ominicia roles as well
+    if (filters.roles.length < 4) {
+      _.map(filters.roles, role => {
+        roles.push(role);
+        roles.push(role - 3);
+      });
+    }
+
+    filters.roles = roles;
     const { selectedCustomer } = this.props;
     selectedCustomer &&
       this.props.dispatch(
         UsermanagementActions.fetchUsers({
           customerId: selectedCustomer.id,
+          isOmnicia: true,
           ...filters
         })
       );
@@ -647,7 +660,8 @@ class SubmissionView extends Component {
     }
     const id = _.get(node, "state.properties.ID");
     if (id) {
-      this.treeNodesMap.set(id, node);
+      const existingNode = this.treeNodesMap.get(id);
+      !existingNode && this.treeNodesMap.set(id, node);
     } else if (_.get(node, "[state][properties][dtd-version]")) {
       const label = this.getSequenceLabel();
       this.treeNodesMap.set(`${label}_${label}`, node);
@@ -1110,6 +1124,7 @@ class SubmissionView extends Component {
                 )}
                 {showUsersSection && (
                   <SubmissionViewUsers
+                    role={role}
                     searchUsers={this.fetchUsers}
                     users={users}
                     selectedUser={selectedUser}

@@ -64,7 +64,7 @@
           overflow: auto;
         }
         &__result {
-          height: 35px;
+          min-height: 35px;
           &:nth-child(even) {
             background-color: $froasted-glass;
           }

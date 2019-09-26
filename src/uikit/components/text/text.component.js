@@ -1,12 +1,22 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-const Text = ({ text, type, size, opacity, className, textStyle, onClick }) => {
+const Text = ({
+  text,
+  type,
+  size,
+  opacity,
+  className,
+  textStyle,
+  onClick,
+  onDoubleClick
+}) => {
   return (
     <p
       className={`heebo_text-${type} ${className}`}
       style={{ fontSize: size, opacity, ...textStyle }}
       onClick={onClick}
+      onDoubleClick={onDoubleClick}
     >
       {text}
     </p>

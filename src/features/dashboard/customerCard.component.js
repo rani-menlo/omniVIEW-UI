@@ -49,19 +49,21 @@ class CustomerCard extends Component {
           >
             {this.getName(customer)}
           </span>
-          <Dropdown
-            overlay={getMenu && getMenu()}
-            trigger={["click"]}
-            overlayClassName="customercard__heading-dropdown"
-            onVisibleChange={this.onDropdownClick}
-          >
-            <img
-              src={`/images/overflow${
-                this.state.overflowIconClicked ? "-selected" : ""
-              }.svg`}
-              className="customercard__heading-more"
-            />
-          </Dropdown>
+          {isLoggedInOmniciaAdmin(role) && (
+            <Dropdown
+              overlay={getMenu && getMenu()}
+              trigger={["click"]}
+              overlayClassName="customercard__heading-dropdown"
+              onVisibleChange={this.onDropdownClick}
+            >
+              <img
+                src={`/images/overflow${
+                  this.state.overflowIconClicked ? "-selected" : ""
+                }.svg`}
+                className="customercard__heading-more"
+              />
+            </Dropdown>
+          )}
         </div>
         <div
           className="customercard__content"

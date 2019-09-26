@@ -20,6 +20,9 @@ export default {
       }
     });
   },
+  fetchCustomersByUserId: data => {
+    return api.post(URI.GET_ACCESSED_CUSTOMERS, data);
+  },
   getCustomerById: customerId =>
     api.get(URI.GET_CUSTOMER.replace(":customerId", customerId)),
   addCustomer: customer => api.post(URI.ADD_CUSTOMER, customer),

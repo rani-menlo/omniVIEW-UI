@@ -97,7 +97,7 @@ class FindNode extends Component {
   };
 
   onItemSelected = item => () => {
-    this.setState({ selected: `${item.name}_${item.title}` });
+    this.setState({ selected: `${item.ID}_${item.name}_${item.title}` });
     this.props.onItemSelected && this.props.onItemSelected(item);
   };
 
@@ -246,7 +246,7 @@ class FindNode extends Component {
                   return (
                     <div
                       className={`validationResults__table__body__find__result global__center-vert global__cursor-pointer ${selected ===
-                        `${search.name}_${search.title}` &&
+                        `${search.ID}_${search.name}_${search.title}` &&
                         "global__node-selected"}`}
                       onClick={this.onItemSelected(search)}
                       key={search.name}
@@ -280,7 +280,13 @@ class FindNode extends Component {
                           {search.title}
                         </span>
                       </div>
-                      <div style={{ width: "50%", padding: "2px 16px" }}>
+                      <div
+                        style={{
+                          width: "50%",
+                          padding: "2px 16px",
+                          wordBreak: "break-word"
+                        }}
+                      >
                         {search.name}
                       </div>
                     </div>
