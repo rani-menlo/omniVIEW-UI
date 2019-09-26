@@ -2,10 +2,11 @@ import React from "react";
 import _ from "lodash";
 import { translate } from "../../translations/translator";
 import { getFormattedDate } from "../../utils";
-import { Avatar } from "antd";
+import { Avatar, Icon, Dropdown } from "antd";
 import { ImageLoader } from "../../uikit/components";
 
 const UserCard = ({
+  menu,
   user,
   onAvatarClick,
   onStatusClick,
@@ -26,11 +27,26 @@ const UserCard = ({
       />
       {/* <Avatar size={48} icon="user" onClick={onAvatarClick} /> */}
       <div className="userManagement__group__users__user__info">
-        <p className="userManagement__group__users__user__info-name">{`${_.get(
-          user,
-          "first_name",
-          ""
-        )} ${_.get(user, "last_name", "")}`}</p>
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <p
+            className="userManagement__group__users__user__info-name"
+            style={{ wordBreak: "break-word" }}
+          >{`${_.get(user, "first_name", "")} ${_.get(
+            user,
+            "last_name",
+            ""
+          )}`}</p>
+          <Dropdown
+            overlay={menu(user)}
+            trigger={["click"]}
+            overlayClassName="maindashboard__list__item-dropdown"
+          >
+            <Icon
+              type="down-square"
+              style={{ marginRight: "10%", fontSize: "18px" }}
+            />
+          </Dropdown>
+        </div>
         <p className="userManagement__group__users__user__info-text">
           {translate("label.usermgmt.department")}:{" "}
           {_.get(user, "department_name", "")}
@@ -57,7 +73,7 @@ const UserCard = ({
         <p className="userManagement__group__users__user__info-text">
           {_.get(user, "email", "")}
         </p>
-        <div className="global__center-vert">
+        {/* <div className="global__center-vert">
           <p
             className="userManagement__group__users__user__info-link"
             onClick={onEdit}
@@ -86,7 +102,7 @@ const UserCard = ({
               ? translate("label.usermgmt.deactivate")
               : translate("label.usermgmt.activate")}
           </p>
-        </div>
+        </div> */}
       </div>
     </div>
   );

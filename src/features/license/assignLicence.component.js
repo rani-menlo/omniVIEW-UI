@@ -205,7 +205,7 @@ const AssignLicence = ({
                 text={`${(_.get(user, "license_status", 0) || "") &&
                   ` - License ${translate(
                     "label.usermgmt.expires"
-                  )}`} ${getFormattedDate(_.get(user, "expiryDate"))}`}
+                  )}`} ${getFormattedDate(_.get(user, "expired_date"))}`}
                 textStyle={{ display: "inline" }}
               />
             </div>

@@ -23,6 +23,9 @@ export default {
   assignSubmissionPermissions: data => {
     return api.post(URI.ASSIGN_SUBMISSION_PERMISSIONS, data);
   },
+  updateOmniciaUserPermissions: data => {
+    return api.post(URI.UPDATE_PERMISSIONS, data);
+  },
   assignFolderPermissions: data => {
     return api.post(URI.ASSIGN_FOLDER_PERMISSIONS, data);
   },

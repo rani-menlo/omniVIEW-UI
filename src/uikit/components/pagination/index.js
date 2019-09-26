@@ -140,7 +140,7 @@ class Pagination extends Component {
           <div className="pagination__pagesize__label">
             {translate("text.pagination.noofitems")}{" "}
           </div>
-          <div className="pagination__pagesize__container">
+          <div className="pagination__pagesize__container" id={this.state.pageSize}>
             <Input
               className="pagination__pagesize__container-input"
               onChange={this.handlePageSizeChange}

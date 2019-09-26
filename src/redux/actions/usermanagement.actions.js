@@ -191,6 +191,9 @@ export default {
       }
     };
   },
+  getLicenseInfo: () => {
+    return UsermanagementApi.getLicenseInfo();
+  },
   assignLicense: (data, callback) => {
     return async dispatch => {
       ApiActions.request(dispatch);

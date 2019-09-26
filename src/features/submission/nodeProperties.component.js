@@ -215,30 +215,21 @@ class NodeProperties extends Component {
                               {_.map(categories, (studyCateg, idx) => {
                                 return (
                                   <tr key={idx}>
-                                    <td
-                                      className="value"
-                                      style={{ paddingRight: "10px" }}
-                                    >
+                                    <td style={{ paddingRight: "10px" }}>
                                       <Text
                                         type="regular"
                                         size="12px"
                                         text={studyCateg.name || ""}
                                       />
                                     </td>
-                                    <td
-                                      className="value"
-                                      style={{ paddingRight: "10px" }}
-                                    >
+                                    <td style={{ paddingRight: "10px" }}>
                                       <Text
                                         type="regular"
                                         size="12px"
                                         text={`[${studyCateg["info-type"]}]`}
                                       />
                                     </td>
-                                    <td
-                                      className="value"
-                                      style={{ paddingRight: "10px" }}
-                                    >
+                                    <td style={{ paddingRight: "10px" }}>
                                       <Text
                                         type="regular"
                                         size="12px"

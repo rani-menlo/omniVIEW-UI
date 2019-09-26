@@ -22,8 +22,16 @@ export default {
   fetchApplications: (customerId, search) => {
     return api.post(URI.GET_APPLICATIONS, { customerId, search });
   },
+  fetchAccessedApplications: data => {
+    return api.post(URI.GET_ACCESSED_SUBMISSIONS, data);
+  },
   fetchSubmissionCenters: () => {
     return api.get(URI.GET_SUBMISSION_CENTERS);
   },
-  updateSubmissionCenter: data => api.post(URI.UPDATE_SUBMISSION_CENTER, data)
+  updateSubmissionCenter: data => api.post(URI.UPDATE_SUBMISSION_CENTER, data),
+  saveFTPDetails: details => api.post(URI.SAVE_FTP_DETAILS, details),
+  getFTPDetails: customerId =>
+    api.get(URI.GET_FTP_DETAILS.replace("{customerId}", customerId)),
+  getContentsOfPath: data => api.post(URI.GET_FTP_CONTENTS, data),
+  isValidFTPSubmissionFolder: data => api.post(URI.IS_VALID_FOLDER, data)
 };

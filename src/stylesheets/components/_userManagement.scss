@@ -8,7 +8,7 @@
     }
   }
   &__header {
-    @include text-bold-active(36px);
+    @include text-bold-active(30px);
     text-align: center;
     &-addButton {
       float: right;
@@ -28,10 +28,10 @@
         align-items: flex-start;
         margin-bottom: 40px;
         margin-right: 8px;
-        min-width: 32%;
-        max-width: 42%;
+        width: 32%;
         &__info {
           margin-left: 6px;
+          width: 100%;
           &-name {
             @include text-meduim-bold-active(16px);
             font-weight: 500;

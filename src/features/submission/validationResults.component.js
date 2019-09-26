@@ -9,6 +9,7 @@ import _ from "lodash";
 import { getValidationsBySequence } from "../../redux/selectors/validationResults.selector";
 import { Text, Row } from "../../uikit/components";
 import { translate } from "../../translations/translator";
+import { URI, SERVER_URL } from "../../constants";
 
 class ValidationResults extends Component {
   constructor(props) {
@@ -110,7 +111,7 @@ class ValidationResults extends Component {
       case "STF":
         img = (
           <img
-            src="/images/file-stf.svg"
+            src={`/images/file-${isFile ? "new" : "stf"}.svg`}
             className="global__file-folder"
             style={{ width: "18px", height: "22px" }}
           />
@@ -120,6 +121,17 @@ class ValidationResults extends Component {
         return img;
     }
     return img;
+  };
+
+  openReport = () => {
+    const authToken = localStorage.getItem("omniview_user_token");
+    const {
+      sequence: { id }
+    } = this.props;
+    let url = URI.VALIDATION_REPORT.replace("{sequenceId}", id);
+    url = url.replace("{authToken}", authToken);
+    url = `${SERVER_URL}${url}`;
+    window.open(url, "_blank");
   };
 
   render() {
@@ -213,9 +225,10 @@ class ValidationResults extends Component {
                                 wordBreak: "break-word"
                               }}
                             >
-                              {_.size(validation.title) > 0
-                                ? _.replace(validation.title, " [ ]", "")
-                                : ""}
+                              {_.get(validation, "displayName", "") ||
+                                (_.size(validation.title) > 0
+                                  ? _.replace(validation.title, " [ ]", "")
+                                  : "")}
                             </span>
                           </div>
                         </td>
@@ -233,7 +246,8 @@ class ValidationResults extends Component {
                               wordBreak: "break-word"
                             }}
                           >
-                            {validation.description}
+                            {`${validation.description}${validation.extraInfo ||
+                              ""}`}
                           </span>
                         </td>
                       </tr>
@@ -244,7 +258,10 @@ class ValidationResults extends Component {
             </div>
           </div>
           <div className="validationResults__footer">
-            <div className="validationResults__footer__viewreport global__disabled-box">
+            <div
+              className="validationResults__footer__viewreport"
+              onClick={this.openReport}
+            >
               View Report
             </div>
             <Button

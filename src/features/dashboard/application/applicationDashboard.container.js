@@ -547,6 +547,10 @@ class ApplicationDashboard extends Component {
     );
   };
 
+  addNewApplication = () => {
+    this.props.history.push("/applications/add");
+  };
+
   render() {
     const {
       viewBy,
@@ -640,7 +644,7 @@ class ApplicationDashboard extends Component {
                   type: translate("label.dashboard.application")
                 })}
                 buttonStyle={{ height: "40px" }}
-                className="global__disabled-box"
+                onClick={this.addNewApplication}
               />
             )}
           </div>
@@ -775,6 +779,7 @@ class ApplicationDashboard extends Component {
                         overlayClassName="maindashboard__list__item-dropdown"
                       >
                         <img
+                        className="global__cursor-pointer"
                           src="/images/overflow-black.svg"
                           style={{ width: "20px", height: "20px" }}
                         />

@@ -5,7 +5,13 @@ import PopoverUsersFilter from "../usermanagement/popoverUsersFilter";
 import { Avatar, Icon } from "antd";
 import { Text, SearchBox, Row, ImageLoader } from "../../uikit/components";
 import { translate } from "../../translations/translator";
-import { getRoleName } from "../../utils";
+import {
+  getRoleName,
+  isLoggedInOmniciaRole,
+  isLoggedInCustomerAdmin,
+  isOmniciaRole,
+  isLoggedInOmniciaAdmin
+} from "../../utils";
 import { DEBOUNCE_TIME } from "../../constants";
 
 class SubmissionViewUsers extends Component {
@@ -20,7 +26,8 @@ class SubmissionViewUsers extends Component {
 
   static propTypes = {
     selectedUser: PropTypes.object,
-    onUserSelected: PropTypes.func
+    onUserSelected: PropTypes.func,
+    role: PropTypes.object
   };
 
   onFiltersUpdate = filters => {
@@ -51,12 +58,18 @@ class SubmissionViewUsers extends Component {
   };
 
   setSelectedUser = user => () => {
+    if (
+      !isLoggedInOmniciaAdmin(this.props.role) &&
+      isOmniciaRole(user.role_name)
+    ) {
+      return;
+    }
     this.props.onUserSelected && this.props.onUserSelected(user);
   };
 
   render() {
     const { searchText } = this.state;
-    const { selectedUser } = this.props;
+    const { selectedUser, role } = this.props;
     return (
       <div className="submissionViewUsers">
         <div className="submissionViewUsers__filters">
@@ -85,6 +98,13 @@ class SubmissionViewUsers extends Component {
                   : ""
               }`}
               onClick={this.setSelectedUser(user)}
+              style={{
+                ...(!isLoggedInOmniciaAdmin(role) &&
+                  isOmniciaRole(user.role_name) && {
+                    opacity: "0.5",
+                    cursor: "not-allowed"
+                  })
+              }}
             >
               <ImageLoader
                 path={_.get(user, "profile")}
@@ -117,7 +137,7 @@ class SubmissionViewUsers extends Component {
               </div>
             </div>
           ))}
-          {!this.props.users.length && (
+          {this.props.users != null && !this.props.users.length && (
             <Row className="maindashboard__nodata">
               <Icon
                 style={{ fontSize: "20px" }}

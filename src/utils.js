@@ -8,6 +8,7 @@ const REGEX_EMAIL = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+
 const REGEX_PWD = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/;
 
 const isLoggedInOmniciaRole = role => _.get(role, "slug", "").includes("o_");
+const isOmniciaRole = roleName => roleName.includes("o_");
 const isLoggedInCustomerAdmin = role => _.get(role, "slug", "") === "c_admin";
 const isLoggedInOmniciaAdmin = role => _.get(role, "slug", "") === "o_admin";
 const isLoggedInAuthor = role => _.get(role, "slug", "").includes("_author");
@@ -91,6 +92,7 @@ const getCombinedLicences = licences => {
 
 export {
   isLoggedInOmniciaRole,
+  isOmniciaRole,
   isAdmin,
   isLoggedInCustomerAdmin,
   isLoggedInOmniciaAdmin,

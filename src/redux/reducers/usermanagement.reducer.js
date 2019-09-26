@@ -4,7 +4,7 @@ import { UsermanagementActionTypes } from "../actionTypes";
 import { Toast } from "../../uikit/components";
 
 const initialState = {
-  users: [],
+  users: null,
   cAdmins: [],
   usersOfFileOrSubmission: [],
   usersCount: 0,

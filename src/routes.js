@@ -20,6 +20,8 @@ import ForgotPassword from "./features/forgotpwd/forgotpwd.component";
 import ResetPassword from "./features/forgotpwd/resetPassword.component";
 import SubscriptionsPage from "./features/license/subscriptionsPage.component";
 import RequestLicense from "./features/license/requestLicence.component";
+import AddNewApplication from "./features/dashboard/application/addNewApplication.container";
+import RemoteDetails from "./features/dashboard/application/remoteDetails.component";
 
 const Routes = () => {
   return (
@@ -31,6 +33,11 @@ const Routes = () => {
             <Route exact path="/forgotpwd" component={ForgotPassword} />
             <Route exact path="/resetPassword/:key" component={ResetPassword} />
             <Route exact path="/requestlicense" component={RequestLicense} />
+            <Route
+              exact
+              path="/applications/add"
+              component={AddNewApplication}
+            />
             <PrivateRoute
               exact
               path="/viewer/:type/:fileId?"

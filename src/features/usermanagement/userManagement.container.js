@@ -40,12 +40,18 @@ import PopoverCustomers from "./popoverCustomers.component";
 import LicenceInUseUnAssigned from "../license/licenceInUseUnAssigned.component";
 import AssignLicence from "../license/assignLicence.component";
 import { CustomerApi } from "../../redux/api";
+import AccessControl from "../../uikit/components/modal/accessControlModal.component";
 
 class UserManagementContainer extends Component {
   static getDerivedStateFromProps(props, state) {
     if (_.get(props, "users.length") && !_.get(state, "users.length")) {
       return {
-        users: props.users
+        users: _.map(props.users, user => {
+          if (user.is_secondary_contact === null) {
+            user.is_secondary_contact = false;
+          }
+          return user;
+        })
       };
     }
     return null;
@@ -66,6 +72,7 @@ class UserManagementContainer extends Component {
       itemsPerPage: 5,
       showLicenceUnAssignedModal: false,
       showLicenceUnAssignedModalError: "",
+      showAccessControlModal: false,
       assigningLicence: null,
       deactivateAll: false,
       markAllSecondary: false,
@@ -197,6 +204,10 @@ class UserManagementContainer extends Component {
     });
   };
 
+  openAccessControlModal = user => () => {
+    this.setState({ showAccessControlModal: true, selectedUser: user });
+  };
+
   getMenu = usr => () => {
     return (
       <Menu className="maindashboard__list__item-dropdown-menu">
@@ -211,15 +222,28 @@ class UserManagementContainer extends Component {
             )}`}</span>
           </p>
         </Menu.Item>
-        <Menu.Item
-          className="maindashboard__list__item-dropdown-menu-item"
-          onClick={this.showLicenceUnAssignedModal(usr)}
-        >
-          <p>
-            <img src="/images/key.svg" />
-            <span>{translate("label.usermgmt.assignlicence")}</span>
-          </p>
-        </Menu.Item>
+        {usr.role_id !== 1 && (
+          <Menu.Item
+            className="maindashboard__list__item-dropdown-menu-item"
+            onClick={this.showLicenceUnAssignedModal(usr)}
+          >
+            <p>
+              <img src="/images/key.svg" />
+              <span>{translate("label.usermgmt.assignlicence")}</span>
+            </p>
+          </Menu.Item>
+        )}
+        {usr.role_id !== 1 && this.props.selectedCustomer.is_omnicia && (
+          <Menu.Item
+            className="maindashboard__list__item-dropdown-menu-item"
+            onClick={this.openAccessControlModal(usr)}
+          >
+            <p>
+              <img src="/images/assign.svg" />
+              <span>{translate("label.usermgmt.accesscontrol")}</span>
+            </p>
+          </Menu.Item>
+        )}
         <Menu.Item
           className="maindashboard__list__item-dropdown-menu-item"
           onClick={this.openActivateDeactivateModal(usr)}
@@ -308,7 +332,7 @@ class UserManagementContainer extends Component {
   };
 
   onPageSizeChange = itemsPerPage => {
-    this.setState({ itemsPerPage }, () => this.fetchUsers());
+    this.setState({ itemsPerPage, pageNo: 1 }, () => this.fetchUsers());
   };
 
   sortColumn = (sortBy, orderBy) => {
@@ -556,6 +580,10 @@ class UserManagementContainer extends Component {
     );
   };
 
+  closeAccessControlModal = () => {
+    this.setState({ showAccessControlModal: false });
+  };
+
   render() {
     const {
       searchText,
@@ -565,7 +593,8 @@ class UserManagementContainer extends Component {
       showLicenceUnAssignedModal,
       showLicenceUnAssignedModalError,
       showAssignLicenceToUser,
-      assigningLicence
+      assigningLicence,
+      showAccessControlModal
     } = this.state;
     const { loading, selectedCustomer, usersCount } = this.props;
     if (!selectedCustomer) {
@@ -672,6 +701,7 @@ class UserManagementContainer extends Component {
                     <div className="userManagement__group__users">
                       {_.map(user, usr => (
                         <UserCard
+                          menu={this.getMenu}
                           key={usr.user_id}
                           user={usr}
                           onAvatarClick={this.openUserCard(usr)}
@@ -789,7 +819,7 @@ class UserManagementContainer extends Component {
                     <Column
                       width={this.getColumnWidth(TableColumnNames.STATUS)}
                       className="maindashboard__list__item-text"
-                      style={{paddingLeft: '5px'}}
+                      style={{ paddingLeft: "5px" }}
                     >
                       {_.get(usr, "is_active", false) ? (
                         <span className="maindashboard__list__item-text-active">
@@ -821,6 +851,7 @@ class UserManagementContainer extends Component {
                         overlayClassName="maindashboard__list__item-dropdown"
                       >
                         <img
+                          className="global__cursor-pointer"
                           src="/images/overflow-black.svg"
                           style={{ width: "18px", height: "18px" }}
                         />
@@ -842,6 +873,7 @@ class UserManagementContainer extends Component {
                 </Row>
               )}
               <Pagination
+                key={usersCount}
                 containerStyle={
                   usersCount > 4 ? { marginTop: "1%" } : { marginTop: "20%" }
                 }
@@ -901,6 +933,13 @@ class UserManagementContainer extends Component {
               closeModal={this.closeLicenseUnAssignedModal}
               customer={this.props.selectedCustomer}
               onAssignLicenseClick={this.onAssignLicenseClick}
+            />
+          )}
+          {showAccessControlModal && (
+            <AccessControl
+              visible={showAccessControlModal}
+              user={this.state.selectedUser}
+              closeModal={this.closeAccessControlModal}
             />
           )}
           <AssignLicence

@@ -83,20 +83,22 @@ class CustomerDashboard extends Component {
 
   subscriptionsInUse = customer => event => {
     event.stopPropagation();
-    this.setState({
-      selectedCustomer: customer,
-      showSubscriptionsInUse: true,
-      showLicenceUnAssigned: false
-    });
+    isLoggedInOmniciaAdmin(this.props.role) &&
+      this.setState({
+        selectedCustomer: customer,
+        showSubscriptionsInUse: true,
+        showLicenceUnAssigned: false
+      });
   };
 
   subscriptionsUnAssigned = customer => event => {
     event.stopPropagation();
-    this.setState({
-      selectedCustomer: customer,
-      showLicenceUnAssigned: true,
-      showSubscriptionsInUse: false
-    });
+    isLoggedInOmniciaAdmin(this.props.role) &&
+      this.setState({
+        selectedCustomer: customer,
+        showLicenceUnAssigned: true,
+        showSubscriptionsInUse: false
+      });
   };
 
   closeSubscriptionsModal = () => {
@@ -431,16 +433,19 @@ class CustomerDashboard extends Component {
                             0
                           )} ${translate("label.generic.unassigned")}`}</span>
                       </p>
-                      <Dropdown
-                        overlay={this.getMenu(customer)()}
-                        trigger={["click"]}
-                        overlayClassName="maindashboard__list__item-dropdown"
-                      >
-                        <img
-                          src="/images/overflow-black.svg"
-                          style={{ width: "18px", height: "18px" }}
-                        />
-                      </Dropdown>
+                      {isLoggedInOmniciaAdmin(role) && (
+                        <Dropdown
+                          overlay={this.getMenu(customer)()}
+                          trigger={["click"]}
+                          overlayClassName="maindashboard__list__item-dropdown"
+                        >
+                          <img
+                            className="global__cursor-pointer"
+                            src="/images/overflow-black.svg"
+                            style={{ width: "18px", height: "18px" }}
+                          />
+                        </Dropdown>
+                      )}
                     </Column>
                   </Row>
                 ))}

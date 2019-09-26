@@ -202,7 +202,9 @@ class TreeNode extends Component {
           _.get(value, "version", "").includes("STF") ||
           _.get(value, "STF", false)
         ) {
-          const groups = _.groupBy(content, val => val.title);
+          const groups = _.groupBy(content, val => {
+            return val.title;
+          });
           node.leafParent = groups[value.title];
           nodes.push(node);
         } else {
@@ -779,6 +781,7 @@ class TreeNode extends Component {
     return (
       <React.Fragment>
         <div
+          id={properties.ID}
           ref={this.nodeElementRef}
           className={`node ${selectedNodeId === this.state.nodeId &&
             "global__node-selected"}`}
