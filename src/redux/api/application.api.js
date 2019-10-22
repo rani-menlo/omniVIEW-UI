@@ -33,5 +33,7 @@ export default {
   getFTPDetails: customerId =>
     api.get(URI.GET_FTP_DETAILS.replace("{customerId}", customerId)),
   getContentsOfPath: data => api.post(URI.GET_FTP_CONTENTS, data),
-  isValidFTPSubmissionFolder: data => api.post(URI.IS_VALID_FOLDER, data)
+  isValidFTPSubmissionFolder: data => api.post(URI.IS_VALID_FOLDER, data),
+  getSubmissionLookupInfo: () => api.get(URI.SUBMISSION_LOOKUP_INFO),
+  saveSubmissionDetails: data => api.post(URI.SAVE_SUBMISSION_DETAILS, data)
 };

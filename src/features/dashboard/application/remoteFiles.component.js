@@ -27,19 +27,24 @@ class RemoteFiles extends Component {
   };
 
   render() {
-    const { cancel, submit, remoteFiles } = this.props;
+    const { cancel, remoteFiles, rootPath, currentPath } = this.props;
     const { selected } = this.state;
     return (
       <React.Fragment>
         <div className="addnewapplication__remotefiles">
-          <Text
-            type="extra_bold"
-            size="14px"
-            text=".."
-            textStyle={{ cursor: "alias" }}
-            className="addnewapplication__remotefiles-file"
-            onDoubleClick={this.goBack}
-          />
+          {rootPath != currentPath && (
+            <div
+              className="addnewapplication__remotefiles-file global__center-vert global__cursor-pointer"
+              onDoubleClick={this.goBack}
+            >
+              <img
+                src="/images/folder-back.svg"
+                className="global__file-folder"
+                style={{ width: "22px", height: "22px" }}
+              />
+              <Text type="extra_bold" size="14px" text=".." />
+            </div>
+          )}
           {_.map(remoteFiles, file => {
             return (
               <div
@@ -76,7 +81,6 @@ class RemoteFiles extends Component {
             onClick={cancel}
           />
           <OmniButton
-            disabled
             type="primary"
             label={translate("label.button.continue")}
             onClick={this.submit}

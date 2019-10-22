@@ -59,12 +59,24 @@ const UserCard = ({
             }`}
           >
             {_.get(user, "license_status", 0)
+              ? ` ${translate("label.generic.subscribed")}`
+              : ` ${translate("label.generic.unsubscribed")}`}
+          </span>
+        </p>
+        <p className="userManagement__group__users__user__info-text">
+          {translate("label.usermgmt.accountstatus")}:
+          <span
+            className={`userManagement__group__users__user__info-text-${
+              _.get(user, "is_active", 0) ? "active" : "inactive"
+            }`}
+          >
+            {_.get(user, "is_active", 0)
               ? ` ${translate("label.user.active")}`
               : ` ${translate("label.user.inactive")}`}
           </span>
         </p>
         <p className="userManagement__group__users__user__info-text">
-          {`${translate("label.usermgmt.expires")} ${
+          {`${translate("label.usermgmt.expires")}: ${
             _.get(user, "license_status")
               ? getFormattedDate(_.get(user, "expiryDate"))
               : "N/A"

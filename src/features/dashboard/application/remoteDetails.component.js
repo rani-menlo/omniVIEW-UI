@@ -48,7 +48,7 @@ class RemoteDetails extends Component {
       username: { value: details.username },
       password: { value: details.password },
       port: { value: details.port },
-      path: { value: details.root_path }
+      path: { value: details.root_path || details.ftp_path }
     });
   };
 
@@ -74,13 +74,13 @@ class RemoteDetails extends Component {
     if (!state.username.value) {
       error = true;
       state.username.error = translate("error.form.required", {
-        type: translate("label.newapplication.username")
+        type: translate("label.form.username")
       });
     }
     if (!state.password.value) {
       error = true;
       state.password.error = translate("error.form.required", {
-        type: translate("label.newapplication.password")
+        type: translate("label.form.password")
       });
     }
     if (!state.port.value) {
@@ -116,7 +116,9 @@ class RemoteDetails extends Component {
     return (
       <div className="addnewapplication__remote">
         <InputField
-          label={`${translate("label.newapplication.host")}*`}
+          label={`${translate(
+            "label.newapplication.host"
+          )}* (Ex: ftp.example.com)`}
           value={host.value}
           placeholder={translate("label.newapplication.host")}
           error={host.error}
@@ -138,14 +140,16 @@ class RemoteDetails extends Component {
           onChange={this.onInputChange("password")}
         />
         <InputField
-          label={`${translate("label.newapplication.port")}*`}
+          label={`${translate("label.newapplication.port")}* (Ex: 22)`}
           value={port.value}
           placeholder={translate("label.newapplication.port")}
           error={port.error}
           onChange={this.onInputChange("port")}
         />
         <InputField
-          label={`${translate("label.newapplication.path")}*`}
+          label={`${translate(
+            "label.newapplication.path"
+          )}* (Ex: /server_path/folder/)`}
           value={path.value}
           placeholder={translate("label.newapplication.path")}
           error={path.error}

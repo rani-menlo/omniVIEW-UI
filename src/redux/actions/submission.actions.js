@@ -343,6 +343,7 @@ export default {
       try {
         const res = await SubmissionApi.findText(data);
         dispatch({
+          text: data.text,
           type: SubmissionActionTypes.FIND_TEXT,
           data: res.data
         });
@@ -350,6 +351,33 @@ export default {
       } catch (err) {
         ApiActions.failure(dispatch);
       }
+    };
+  },
+  findMatchBy: match => {
+    return {
+      type: SubmissionActionTypes.FIND_MATCH_BY,
+      match
+    };
+  },
+  findSortByTitle: () => {
+    return {
+      type: SubmissionActionTypes.FIND_SORT_BY_TITLE
+    };
+  },
+  findSortByFile: () => {
+    return {
+      type: SubmissionActionTypes.FIND_SORT_BY_FILE
+    };
+  },
+  findSelectedResult: selected => {
+    return {
+      type: SubmissionActionTypes.FIND_SELECTED_RESULT,
+      selected
+    };
+  },
+  resetFind: () => {
+    return {
+      type: SubmissionActionTypes.RESET_FIND
     };
   },
   clearSearchResults: () => {

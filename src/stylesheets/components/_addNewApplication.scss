@@ -21,6 +21,7 @@
     overflow-y: auto;
     &-file {
       height: 30px;
+      user-select: none;
       &:nth-child(even) {
         background-color: $froasted-glass;
       }

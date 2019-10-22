@@ -84,6 +84,7 @@ const URI = {
   GET_USERS: `${path}user/getUsers`,
   ADD_USER: `${path}user/addUsers`,
   UPDATE_USER: `${path}user/updateUsers`,
+  DELETE_USER: `${path}user/deleteUsers`,
   CREATE_UPDATE_PROFILE: `${path}user/updateProfile`,
   ACTIVATE_DEACTIVATE: `${path}user/activateOrDeactivateUser`,
   UPDATE_SECONDARY_CONTACTS: `${path}user/updateSecondaryContacts`,
@@ -116,7 +117,9 @@ const URI = {
   SAVE_FTP_DETAILS: `${path}upload/checkAndSaveFTPDetails`,
   GET_FTP_DETAILS: `${path}upload/getSavedFTPDetails/{customerId}`,
   GET_FTP_CONTENTS: `${path}upload/getContentsOfFTPPath`,
-  IS_VALID_FOLDER: `${path}upload/isValidFTPSubmissionFolder`
+  IS_VALID_FOLDER: `${path}upload/isValidFTPSubmissionFolder`,
+  SUBMISSION_LOOKUP_INFO: `${path}upload/submissionLookUpInfo`,
+  SAVE_SUBMISSION_DETAILS: `${path}upload/saveSubmissionDetails`
 };
 
 const DATE_FORMAT = "MM/DD/YYYY";
@@ -130,9 +133,18 @@ const VIEWER = {
 const IMAGE_SUPPORT_TYPES = ".JPG, .JPEG, .PNG";
 
 const CLOUDS = {
-  FTP: "FTP",
-  ONE_DRIVE: "ONE DRIVE",
-  BOX: "BOX"
+  ftp: {
+    name: "FTP",
+    disabled: false
+  },
+  oneDrive: {
+    name: "ONE DRIVE",
+    disabled: true
+  },
+  box: {
+    name: "BOX",
+    disabled: true
+  }
 };
 
 export {

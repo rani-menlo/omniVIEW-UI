@@ -27,7 +27,8 @@ class AccessControl extends Component {
       customers: "",
       selectedCustomer: "",
       applications: "",
-      checkAll: false,
+      checkAllApplications: false,
+      checkAllCustomers: false,
       data: {}
     };
   }
@@ -61,36 +62,10 @@ class AccessControl extends Component {
     this.setState({ order, customers });
   };
 
-  getChangedData = customer => {
-    let { data, checkAll } = this.state;
-    let applications = data[customer.id];
-    if (!applications) {
-      applications = customer.checked ? [] : null;
-      data[customer.id] = applications;
-    } else {
-      if (!applications.length) {
-        applications = null;
-      } else {
-        applications = _.map(applications, application => {
-          application.checked = customer.checked;
-          return application;
-        });
-      }
-      data[customer.id] = applications;
-    }
-
-    if (_.get(this.state, "selectedCustomer.id", "") === customer.id) {
-      checkAll = _.every(applications, ["checked", true]);
-    } else {
-      applications = data[this.state.selectedCustomer.id];
-    }
-    return { applications, data, checkAll };
-  };
-
   onCustomerCheck = customer => e => {
     const checked = e.target.checked;
     customer.checked = checked;
-    let { data, checkAll } = this.state;
+    let { data, checkAllApplications, customers } = this.state;
     let applications = data[customer.id];
     if (!applications) {
       applications = customer.checked ? [] : null;
@@ -107,13 +82,18 @@ class AccessControl extends Component {
       }
       data[customer.id] = applications;
     }
-
+    const checkAllCustomers = _.every(customers, ["checked", true]);
     if (_.get(this.state, "selectedCustomer.id", "") === customer.id) {
-      checkAll = _.every(applications, ["checked", true]);
+      checkAllApplications = _.every(applications, ["checked", true]);
     } else {
       applications = data[this.state.selectedCustomer.id];
     }
-    this.setState({ applications, data, checkAll });
+    this.setState({
+      applications,
+      data,
+      checkAllApplications,
+      checkAllCustomers
+    });
   };
 
   onCustomerSelected = customer => async e => {
@@ -150,31 +130,33 @@ class AccessControl extends Component {
       data: { ...this.state.data, [customer.id]: applications },
       applications,
       selectedCustomer: customer,
-      checkAll: allChecked
+      checkAllApplications: allChecked
     });
   };
 
   onApplicationCheck = application => e => {
     const checked = e.target.checked;
-    const { data, selectedCustomer } = this.state;
+    const { data, selectedCustomer, customers } = this.state;
     const applications = [...this.state.applications];
     application.checked = checked;
     application.mutated = true;
     data[selectedCustomer.id] = applications;
     const someAreChecked = _.some(applications, ["checked", true]);
     selectedCustomer.checked = someAreChecked;
-    const allChecked = _.every(applications, ["checked", true]);
+    const checkAllApplications = _.every(applications, ["checked", true]);
+    const checkAllCustomers = _.every(customers, ["checked", true]);
     this.setState({
       applications,
-      checkAll: allChecked,
+      checkAllApplications,
+      checkAllCustomers,
       selectedCustomer,
       data
     });
   };
 
-  checkAll = e => {
+  checkAllApplications = e => {
     const checked = e.target.checked;
-    const { data, selectedCustomer } = this.state;
+    const { data, selectedCustomer, customers } = this.state;
     const applications = _.map(this.state.applications, application => {
       application.checked = checked;
       application.mutated = true;
@@ -184,7 +166,47 @@ class AccessControl extends Component {
       selectedCustomer.checked = checked;
       data[selectedCustomer.id] = applications;
     }
-    this.setState({ applications, checkAll: checked, selectedCustomer, data });
+    const checkAllCustomers = _.every(customers, ["checked", true]);
+    this.setState({
+      applications,
+      checkAllApplications: checked,
+      checkAllCustomers,
+      selectedCustomer,
+      data
+    });
+  };
+
+  checkAllCustomers = e => {
+    const checked = e.target.checked;
+    let { data, customers, selectedCustomer } = this.state;
+    customers = _.map(customers, customer => {
+      customer.checked = checked;
+      let applications = data[customer.id];
+      if (!applications) {
+        applications = checked ? [] : null;
+        data[customer.id] = applications;
+      } else {
+        if (!applications.length) {
+          applications = null;
+        } else {
+          applications = _.map(applications, application => {
+            application.checked = checked;
+            application.mutated = true;
+            return application;
+          });
+        }
+        data[customer.id] = applications;
+      }
+      return customer;
+    });
+    const applications = data[selectedCustomer.id];
+
+    this.setState({
+      checkAllCustomers: checked,
+      checkAllApplications: checked,
+      applications,
+      data
+    });
   };
 
   save = async () => {
@@ -241,7 +263,13 @@ class AccessControl extends Component {
 
   render() {
     const { visible, closeModal, user } = this.props;
-    const { customers, applications, selectedCustomer, checkAll } = this.state;
+    const {
+      customers,
+      applications,
+      selectedCustomer,
+      checkAllApplications,
+      checkAllCustomers
+    } = this.state;
     return (
       <Modal
         destroyOnClose
@@ -307,15 +335,30 @@ class AccessControl extends Component {
                 size="14px"
                 text={translate("label.dashboard.customers")}
               />
-              <Icon
-                type={
-                  this.state.order === "asc"
-                    ? "sort-ascending"
-                    : "sort-descending"
-                }
+              <div
+                className="global__center-vert global__cursor-pointer"
                 onClick={this.sort}
-                style={{ fontSize: "24px", marginRight: "10px" }}
-              />
+              >
+                <span>{translate("label.generic.sort")}</span>
+                <Icon
+                  type={
+                    this.state.order === "asc"
+                      ? "sort-ascending"
+                      : "sort-descending"
+                  }
+                  style={{ fontSize: "24px", marginLeft: "5px" }}
+                />
+              </div>
+              {(_.get(customers, "length") || "") && (
+                <p>
+                  Select All
+                  <Checkbox
+                    checked={checkAllCustomers}
+                    onChange={this.checkAllCustomers}
+                    style={{ marginLeft: "10px" }}
+                  />
+                </p>
+              )}
             </div>
             <div
               className="assign-permissions-modal__columns-content"
@@ -325,17 +368,38 @@ class AccessControl extends Component {
                 <div
                   className={`assign-permissions-modal__columns-content-item global__center-vert global__cursor-pointer ${selectedCustomer.id ===
                     customer.id && "global__node-selected"}`}
-                  style={{ justifyContent: "space-between" }}
-                  onClick={this.onCustomerSelected(customer)}
+                  style={{
+                    justifyContent: "space-between",
+                    ...(!customer.submissionCount && {
+                      cursor: "not-allowed",
+                      opacity: 0.25
+                    })
+                  }}
+                  onClick={
+                    customer.submissionCount &&
+                    this.onCustomerSelected(customer)
+                  }
                 >
-                  <Text
-                    key={customer.id}
-                    type="medium"
-                    size="14px"
-                    text={customer.company_name}
-                    textStyle={{ wordBreak: "break-word" }}
-                  />
+                  <div>
+                    <Text
+                      key={customer.id}
+                      type="medium"
+                      size="14px"
+                      text={customer.company_name}
+                      textStyle={{ wordBreak: "break-word" }}
+                    />
+                    {!customer.submissionCount && (
+                      <Text
+                        type="regular"
+                        size="14px"
+                        text="No applications available"
+                        className="global__text-red"
+                        textStyle={{ wordBreak: "break-word" }}
+                      />
+                    )}
+                  </div>
                   <PermissionCheckbox
+                    disabled={customer.submissionCount === 0}
                     value={+customer.checked}
                     onChange={this.onCustomerCheck(customer)}
                   />
@@ -358,8 +422,8 @@ class AccessControl extends Component {
                 <p>
                   Select All
                   <Checkbox
-                    checked={checkAll}
-                    onChange={this.checkAll}
+                    checked={checkAllApplications}
+                    onChange={this.checkAllApplications}
                     style={{ marginLeft: "10px" }}
                   />
                 </p>

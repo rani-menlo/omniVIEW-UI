@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import _ from "lodash";
-import { Loader, ContentLayout, Text } from "../../../uikit/components";
+import { Loader, ContentLayout, Text, Toast } from "../../../uikit/components";
 import Header from "../../header/header.component";
 import ChooseCloud from "./chooseCloud.component";
 import RemoteDetails from "./remoteDetails.component";
@@ -20,11 +20,16 @@ class AddNewApplication extends Component {
       showClouds: true,
       enterRemoteDetails: false,
       path: "",
+      auth_id: "",
       remoteDetails: null,
       remoteFiles: null,
       showRemoteFiles: false,
       selectedFolderError: "",
-      showApplicationDetails: false
+      showApplicationDetails: false,
+      regions: [],
+      submission_centers: [],
+      application_types: [],
+      cloud_types: []
     };
   }
   showLoading = () => {
@@ -40,17 +45,19 @@ class AddNewApplication extends Component {
     const res = await ApplicationApi.getFTPDetails(
       this.props.selectedCustomer.id
     );
-    this.hideLoading();
     let remoteDetails = null;
     if (!res.data.error) {
       remoteDetails = res.data.data;
     }
-    this.setState({
-      remoteDetails,
-      selectedCloud: cloud,
-      showClouds: false,
-      enterRemoteDetails: true
-    });
+    this.setState(
+      {
+        remoteDetails,
+        selectedCloud: cloud.name,
+        showClouds: false,
+        enterRemoteDetails: true
+      },
+      this.hideLoading
+    );
   };
 
   showClouds = () => {
@@ -71,9 +78,14 @@ class AddNewApplication extends Component {
 
   showRemoteFiles = async remoteDetails => {
     remoteDetails.customer_id = this.props.selectedCustomer.id;
+    remoteDetails.id = _.get(this.state, "remoteDetails.id", "");
     this.showLoading();
-    ApplicationApi.saveFTPDetails(remoteDetails);
-    const res = await ApplicationApi.getContentsOfPath({
+    let res = await ApplicationApi.saveFTPDetails(remoteDetails);
+    let auth_id = "";
+    if (!res.data.error) {
+      auth_id = res.data.data.auth_id;
+    }
+    res = await ApplicationApi.getContentsOfPath({
       customer_id: this.props.selectedCustomer.id,
       ...(!_.isEmpty(remoteDetails.ftp_path) && {
         ftp_path: remoteDetails.ftp_path
@@ -83,15 +95,30 @@ class AddNewApplication extends Component {
     if (!res.data.error) {
       remoteFiles = res.data.data;
     }
-    this.hideLoading();
-    this.setState({
-      path: remoteDetails.ftp_path,
-      remoteDetails,
-      remoteFiles,
-      showRemoteFiles: true,
-      enterRemoteDetails: false,
-      showApplicationDetails: false
-    });
+    this.setState(
+      {
+        remoteDetails,
+        path: remoteDetails.ftp_path,
+        auth_id,
+        remoteFiles,
+        showRemoteFiles: true,
+        enterRemoteDetails: false,
+        showApplicationDetails: false
+      },
+      this.hideLoading
+    );
+  };
+
+  cancelApplicationDetails = () => {
+    this.setState(
+      {
+        showRemoteFiles: true,
+        enterRemoteDetails: false,
+        showApplicationDetails: false,
+        selectedFolderError: ""
+      },
+      this.goBack
+    );
   };
 
   getContents = async file => {
@@ -106,14 +133,15 @@ class AddNewApplication extends Component {
     if (!res.data.error) {
       remoteFiles = res.data.data;
     }
-    this.hideLoading();
-    this.setState({ remoteFiles, path });
+    this.setState(
+      { remoteFiles, path, selectedFolderError: "" },
+      this.hideLoading
+    );
   };
 
   goBack = async () => {
-    const { remoteDetails } = this.state;
-    let { path } = this.state;
-    if (!path) {
+    let { path, remoteDetails } = this.state;
+    if (!path || remoteDetails.root_path === path) {
       return;
     }
     path = path.substring(0, path.lastIndexOf("/"));
@@ -126,32 +154,92 @@ class AddNewApplication extends Component {
     if (!res.data.error) {
       remoteFiles = res.data.data;
     }
-    this.hideLoading();
-    this.setState({ remoteFiles, path });
+    this.setState(
+      { remoteFiles, path, selectedFolderError: "" },
+      this.hideLoading
+    );
   };
 
   showApplicationDetails = async selectedFolder => {
     let { path } = this.state;
-    path = `${path}/${selectedFolder.name}`;
+    path = `${path}/${_.get(selectedFolder, "name", "")}`;
+    path = _.replace(path, new RegExp("//", "g"), "/");
     this.showLoading();
-    const res = await ApplicationApi.isValidFTPSubmissionFolder({
+    let res = await ApplicationApi.isValidFTPSubmissionFolder({
       customer_id: this.props.selectedCustomer.id,
-      ftpPath: `${this.state.remoteDetails.ftp_path}${path}`
+      ftp_path: path
     });
-    this.hideLoading();
-    if (res.data.error) {
-      this.setState({ selectedFolderError: res.data.message });
+    let { error, data, message } = res.data;
+    if (error) {
+      this.setState({ selectedFolderError: message }, this.hideLoading);
       return;
     }
-    this.setState({
-      showApplicationDetails: true,
-      showRemoteFiles: false,
-      path
-    });
+    const validSequences = _.get(data, "validSequences.length", 0);
+    if (!validSequences) {
+      this.setState(
+        {
+          selectedFolderError:
+            "Invalid folder. Please select a Submission folder."
+        },
+        this.hideLoading
+      );
+      return;
+    }
+
+    res = await ApplicationApi.getSubmissionLookupInfo();
+    error = res.data.error;
+    if (error) {
+      this.setState({ selectedFolderError: message }, this.hideLoading);
+      return;
+    }
+
+    const {
+      application_types,
+      cloud_types,
+      regions,
+      submission_centers
+    } = res.data.data;
+    this.setState(
+      {
+        selectedFolderError: "",
+        showApplicationDetails: true,
+        showRemoteFiles: false,
+        path,
+        application_types,
+        cloud_types,
+        regions,
+        submission_centers,
+        validSequences
+      },
+      this.hideLoading
+    );
   };
 
   openCustomersScreen = () => {
     this.props.history.push("/customers");
+  };
+
+  saveDetails = async obj => {
+    obj.customer_id = this.props.selectedCustomer.id;
+    obj.cloud_type_id = 1;
+    obj.additional_details = {
+      auth_id: this.state.auth_id,
+      submission_path: this.state.path
+    };
+    this.showLoading();
+    const res = await ApplicationApi.saveSubmissionDetails(obj);
+    if (res.data.error) {
+      this.setState(
+        { selectedFolderError: res.data.message },
+        this.hideLoading
+      );
+      return;
+    }
+    this.hideLoading();
+    if (!res.data.error) {
+      Toast.success(res.data.message);
+    }
+    this.openApplicationsScreen();
   };
 
   openApplicationsScreen = () => {
@@ -160,12 +248,10 @@ class AddNewApplication extends Component {
 
   getTitle = () => {
     if (this.state.showApplicationDetails) {
-      return `${_.get(this.state.remoteDetails, "ftp_path", "")}${
-        this.state.path
-      }`;
+      return this.state.path;
     }
     if (this.state.selectedCloud) {
-      return CLOUDS[this.state.selectedCloud];
+      return this.state.selectedCloud;
     }
     return translate("label.newapplication.source");
   };
@@ -186,7 +272,7 @@ class AddNewApplication extends Component {
   render() {
     const { selectedCustomer, loading } = this.props;
     const {
-      selectedCloud,
+      path,
       remoteDetails,
       remoteFiles,
       showClouds,
@@ -194,7 +280,11 @@ class AddNewApplication extends Component {
       showRemoteFiles,
       selectedFolderError,
       showApplicationDetails,
-      path
+      regions,
+      submission_centers,
+      application_types,
+      validSequences,
+      cloud_types
     } = this.state;
     return (
       <React.Fragment>
@@ -232,7 +322,9 @@ class AddNewApplication extends Component {
               })}
             </span>
           </div>
-          <p className="addUser-title">{this.getTitle()}</p>
+          <p className="addUser-title" style={{ fontSize: "20px" }}>
+            {this.getTitle()}
+          </p>
           <p className="addUser-subtitle">{this.getSubtitle()}</p>
           <div className="global__hr-line" style={{ marginBottom: "20px" }} />
           {selectedFolderError && (
@@ -253,6 +345,8 @@ class AddNewApplication extends Component {
             )}
             {showRemoteFiles && (
               <RemoteFiles
+                currentPath={path}
+                rootPath={remoteDetails.ftp_path}
                 remoteFiles={remoteFiles}
                 cancel={this.enterRemoteDetails}
                 openContents={this.getContents}
@@ -262,8 +356,21 @@ class AddNewApplication extends Component {
             )}
             {showApplicationDetails && (
               <ApplicationDetails
-                cancel={this.showRemoteFiles}
-                submit={this.openApplicationsScreen}
+                cancel={this.cancelApplicationDetails}
+                submit={this.saveDetails}
+                regions={_.map(regions, region => ({
+                  key: region.id,
+                  value: region.name
+                }))}
+                centers={_.map(submission_centers, center => ({
+                  key: center.id,
+                  value: center.name
+                }))}
+                types={_.map(application_types, type => ({
+                  key: type.id,
+                  value: type.name
+                }))}
+                validSequences={validSequences}
               />
             )}
           </div>

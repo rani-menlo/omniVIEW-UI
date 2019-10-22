@@ -24,10 +24,12 @@ const NumericInput = ({
   error,
   style,
   className,
-  limit
+  limit,
+  disabled
 }) => {
   return (
     <InputField
+      disabled={disabled}
       label={label}
       value={value}
       onChange={onInputText(onChange, limit)}

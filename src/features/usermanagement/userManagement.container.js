@@ -19,7 +19,7 @@ import {
   Toast,
   OmniCheckbox
 } from "../../uikit/components";
-import { DEBOUNCE_TIME, ROLES } from "../../constants";
+import { DEBOUNCE_TIME, ROLES, ROLE_IDS } from "../../constants";
 import {
   UsermanagementActions,
   CustomerActions,
@@ -31,7 +31,8 @@ import {
   getRoleName,
   getFormattedDate,
   isLoggedInOmniciaRole,
-  isLoggedInOmniciaAdmin
+  isLoggedInOmniciaAdmin,
+  isLoggedInCustomerAdmin
 } from "../../utils";
 import PopoverUsersFilter from "./popoverUsersFilter";
 import UserCard from "./userCard.component";
@@ -208,6 +209,42 @@ class UserManagementContainer extends Component {
     this.setState({ showAccessControlModal: true, selectedUser: user });
   };
 
+  removeUser = usr => () => {
+    Modal.confirm({
+      className: "omnimodal",
+      title: translate("label.generic.delete"),
+      content: translate("label.user.areyousuredeleteuser"),
+      okText: translate("label.generic.delete"),
+      cancelText: translate("label.button.cancel"),
+      onOk: () => {
+        this.setState({ selectedUser: usr }, this.deleteUser);
+      },
+      onCancel: () => {
+        this.setState({ selectedUser: null }, this.deleteUser);
+      }
+    });
+  };
+
+  deleteUser = () => {
+    const userIds = this.state.selectedUser
+      ? [this.state.selectedUser.user_id]
+      : _.map(this.state.checkedUsers, "user_id");
+
+    this.props.dispatch(
+      UsermanagementActions.deleteusers({ userIds }, async () => {
+        Toast.success(`User${userIds.length > 1 ? "s" : ""} Deleted!`);
+        this.props.dispatch(ApiActions.requestOnDemand());
+          const res = await CustomerApi.getCustomerById(
+            this.props.selectedCustomer.id
+          );
+          this.props.dispatch(
+            CustomerActions.setSelectedCustomer(res.data.data)
+          );
+        this.fetchUsers();
+      })
+    );
+  };
+
   getMenu = usr => () => {
     return (
       <Menu className="maindashboard__list__item-dropdown-menu">
@@ -222,7 +259,7 @@ class UserManagementContainer extends Component {
             )}`}</span>
           </p>
         </Menu.Item>
-        {usr.role_id !== 1 && (
+        {usr.role_id !== ROLE_IDS.OMNICIA.administrator && (
           <Menu.Item
             className="maindashboard__list__item-dropdown-menu-item"
             onClick={this.showLicenceUnAssignedModal(usr)}
@@ -233,17 +270,18 @@ class UserManagementContainer extends Component {
             </p>
           </Menu.Item>
         )}
-        {usr.role_id !== 1 && this.props.selectedCustomer.is_omnicia && (
-          <Menu.Item
-            className="maindashboard__list__item-dropdown-menu-item"
-            onClick={this.openAccessControlModal(usr)}
-          >
-            <p>
-              <img src="/images/assign.svg" />
-              <span>{translate("label.usermgmt.accesscontrol")}</span>
-            </p>
-          </Menu.Item>
-        )}
+        {usr.role_id !== ROLE_IDS.OMNICIA.administrator &&
+          this.props.selectedCustomer.is_omnicia && (
+            <Menu.Item
+              className="maindashboard__list__item-dropdown-menu-item"
+              onClick={this.openAccessControlModal(usr)}
+            >
+              <p>
+                <img src="/images/assign.svg" />
+                <span>{translate("label.usermgmt.accesscontrol")}</span>
+              </p>
+            </Menu.Item>
+          )}
         <Menu.Item
           className="maindashboard__list__item-dropdown-menu-item"
           onClick={this.openActivateDeactivateModal(usr)}
@@ -253,7 +291,14 @@ class UserManagementContainer extends Component {
               color: _.get(usr, "is_active", false) ? "red" : "#00d592"
             }}
           >
-            <img src="/images/deactivate.svg" />
+            {_.get(usr, "is_active", false) ? (
+              <img src="/images/deactivate.svg" />
+            ) : (
+              <Icon
+                type="check-circle"
+                style={{ fontSize: "20px", marginRight: "8px" }}
+              />
+            )}
             <span>
               {_.get(usr, "is_active", false)
                 ? translate("label.usermgmt.deactivate")
@@ -261,6 +306,23 @@ class UserManagementContainer extends Component {
             </span>
           </p>
         </Menu.Item>
+        {!usr.is_active &&
+          (isLoggedInOmniciaAdmin(this.props.role) ||
+            isLoggedInCustomerAdmin(this.props.role)) && (
+            <Menu.Item
+              className="maindashboard__list__item-dropdown-menu-item"
+              onClick={this.removeUser(usr)}
+            >
+              <p className="global__text-red">
+                <Icon
+                  type="delete"
+                  theme="filled"
+                  style={{ fontSize: "20px", marginRight: "8px" }}
+                />
+                <span>{translate("label.generic.delete")}</span>
+              </p>
+            </Menu.Item>
+          )}
       </Menu>
     );
   };
@@ -402,8 +464,15 @@ class UserManagementContainer extends Component {
     };
 
     this.props.dispatch(
-      UsermanagementActions.activateDeactivateUser(users, () => {
+      UsermanagementActions.activateDeactivateUser(users, async () => {
         Toast.success("User Status Updated!");
+        this.props.dispatch(ApiActions.requestOnDemand());
+          const res = await CustomerApi.getCustomerById(
+            this.props.selectedCustomer.id
+          );
+          this.props.dispatch(
+            CustomerActions.setSelectedCustomer(res.data.data)
+          );
         this.fetchUsers();
       })
     );
@@ -584,6 +653,17 @@ class UserManagementContainer extends Component {
     this.setState({ showAccessControlModal: false });
   };
 
+  hasDeactivatedUsers = () => {
+    if (!this.state.checkedUsers.length) {
+      return false;
+    }
+    const allRdeactivated = _.every(this.state.checkedUsers, [
+      "is_active",
+      false
+    ]);
+    return allRdeactivated;
+  };
+
   render() {
     const {
       searchText,
@@ -760,12 +840,21 @@ class UserManagementContainer extends Component {
                 <OmniButton
                   type="primary"
                   disabled={!this.state.showGlobalButtons}
+                  buttonStyle={{
+                    marginRight: "8px"
+                  }}
                   label={`${
                     this.state.markAllSecondary
                       ? translate("label.generic.tag")
                       : translate("label.generic.untag")
                   } ${translate("label.user.seccontact")}`}
                   onClick={this.openSecondaryContact}
+                />
+                <OmniButton
+                  type="primary"
+                  disabled={!this.hasDeactivatedUsers()}
+                  label={translate("label.generic.delete")}
+                  onClick={this.removeUser()}
                 />
               </div>
               <div className="maindashboard__list">
@@ -963,7 +1052,7 @@ const TableColumnNames = {
   DEPARTMENT: translate("label.user.department"),
   EMAIl: translate("label.user.email"),
   CONTACT: translate("label.user.seccontact"),
-  STATUS: translate("label.user.status"),
+  STATUS: translate("label.user.accstatus"),
   EXP_DATE: translate("label.user.expdate")
 };
 

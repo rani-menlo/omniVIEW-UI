@@ -14,7 +14,11 @@ import {
 } from "../../uikit/components";
 import { Radio, Icon, Switch, Checkbox } from "antd";
 import Header from "../header/header.component";
-import { UsermanagementActions } from "../../redux/actions";
+import {
+  UsermanagementActions,
+  CustomerActions,
+  ApiActions
+} from "../../redux/actions";
 import {
   isEmail,
   isPhone,
@@ -24,6 +28,7 @@ import {
 } from "../../utils";
 import { translate } from "../../translations/translator";
 import { ROLES } from "../../constants";
+import { CustomerApi } from "../../redux/api";
 
 const RadioGroup = Radio.Group;
 
@@ -226,13 +231,13 @@ class AddUser extends Component {
       );
     } else {
       _.map(state.selectedLicences, licence => {
-        if (_.includes(_.get(licence, 'licences[0].slug'), "omniview")) {
+        if (_.includes(_.get(licence, "licences[0].slug"), "omniview")) {
           reqObject["subscriptions"] = {
             ...reqObject["subscriptions"],
             "omni-view": licence.id
           };
         }
-        if (_.includes(_.get(licence, 'licences[0].slug'), "omnifile")) {
+        if (_.includes(_.get(licence, "licences[0].slug"), "omnifile")) {
           reqObject["subscriptions"] = {
             ...reqObject["subscriptions"],
             "omni-file": licence.id
@@ -240,7 +245,16 @@ class AddUser extends Component {
         }
       });
       this.props.dispatch(
-        UsermanagementActions.addUser(reqObject, this.props.history)
+        UsermanagementActions.addUser(reqObject, async () => {
+          this.props.history.goBack();
+          this.props.dispatch(ApiActions.requestOnDemand());
+          const res = await CustomerApi.getCustomerById(
+            this.props.selectedCustomer.id
+          );
+          this.props.dispatch(
+            CustomerActions.setSelectedCustomer(res.data.data)
+          );
+        })
       );
     }
   };

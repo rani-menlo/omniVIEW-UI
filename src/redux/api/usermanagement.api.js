@@ -14,6 +14,7 @@ export default {
   addUser: user => api.post(URI.ADD_USER, user),
   updateUser: user => api.post(URI.UPDATE_USER, user),
   activateDeactivateUser: user => api.post(URI.ACTIVATE_DEACTIVATE, user),
+  deleteUser: data => api.post(URI.DELETE_USER, data),
   updateSecondaryContacts: data =>
     api.post(URI.UPDATE_SECONDARY_CONTACTS, data),
   fetchUsers: data => api.post(URI.GET_USERS, data),
