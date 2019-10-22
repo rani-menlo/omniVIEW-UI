@@ -1,6 +1,12 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { InputField, OmniButton } from "../../../uikit/components";
+import _ from "lodash";
+import {
+  InputField,
+  OmniButton,
+  SelectField,
+  NumericInput
+} from "../../../uikit/components";
 import { translate } from "../../../translations/translator";
 
 class ApplicationDetails extends Component {
@@ -35,6 +41,11 @@ class ApplicationDetails extends Component {
     };
   }
 
+  onSelect = (field, array) => val => {
+    const value = _.find(array, item => item.key == val);
+    this.setState({ [field]: { value, error: "" } });
+  };
+
   onInputChange = field => e => {
     const { value } = e.target;
     if (value === " ") {
@@ -45,42 +56,106 @@ class ApplicationDetails extends Component {
     });
   };
 
+  submit = () => {
+    const { submit } = this.props;
+    const state = { ...this.state };
+    let error = false;
+    if (!state.region.value) {
+      error = true;
+      state.region.error = translate("error.form.required", {
+        type: translate("label.newapplication.region")
+      });
+    }
+    if (!state.submissionCenter.value) {
+      error = true;
+      state.submissionCenter.error = translate("error.form.required", {
+        type: translate("label.newapplication.submissioncenter")
+      });
+    }
+    if (!state.applicationType.value) {
+      error = true;
+      state.applicationType.error = translate("error.form.required", {
+        type: translate("label.newapplication.applicationtype")
+      });
+    }
+    if (!state.applicationNo.value) {
+      error = true;
+      state.applicationNo.error = translate("error.form.required", {
+        type: translate("label.newapplication.applicationnumber")
+      });
+    }
+    /* if (!state.sequences.value) {
+      error = true;
+      state.sequences.error = translate("error.form.required", {
+        type: translate("label.newapplication.noofsequences")
+      });
+    } */
+    if (error) {
+      this.setState(state);
+      return;
+    }
+
+    const obj = {
+      region_id: state.region.value.key,
+      submission_center: state.submissionCenter.value.value,
+      application_type_id: state.applicationType.value.key,
+      app_number: +state.applicationNo.value,
+      no_of_sequences: this.props.validSequences
+    };
+    submit(obj);
+  };
+
   render() {
-    const { region, submissionCenter, applicationType, applicationNo, sequences } = this.state;
-    const { cancel, submit } = this.props;
+    const {
+      applicationNo,
+      sequences,
+      region,
+      submissionCenter,
+      applicationType
+    } = this.state;
+    const { cancel, regions, centers, types, validSequences } = this.props;
+    const style = { marginBottom: "10%" };
     return (
       <div className="addnewapplication__remote">
-        <InputField
-          label={`${translate("label.newapplication.region")}*`}
-          value={region.value}
-          placeholder={translate("label.newapplication.region")}
+        <SelectField
+          style={style}
+          selectFieldClassName="newlicence__field-select"
+          options={regions}
           error={region.error}
-          onChange={this.onInputChange("region")}
+          onChange={this.onSelect("region", regions)}
+          label={`${translate("label.newapplication.region")}*`}
+          placeholder={translate("label.newapplication.region")}
         />
-        <InputField
-          label={`${translate("label.newapplication.submissioncenter")}*`}
-          value={applicationType.value}
-          placeholder={translate("label.newapplication.submissioncenter")}
-          error={applicationType.error}
-          onChange={this.onInputChange("applicationType")}
-        />
-        <InputField
-          label={`${translate("label.newapplication.applicationtype")}*`}
-          value={submissionCenter.value}
-          placeholder={translate("label.newapplication.applicationtype")}
+        <SelectField
+          selectFieldClassName="newlicence__field-select"
+          style={style}
+          options={centers}
           error={submissionCenter.error}
-          onChange={this.onInputChange("submissionCenter")}
+          onChange={this.onSelect("submissionCenter", centers)}
+          label={`${translate("label.newapplication.submissioncenter")}*`}
+          placeholder={translate("label.newapplication.submissioncenter")}
         />
-        <InputField
+        <SelectField
+          selectFieldClassName="newlicence__field-select"
+          style={style}
+          options={types}
+          error={applicationType.error}
+          onChange={this.onSelect("applicationType", types)}
+          label={`${translate("label.newapplication.applicationtype")}*`}
+          placeholder={translate("label.newapplication.applicationtype")}
+        />
+        <NumericInput
+          limit={999999}
           label={`${translate("label.newapplication.applicationnumber")}*`}
           value={applicationNo.value}
           placeholder={translate("label.newapplication.applicationnumber")}
           error={applicationNo.error}
           onChange={this.onInputChange("applicationNo")}
         />
-        <InputField
-          label={`${translate("label.newapplication.noofsequences")}*`}
-          value={sequences.value}
+        <NumericInput
+          disabled
+          label={`${translate("label.newapplication.noofsequences")}`}
+          value={validSequences}
           placeholder={translate("label.newapplication.noofsequences")}
           error={sequences.error}
           onChange={this.onInputChange("sequences")}
@@ -95,7 +170,7 @@ class ApplicationDetails extends Component {
           <OmniButton
             type="primary"
             label={translate("label.button.upload")}
-            onClick={submit}
+            onClick={this.submit}
           />
         </div>
       </div>

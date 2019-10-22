@@ -7,7 +7,15 @@ const initialState = {
   sequenceJson: {},
   lifeCycleJson: {},
   validations: {},
-  searchResults: []
+  find: {
+    searchResults: [],
+    selected: "",
+    searchText: "",
+    matchCase: false,
+    matchWholeword: false,
+    sortFile: "asc",
+    sortTitle: "asc"
+  }
 };
 
 export default (state = initialState, action) => {
@@ -53,13 +61,80 @@ export default (state = initialState, action) => {
     case SubmissionActionTypes.FIND_TEXT: {
       return {
         ...state,
-        searchResults: action.data.data
+        find: {
+          ...state.find,
+          searchResults: action.data.data,
+          searchText: action.text
+        }
+      };
+    }
+    case SubmissionActionTypes.FIND_SELECTED_RESULT: {
+      const search = action.selected;
+      return {
+        ...state,
+        find: {
+          ...state.find,
+          selected: `${search.ID}_${search.name}_${search.title}`
+        }
+      };
+    }
+    case SubmissionActionTypes.FIND_MATCH_BY: {
+      return {
+        ...state,
+        find: {
+          ...state.find,
+          [action.match]: !state.find[action.match]
+        }
+      };
+    }
+    case SubmissionActionTypes.FIND_SORT_BY_TITLE: {
+      const order = state.find.sortTitle === "asc" ? "desc" : "asc";
+      const searchResults = _.orderBy(
+        state.find.searchResults,
+        ["title"],
+        [order]
+      );
+      return {
+        ...state,
+        find: {
+          ...state.find,
+          searchResults,
+          sortTitle: order
+        }
+      };
+    }
+    case SubmissionActionTypes.FIND_SORT_BY_FILE: {
+      const order = state.find.sortFile === "asc" ? "desc" : "asc";
+      const searchResults = _.orderBy(
+        state.find.searchResults,
+        ["name"],
+        [order]
+      );
+      return {
+        ...state,
+        find: {
+          ...state.find,
+          searchResults,
+          sortFile: order
+        }
       };
     }
     case SubmissionActionTypes.CLEAR_SEARCH_RESULTS: {
       return {
         ...state,
-        searchResults: []
+        find: {
+          ...state.find,
+          searchResults: [],
+          searchText: ""
+        }
+      };
+    }
+    case SubmissionActionTypes.RESET_FIND: {
+      return {
+        ...state,
+        find: {
+          ...initialState.find
+        }
       };
     }
     default:

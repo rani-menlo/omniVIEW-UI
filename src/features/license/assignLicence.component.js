@@ -136,7 +136,10 @@ const AssignLicence = ({
             type="regular"
             size="14px"
             text={translate("text.licence.accesspermitteduntil", {
-              date: moment()
+              date: moment(
+                _.get(licence, "purchaseDate", null) ||
+                  _.get(licence, "purchase_date", "")
+              )
                 .add(_.get(licence, "duration", 0), "days")
                 .calendar()
             })}
@@ -214,7 +217,10 @@ const AssignLicence = ({
             type="regular"
             size="14px"
             text={translate("text.licence.accesspermitteduntil", {
-              date: moment()
+              date: moment(
+                _.get(licence, "purchaseDate", null) ||
+                  _.get(licence, "purchase_date", "")
+              )
                 .add(_.get(licence, "duration", 0), "days")
                 .calendar()
             })}

@@ -8,34 +8,23 @@ import { SearchBox, OmniCheckbox, Text, Row } from "../../uikit/components";
 import { SubmissionActions } from "../../redux/actions";
 
 class FindNode extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      searchResults: [],
-      searchText: null,
-      matchCase: false,
-      matchWholeword: false,
-      sortFile: "asc",
-      sortTitle: "asc"
-    };
-  }
-
   static propTypes = {
     onClose: PropTypes.func,
     onItemSelected: PropTypes.func
   };
-
-  static getDerivedStateFromProps(props, state) {
-    if (!state.searchResults.length && props.searchResults.length) {
-      return {
-        searchResults: _.sortBy(props.searchResults, "title")
-      };
-    }
-    return null;
+  constructor(props) {
+    super(props);
+    this.state = {
+      searchText: null,
+      selected: ""
+    };
   }
 
-  componentWillUnmount() {
-    this.props.dispatch(SubmissionActions.clearSearchResults());
+  componentDidMount() {
+    this.setState({
+      searchText: this.props.searchText,
+      selected: this.props.selected
+    });
   }
 
   handleSearch = e => {
@@ -43,45 +32,43 @@ class FindNode extends Component {
     this.setState({ searchText });
   };
 
+  clearSearch = () => {
+    this.setState({ searchText: "" });
+  };
+
   onCheckboxChange = type => e => {
-    this.setState({ [type]: e.target.checked });
+    this.props.dispatch(SubmissionActions.findMatchBy(type));
+    // this.setState({ [type]: e.target.checked });
   };
 
   search = () => {
-    const { selectedSequence, selectedSubmission } = this.props;
+    const { searchText } = this.state;
+    const {
+      selectedSequence,
+      selectedSubmission,
+      matchCase,
+      matchWholeword
+    } = this.props;
     const fileID = selectedSequence
       ? selectedSequence.json_path
       : selectedSubmission.life_cycle_json_path;
     this.props.dispatch(SubmissionActions.clearSearchResults());
-    this.setState({ searchResults: [] });
     this.props.dispatch(
       SubmissionActions.findText({
         fileID,
-        text: this.state.searchText,
-        matchCase: this.state.matchCase,
-        wholeWord: this.state.matchWholeword
+        text: searchText,
+        matchCase,
+        wholeWord: matchWholeword
       })
     );
   };
 
   sortTitle = () => {
-    const order = this.state.sortTitle === "asc" ? "desc" : "asc";
-    const searchResults = _.orderBy(
-      this.state.searchResults,
-      ["title"],
-      [order]
-    );
-    this.setState({ searchResults, sortTitle: order });
+    this.props.dispatch(SubmissionActions.findSortByTitle());
   };
 
   sortFile = () => {
-    const order = this.state.sortFile === "asc" ? "desc" : "asc";
-    const searchResults = _.orderBy(
-      this.state.searchResults,
-      ["name"],
-      [order]
-    );
-    this.setState({ searchResults, sortFile: order });
+    this.props.dispatch(SubmissionActions.findSortByFile());
   };
 
   getPathBasedOnOperation = operation => {
@@ -98,12 +85,19 @@ class FindNode extends Component {
 
   onItemSelected = item => () => {
     this.setState({ selected: `${item.ID}_${item.name}_${item.title}` });
+    this.props.dispatch(SubmissionActions.findSelectedResult(item));
     this.props.onItemSelected && this.props.onItemSelected(item);
   };
 
   render() {
-    const { searchText, searchResults, selected } = this.state;
-    const { onClose } = this.props;
+    const { searchText } = this.state;
+    const {
+      onClose,
+      searchResults,
+      selected,
+      matchCase,
+      matchWholeword
+    } = this.props;
     return (
       <div className="validationResults">
         <div className="validationResults__header">
@@ -131,19 +125,31 @@ class FindNode extends Component {
             placeholder={translate("placeholder.submission.find")}
             className="validationResults-find"
             searchText={searchText}
-            suffixIcon={
+            prefixIcon={null}
+            /* suffixIcon={
               <Button
                 type="primary"
                 shape="circle"
                 icon="search"
                 onClick={this.search}
               />
-            }
+            } */
+            clearSearch={this.clearSearch}
             onPressEnter={this.search}
             onChange={this.handleSearch}
           />
+          <Button
+            disabled={_.isEmpty(searchText)}
+            type="primary"
+            icon="search"
+            style={{ marginLeft: "10px", color: "white" }}
+            onClick={this.search}
+          >
+            {translate("label.button.search")}
+          </Button>
           <div style={{ marginLeft: "10px" }}>
             <Checkbox
+              checked={matchWholeword}
               onChange={this.onCheckboxChange("matchWholeword")}
               className="permissionCheckbox"
             >
@@ -155,6 +161,7 @@ class FindNode extends Component {
               />
             </Checkbox>
             <Checkbox
+              checked={matchCase}
               onChange={this.onCheckboxChange("matchCase")}
               className="permissionCheckbox"
               style={{ marginLeft: "unset" }}
@@ -199,7 +206,7 @@ class FindNode extends Component {
                     text={translate("label.generic.title")}
                   />
                   <img
-                    src={`/images/sort_${this.state.sortTitle}.svg`}
+                    src={`/images/sort_${this.props.sortTitle}.svg`}
                     style={{ width: "16px", height: "16px" }}
                   />
                 </div>
@@ -214,7 +221,7 @@ class FindNode extends Component {
                     text={translate("label.generic.filename")}
                   />
                   <img
-                    src={`/images/sort_${this.state.sortFile}.svg`}
+                    src={`/images/sort_${this.props.sortFile}.svg`}
                     style={{ width: "16px", height: "16px" }}
                   />
                 </div>
@@ -240,7 +247,7 @@ class FindNode extends Component {
             {searchText !== null && (
               <div
                 className="validationResults__table__body__find__results"
-                key={`${this.state.sortTitle}_${this.state.sortFile}`}
+                key={`${this.props.sortTitle}_${this.props.sortFile}`}
               >
                 {_.map(searchResults, search => {
                   return (
@@ -317,7 +324,13 @@ function mapStateToProps(state, props) {
   return {
     selectedSequence: state.Submission.selectedSequence,
     selectedSubmission: state.Application.selectedSubmission,
-    searchResults: state.Submission.searchResults
+    searchResults: state.Submission.find.searchResults,
+    selected: state.Submission.find.selected,
+    searchText: state.Submission.find.searchText,
+    sortFile: state.Submission.find.sortFile,
+    sortTitle: state.Submission.find.sortTitle,
+    matchCase: state.Submission.find.matchCase,
+    matchWholeword: state.Submission.find.matchWholeword
   };
 }
 

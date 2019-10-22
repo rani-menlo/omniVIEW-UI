@@ -4,6 +4,7 @@ import { Avatar, Modal, Icon } from "antd";
 import { Row, Text, OmniButton, ImageLoader } from "../../uikit/components";
 import { getRoleName, getFormattedDate } from "../../utils";
 import { translate } from "../../translations/translator";
+import { ROLE_IDS } from "../../constants";
 
 const UserProfileCard = ({
   user,
@@ -63,25 +64,26 @@ const UserProfileCard = ({
             type="regular"
             size="16px"
             text={
-              _.get(user, "license_status", false)
-                ? ` ${translate("label.user.active")}`
-                : ` ${translate("label.user.inactive")}`
+              _.get(user, "license_status", 0)
+                ? ` ${translate("label.generic.subscribed")}`
+                : ` ${translate("label.generic.unsubscribed")}`
             }
           />
         </Row>
-        {_.get(user, "role_id") !== 1 && (
-          <Text
-            textStyle={{ textAlign: "right", width: "100%" }}
-            type="regular"
-            size="14px"
-            opacity={0.5}
-            text={`${(_.get(user, "is_active") || "") &&
-              ` ${translate("label.usermgmt.expires")}`} ${getFormattedDate(
-              _.get(user, "expiryDate")
-            )}`}
-          />
-        )}
-        {_.get(user, "role_id") !== 1 && (
+        {_.get(user, "role_id") !== ROLE_IDS.OMNICIA.administrator &&
+          _.get(user, "expiryDate") && (
+            <Text
+              textStyle={{ textAlign: "right", width: "100%" }}
+              type="regular"
+              size="14px"
+              opacity={0.5}
+              text={`${(_.get(user, "is_active") || "") &&
+                ` ${translate("label.usermgmt.expires")}`} ${getFormattedDate(
+                _.get(user, "expiryDate")
+              )}`}
+            />
+          )}
+        {_.get(user, "role_id") !== ROLE_IDS.OMNICIA.administrator && (
           <OmniButton
             className="userProfileCard-button"
             type="primary"

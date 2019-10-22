@@ -17,10 +17,11 @@ const ChooseCloud = ({ onCloudSelect }) => {
     <div className="addnewapplication__cloud">
       {_.map(CLOUDS, (val, key) => (
         <OmniButton
+          disabled={val.disabled}
           type="primary"
-          label={val}
+          label={val.name}
           buttonStyle={buttonStyle}
-          onClick={onSelect(onCloudSelect, key)}
+          onClick={onSelect(onCloudSelect, val)}
         />
       ))}
     </div>

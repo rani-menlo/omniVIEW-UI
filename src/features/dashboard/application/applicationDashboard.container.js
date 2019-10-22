@@ -268,6 +268,9 @@ class ApplicationDashboard extends Component {
   };
 
   onSubmissionSelected = submission => () => {
+    if (_.get(submission, "sequence_count", 0) == 0) {
+      return;
+    }
     this.props.actions.setSelectedSubmission(submission);
     this.props.dispatch(
       submissionActions.resetSequences(submission.id, () => {
@@ -411,7 +414,7 @@ class ApplicationDashboard extends Component {
   };
 
   closePermissionsModal = () => {
-    this.checkAll();
+    this.state.viewBy === "lists" && this.checkAll();
     this.setState({
       showPermissionsModal: false,
       assignGlobalPermissions: false
@@ -779,7 +782,7 @@ class ApplicationDashboard extends Component {
                         overlayClassName="maindashboard__list__item-dropdown"
                       >
                         <img
-                        className="global__cursor-pointer"
+                          className="global__cursor-pointer"
                           src="/images/overflow-black.svg"
                           style={{ width: "20px", height: "20px" }}
                         />

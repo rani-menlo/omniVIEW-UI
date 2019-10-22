@@ -10,6 +10,7 @@ const SearchBox = ({
   className,
   style,
   suffixIcon,
+  prefixIcon,
   onPressEnter
 }) => {
   return (
@@ -17,7 +18,11 @@ const SearchBox = ({
       style={style}
       value={searchText}
       className={`searchBox ${className}`}
-      prefix={<img src="/images/search.svg" style={{ marginLeft: "5px" }} />}
+      prefix={
+        prefixIcon === null ? null : (
+          <img src="/images/search.svg" style={{ marginLeft: "5px" }} />
+        )
+      }
       suffix={
         searchText ? (
           suffixIcon ? (

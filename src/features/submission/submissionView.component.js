@@ -43,6 +43,7 @@ import {
 } from "../../utils";
 import usermanagementActions from "../../redux/actions/usermanagement.actions";
 import FindNode from "./findNode.component";
+import { UsermanagementApi } from "../../redux/api";
 
 const TabPane = Tabs.TabPane;
 
@@ -70,6 +71,8 @@ class SubmissionView extends Component {
       sequences: [],
       showPermissionsModal: false,
       selectedNode: null,
+      proUser: false,
+      enableValidateSequence: false,
       fileLevelAccessObj: {
         label: "",
         fileIds: [],
@@ -94,12 +97,30 @@ class SubmissionView extends Component {
     ) {
       state.viewPermissions = true;
     }
+    let proUser = false;
+    if (isLoggedInOmniciaAdmin(this.props.role)) {
+      proUser = true;
+    } else {
+      const res = await UsermanagementApi.getLicenseInfo();
+      _.forEach(res.data.data, subscription => {
+        const hasPro = subscription.type_name.includes("Pro");
+        if (hasPro) {
+          proUser = hasPro;
+          return false;
+        }
+      });
+    }
+    if (proUser) {
+      state.proUser = proUser;
+    }
     if (_.size(state)) {
       this.setState({ ...state });
     }
     this.initData();
-    const res = await UsermanagementActions.getLicenseInfo();
-    console.log(res.data);
+  }
+
+  componentWillUnmount() {
+    this.props.dispatch(SubmissionActions.clearSearchResults());
   }
 
   static getDerivedStateFromProps(props, state) {
@@ -335,12 +356,14 @@ class SubmissionView extends Component {
     this.setState({
       treeExpand: false,
       selectedView: "",
-      nodeProperties: null
+      nodeProperties: null,
+      enableValidateSequence: this.state.proUser
     });
     this.closeValidationModal();
   };
 
   onSelectedSequence = sequence => {
+    this.props.dispatch(SubmissionActions.clearSearchResults());
     if (Permissions.hasChanges()) {
       this.showConfirmDialog(() => this.onSequenceSelected(sequence));
       return;
@@ -407,6 +430,7 @@ class SubmissionView extends Component {
   };
 
   changeView = view => {
+    this.props.dispatch(SubmissionActions.clearSearchResults());
     Permissions.clear();
     const { selectedUser, nodeProperties } = this.state;
     const { selectedSubmission, user } = this.props;
@@ -445,6 +469,7 @@ class SubmissionView extends Component {
   };
 
   openApplicationsScreen = () => {
+    this.props.dispatch(SubmissionActions.resetFind());
     this.props.actions.setSelectedSequence(null);
     window.close();
     this.props.history.push("/applications");
@@ -554,11 +579,12 @@ class SubmissionView extends Component {
     }
 
     filters.roles = roles;
-    const { selectedCustomer } = this.props;
+    const { selectedCustomer, selectedSubmission } = this.props;
     selectedCustomer &&
       this.props.dispatch(
         UsermanagementActions.fetchUsers({
           customerId: selectedCustomer.id,
+          submissionId: selectedSubmission.id,
           isOmnicia: true,
           ...filters
         })
@@ -617,11 +643,9 @@ class SubmissionView extends Component {
   };
 
   getNodeFromMap = item => {
-    return _.get(item, "ID")
-      ? this.treeNodesMap.get(item.ID)
-      : this.treeNodesMap.get(
-          `${_.get(item, "name", "")}_${_.get(item, "title", "")}`
-        );
+    const label = `${_.get(item, "name", "")}_${_.get(item, "title", "")}`;
+    let node = this.treeNodesMap.get(label) || this.treeNodesMap.get(item.ID);
+    return node;
   };
 
   selectChildNode = item => {
@@ -659,9 +683,18 @@ class SubmissionView extends Component {
       return;
     }
     const id = _.get(node, "state.properties.ID");
+    if (id === "n03262") {
+      console.log(node);
+    }
     if (id) {
       const existingNode = this.treeNodesMap.get(id);
-      !existingNode && this.treeNodesMap.set(id, node);
+      if (existingNode && _.get(node, "state.properties.STF")) {
+        const name = _.get(node, "state.properties.name", "");
+        const title = _.get(node, "state.properties.title", "");
+        this.treeNodesMap.set(`${name}_${title}`, node);
+      } else {
+        this.treeNodesMap.set(id, node);
+      }
     } else if (_.get(node, "[state][properties][dtd-version]")) {
       const label = this.getSequenceLabel();
       this.treeNodesMap.set(`${label}_${label}`, node);
@@ -892,7 +925,8 @@ class SubmissionView extends Component {
       viewPermissions,
       editPermissions,
       showPermissionsModal,
-      fileLevelAccessObj
+      fileLevelAccessObj,
+      enableValidateSequence
     } = this.state;
 
     if (!selectedSubmission) {
@@ -989,35 +1023,24 @@ class SubmissionView extends Component {
                 <span className="icon-label">Find</span>
               </FlexBox>
               <div
-                className={`submissionview__header__validate icon_text_border ${selectedSequence &&
+                className={`submissionview__header__validate icon_text_border ${enableValidateSequence &&
                   "global__cursor-pointer"}`}
                 style={{
-                  /* ...(!(
-                    isLoggedInOmniciaAdmin(role) || this.props["omniview-pro"]
-                  ) && {
-                    opacity: 0.2,
-                    cursor: "not-allowed"
-                  }), */
-                  ...(!selectedSequence && { border: 0 })
+                  ...(!enableValidateSequence && { border: 0 })
                 }}
-                onClick={
-                  selectedSequence &&
-                  /* (isLoggedInOmniciaAdmin(role) ||
-                    this.props["omniview-pro"]) && */
-                  this.validate
-                }
+                onClick={enableValidateSequence && this.validate}
               >
                 <img
                   src="/images/folder-validate.svg"
                   className="global__icon"
                   style={{
                     marginLeft: 0,
-                    opacity: !selectedSequence ? 0.2 : 1
+                    opacity: !enableValidateSequence ? 0.2 : 1
                   }}
                 />
                 <span
                   className="text"
-                  style={!selectedSequence ? { opacity: 0.2 } : {}}
+                  style={!enableValidateSequence ? { opacity: 0.2 } : {}}
                 >
                   Validate Sequence
                 </span>

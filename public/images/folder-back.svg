@@ -1,0 +1,52 @@
+<svg width="35.999" height="36.005" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+ <g>
+  <title>background</title>
+  <rect fill="none" id="canvas_background" height="402" width="582" y="-1" x="-1"/>
+ </g>
+ <g>
+  <title>Layer 1</title>
+  <path id="svg_1" fill="none" marker-start="none" marker-end="none" d="m0,0l0,36.005l35.999,0l0,-36.005l-35.999,0z"/>
+  <defs>
+   <rect width="35.999" id="SVGID_1_" height="36.005"/>
+   <linearGradient y2="Infinity" y1="Infinity" x2="Infinity" x1="Infinity" id="SVGID_3_">
+    <stop stop-color="#F1E994" offset="0"/>
+    <stop stop-color="#FEDF17" offset="1"/>
+   </linearGradient>
+   <linearGradient y2="Infinity" y1="Infinity" x2="Infinity" x1="Infinity" id="SVGID_4_">
+    <stop stop-color="#F1E994" offset="0"/>
+    <stop stop-color="#FEDF17" offset="1"/>
+   </linearGradient>
+   <linearGradient y2="-Infinity" y1="-Infinity" x2="Infinity" x1="Infinity" id="SVGID_5_">
+    <stop stop-color="#FFFFFF" offset="0"/>
+    <stop stop-color="#000000" offset="1"/>
+   </linearGradient>
+  </defs>
+  <clipPath id="SVGID_2_">
+   <use id="svg_3" xlink:href="#SVGID_1_"/>
+  </clipPath>
+  <path id="svg_5" fill="#ffffff" marker-start="none" marker-end="none" d="m2.296,31.504l-0.045,-21c-0.001,-0.163 0.052,-0.321 0.15,-0.452l2.25,-3c0.141,-0.188 0.363,-0.3 0.6,-0.3l7.5,0c0.236,0 0.458,0.112 0.6,0.3l2.025,2.7l16.125,0c0.413,0 0.75,0.337 0.749,0.751l-0.001,21c0,0.413 -0.336,0.749 -0.749,0.749l-28.454,0c-0.414,0 -0.75,-0.335 -0.75,-0.748z"/>
+  <path id="svg_6" fill="url(#SVGID_3_)" marker-start="none" marker-end="none" d="m3.001,10.502l0.045,21l28.454,0l0.001,-21l-16.5,0l-2.25,-3l-7.5,0l-2.25,3z"/>
+  <a id="svg_7">
+   <path id="svg_8" fill="#FFFDEA" marker-start="none" marker-end="none" d="m4.688,8.252l0.563,-0.75l7.5,0l0.562,0.75l-8.625,0z"/>
+  </a>
+  <path id="svg_9" fill="#ffffff" marker-start="none" marker-end="none" d="m2.272,32.252l0,-18c0,-0.413 0.336,-0.75 0.75,-0.75l28.455,0c0.413,0 0.75,0.337 0.75,0.75l0,18c0,0.414 -0.337,0.75 -0.75,0.75l-28.455,0c-0.414,0 -0.75,-0.336 -0.75,-0.75z"/>
+  <path id="svg_10" fill="url(#SVGID_4_)" marker-start="none" marker-end="none" d="m3.022,14.252l0,18l28.455,0l0,-18l-28.455,0z"/>
+  <path id="svg_11" fill="#D9A025" fill-opacity="0.4078" marker-start="none" marker-end="none" d="m2.999,30.752l0,0.751l28.453,0l0,-0.751l-28.453,0z"/>
+  <path stroke="null" style="vector-effect: non-scaling-stroke;" id="svg_12" fill="#FFFDEA" fill-opacity="0.4078" marker-start="none" marker-end="none" d="m3.026,31.501l0,0.749l28.451,0l0,-0.749l-28.451,0z"/>
+  <path id="svg_13" fill="#D9A025" fill-opacity="0.4078" marker-start="none" marker-end="none" d="m3.049,29.252l0,0.749l28.451,0l0,-0.749l-28.451,0z"/>
+  <path id="svg_14" fill="#FFFDEA" fill-opacity="0.4078" marker-start="none" marker-end="none" d="m2.999,30.002l0,0.749l28.453,0l0,-0.749l-28.453,0z"/>
+  <defs>
+   <filter y="14.252" x="3.025" width="0.725" id="Adobe_OpacityMaskFilter" height="17.993" filterUnits="userSpaceOnUse"/>
+  </defs>
+  <mask y="14.252" x="3.025" width="0.725" maskUnits="userSpaceOnUse" id="TranspMask_16_1_" height="17.993">
+   <rect id="svg_15" fill="url(#SVGID_5_)" filter="url(#Adobe_OpacityMaskFilter)" y="-373.37" x="-269.075" width="576.899" height="784.45"/>
+  </mask>
+  <path id="svg_16" mask="url(#TranspMask_16_1_)" fill="#FFFDEA" marker-start="none" marker-end="none" d="m3.025,14.252l0,17.993l0.725,0l0,-17.993l-0.725,0z"/>
+  <path id="svg_17" fill="#FFFDEA" fill-opacity="0.8549" marker-start="none" marker-end="none" d="m3.001,14.252l0,0.749l28.465,0l0,-0.749l-28.465,0z"/>
+  <path id="svg_18" fill="#D9A025" fill-opacity="0.2078" marker-start="none" marker-end="none" d="m3.001,12.752l0,0.751l28.447,0l0,-0.751l-28.447,0z"/>
+  <path id="svg_19" fill="#FFFDEA" fill-opacity="0.4078" marker-start="none" marker-end="none" d="m3,28.502l0,0.749l28.453,0l0,-0.749l-28.453,0z"/>
+  <path id="svg_20" fill="#D9A025" fill-opacity="0.4078" marker-start="none" marker-end="none" d="m3,27.752l0,0.749l28.451,0l0,-0.749l-28.451,0z"/>
+  <path id="svg_21" fill="#000500" marker-start="none" marker-end="none" d="m27.119,23.108617l0.815,-0.639l0.778,-0.896c1.645,-2.268 1.837,-5.407 0.245,-7.91c-0.367,-0.576 -0.804,-1.081 -1.287,-1.507l-0.348,-0.279l-2.781,2.897c-0.467,0.486 -1.291,0.154 -1.291,-0.52l0,-9.681c0,-0.413 0.336,-0.75 0.75,-0.75l9.61,0c0.667,0 1.002,0.813 0.527,1.283l-2.407,2.385l0.572,0.802c3.339,5.245 1.789,12.215 -3.457,15.549l-0.032,0.018l-0.861,0.49c-0.8,0.456 -1.558,-0.674 -0.833,-1.242z"/>
+  <path id="svg_22" fill="#000500" marker-start="none" marker-end="none" d="m27.510383,23.627l0.861,-0.49c4.896,-3.111 6.343,-9.617 3.226,-14.513c-0.192,-0.303 -0.4,-0.597 -0.621,-0.874l-0.331,-0.381l2.893,-2.867l-9.61,0l0,9.681l3.229,-3.364l0.375,0.252c0.767,0.558 1.446,1.269 1.986,2.118c2.015,3.166 1.449,7.251 -1.149,9.765l-0.859,0.673z"/>
+ </g>
+</svg>

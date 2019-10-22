@@ -111,7 +111,7 @@ export default {
     type: UsermanagementActionTypes.FETCH_USERS_OF_FILE_OR_SUBMISSION,
     data: { data: [] }
   }),
-  addUser: (user, history) => {
+  addUser: (user, cb) => {
     return async dispatch => {
       ApiActions.request(dispatch);
       try {
@@ -122,7 +122,7 @@ export default {
         });
         if (!res.data.error) {
           Toast.success("User Created!");
-          history.goBack();
+          cb && cb();
         }
         ApiActions.success(dispatch);
       } catch (err) {
@@ -154,6 +154,18 @@ export default {
       ApiActions.request(dispatch);
       try {
         const res = await UsermanagementApi.activateDeactivateUser(usr);
+        ApiActions.success(dispatch);
+        !res.data.error && cb && cb();
+      } catch (err) {
+        ApiActions.failure(dispatch);
+      }
+    };
+  },
+  deleteusers: (data, cb) => {
+    return async dispatch => {
+      ApiActions.request(dispatch);
+      try {
+        const res = await UsermanagementApi.deleteUser(data);
         ApiActions.success(dispatch);
         !res.data.error && cb && cb();
       } catch (err) {
