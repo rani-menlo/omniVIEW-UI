@@ -80,6 +80,7 @@
   "scripts": {
     "start": "node scripts/start.js",
     "build:staging": "env-cmd .env.staging node scripts/build.js",
+    "build:uat": "env-cmd .env.uat node scripts/build.js",
     "build:prod": "node scripts/build.js",
     "test": "node scripts/test.js"
   },

@@ -68,6 +68,7 @@ const URI = {
 
   // Submission
   GET_APPLICATIONS: `${path}submission/getSubmissions`,
+
   GET_SUBMISSION_CENTERS: `${path}submission/getSubmissionCenters`,
   UPDATE_SUBMISSION_CENTER: `${path}submission/updateSubmissionCenter`,
 
@@ -103,6 +104,7 @@ const URI = {
 
   // access
   ASSIGN_FILE_PERMISSIONS: `${path}access/assignFilePermissions`,
+  ADD_APPLICATION: `${path}access/checkAddApplicationAccess`,
   ASSIGN_SUBMISSION_PERMISSIONS: `${path}access/assignSubmissionPermissions`,
   ASSIGN_SEQUENCE_PERMISSIONS: `${path}access/assignSequencePermissions`,
   GET_USERS_OF_SUBMISSIONS: `${path}access/getSubmissionAccessedUsers`,
@@ -119,7 +121,8 @@ const URI = {
   GET_FTP_CONTENTS: `${path}upload/getContentsOfFTPPath`,
   IS_VALID_FOLDER: `${path}upload/isValidFTPSubmissionFolder`,
   SUBMISSION_LOOKUP_INFO: `${path}upload/submissionLookUpInfo`,
-  SAVE_SUBMISSION_DETAILS: `${path}upload/saveSubmissionDetails`
+  SAVE_SUBMISSION_DETAILS: `${path}upload/saveSubmissionDetails`,
+  MONITOR_STATUS : `${path}upload/monitorStatus`
 };
 
 const DATE_FORMAT = "MM/DD/YYYY";

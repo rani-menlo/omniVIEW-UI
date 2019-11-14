@@ -205,9 +205,7 @@ class LicenceInUseUnAssigned extends Component {
               <Text
                 type="extra_bold"
                 size="16px"
-                text={`${translate(
-                  "text.customer.subslicences"
-                )} - ${_.startCase(
+                text={`${_.startCase(
                   translate(
                     type === "inuse"
                       ? "label.generic.inuse"

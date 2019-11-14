@@ -99,7 +99,7 @@ class ApplicationDetails extends Component {
       region_id: state.region.value.key,
       submission_center: state.submissionCenter.value.value,
       application_type_id: state.applicationType.value.key,
-      app_number: +state.applicationNo.value,
+      app_number: state.applicationNo.value,
       no_of_sequences: this.props.validSequences
     };
     submit(obj);
@@ -146,7 +146,7 @@ class ApplicationDetails extends Component {
         />
         <NumericInput
           limit={999999}
-          label={`${translate("label.newapplication.applicationnumber")}*`}
+          label={`${translate("label.newapplication.applicationnumber")}*`} 
           value={applicationNo.value}
           placeholder={translate("label.newapplication.applicationnumber")}
           error={applicationNo.error}

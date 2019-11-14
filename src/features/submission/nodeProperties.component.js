@@ -616,6 +616,15 @@ class NodeProperties extends Component {
         _.get(TypesJson, "[applicant-contact-type]", ""),
         type => type.code === contactType
       );
+
+      // let phones = contact.telephones.telephone;
+      // phones.map((number) =>{
+      //   console.log("number",number.$t)
+      //   console.log("telephone",number)
+      //   let phoneTxt =  `${_.get(number, "[$t]", "")}`;
+      //   console.log("phoneTxt",phoneTxt);
+      // });
+
       text = `${text}(${_.get(contactType, "display", "")}), `;
       text = `${text}${_.get(contact, "[telephones][telephone][$t]", "")}`;
       let phoneType = _.get(

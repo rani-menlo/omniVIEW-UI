@@ -903,6 +903,24 @@ class SubmissionView extends Component {
     this.setState({ openFindModal: false });
   };
 
+  getFilteredUsers = () => {
+    const { administrator, publisher, author } = ROLE_IDS.OMNICIA;
+    const filteredUsers = _.filter(this.props.users, user => {
+      if (
+        user.role_id === administrator ||
+        user.role_id === publisher ||
+        user.role_id === author
+      ) {
+        if (!user.hasAccess) {
+          console.log(user);
+        }
+        return user.hasAccess;
+      }
+      return true;
+    });
+    return filteredUsers;
+  };
+
   render() {
     const {
       loading,
@@ -1149,7 +1167,7 @@ class SubmissionView extends Component {
                   <SubmissionViewUsers
                     role={role}
                     searchUsers={this.fetchUsers}
-                    users={users}
+                    users={this.getFilteredUsers()}
                     selectedUser={selectedUser}
                     onUserSelected={this.viewPermissions}
                   />

@@ -7,9 +7,9 @@ import { Toast } from "../../uikit/components";
 import { getCombinedLicences } from "../../utils";
 
 export default {
-  getDepartments: () => {
+  getDepartments: noLoading => {
     return async (dispatch, getState) => {
-      ApiActions.request(dispatch);
+      !noLoading && ApiActions.request(dispatch);
       try {
         const departments = getState().Usermanagement.departments;
         let data = [];
@@ -23,9 +23,8 @@ export default {
           type: UsermanagementActionTypes.FETCH_DEPARTMENTS,
           data
         });
-        ApiActions.success(dispatch);
+        !noLoading && ApiActions.success(dispatch);
       } catch (err) {
-        console.log(err);
         ApiActions.failure(dispatch);
       }
     };
