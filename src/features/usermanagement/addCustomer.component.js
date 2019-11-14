@@ -230,7 +230,11 @@ class AddCustomer extends Component {
         const state = this.populateState();
         newState = { ...state, ...newState };
         this.fetchCustomerAdmins();
-        this.fetchUsers();
+        if(selectedCustomer.is_omnicia == true) {
+          this.fetchOmniUsers();
+        } else {
+          this.fetchUsers();
+        }
       }
       if (history.location.pathname.endsWith("subscriptions")) {
         newState.selectedTab = "subscriptionLicences";
@@ -255,7 +259,16 @@ class AddCustomer extends Component {
     this.props.dispatch(
       UsermanagementActions.fetchUsers({
         customerId: this.props.selectedCustomer.id,
-        roles: _.values(ROLE_IDS.CUSTOMER)
+        roles: _.values(ROLE_IDS.CUSTOMER) 
+      })
+    );
+  };
+
+  fetchOmniUsers = () => {
+    this.props.dispatch(
+      UsermanagementActions.fetchUsers({
+        customerId: this.props.selectedCustomer.id,
+        roles: _.values(ROLE_IDS.OMNICIA) 
       })
     );
   };
@@ -936,6 +949,7 @@ class AddCustomer extends Component {
                   onChange={this.onPhoneChange}
                 />
               </Row>
+
               {editCustomer && (
                 <React.Fragment>
                   <p className="addUser-heading">
@@ -959,6 +973,7 @@ class AddCustomer extends Component {
                   />
                 </React.Fragment>
               )}
+              
               <p className="addUser-heading">
                 {translate("text.customer.subsoptions")}
               </p>
@@ -1154,7 +1169,7 @@ class AddCustomer extends Component {
               </div>
             </TabPane>
             <TabPane
-              tab="Subscription Licences"
+              tab="Licences"
               key="subscriptionLicences"
               disabled={!this.props.selectedCustomer}
             >

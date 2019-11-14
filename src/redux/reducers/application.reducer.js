@@ -4,7 +4,8 @@ const initialState = {
   submissions: [],
   selectedSubmission: null,
   submissionCount: 0,
-  submissionCenters: []
+  submissionCenters: [],
+  access: {}
 };
 
 export default (state = initialState, action) => {
@@ -14,6 +15,12 @@ export default (state = initialState, action) => {
         ...state,
         submissions: action.data.data,
         submissionCount: action.data.submissionCount
+      };
+    }
+    case ApplicationActionTypes.ADD_APPLICATION: {
+      return {
+        ...state,
+        access: action.data
       };
     }
     case ApplicationActionTypes.FETCH_SUBMISSION_CENTERS: {

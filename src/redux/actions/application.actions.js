@@ -49,6 +49,22 @@ export default {
       }
     };
   },
+  fetchAddApplication: () => {
+    return async (dispatch, getState) => {
+      ApiActions.request(dispatch);
+      try {
+        const res = await ApplicationApi.fetchAddApplication();
+        dispatch({
+          type: ApplicationActionTypes.ADD_APPLICATION,
+          data: res.data
+        });
+        ApiActions.success(dispatch);
+      } catch (err) {
+        ApiActions.failure(dispatch);
+      }
+    };
+  },
+
   getSubmissionCenters: () => {
     return async dispatch => {
       ApiActions.request(dispatch);

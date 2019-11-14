@@ -220,7 +220,7 @@ class UserManagementContainer extends Component {
         this.setState({ selectedUser: usr }, this.deleteUser);
       },
       onCancel: () => {
-        this.setState({ selectedUser: null }, this.deleteUser);
+        // this.setState({ selectedUser: null }, this.deleteUser);
       }
     });
   };
@@ -328,7 +328,7 @@ class UserManagementContainer extends Component {
   };
 
   changeView = type => {
-    this.selectedFilters = {};
+    // this.selectedFilters = {};
     this.setState({ viewBy: type }, () => this.fetchUsers());
   };
 
@@ -772,7 +772,7 @@ class UserManagementContainer extends Component {
           </div>
           {viewBy === "cards" && (
             <div>
-              {_.map(users, (user, key) => {
+              {_.map(users, (user, key) => { 
                 return (
                   <div key={key} className="userManagement__group">
                     <p className="userManagement__group-label">

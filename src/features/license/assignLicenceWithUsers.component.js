@@ -39,12 +39,22 @@ class AssignLicenceWithUsers extends Component {
     const { selectedCustomer, selectedUsers } = this.props;
     selectedUsers &&
       this.setState({ selected: new Set(_.map(selectedUsers, "user_id")) });
-    this.props.dispatch(
-      UsermanagementActions.fetchUsers({
-        customerId: selectedCustomer.id,
-        roles: _.values(ROLE_IDS.CUSTOMER)
-      })
-    );
+      if(selectedCustomer.is_omnicia == true) {
+        this.props.dispatch(
+          UsermanagementActions.fetchUsers({
+            customerId: this.props.selectedCustomer.id,
+            roles: _.values(ROLE_IDS.OMNICIA) 
+          })
+        ); 
+      } else {
+        this.props.dispatch(
+          UsermanagementActions.fetchUsers({
+            customerId: selectedCustomer.id,
+            roles: _.values(ROLE_IDS.CUSTOMER)
+          })
+        );
+      }
+
   }
 
   select = user => () => {
@@ -116,6 +126,7 @@ class AssignLicenceWithUsers extends Component {
             onClick={this.orderByExpireDate}
           />
         </div> */}
+
         {(_.get(users, "length") || "") && (
           <div className="licence-modal__content" style={{ marginTop: "15px" }}>
             {_.map(users, user => {

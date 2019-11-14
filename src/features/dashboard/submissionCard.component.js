@@ -5,6 +5,7 @@ import _ from "lodash";
 import { translate } from "../../translations/translator";
 import { getFormattedDate } from "../../utils";
 import { Text, Row } from "../../uikit/components";
+import { ApplicationApi } from "../../redux/api";
 
 class SubmissionCard extends Component {
   static propTypes = {
@@ -13,6 +14,28 @@ class SubmissionCard extends Component {
     onMenuItemClick: PropTypes.func,
     customer: PropTypes.object
   };
+  
+  componentDidMount() {
+    if(this.props.submission.sequence_count == 0) {
+      this.interval = setInterval(() => {
+        const res = ApplicationApi.monitorStatus({
+          submission_id: this.props.submission.id
+        }).then(function(data) {
+          if(data.data.status == "Succeeded") {
+            window.location.reload();
+          } else if(data.data.status == "Failed") {
+            console.log(data.data.message)
+          }
+        })
+      }, 30000); 
+    }
+  }
+
+  componentWillUnmount() {
+     if (this.interval) {
+      clearTimeout(this.interval)
+      }
+  }
 
   render() {
     const { submission, onSelect, getMenu, customer } = this.props;
@@ -65,7 +88,7 @@ class SubmissionCard extends Component {
                     className="submissioncard__content__item-text"
                     style={{ marginLeft: "6px" }}
                   >
-                    {_.get(submission, "addedBy", "Corabelle Durrad")}
+                    {_.get(submission, "created_by") || "Corabelle Durrad"}
                   </span>
                 </div>
               </div>

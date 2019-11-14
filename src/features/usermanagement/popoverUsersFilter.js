@@ -53,7 +53,7 @@ class PopoverUsersFilter extends Component {
   }
 
   componentDidMount() {
-    this.props.dispatch(UsermanagementActions.getDepartments());
+    this.props.dispatch(UsermanagementActions.getDepartments(true));
     const { selectedCustomer } = this.props;
     const customerRoles = _.get(selectedCustomer, "is_omnicia", false)
       ? ROLES.OMNICIA

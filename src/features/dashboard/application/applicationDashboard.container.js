@@ -47,6 +47,8 @@ import AssignLicenceWithUsers from "../../license/assignLicenceWithUsers.compone
 import { CustomerApi } from "../../../redux/api";
 import ApplicationProperties from "./applicationProperties.component";
 // import { Customers } from "./sampleCustomers";
+// import  ApplicationApi  from "../../../redux/api/application.api"
+
 
 class ApplicationDashboard extends Component {
   constructor(props) {
@@ -145,7 +147,8 @@ class ApplicationDashboard extends Component {
   }
 
   async componentDidMount() {
-    this.fetchApplications();
+      this.fetchApplications();
+    this.fetchAddApplication();
     if (!isLoggedInOmniciaRole(this.props.role)) {
       const res = await CustomerApi.getCustomerById(
         this.props.selectedCustomer.id
@@ -157,6 +160,7 @@ class ApplicationDashboard extends Component {
       TableColumns.shift();
       this.setState({ TableColumns });
     }
+    
   }
 
   onMenuClick = submission => ({ key }) => {
@@ -230,6 +234,7 @@ class ApplicationDashboard extends Component {
   };
 
   fetchApplications = (sortBy = "name", orderBy = "ASC") => {
+    console.log("aaa")
     this.props.actions.resetApplications();
     this.setState({ submissions: [] });
     const { viewBy, pageNo, itemsPerPage, searchText } = this.state;
@@ -252,6 +257,15 @@ class ApplicationDashboard extends Component {
         );
     }
   };
+
+  fetchAddApplication = () => {
+   this.props.actions.fetchAddApplication(() => {
+    // this.setState({ messages : this.props.access.message });
+   }
+  );
+ 
+  };
+  
 
   changeView = type => {
     const TableColumns = [...this.state.TableColumns];
@@ -565,7 +579,8 @@ class ApplicationDashboard extends Component {
       showPermissionsModal,
       checkedSubmissions,
       showSubscriptionsInUse,
-      showLicenceUnAssigned
+      showLicenceUnAssigned,
+      messages
     } = this.state;
     const { loading, selectedCustomer, submissionCount, role } = this.props;
     if (!selectedCustomer) {
@@ -640,7 +655,10 @@ class ApplicationDashboard extends Component {
               )}
             </div>
             {(isLoggedInOmniciaAdmin(this.props.role) ||
-              isLoggedInCustomerAdmin(this.props.role)) && (
+              isLoggedInCustomerAdmin(this.props.role) || (this.props.access.message === "User Has Access"))
+              
+               && (
+                  <React.Fragment>
               <OmniButton
                 type="add"
                 label={translate("label.button.add", {
@@ -649,7 +667,10 @@ class ApplicationDashboard extends Component {
                 buttonStyle={{ height: "40px" }}
                 onClick={this.addNewApplication}
               />
-            )}
+              </React.Fragment> )  
+
+
+            }
           </div>
           {(isLoggedInOmniciaAdmin(role) || isLoggedInCustomerAdmin(role)) && (
             <div className="global__center-vert" style={{ marginTop: "10px" }}>
@@ -919,7 +940,8 @@ function mapStateToProps(state) {
     submissions: state.Application.submissions, //getSubmissionsByCustomer(state),
     selectedCustomer: state.Customer.selectedCustomer,
     submissionCount: state.Application.submissionCount,
-    selectedSubmission: state.Application.selectedSubmission
+    selectedSubmission: state.Application.selectedSubmission,
+    access: state.Application.access
   };
 }
 
