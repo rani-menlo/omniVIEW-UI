@@ -55,7 +55,7 @@ const UserCard = ({
         {user.role_id !== 1 ? (
         <React.Fragment>
           <p className="userManagement__group__users__user__info-text">
-            {translate("label.usermgmt.subscriptionstatus")}:
+            {translate("label.usermgmt.licensestatus")}:
             <span
               className={`userManagement__group__users__user__info-text-${
                 _.get(user, "license_status", 0) ? "active" : "inactive"
