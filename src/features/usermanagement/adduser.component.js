@@ -431,44 +431,6 @@ class AddUser extends Component {
               </p>
             </Checkbox>
           )}
-          <div className="addUser__section">
-            <p className="addUser__section-label">
-              {translate("text.user.selectrolemsg")}
-            </p>
-            <RadioGroup value={selectedRole} onChange={this.onRoleChange}>
-              {_.map(this.roles, role => (
-                <Radio
-                  key={role.id}
-                  style={radioStyle}
-                  className="global__radio"
-                  value={role.id}
-                >
-                  {role.name}
-                </Radio>
-              ))}
-            </RadioGroup>
-          </div>
-          <div className="addUser__section">
-            <p className="addUser__section-label">
-              {translate("text.user.selectdeptmsg")}
-            </p>
-            <RadioGroup
-              value={selectedDept}
-              onChange={this.onDeptChange}
-              className="global__radio addUser__section__radiogroup"
-            >
-              {_.map(departments, dept => (
-                <Radio
-                  key={dept.id}
-                  style={radioStyle}
-                  className="addUser__section__radiogroup-radio"
-                  value={dept.id}
-                >
-                  {dept.name}
-                </Radio>
-              ))}
-            </RadioGroup>
-          </div>
           {editUser && (
             <React.Fragment>
               {/* <p className="addUser-heading">Profile Picture</p>
@@ -516,6 +478,45 @@ class AddUser extends Component {
               </div>
             </React.Fragment>
           )}
+          <div className="addUser__section">
+            <p className="addUser__section-label">
+              {translate("text.user.selectrolemsg")}
+            </p>
+            <RadioGroup value={selectedRole} onChange={this.onRoleChange}>
+              {_.map(this.roles, role => (
+                <Radio
+                  key={role.id}
+                  style={radioStyle}
+                  className="global__radio"
+                  value={role.id}
+                >
+                  {role.name}
+                </Radio>
+              ))}
+            </RadioGroup>
+          </div>
+          <div className="addUser__section">
+            <p className="addUser__section-label">
+              {translate("text.user.selectdeptmsg")}
+            </p>
+            <RadioGroup
+              value={selectedDept}
+              onChange={this.onDeptChange}
+              className="global__radio addUser__section__radiogroup"
+            >
+              {_.map(departments, dept => (
+                <Radio
+                  key={dept.id}
+                  style={radioStyle}
+                  className="addUser__section__radiogroup-radio"
+                  value={dept.id}
+                >
+                  {dept.name}
+                </Radio>
+              ))}
+            </RadioGroup>
+          </div>
+          
           {!editUser && (
             <React.Fragment>
               <p className="addUser__section addUser__section-label">

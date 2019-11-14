@@ -876,7 +876,7 @@ class SubmissionView extends Component {
 
   getFormFile = () => {
     const { selectedSequence, sequenceJson, lifeCycleJson } = this.props;
-    let formFile = null;
+    let formFile = [];
     const json = selectedSequence ? sequenceJson : lifeCycleJson;
     const m1Regional = _.get(
       json,
@@ -884,11 +884,12 @@ class SubmissionView extends Component {
     );
     _.forEach(m1Regional, (val, key) => {
       if (_.includes(key, "submission-information")) {
-        formFile = _.get(val, "Form FDA 1571.leaf[0]", "");
+        formFile.push(_.get(val, "Form FDA 1571.leaf[0]", null));
+        formFile.push(_.get(val, "Form FDA 356h.leaf[0]", null));
         return false;
       }
     });
-    return formFile;
+    return _.filter(formFile);
   };
 
   onFullyExpand = () => {

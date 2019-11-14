@@ -154,6 +154,7 @@
   "label.usermgmt.title": "User Management",
   "label.usermgmt.department": "Department",
   "label.usermgmt.subscriptionstatus": "Subscription Status",
+  "label.usermgmt.licensestatus": "License Status",
   "label.usermgmt.accountstatus": "Account Status",
   "label.usermgmt.edit": "Edit",
   "label.usermgmt.add": "Add",

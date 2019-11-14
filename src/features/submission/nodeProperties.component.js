@@ -22,7 +22,7 @@ class NodeProperties extends Component {
     projectJson: PropTypes.object,
     view: PropTypes.oneOf(["current", "lifeCycle"]),
     mode: PropTypes.oneOf(["standard", "qc"]),
-    formFile: PropTypes.object
+    formFile: PropTypes.array
   };
 
   getFileName = fullName => {
@@ -92,10 +92,9 @@ class NodeProperties extends Component {
     this.loadFile(fileHref, lifeCycle.fileID, lifeCycle.title);
   };
 
-  openFormFile = () => {
-    const { formFile } = this.props;
-    const fileHref = formFile["xlink:href"];
-    this.loadFile(fileHref, formFile.fileID, formFile.title);
+  openFormFile = (file) => () => {
+    const fileHref = file["xlink:href"];
+    this.loadFile(fileHref, file.fileID, file.title);
   };
 
   getStfProperties = () => {
@@ -762,17 +761,19 @@ class NodeProperties extends Component {
             {_.get(sequence, "[submission_sub_type]", "")}
           </div>
         </RowItems>
-        {formFile && (
-          <RowItems>
-            <div className="label">Form: </div>
-            <div className="value link">
-              <a onClick={this.openFormFile}>
-                {this.getFileTypeIcon(_.get(formFile, "[xlink:href]", ""))}
-                {this.getFileName(_.get(formFile, "[xlink:href]", ""))}
-              </a>
-            </div>
-          </RowItems>
-        )}
+        {formFile.length && _.map(formFile, file => {
+          return (
+            <RowItems key={file}>
+              <div className="label">Form: </div>
+              <div className="value link">
+                <a onClick={this.openFormFile(file)}>
+                  {this.getFileTypeIcon(_.get(file, "[xlink:href]", ""))}
+                  {this.getFileName(_.get(file, "[xlink:href]", ""))}
+                </a>
+              </div>
+            </RowItems>
+          );
+        })}
         {leafProperties && (
           <React.Fragment>
             <div className="section-title">Leaf Properties</div>

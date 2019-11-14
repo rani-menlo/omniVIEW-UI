@@ -55,7 +55,7 @@ const UserProfileCard = ({
           <Text
             type="regular"
             size="16px"
-            text={`${translate("label.usermgmt.subscriptionstatus")}:`}
+            text={`${translate("label.usermgmt.licensestatus")}:`}
           />
           <Text
             className={`userProfileCard-${

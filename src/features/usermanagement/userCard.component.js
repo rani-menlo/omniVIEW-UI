@@ -52,15 +52,15 @@ const UserCard = ({
           {_.get(user, "department_name", "")}
         </p>
         <p className="userManagement__group__users__user__info-text">
-          {translate("label.usermgmt.subscriptionstatus")}:
+          {translate("label.usermgmt.licensestatus")}:
           <span
             className={`userManagement__group__users__user__info-text-${
               _.get(user, "license_status", 0) ? "active" : "inactive"
             }`}
           >
             {_.get(user, "license_status", 0)
-              ? ` ${translate("label.generic.subscribed")}`
-              : ` ${translate("label.generic.unsubscribed")}`}
+              ? ` ${translate("label.user.active")}`
+              : ` ${translate("label.user.inactive")}`}
           </span>
         </p>
         <p className="userManagement__group__users__user__info-text">
