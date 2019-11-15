@@ -478,6 +478,31 @@ class AddUser extends Component {
               </div>
             </React.Fragment>
           )}
+          <p className="addUser-heading">
+          {translate("label.usermgmt.licensestatus")}:
+          <span
+            className={`userManagement__group__users__user__info-text-${
+              _.get(selectedUser, "license_status", 0) ? "active" : "inactive"
+            }`}
+          >
+            {_.get(selectedUser, "license_status", 0)
+              ? ` ${translate("label.user.active")}`
+              : ` ${translate("label.user.inactive")}`}
+          </span>
+        </p>
+
+        {selectedUser !== 1 ? (
+        <React.Fragment>
+          <p className="addUser-heading">
+            {`${translate("label.usermgmt.expires")}: ${
+              _.get(selectedUser, "license_status")
+                ? getFormattedDate(_.get(selectedUser, "expiryDate"))
+                : "N/A"
+            }`}
+          </p>
+        </React.Fragment> )  : (
+          ""
+        )}
           <div className="addUser__section">
             <p className="addUser__section-label">
               {translate("text.user.selectrolemsg")}
