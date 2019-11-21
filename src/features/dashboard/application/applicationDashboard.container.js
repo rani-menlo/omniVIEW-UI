@@ -282,7 +282,7 @@ class ApplicationDashboard extends Component {
   };
 
   onSubmissionSelected = submission => () => {
-    if (_.get(submission, "sequence_count", 0) == 0) {
+    if (_.get(submission, "sequence_count", 0) == 0 || _.get(submission, 'sequence_failed', []).length) {
       return;
     }
     this.props.actions.setSelectedSubmission(submission);

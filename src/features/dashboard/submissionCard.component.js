@@ -35,24 +35,28 @@ class SubmissionCard extends Component {
       this.props.updateSubmissions(submission);
     }
   };
+
+  moniorStatus = () => {
+    const res = ApplicationApi.monitorStatus({
+      submission_id: this.props.submission.id
+    }).then((data) => {
+      if(data && data.data && data.data.result.length) {
+        this.checkSequenceStatus(data.data.result, this.props.submission);
+      } else {
+        if(this.interval) {
+          clearInterval(this.interval);
+        }
+      }
+    });
+  }
   
   componentDidMount() {
     this.idx = 0;
     if(this.props.submission.sequence_count == 0) {
+      this.moniorStatus();
       this.interval = setInterval(() => {
-        const res = ApplicationApi.monitorStatus({
-          submission_id: this.props.submission.id
-        }).then((data) => {
-          console.log('data', data, this);
-          if(data && data.data && data.data.result.length) {
-            this.checkSequenceStatus(data.data.result, this.props.submission);
-          } else {
-            if(this.interval) {
-              clearInterval(this.interval);
-            }
-          }
-        })
-      }, 30000); 
+        this.moniorStatus();
+      }, 15000); 
     }
   }
 
@@ -69,12 +73,12 @@ class SubmissionCard extends Component {
     return (
       <div
         className="submissioncard"
-        style={{ ...(uploading && { cursor: "not-allowed" }) }}
+        style={{ ...((uploading || (submission.sequence_failed && submission.sequence_failed.length)) && { cursor: "not-allowed" }) }}
       >
         <div className="submissioncard__heading">
           <span
             className="submissioncard__heading-text global__cursor-pointer"
-            style={{ ...(uploading && { cursor: "not-allowed" }) }}
+            style={{ ...((uploading || (submission.sequence_failed && submission.sequence_failed.length)) && { cursor: "not-allowed" }) }}
             onClick={onSelect && onSelect(submission)}
           >
             {_.get(submission, "name")}
@@ -94,7 +98,7 @@ class SubmissionCard extends Component {
         </div>
         <div
           className="submissioncard__content"
-          style={{ ...(uploading && { cursor: "not-allowed" }) }}
+          style={{ ...((uploading || (submission.sequence_failed && submission.sequence_failed.length)) && { cursor: "not-allowed" }) }}
           onClick={onSelect && onSelect(submission)}
         >
           {uploading && (
