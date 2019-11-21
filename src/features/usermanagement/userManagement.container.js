@@ -465,7 +465,12 @@ class UserManagementContainer extends Component {
 
     this.props.dispatch(
       UsermanagementActions.activateDeactivateUser(users, async () => {
-        Toast.success("User Status Updated!");
+        if (_.get(users, ["users", "0", "is_active"]) === 1) {
+          Toast.success("User has been activated!");
+        }
+        else {
+          Toast.success("User has been deactivated!");
+        }
         this.props.dispatch(ApiActions.requestOnDemand());
           const res = await CustomerApi.getCustomerById(
             this.props.selectedCustomer.id

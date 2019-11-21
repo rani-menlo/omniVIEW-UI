@@ -419,7 +419,7 @@ class AddUser extends Component {
             isLoggedInCustomerAdmin(this.props.role)) && (
             <Checkbox
               key={0}
-              style={{ marginTop: "24px" }}
+              style={{ marginBottom: "24px" }}
               checked={secondaryContact}
               onChange={this.onSecondaryContactChecked}
             >

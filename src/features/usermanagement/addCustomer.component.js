@@ -543,7 +543,7 @@ class AddCustomer extends Component {
           subscriptions: newLicences
         },
         () => {
-          Toast.success("Subscription Licenses Added!");
+          Toast.success("New License(s) Added!");
           this.onTabChange("subscriptionLicences");
         }
       )
@@ -1169,7 +1169,7 @@ class AddCustomer extends Component {
               </div>
             </TabPane>
             <TabPane
-              tab="Licences"
+              tab="Licenses"
               key="subscriptionLicences"
               disabled={!this.props.selectedCustomer}
             >
