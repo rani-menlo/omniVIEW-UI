@@ -282,7 +282,7 @@ class ApplicationDashboard extends Component {
   };
 
   onSubmissionSelected = submission => () => {
-    if (_.get(submission, "sequence_count", 0) == 0) {
+    if (_.get(submission, "sequence_count", 0) == 0 || _.get(submission, 'sequence_failed', []).length) {
       return;
     }
     this.props.actions.setSelectedSubmission(submission);
@@ -567,6 +567,17 @@ class ApplicationDashboard extends Component {
   addNewApplication = () => {
     this.props.history.push("/applications/add");
   };
+
+  updateSubmissions = (submission) => {
+    const {submissions} = this.state;
+    console.log('updating customer sequences from ', submissions, submission);
+    let submissionIdx = submissions.filter(x => x.id === submission.id);
+    submissions[submissionIdx] = submission;
+    this.setState({
+      submissions: submissions
+    });
+    // this.fetchApplications();
+  }
 
   render() {
     const {
@@ -856,6 +867,7 @@ class ApplicationDashboard extends Component {
                     customer={selectedCustomer}
                     onSelect={this.onSubmissionSelected}
                     getMenu={this.getMenu(submission)}
+                    updateSubmissions={this.updateSubmissions}
                   />
                 ))}
               </div>
