@@ -139,7 +139,7 @@ export default {
           data: res.data
         });
         if (!res.data.error) {
-          Toast.success("User Updated!");
+          Toast.success("User details have been updated!");
           history.goBack();
         }
         ApiActions.success(dispatch);
