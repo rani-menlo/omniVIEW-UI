@@ -568,6 +568,17 @@ class ApplicationDashboard extends Component {
     this.props.history.push("/applications/add");
   };
 
+  updateSubmissions = (submission) => {
+    const {submissions} = this.state;
+    console.log('updating customer sequences from ', submissions, submission);
+    let submissionIdx = submissions.filter(x => x.id === submission.id);
+    submissions[submissionIdx] = submission;
+    this.setState({
+      submissions: submissions
+    });
+    // this.fetchApplications();
+  }
+
   render() {
     const {
       viewBy,
@@ -856,6 +867,7 @@ class ApplicationDashboard extends Component {
                     customer={selectedCustomer}
                     onSelect={this.onSubmissionSelected}
                     getMenu={this.getMenu(submission)}
+                    updateSubmissions={this.updateSubmissions}
                   />
                 ))}
               </div>

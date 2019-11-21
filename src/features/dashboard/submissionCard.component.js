@@ -6,7 +6,10 @@ import { translate } from "../../translations/translator";
 import { getFormattedDate } from "../../utils";
 import { Text, Row } from "../../uikit/components";
 import { ApplicationApi } from "../../redux/api";
-
+import styled from "styled-components";
+const Column = styled.div`
+  width: ${props => props.width};
+`;
 class SubmissionCard extends Component {
   static propTypes = {
     submission: PropTypes.object,
@@ -14,17 +17,39 @@ class SubmissionCard extends Component {
     onMenuItemClick: PropTypes.func,
     customer: PropTypes.object
   };
+
+  checkSequenceStatus = (data, submission) => {
+    let sequenceStatus = data.filter(seq => !seq.status);
+    if(sequenceStatus && !sequenceStatus.length) {
+      if(this.interval) {
+        clearInterval(this.interval);
+      }
+      submission.sequence_failed = data.filter(seq => seq.status == 1);
+      submission.sequence_success = data.filter(seq => seq.status == 2);
+      submission.sequence_count = data.length;
+      this.props.updateSubmissions(submission);
+    } else {
+      submission.sequence_inProgress = data.filter(seq => !seq.status);
+      submission.sequence_failed = data.filter(seq => seq.status == 1);
+      submission.sequence_success = data.filter(seq => seq.status == 2);
+      this.props.updateSubmissions(submission);
+    }
+  };
   
   componentDidMount() {
+    this.idx = 0;
     if(this.props.submission.sequence_count == 0) {
       this.interval = setInterval(() => {
         const res = ApplicationApi.monitorStatus({
           submission_id: this.props.submission.id
-        }).then(function(data) {
-          if(data.data.status == "Succeeded") {
-            window.location.reload();
-          } else if(data.data.status == "Failed") {
-            console.log(data.data.message)
+        }).then((data) => {
+          console.log('data', data, this);
+          if(data && data.data && data.data.result.length) {
+            this.checkSequenceStatus(data.data.result, this.props.submission);
+          } else {
+            if(this.interval) {
+              clearInterval(this.interval);
+            }
           }
         })
       }, 30000); 
@@ -40,6 +65,7 @@ class SubmissionCard extends Component {
   render() {
     const { submission, onSelect, getMenu, customer } = this.props;
     const uploading = _.get(submission, "sequence_count", 0) == 0;
+    const submissionFailedCount = submission.sequence_failed && submission.sequence_failed.length;
     return (
       <div
         className="submissioncard"
@@ -72,11 +98,20 @@ class SubmissionCard extends Component {
           onClick={onSelect && onSelect(submission)}
         >
           {uploading && (
-            <Row style={{ height: "100%" }}>
-              <Text type="medium" text="Uploading..." />
-            </Row>
+            <React.Fragment>
+              <div style={{height: '30%', padding: '10px'}}>
+                <Text type="medium" textStyle={{ color: '#00d592' }} text={`Sequence Success: ${submission.sequence_success ? submission.sequence_success.length : 0}`} />
+                <Text type="medium" textStyle={{ color: 'red' }} text={`Sequence Failed: ${submission.sequence_failed ? submission.sequence_failed.length : 0}`} />
+                <Text type="medium" textStyle={{ color: 'gray' }} text={`Sequence In Progress: ${submission.sequence_inProgress ? submission.sequence_inProgress.length : 0}`} />
+              </div>
+            </React.Fragment>
           )}
-          {!uploading && (
+          {!uploading && submission.sequence_failed && submission.sequence_failed.length ? (
+            <Row style={{height: '100%'}}>
+              <Text type="medium" textStyle={{ color: 'red' }} text="Submission Failed"/>
+            </Row>
+          ) : null}
+          {!uploading && (!submission.sequence_failed || !submission.sequence_failed.length) ? (
             <React.Fragment>
               <div className="submissioncard__content__item">
                 <span className="submissioncard__content__item-label">
@@ -137,7 +172,7 @@ class SubmissionCard extends Component {
                 <div>{customer.number_of_users}</div>
               </div>
             </React.Fragment>
-          )}
+          ) : null}
         </div>
       </div>
     );
