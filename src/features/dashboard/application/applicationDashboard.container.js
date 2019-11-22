@@ -571,7 +571,7 @@ class ApplicationDashboard extends Component {
   updateSubmissions = (submission) => {
     const {submissions} = this.state;
     console.log('updating customer sequences from ', submissions, submission);
-    let submissionIdx = submissions.filter(x => x.id === submission.id);
+    let submissionIdx = submissions.findIndex(x => x.id === submission.id);
     submissions[submissionIdx] = submission;
     this.setState({
       submissions: submissions
