@@ -63,6 +63,7 @@ class AddNewApplication extends Component {
   showClouds = () => {
     this.setState({
       selectedCloud: "",
+      selectedFolderError: "",
       showClouds: true,
       enterRemoteDetails: false
     });
@@ -84,29 +85,32 @@ class AddNewApplication extends Component {
     let auth_id = "";
     if (!res.data.error) {
       auth_id = res.data.data.auth_id;
+      res = await ApplicationApi.getContentsOfPath({
+        customer_id: this.props.selectedCustomer.id,
+        ...(!_.isEmpty(remoteDetails.ftp_path) && {
+          ftp_path: remoteDetails.ftp_path
+        })
+      });
+      let remoteFiles = null;
+      if (!res.data.error) {
+        remoteFiles = res.data.data;
+      }
+      this.setState(
+        {
+          remoteDetails,
+          path: remoteDetails.ftp_path,
+          auth_id,
+          remoteFiles,
+          selectedFolderError: "",
+          showRemoteFiles: true,
+          enterRemoteDetails: false,
+          showApplicationDetails: false
+        },
+        this.hideLoading
+      );
+    } else {
+      this.setState({selectedFolderError: res.data.message},this.hideLoading);
     }
-    res = await ApplicationApi.getContentsOfPath({
-      customer_id: this.props.selectedCustomer.id,
-      ...(!_.isEmpty(remoteDetails.ftp_path) && {
-        ftp_path: remoteDetails.ftp_path
-      })
-    });
-    let remoteFiles = null;
-    if (!res.data.error) {
-      remoteFiles = res.data.data;
-    }
-    this.setState(
-      {
-        remoteDetails,
-        path: remoteDetails.ftp_path,
-        auth_id,
-        remoteFiles,
-        showRemoteFiles: true,
-        enterRemoteDetails: false,
-        showApplicationDetails: false
-      },
-      this.hideLoading
-    );
   };
 
   cancelApplicationDetails = () => {
@@ -243,6 +247,7 @@ class AddNewApplication extends Component {
   };
 
   openApplicationsScreen = () => {
+    this.setState({selectedFolderError: ""});
     this.props.history.push("/applications");
   };
 

@@ -208,8 +208,8 @@ class LicenceInUseUnAssigned extends Component {
                 text={`${_.startCase(
                   translate(
                     type === "inuse"
-                      ? "label.generic.inuse"
-                      : "label.generic.unassigned"
+                      ? "label.generic.inuselicenses"
+                      : "label.generic.unassignedlicenses"
                   )
                 )}`}
               />

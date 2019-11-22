@@ -28,7 +28,8 @@ const InputField = ({
       {label && <p className="global__field-label">{label}</p>}
       <FormItem>
         {type === "password" ? (
-          <Input.Password
+          <Input
+            type="password"
             disabled={disabled}
             placeholder={placeholder}
             onChange={onInputText(onChange)}

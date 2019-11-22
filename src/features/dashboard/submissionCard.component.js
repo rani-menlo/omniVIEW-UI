@@ -6,10 +6,7 @@ import { translate } from "../../translations/translator";
 import { getFormattedDate } from "../../utils";
 import { Text, Row } from "../../uikit/components";
 import { ApplicationApi } from "../../redux/api";
-import styled from "styled-components";
-const Column = styled.div`
-  width: ${props => props.width};
-`;
+
 class SubmissionCard extends Component {
   static propTypes = {
     submission: PropTypes.object,
@@ -26,7 +23,9 @@ class SubmissionCard extends Component {
       }
       submission.sequence_failed = data.filter(seq => seq.status == 1);
       submission.sequence_success = data.filter(seq => seq.status == 2);
-      submission.sequence_count = data.length;
+      if(!submission.sequence_failed || !submission.sequence_failed.length) {
+        submission.sequence_count = data.length;
+      }
       this.props.updateSubmissions(submission);
     } else {
       submission.sequence_inProgress = data.filter(seq => !seq.status);
@@ -69,7 +68,6 @@ class SubmissionCard extends Component {
   render() {
     const { submission, onSelect, getMenu, customer } = this.props;
     const uploading = _.get(submission, "sequence_count", 0) == 0;
-    const submissionFailedCount = submission.sequence_failed && submission.sequence_failed.length;
     return (
       <div
         className="submissioncard"
@@ -104,18 +102,13 @@ class SubmissionCard extends Component {
           {uploading && (
             <React.Fragment>
               <div style={{height: '30%', padding: '10px'}}>
-                <Text type="medium" textStyle={{ color: '#00d592' }} text={`Sequence Success: ${submission.sequence_success ? submission.sequence_success.length : 0}`} />
-                <Text type="medium" textStyle={{ color: 'red' }} text={`Sequence Failed: ${submission.sequence_failed ? submission.sequence_failed.length : 0}`} />
-                <Text type="medium" textStyle={{ color: 'gray' }} text={`Sequence In Progress: ${submission.sequence_inProgress ? submission.sequence_inProgress.length : 0}`} />
+                <Text type="medium" textStyle={{ color: 'gray' }} text={`Sequences Remaining: ${submission.sequence_inProgress ? submission.sequence_inProgress.length : 0}`} />
+                <Text type="medium" textStyle={{ color: '#00d592' }} text={`Sequences Uploaded: ${submission.sequence_success ? submission.sequence_success.length : 0}`} />
+                <Text type="medium" textStyle={{ color: 'red' }} text={`Sequences Failed: ${submission.sequence_failed ? submission.sequence_failed.length : 0}`} />
               </div>
             </React.Fragment>
           )}
-          {!uploading && submission.sequence_failed && submission.sequence_failed.length ? (
-            <Row style={{height: '100%'}}>
-              <Text type="medium" textStyle={{ color: 'red' }} text="Submission Failed"/>
-            </Row>
-          ) : null}
-          {!uploading && (!submission.sequence_failed || !submission.sequence_failed.length) ? (
+          {!uploading ? (
             <React.Fragment>
               <div className="submissioncard__content__item">
                 <span className="submissioncard__content__item-label">
