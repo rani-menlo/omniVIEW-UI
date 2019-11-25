@@ -479,7 +479,8 @@ class AddUser extends Component {
             </React.Fragment>
           )}
           {
-            editUser &&
+            editUser && 
+            _.get(selectedUser, "role_id") !== 1 &&
             <p className="addUser-heading">
             {translate("label.usermgmt.licensestatus")}:
             <span
@@ -494,7 +495,7 @@ class AddUser extends Component {
           </p>
           }
 
-        {(selectedUser !== 1 && editUser) ? (
+        {(selectedUser !== 1 && editUser && _.get(selectedUser, "role_id") !== 1) ? (
         <React.Fragment>
           <p className="addUser-heading">
             {`${translate("label.usermgmt.expires")}: ${
