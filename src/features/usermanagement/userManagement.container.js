@@ -234,14 +234,23 @@ class UserManagementContainer extends Component {
       UsermanagementActions.deleteusers({ userIds }, async () => {
         Toast.success(`User${userIds.length > 1 ? "s" : ""} Deleted!`);
         this.props.dispatch(ApiActions.requestOnDemand());
-          const res = await CustomerApi.getCustomerById(
-            this.props.selectedCustomer.id
-          );
-          this.props.dispatch(
-            CustomerActions.setSelectedCustomer(res.data.data)
-          );
+        const res = await CustomerApi.getCustomerById(
+          this.props.selectedCustomer.id
+        );
+        this.props.dispatch(CustomerActions.setSelectedCustomer(res.data.data));
         this.fetchUsers();
       })
+    );
+  };
+
+  resendInvitation = usr => () => {
+    this.props.dispatch(
+      UsermanagementActions.resendInvitationMail(
+        { userId: usr.user_id },
+        () => {
+          Toast.success("Invitation Mail sent.");
+        }
+      )
     );
   };
 
@@ -306,6 +315,22 @@ class UserManagementContainer extends Component {
             </span>
           </p>
         </Menu.Item>
+        {(isLoggedInOmniciaAdmin(this.props.role) ||
+          isLoggedInCustomerAdmin(this.props.role)) &&
+          usr.first_login && (
+            <Menu.Item
+              className="maindashboard__list__item-dropdown-menu-item"
+              onClick={this.resendInvitation(usr)}
+            >
+              <p className="global__center-vert">
+                <Icon
+                  type="mail"
+                  style={{ fontSize: "20px", marginRight: "8px" }}
+                />
+                <span>Resend Invitation Mail</span>
+              </p>
+            </Menu.Item>
+          )}
         {!usr.is_active &&
           (isLoggedInOmniciaAdmin(this.props.role) ||
             isLoggedInCustomerAdmin(this.props.role)) && (
@@ -467,17 +492,14 @@ class UserManagementContainer extends Component {
       UsermanagementActions.activateDeactivateUser(users, async () => {
         if (_.get(users, ["users", "0", "is_active"]) === 1) {
           Toast.success("User has been activated!");
-        }
-        else {
+        } else {
           Toast.success("User has been deactivated!");
         }
         this.props.dispatch(ApiActions.requestOnDemand());
-          const res = await CustomerApi.getCustomerById(
-            this.props.selectedCustomer.id
-          );
-          this.props.dispatch(
-            CustomerActions.setSelectedCustomer(res.data.data)
-          );
+        const res = await CustomerApi.getCustomerById(
+          this.props.selectedCustomer.id
+        );
+        this.props.dispatch(CustomerActions.setSelectedCustomer(res.data.data));
         this.fetchUsers();
       })
     );
@@ -777,7 +799,7 @@ class UserManagementContainer extends Component {
           </div>
           {viewBy === "cards" && (
             <div>
-              {_.map(users, (user, key) => { 
+              {_.map(users, (user, key) => {
                 return (
                   <div key={key} className="userManagement__group">
                     <p className="userManagement__group-label">

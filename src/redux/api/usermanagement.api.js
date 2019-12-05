@@ -19,5 +19,6 @@ export default {
     api.post(URI.UPDATE_SECONDARY_CONTACTS, data),
   fetchUsers: data => api.post(URI.GET_USERS, data),
   fetchUsersOfSubmissions: data => api.post(URI.GET_USERS_OF_SUBMISSIONS, data),
-  fetchUsersOfFiles: data => api.post(URI.GET_USERS_OF_FILES, data)
+  fetchUsersOfFiles: data => api.post(URI.GET_USERS_OF_FILES, data),
+  resendInvitationMail: data => api.post(URI.RESEND_INVITATION_MAIL, data)
 };

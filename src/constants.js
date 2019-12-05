@@ -93,6 +93,7 @@ const URI = {
   REVOKE_LICENSE: `${path}user/revokeLicense`,
   REQUEST_LICENSE: `${path}user/requestLicense`,
   GET_LICENSE_INFO: `${path}user/getLicenseInfo`,
+  RESEND_INVITATION_MAIL: `${path}user/resendInvitationMail`,
 
   // File
   GET_FILE_SIZE: `${path}file/getFileSize`,
@@ -122,11 +123,16 @@ const URI = {
   IS_VALID_FOLDER: `${path}upload/isValidFTPSubmissionFolder`,
   SUBMISSION_LOOKUP_INFO: `${path}upload/submissionLookUpInfo`,
   SAVE_SUBMISSION_DETAILS: `${path}upload/saveSubmissionDetails`,
-  MONITOR_STATUS : `${path}upload/monitorStatus`
+  MONITOR_STATUS: `${path}upload/monitorStatus`,
+  RETRY_UPLOADS: `${path}upload/retrySequence`
 };
 
 const DATE_FORMAT = "MM/DD/YYYY";
 const DEBOUNCE_TIME = 700; //ms
+const POLLING_INTERVAL = 15000; //ms
+const UPLOAD_INPROGRES = 0;
+const UPLOAD_FAILED = 1;
+const UPLOAD_SUCCESS = 2;
 
 const VIEWER = {
   GOOGLE_VIEWER_MAX_SIZE: 22 * 1024 * 1024, // 22MB
@@ -156,6 +162,10 @@ export {
   DATE_FORMAT,
   VIEWER,
   DEBOUNCE_TIME,
+  POLLING_INTERVAL,
+  UPLOAD_INPROGRES,
+  UPLOAD_FAILED,
+  UPLOAD_SUCCESS,
   ROLES,
   ROLE_IDS,
   CHECKBOX,

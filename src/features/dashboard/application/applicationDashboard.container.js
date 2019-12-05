@@ -49,7 +49,6 @@ import ApplicationProperties from "./applicationProperties.component";
 // import { Customers } from "./sampleCustomers";
 // import  ApplicationApi  from "../../../redux/api/application.api"
 
-
 class ApplicationDashboard extends Component {
   constructor(props) {
     super(props);
@@ -85,14 +84,14 @@ class ApplicationDashboard extends Component {
           key: "name",
           checkbox: false,
           sort: true,
-          width: "22%"
+          width: "15%"
         },
         {
           name: TableColumnNames.SEQUENCES,
           key: "sequence_count",
           checkbox: false,
           sort: true,
-          width: "12%"
+          width: "10%"
         },
         {
           name: TableColumnNames.ADDEDBY,
@@ -100,7 +99,7 @@ class ApplicationDashboard extends Component {
           checkbox: false,
           sort: true,
           width: "26%",
-          style: { justifyContent: "center" }
+          style: { paddingLeft: "15px" }
         },
         {
           name: TableColumnNames.ADDEDON,
@@ -147,8 +146,7 @@ class ApplicationDashboard extends Component {
   }
 
   async componentDidMount() {
-      this.fetchApplications();
-    this.fetchAddApplication();
+    this.fetchApplications();
     if (!isLoggedInOmniciaRole(this.props.role)) {
       const res = await CustomerApi.getCustomerById(
         this.props.selectedCustomer.id
@@ -160,7 +158,6 @@ class ApplicationDashboard extends Component {
       TableColumns.shift();
       this.setState({ TableColumns });
     }
-    
   }
 
   onMenuClick = submission => ({ key }) => {
@@ -234,7 +231,6 @@ class ApplicationDashboard extends Component {
   };
 
   fetchApplications = (sortBy = "name", orderBy = "ASC") => {
-    console.log("aaa")
     this.props.actions.resetApplications();
     this.setState({ submissions: [] });
     const { viewBy, pageNo, itemsPerPage, searchText } = this.state;
@@ -258,15 +254,6 @@ class ApplicationDashboard extends Component {
     }
   };
 
-  fetchAddApplication = () => {
-   this.props.actions.fetchAddApplication(() => {
-    // this.setState({ messages : this.props.access.message });
-   }
-  );
- 
-  };
-  
-
   changeView = type => {
     const TableColumns = [...this.state.TableColumns];
     TableColumns[0].checked = false;
@@ -282,7 +269,10 @@ class ApplicationDashboard extends Component {
   };
 
   onSubmissionSelected = submission => () => {
-    if (_.get(submission, "sequence_count", 0) == 0 || _.get(submission, 'sequence_failed', []).length) {
+    if (
+      _.get(submission, "sequence_count", 0) == 0 ||
+      _.get(submission, "sequence_failed", []).length
+    ) {
       return;
     }
     this.props.actions.setSelectedSubmission(submission);
@@ -568,16 +558,23 @@ class ApplicationDashboard extends Component {
     this.props.history.push("/applications/add");
   };
 
-  updateSubmissions = (submission) => {
-    const {submissions} = this.state;
-    console.log('updating customer sequences from ', submissions, submission);
+  updateSubmissions = submission => {
+    const { submissions } = this.state;
     let submissionIdx = submissions.findIndex(x => x.id === submission.id);
     submissions[submissionIdx] = submission;
     this.setState({
       submissions: submissions
     });
     // this.fetchApplications();
-  }
+  };
+
+  retryUpload = sequences => {
+    this.props.dispatch(
+      ApplicationActions.retryUploads({ ids: _.map(sequences, "id") }, () => {
+        this.fetchApplications();
+      })
+    );
+  };
 
   render() {
     const {
@@ -593,7 +590,13 @@ class ApplicationDashboard extends Component {
       showLicenceUnAssigned,
       messages
     } = this.state;
-    const { loading, selectedCustomer, submissionCount, role } = this.props;
+    const {
+      loading,
+      selectedCustomer,
+      submissionCount,
+      role,
+      user
+    } = this.props;
     if (!selectedCustomer) {
       return <Redirect to="/customers" />;
     }
@@ -666,22 +669,19 @@ class ApplicationDashboard extends Component {
               )}
             </div>
             {(isLoggedInOmniciaAdmin(this.props.role) ||
-              isLoggedInCustomerAdmin(this.props.role) || (this.props.access.message === "User Has Access"))
-              
-               && (
-                  <React.Fragment>
-              <OmniButton
-                type="add"
-                label={translate("label.button.add", {
-                  type: translate("label.dashboard.application")
-                })}
-                buttonStyle={{ height: "40px" }}
-                onClick={this.addNewApplication}
-              />
-              </React.Fragment> )  
-
-
-            }
+              isLoggedInCustomerAdmin(this.props.role) ||
+              user.is_secondary_contact) && (
+              <React.Fragment>
+                <OmniButton
+                  type="add"
+                  label={translate("label.button.add", {
+                    type: translate("label.dashboard.application")
+                  })}
+                  buttonStyle={{ height: "40px" }}
+                  onClick={this.addNewApplication}
+                />
+              </React.Fragment>
+            )}
           </div>
           {(isLoggedInOmniciaAdmin(role) || isLoggedInCustomerAdmin(role)) && (
             <div className="global__center-vert" style={{ marginTop: "10px" }}>
@@ -749,12 +749,18 @@ class ApplicationDashboard extends Component {
                   <Row
                     key={submission.id}
                     className="maindashboard__list__item"
+                    style={{
+                      ...(!_.get(submission, "sequence_count") && {
+                        cursor: "not-allowed"
+                      })
+                    }}
                   >
                     {isAdmin(role.slug) && (
                       <Column
                         width={this.getColumnWidth(TableColumnNames.CHECKBOX)}
                       >
                         <OmniCheckbox
+                          disabled={!_.get(submission, "sequence_count")}
                           checked={submission.checked}
                           onCheckboxChange={this.onCheckboxChange(submission)}
                         />
@@ -774,12 +780,11 @@ class ApplicationDashboard extends Component {
                       className="maindashboard__list__item-text"
                       onClick={this.onSubmissionSelected(submission)}
                     >
-                      {_.get(submission, "sequence_count", "")}
+                      {_.get(submission, "sequence_count") || "In Progress"}
                     </Column>
                     <Column
                       width={this.getColumnWidth(TableColumnNames.ADDEDBY)}
                       className="maindashboard__list__item-text"
-                      style={{ textAlign: "center" }}
                       onClick={this.onSubmissionSelected(submission)}
                     >
                       <Avatar
@@ -809,14 +814,24 @@ class ApplicationDashboard extends Component {
                     >
                       <div>{this.props.selectedCustomer.number_of_users}</div>
                       <Dropdown
+                        disabled={!_.get(submission, "sequence_count")}
                         overlay={this.getMenu(submission)}
                         trigger={["click"]}
                         overlayClassName="maindashboard__list__item-dropdown"
                       >
                         <img
-                          className="global__cursor-pointer"
+                          className={
+                            _.get(submission, "sequence_count") &&
+                            "global__cursor-pointer"
+                          }
                           src="/images/overflow-black.svg"
-                          style={{ width: "20px", height: "20px" }}
+                          style={{
+                            width: "20px",
+                            height: "20px",
+                            opacity: !_.get(submission, "sequence_count")
+                              ? 0.2
+                              : 1
+                          }}
                         />
                       </Dropdown>
                     </Column>
@@ -868,6 +883,7 @@ class ApplicationDashboard extends Component {
                     onSelect={this.onSubmissionSelected}
                     getMenu={this.getMenu(submission)}
                     updateSubmissions={this.updateSubmissions}
+                    retryUpload={this.retryUpload}
                   />
                 ))}
               </div>
@@ -953,6 +969,7 @@ function mapStateToProps(state) {
     selectedCustomer: state.Customer.selectedCustomer,
     submissionCount: state.Application.submissionCount,
     selectedSubmission: state.Application.selectedSubmission,
+    user: state.Login.user,
     access: state.Application.access
   };
 }

@@ -95,6 +95,21 @@ export default {
       }
     };
   },
+  retryUploads: (data, callback) => {
+    return async dispatch => {
+      ApiActions.request(dispatch);
+      try {
+        const res = await ApplicationApi.retryUploads(data);
+        dispatch({
+          type: ApplicationActionTypes.RETRY_UPLOADS
+        });
+        ApiActions.success(dispatch);
+        !res.data.error && callback && callback();
+      } catch (err) {
+        ApiActions.failure(dispatch);
+      }
+    };
+  },
   resetApplications: () => {
     return {
       type: ApplicationActionTypes.RESET_APPLICATIONS

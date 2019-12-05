@@ -86,7 +86,7 @@ export default {
       }
     };
   },
-  fetchCustomerAdmins: (data, cb) => {
+  fetchAdmins: (data, cb) => {
     return async dispatch => {
       ApiActions.request(dispatch);
       try {
@@ -259,5 +259,21 @@ export default {
   setSelectedUser: user => ({
     type: UsermanagementActionTypes.SET_SELECTED_USER,
     user
-  })
+  }),
+  resendInvitationMail: (data, cb) => {
+    return async dispatch => {
+      ApiActions.request(dispatch);
+      try {
+        const res = await UsermanagementApi.resendInvitationMail(data);
+        !res.data.error && cb && cb();
+        /* dispatch({
+          type: UsermanagementActionTypes.RESEND_INVITATION_MAIL,
+          data: res.data
+        }); */
+        ApiActions.success(dispatch);
+      } catch (err) {
+        ApiActions.failure(dispatch);
+      }
+    };
+  }
 };

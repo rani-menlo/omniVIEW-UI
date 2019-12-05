@@ -229,10 +229,11 @@ class AddCustomer extends Component {
       if (selectedCustomer) {
         const state = this.populateState();
         newState = { ...state, ...newState };
-        this.fetchCustomerAdmins();
-        if(selectedCustomer.is_omnicia == true) {
+        if (selectedCustomer.is_omnicia == true) {
+          this.fetchOmniAdmins();
           this.fetchOmniUsers();
         } else {
+          this.fetchCustomerAdmins();
           this.fetchUsers();
         }
       }
@@ -245,7 +246,7 @@ class AddCustomer extends Component {
 
   fetchCustomerAdmins = (customer = this.props.selectedCustomer, cb) => {
     this.props.dispatch(
-      UsermanagementActions.fetchCustomerAdmins(
+      UsermanagementActions.fetchAdmins(
         {
           customerId: customer.id,
           roles: [ROLE_IDS.CUSTOMER.administrator]
@@ -255,20 +256,32 @@ class AddCustomer extends Component {
     );
   };
 
-  fetchUsers = () => {
+  fetchOmniAdmins = (customer = this.props.selectedCustomer, cb) => {
+    this.props.dispatch(
+      UsermanagementActions.fetchAdmins(
+        {
+          customerId: customer.id,
+          roles: [ROLE_IDS.OMNICIA.administrator]
+        },
+        cb
+      )
+    );
+  };
+
+  fetchUsers = (customer = this.props.selectedCustomer) => {
     this.props.dispatch(
       UsermanagementActions.fetchUsers({
-        customerId: this.props.selectedCustomer.id,
-        roles: _.values(ROLE_IDS.CUSTOMER) 
+        customerId: customer.id,
+        roles: _.values(ROLE_IDS.CUSTOMER)
       })
     );
   };
 
-  fetchOmniUsers = () => {
+  fetchOmniUsers = (customer = this.props.selectedCustomer) => {
     this.props.dispatch(
       UsermanagementActions.fetchUsers({
-        customerId: this.props.selectedCustomer.id,
-        roles: _.values(ROLE_IDS.OMNICIA) 
+        customerId: customer.id,
+        roles: _.values(ROLE_IDS.OMNICIA)
       })
     );
   };
@@ -589,32 +602,44 @@ class AddCustomer extends Component {
     });
   };
 
+  updateCustomerDetails = customer => {
+    const newState = this.populateState(customer);
+    const primaryContact = AddCustomer.getPrimaryContactDetailsState(
+      this.props,
+      this.state,
+      customer.primary_user_id
+    );
+    this.setState(
+      {
+        ...newState,
+        ...primaryContact,
+        allLicences: null
+      },
+      () => {
+        if (this.state.selectedTab === "subscriptionLicences") {
+          this.props.dispatch(
+            UsermanagementActions.getAllLicences(customer.id)
+          );
+        }
+      }
+    );
+  };
+
   onCustomerSelected = customer => {
     this.props.dispatch(UsermanagementActions.resetAllLicences());
     this.props.dispatch(
       CustomerActions.setSelectedCustomer(customer, () => {
-        this.fetchCustomerAdmins(customer, () => {
-          const newState = this.populateState(customer);
-          const primaryContact = AddCustomer.getPrimaryContactDetailsState(
-            this.props,
-            this.state,
-            customer.primary_user_id
-          );
-          this.setState(
-            {
-              ...newState,
-              ...primaryContact,
-              allLicences: null
-            },
-            () => {
-              if (this.state.selectedTab === "subscriptionLicences") {
-                this.props.dispatch(
-                  UsermanagementActions.getAllLicences(customer.id)
-                );
-              }
-            }
-          );
-        });
+        if (customer.is_omnicia == true) {
+          this.fetchOmniAdmins(customer, () => {
+            this.updateCustomerDetails(customer);
+          });
+          this.fetchOmniUsers(customer);
+        } else {
+          this.fetchCustomerAdmins(customer, () => {
+            this.updateCustomerDetails(customer);
+          });
+          this.fetchUsers(customer);
+        }
       })
     );
   };
@@ -973,7 +998,7 @@ class AddCustomer extends Component {
                   />
                 </React.Fragment>
               )}
-              
+
               <p className="addUser-heading">
                 {translate("text.customer.subsoptions")}
               </p>
@@ -1248,7 +1273,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(AddCustomer);
+export default connect(mapStateToProps, mapDispatchToProps)(AddCustomer);

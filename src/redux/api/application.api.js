@@ -40,4 +40,5 @@ export default {
   getSubmissionLookupInfo: () => api.get(URI.SUBMISSION_LOOKUP_INFO),
   saveSubmissionDetails: data => api.post(URI.SAVE_SUBMISSION_DETAILS, data),
   monitorStatus: data => api.post(URI.MONITOR_STATUS , data),
+  retryUploads: data => api.post(URI.RETRY_UPLOADS , data),
 };

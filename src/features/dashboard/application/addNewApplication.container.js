@@ -29,7 +29,9 @@ class AddNewApplication extends Component {
       regions: [],
       submission_centers: [],
       application_types: [],
-      cloud_types: []
+      cloud_types: [],
+      defaultApplicationType: "",
+      defaultApplicationNumber: ""
     };
   }
   showLoading = () => {
@@ -109,7 +111,10 @@ class AddNewApplication extends Component {
         this.hideLoading
       );
     } else {
-      this.setState({selectedFolderError: res.data.message},this.hideLoading);
+      this.setState(
+        { selectedFolderError: res.data.message },
+        this.hideLoading
+      );
     }
   };
 
@@ -178,6 +183,7 @@ class AddNewApplication extends Component {
       this.setState({ selectedFolderError: message }, this.hideLoading);
       return;
     }
+    const { appNumber, appType } = data;
     const validSequences = _.get(data, "validSequences.length", 0);
     if (!validSequences) {
       this.setState(
@@ -210,6 +216,8 @@ class AddNewApplication extends Component {
         showRemoteFiles: false,
         path,
         application_types,
+        defaultApplicationType: appType,
+        defaultApplicationNumber: appNumber,
         cloud_types,
         regions,
         submission_centers,
@@ -247,7 +255,7 @@ class AddNewApplication extends Component {
   };
 
   openApplicationsScreen = () => {
-    this.setState({selectedFolderError: ""});
+    this.setState({ selectedFolderError: "" });
     this.props.history.push("/applications");
   };
 
@@ -288,6 +296,8 @@ class AddNewApplication extends Component {
       regions,
       submission_centers,
       application_types,
+      defaultApplicationType,
+      defaultApplicationNumber,
       validSequences,
       cloud_types
     } = this.state;
@@ -376,6 +386,11 @@ class AddNewApplication extends Component {
                   value: type.name
                 }))}
                 validSequences={validSequences}
+                appType={{
+                  key: defaultApplicationType.id,
+                  value: defaultApplicationType.name
+                }}
+                appNumber={defaultApplicationNumber}
               />
             )}
           </div>
