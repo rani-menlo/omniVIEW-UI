@@ -877,7 +877,7 @@ class AddCustomer extends Component {
               </p>
               {editCustomer && (
                 <div
-                  className="global__center-vert"
+                  className="addUser__primaryContact global__center-vert"
                   style={{ marginTop: "20px", marginBottom: "20px" }}
                 >
                   <Text
@@ -891,6 +891,7 @@ class AddCustomer extends Component {
                   />
                   <Dropdown
                     overlay={this.getDropdownMenu}
+                    overlayClassName="addUser__primaryContact-dropdown"
                     trigger={["click"]}
                     className="global__center-vert global__cursor-pointer"
                   >

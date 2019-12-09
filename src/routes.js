@@ -38,6 +38,11 @@ const Routes = () => {
               path="/applications/add"
               component={AddNewApplication}
             />
+            <Route
+              exact
+              path="/sequences/add"
+              component={AddNewApplication}
+            />
             <PrivateRoute
               exact
               path="/viewer/:type/:fileId?"

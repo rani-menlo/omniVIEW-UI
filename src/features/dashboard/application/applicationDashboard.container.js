@@ -211,7 +211,7 @@ class ApplicationDashboard extends Component {
           </div>
         </Menu.Item>
         {(isLoggedInOmniciaAdmin(this.props.role) ||
-          isLoggedInCustomerAdmin(this.props.role)) && (
+          isLoggedInCustomerAdmin(this.props.role)) && [
           <Menu.Item
             key="permissions"
             style={{ borderTop: "1px solid rgba(74, 74, 74, 0.25)" }}
@@ -224,8 +224,14 @@ class ApplicationDashboard extends Component {
                 text={translate("label.node.assignuseraccess")}
               />
             </div>
+          </Menu.Item>,
+          <Menu.Item key="sequence">
+            <div className="global__center-vert">
+              <img src="/images/plus-black.svg" style={style} />
+              <Text type="regular" size="12px" text="Add Sequence" />
+            </div>
           </Menu.Item>
-        )}
+        ]}
       </Menu>
     );
   };
@@ -341,6 +347,9 @@ class ApplicationDashboard extends Component {
       this.setState({
         showPropertiesModal: true
       });
+    } else if (key === "sequence") {
+      this.props.actions.setSelectedSubmission(submission);
+      this.props.history.push("/sequences/add");
     }
   };
 

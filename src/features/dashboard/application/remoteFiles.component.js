@@ -27,7 +27,13 @@ class RemoteFiles extends Component {
   };
 
   render() {
-    const { cancel, remoteFiles, rootPath, currentPath } = this.props;
+    const {
+      cancel,
+      remoteFiles,
+      rootPath,
+      currentPath,
+      isSequence
+    } = this.props;
     const { selected } = this.state;
     return (
       <React.Fragment>
@@ -82,7 +88,11 @@ class RemoteFiles extends Component {
           />
           <OmniButton
             type="primary"
-            label={translate("label.button.continue")}
+            label={
+              isSequence
+                ? translate("label.button.upload")
+                : translate("label.button.continue")
+            }
             onClick={this.submit}
           />
         </div>

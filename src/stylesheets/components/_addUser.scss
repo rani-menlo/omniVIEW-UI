@@ -203,4 +203,12 @@
       color: $black !important;
     }
   }
+  &__primaryContact {
+    &-dropdown {
+      > ul {
+        height: 200px;
+        overflow-y: auto;
+      }
+    }
+  }
 }

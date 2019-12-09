@@ -121,8 +121,10 @@ const URI = {
   GET_FTP_DETAILS: `${path}upload/getSavedFTPDetails/{customerId}`,
   GET_FTP_CONTENTS: `${path}upload/getContentsOfFTPPath`,
   IS_VALID_FOLDER: `${path}upload/isValidFTPSubmissionFolder`,
+  IS_VALID_SEQUENCE_FOLDER: `${path}upload/isValidFTPSequenceFolder`,
   SUBMISSION_LOOKUP_INFO: `${path}upload/submissionLookUpInfo`,
   SAVE_SUBMISSION_DETAILS: `${path}upload/saveSubmissionDetails`,
+  SAVE_SEQUENCE_DETAILS: `${path}upload/saveSequenceDetails`,
   MONITOR_STATUS: `${path}upload/monitorStatus`,
   RETRY_UPLOADS: `${path}upload/retrySequence`
 };
@@ -140,6 +142,21 @@ const VIEWER = {
 };
 
 const IMAGE_SUPPORT_TYPES = ".JPG, .JPEG, .PNG";
+
+/* This data hardcoded from valid-values.xml file which we got from legacy application.
+It has full bulk data of strings(titles), these titles appear inside STF files as folder names.
+These folder names should follow order as in the valid-values.xml. 
+valid-values.xml follows ascending order but somehow below titles are pushed to top/bottom without any logic
+hence we are following the same by taking these values to push top/bottom after ascending order */
+const VALID_VALUES_XML_DATA = {
+  BOTTOM_LIST: [
+    "Complete Patient List",
+    "List of Patients Having Abnormal Lab Values",
+    "List of Patients Having Adverse Events",
+    "List of Patients Having Serious Adverse Events"
+  ],
+  TOP_LIST: ["Synopsis"]
+};
 
 const CLOUDS = {
   ftp: {
@@ -170,5 +187,6 @@ export {
   ROLE_IDS,
   CHECKBOX,
   IMAGE_SUPPORT_TYPES,
+  VALID_VALUES_XML_DATA,
   CLOUDS
 };

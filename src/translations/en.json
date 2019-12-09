@@ -117,6 +117,7 @@
   "label.dashboard.customername": "Customer Name",
   "label.dashboard.users": "Users",
   "label.dashboard.user": "User",
+  "label.dashboard.sequence": "Sequence",
   "label.dashboard.sequences": "Sequences",
   "label.dashboard.addedby": "Added By",
   "label.dashboard.addedon": "Added On",
