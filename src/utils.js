@@ -6,6 +6,7 @@ import { translate } from "./translations/translator";
 
 const REGEX_EMAIL = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 const REGEX_PWD = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/;
+const IMAGES = {};
 
 const isLoggedInOmniciaRole = role => _.get(role, "slug", "").includes("o_");
 const isOmniciaRole = roleName => roleName.includes("o_");
@@ -90,6 +91,33 @@ const getCombinedLicences = licences => {
   return combinedLicences;
 };
 
+const getImageData = path => {
+  return IMAGES[path];
+};
+
+const storeImageData = (path, data) => {
+  IMAGES[path] = data;
+};
+
+const getListSequence = (sequence, array = []) => {
+  array.push(sequence);
+  if (_.get(sequence, "childs.length", 0)) {
+    _.map(sequence.childs, seq => {
+      getListSequence(seq, array);
+    });
+  }
+  return array;
+};
+
+const getOrderedSequences = (sequences, order) => {
+  let array = [];
+  _.map(sequences, sequence => {
+    array = array.concat(getListSequence(sequence));
+  });
+  const newArray = _.sortBy(array, s => Number(s.name));
+  return order === "desc" ? newArray.reverse() : newArray;
+};
+
 export {
   isLoggedInOmniciaRole,
   isOmniciaRole,
@@ -103,5 +131,8 @@ export {
   getRoleName,
   getRoleNameByRoleId,
   getFormattedDate,
-  getCombinedLicences
+  getCombinedLicences,
+  storeImageData,
+  getOrderedSequences,
+  getImageData
 };

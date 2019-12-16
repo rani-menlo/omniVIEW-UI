@@ -3,12 +3,15 @@ import PropTypes from "prop-types";
 import _ from "lodash";
 import { ImageApi } from "../../../redux/api";
 import { translate } from "../../../translations/translator";
+import { Spin, Icon } from "antd";
+import { getImageData, storeImageData } from "../../../utils";
 
 class ImageLoader extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      image: "/images/fallback-user.png"
+      image: "/images/fallback-user.png",
+      loading: true
     };
   }
 
@@ -26,14 +29,21 @@ class ImageLoader extends Component {
   async componentDidMount() {
     const { path } = this.props;
     if (path && typeof path === "string") {
-      const ext = path.substring(path.lastIndexOf(".") + 1);
-      const res = await ImageApi.fetchImage(path);
+      let imageData = getImageData(path);
+      if (!imageData) {
+        const ext = path.substring(path.lastIndexOf(".") + 1);
+        const res = await ImageApi.fetchImage(path);
+        imageData = `data:image/${ext};base64,${_.get(res, "data", "")}`;
+        storeImageData(path, imageData);
+      }
       this.setState({
-        image: `data:image/${ext};base64,${_.get(res, "data", "")}`
+        image: imageData,
+        loading: false
       });
     } else {
       this.setState({
-        image: "/images/fallback-user.png"
+        image: "/images/fallback-user.png",
+        loading: false
       });
     }
   }
@@ -53,6 +63,13 @@ class ImageLoader extends Component {
       width,
       ...style
     };
+    if (this.state.loading) {
+      return (
+        <Spin
+          indicator={<Icon type="loading" style={{ fontSize: 24 }} spin />}
+        />
+      );
+    }
     return type === "circle" ? (
       <div style={{ position: "relative", display: "inline-block" }}>
         <img

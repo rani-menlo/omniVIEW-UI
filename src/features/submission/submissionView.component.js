@@ -88,7 +88,7 @@ class SubmissionView extends Component {
   async componentDidMount() {
     let state = {};
     if (this.parentHeaderRef.current) {
-      state.parentHeaderHeight = this.parentHeaderRef.current.clientHeight + 28;
+      state.parentHeaderHeight = this.parentHeaderRef.current.clientHeight + 38;
     }
     // if user is not admin, by default enable view permissions.
     if (
@@ -655,7 +655,14 @@ class SubmissionView extends Component {
     if (_.get(item, "ID") === "m1") {
       item = { ID: "m1-regional_US Regional" };
     }
-    let selectedNode = this.getNodeFromMap(item);
+    let selectedNode = null;
+    if (_.get(item, "dtd-version")) {
+      selectedNode = this.treeNodesMap()
+        .values()
+        .next().value;
+    } else {
+      selectedNode = this.getNodeFromMap(item);
+    }
 
     // this case
     if (!selectedNode) {
@@ -1446,7 +1453,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(SubmissionView);
+export default connect(mapStateToProps, mapDispatchToProps)(SubmissionView);

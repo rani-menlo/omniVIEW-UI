@@ -209,6 +209,7 @@
   "label.user.seccontact": "Secondary Contact",
   "label.user.areyousuremarkseccontact": "Are you sure you want to tag selected users as Secondary Contacts?",
   "label.user.areyousuredeleteuser": "Are you sure you want to delete the user?",
+  "label.user.areyousuredeletesubmission": "Are you sure you want to delete the Application {name}?",
   "label.user.areyousureremoveseccontact": "Are you sure you want to remove the user as the Secondary Contact?",
   "label.user.areyousureunmarkseccontact": "Are you sure you want to remove the selected users as the Secondary Contacts?",
   "error.user.licenceassigned": "{product} - This license was previously assigned to an account that is now deactivated. {remain} days of access remain. Expires in {expire} days if left unassigned.",

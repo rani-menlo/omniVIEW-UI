@@ -242,6 +242,7 @@ class AddCustomer extends Component {
       }
       this.setState(newState);
     }
+    window.scrollTo(0, 0);
   }
 
   fetchCustomerAdmins = (customer = this.props.selectedCustomer, cb) => {
@@ -460,6 +461,9 @@ class AddCustomer extends Component {
       last_name: state.lname.value,
       email: state.email.value,
       phone: state.phone.value,
+      ...(this.props.selectedCustomer && {
+        is_omnicia: this.props.selectedCustomeris_omnicia
+      }),
       tbSpace: state.storageTB || 0,
       gbSpace: state.storageGB || 0,
       max_apps: state.storageApplications.value

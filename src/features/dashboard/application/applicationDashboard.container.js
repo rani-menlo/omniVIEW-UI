@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
 import _ from "lodash";
-import { Icon, Dropdown, Menu, Avatar, message } from "antd";
+import { Icon, Dropdown, Menu, Avatar, Modal } from "antd";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import SubmissionCard from "../submissionCard.component";
@@ -36,7 +36,8 @@ import {
   ContentLayout,
   AssignPermissionsModal,
   Text,
-  Toast
+  Toast,
+  ImageLoader
 } from "../../../uikit/components";
 import { translate } from "../../../translations/translator";
 import submissionActions from "../../../redux/actions/submission.actions";
@@ -232,6 +233,24 @@ class ApplicationDashboard extends Component {
             </div>
           </Menu.Item>
         ]}
+        {(isLoggedInOmniciaAdmin(this.props.role) ||
+          isLoggedInCustomerAdmin(this.props.role)) && (
+          <Menu.Item key="delete">
+            <div className="global__center-vert global__text-red">
+              <Icon
+                type="delete"
+                theme="filled"
+                style={{ fontSize: "20px", marginRight: "8px" }}
+              />
+              <Text
+                type="regular"
+                size="12px"
+                text="Delete Application"
+                className="global__text-red"
+              />
+            </div>
+          </Menu.Item>
+        )}
       </Menu>
     );
   };
@@ -276,7 +295,7 @@ class ApplicationDashboard extends Component {
 
   onSubmissionSelected = submission => () => {
     if (
-      _.get(submission, "sequence_count", 0) == 0 ||
+      _.get(submission, "is_uploading") ||
       _.get(submission, "sequence_failed", []).length
     ) {
       return;
@@ -350,7 +369,36 @@ class ApplicationDashboard extends Component {
     } else if (key === "sequence") {
       this.props.actions.setSelectedSubmission(submission);
       this.props.history.push("/sequences/add");
+    } else if (key === "delete") {
+      this.removeSubmission(submission);
     }
+  };
+
+  removeSubmission = submission => {
+    Modal.confirm({
+      className: "omnimodal",
+      title: translate("label.generic.delete"),
+      content: translate("label.user.areyousuredeletesubmission", {
+        name: submission.name
+      }),
+      okText: translate("label.generic.delete"),
+      cancelText: translate("label.button.cancel"),
+      onOk: () => {
+        this.props.dispatch(
+          ApplicationActions.deleteSubmission(
+            {
+              submission_id: submission.id,
+              customer_id: this.props.selectedCustomer.id
+            },
+            () => {
+              Toast.success("Application has been Deleted!");
+              this.fetchApplications();
+            }
+          )
+        );
+      },
+      onCancel: () => {}
+    });
   };
 
   checkAll = e => {
@@ -570,11 +618,22 @@ class ApplicationDashboard extends Component {
   updateSubmissions = submission => {
     const { submissions } = this.state;
     let submissionIdx = submissions.findIndex(x => x.id === submission.id);
+    if (!_.get(submission, "sequence_inProgress.length")) {
+      submission.is_uploading = false;
+    }
     submissions[submissionIdx] = submission;
     this.setState({
-      submissions: submissions
+      submissions
     });
-    // this.fetchApplications();
+  };
+
+  updateUploadProgress = submission => {
+    const { submissions } = this.state;
+    let submissionIdx = submissions.findIndex(x => x.id === submission.id);
+    submissions[submissionIdx] = submission;
+    this.setState({
+      submissions
+    });
   };
 
   retryUpload = sequences => {
@@ -759,7 +818,7 @@ class ApplicationDashboard extends Component {
                     key={submission.id}
                     className="maindashboard__list__item"
                     style={{
-                      ...(!_.get(submission, "sequence_count") && {
+                      ...(_.get(submission, "is_uploading") && {
                         cursor: "not-allowed"
                       })
                     }}
@@ -769,7 +828,7 @@ class ApplicationDashboard extends Component {
                         width={this.getColumnWidth(TableColumnNames.CHECKBOX)}
                       >
                         <OmniCheckbox
-                          disabled={!_.get(submission, "sequence_count")}
+                          disabled={_.get(submission, "is_uploading")}
                           checked={submission.checked}
                           onCheckboxChange={this.onCheckboxChange(submission)}
                         />
@@ -789,17 +848,21 @@ class ApplicationDashboard extends Component {
                       className="maindashboard__list__item-text"
                       onClick={this.onSubmissionSelected(submission)}
                     >
-                      {_.get(submission, "sequence_count") || "In Progress"}
+                      {_.get(submission, "is_uploading")
+                        ? "In Progress"
+                        : _.get(submission, "sequence_count", "")}
                     </Column>
                     <Column
                       width={this.getColumnWidth(TableColumnNames.ADDEDBY)}
                       className="maindashboard__list__item-text"
                       onClick={this.onSubmissionSelected(submission)}
                     >
-                      <Avatar
-                        size="small"
-                        icon="user"
+                      <ImageLoader
+                        type="circle"
+                        width="30px"
+                        height="30px"
                         style={{ marginRight: "10px" }}
+                        path={submission.profile}
                       />
                       {_.get(submission, "created_by") || "Corabelle Durrad"}
                     </Column>
@@ -823,23 +886,21 @@ class ApplicationDashboard extends Component {
                     >
                       <div>{this.props.selectedCustomer.number_of_users}</div>
                       <Dropdown
-                        disabled={!_.get(submission, "sequence_count")}
+                        disabled={_.get(submission, "is_uploading")}
                         overlay={this.getMenu(submission)}
                         trigger={["click"]}
                         overlayClassName="maindashboard__list__item-dropdown"
                       >
                         <img
                           className={
-                            _.get(submission, "sequence_count") &&
+                            !_.get(submission, "is_uploading") &&
                             "global__cursor-pointer"
                           }
                           src="/images/overflow-black.svg"
                           style={{
                             width: "20px",
                             height: "20px",
-                            opacity: !_.get(submission, "sequence_count")
-                              ? 0.2
-                              : 1
+                            opacity: _.get(submission, "is_uploading") ? 0.2 : 1
                           }}
                         />
                       </Dropdown>
@@ -892,6 +953,7 @@ class ApplicationDashboard extends Component {
                     onSelect={this.onSubmissionSelected}
                     getMenu={this.getMenu(submission)}
                     updateSubmissions={this.updateSubmissions}
+                    updateUploadProgress={this.updateUploadProgress}
                     retryUpload={this.retryUpload}
                   />
                 ))}
@@ -958,7 +1020,7 @@ class ApplicationDashboard extends Component {
 
 const TableColumnNames = {
   CHECKBOX: "",
-  APPLICATION_NAME: translate("label.dashboard.applicationname"),
+  APPLICATION_NAME: translate("label.newapplication.applicationnumber"),
   SEQUENCES: translate("label.dashboard.sequences"),
   ADDEDBY: translate("label.dashboard.addedby"),
   ADDEDON: translate("label.dashboard.addedon"),

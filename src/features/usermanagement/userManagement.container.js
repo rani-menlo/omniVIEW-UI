@@ -248,7 +248,7 @@ class UserManagementContainer extends Component {
       UsermanagementActions.resendInvitationMail(
         { userId: usr.user_id },
         () => {
-          Toast.success("Invitation Mail sent.");
+          Toast.success("Account Activation Email sent.");
         }
       )
     );
@@ -327,11 +327,12 @@ class UserManagementContainer extends Component {
                   type="mail"
                   style={{ fontSize: "20px", marginRight: "8px" }}
                 />
-                <span>Resend Invitation Mail</span>
+                <span>Resend Activation Email</span>
               </p>
             </Menu.Item>
           )}
         {!usr.is_active &&
+          usr.user_id != this.props.selectedCustomer.primary_user_id &&
           (isLoggedInOmniciaAdmin(this.props.role) ||
             isLoggedInCustomerAdmin(this.props.role)) && (
             <Menu.Item
@@ -468,7 +469,7 @@ class UserManagementContainer extends Component {
   };
 
   closeActivateDeactivateModal = () => {
-    this.setState({ showDeactivateModal: false });
+    this.setState({ showDeactivateModal: false, selectedUser: null });
   };
 
   activateDeactivate = () => {
@@ -1011,19 +1012,22 @@ class UserManagementContainer extends Component {
           )}
           <DeactivateModal
             isActive={
-              _.get(this.state, "selectedUser.is_active") ||
-              this.state.deactivateAll
+              !_.isNull(this.state.selectedUser)
+                ? _.get(this.state, "selectedUser.is_active")
+                : this.state.deactivateAll
             }
             visible={this.state.showDeactivateModal}
             title={
-              _.get(this.state, "selectedUser.is_active") ||
-              this.state.deactivateAll
+              (!_.isNull(this.state.selectedUser)
+              ? _.get(this.state, "selectedUser.is_active")
+              : this.state.deactivateAll)
                 ? `${translate("label.usermgmt.deactivateacc")}?`
                 : `${translate("label.usermgmt.activateacc")}?`
             }
             content={
-              _.get(this.state, "selectedUser.is_active") ||
-              this.state.deactivateAll
+              (!_.isNull(this.state.selectedUser)
+              ? _.get(this.state, "selectedUser.is_active")
+              : this.state.deactivateAll)
                 ? translate("text.usermgmt.deactivatemsg")
                 : translate("text.usermgmt.activatemsg")
             }

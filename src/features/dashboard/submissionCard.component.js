@@ -1,11 +1,17 @@
-import React, { Component } from "react";
+import React, { Component, Suspense } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import { Dropdown, Menu, Avatar, Modal, Table } from "antd";
 import _ from "lodash";
 import { translate } from "../../translations/translator";
 import { getFormattedDate } from "../../utils";
-import { Text, Row, OmniButton, Loader } from "../../uikit/components";
+import {
+  Text,
+  Row,
+  OmniButton,
+  Loader,
+  ImageLoader
+} from "../../uikit/components";
 import { ApplicationApi } from "../../redux/api";
 import {
   POLLING_INTERVAL,
@@ -34,10 +40,10 @@ class SubmissionCard extends Component {
     this.Columns = [
       {
         title: "Sequence #",
-        dataIndex: "id",
+        dataIndex: "pipeline_name",
         key: "id",
         render: text => <Text type="regular" size="14px" text={text || 1001} />,
-        width: 150
+        width: 110
       },
 
       {
@@ -57,16 +63,6 @@ class SubmissionCard extends Component {
   }
 
   checkSequenceStatus = (data, submission) => {
-    let noUploadInProgress = _.every(
-      data,
-      seq => seq.status != UPLOAD_INPROGRES
-    );
-    if (noUploadInProgress) {
-      this.interval && clearInterval(this.interval);
-      if (!_.get(submission, "sequence_failed.length", 0)) {
-        submission.sequence_count = data.length;
-      }
-    }
     submission.sequence_inProgress = _.filter(
       data,
       seq => seq.status == UPLOAD_INPROGRES
@@ -79,7 +75,19 @@ class SubmissionCard extends Component {
       data,
       seq => seq.status == UPLOAD_SUCCESS
     );
-    this.props.updateSubmissions(submission);
+    let noUploadInProgress = _.every(
+      data,
+      seq => seq.status != UPLOAD_INPROGRES
+    );
+    if (noUploadInProgress) {
+      this.interval && clearInterval(this.interval);
+      if (!_.get(submission, "sequence_failed.length", 0)) {
+        submission.sequence_count = data.length;
+      }
+      this.props.updateSubmissions(submission);
+    } else {
+      this.props.updateUploadProgress(submission);
+    }
   };
 
   startPolling = async () => {
@@ -100,7 +108,7 @@ class SubmissionCard extends Component {
   };
 
   componentDidMount() {
-    if (this.props.submission.sequence_count == 0) {
+    if (this.props.submission.is_uploading) {
       this.startPolling();
       this.interval = setInterval(() => {
         this.startPolling();
@@ -143,10 +151,12 @@ class SubmissionCard extends Component {
   render() {
     const { submission, onSelect, getMenu, customer } = this.props;
     const { openFailuresModal, reportData, selectedRows } = this.state;
-    const uploading = _.get(submission, "sequence_count", 0) == 0;
+    const uploading = _.get(submission, "is_uploading");
+    const LazyImageLoader = React.lazy(() =>
+      import("../../uikit/components/image/imageLoader.component")
+    );
     return (
       <React.Fragment>
-        {/* <Loader loading={loading} /> */}
         <div
           className="submissioncard"
           style={{
@@ -171,42 +181,48 @@ class SubmissionCard extends Component {
             >
               {_.get(submission, "name")}
             </span>
-            {!uploading && (
-              <Dropdown
-                overlay={getMenu && getMenu()}
-                trigger={["click"]}
-                overlayClassName="submissioncard__heading-dropdown"
-              >
-                <img
-                  src="/images/overflow.svg"
-                  className="submissioncard__heading-more"
-                />
-              </Dropdown>
-            )}
+            {!uploading &&
+              !(_.get(submission, "sequence_failed.length") || "") && (
+                <Dropdown
+                  overlay={getMenu && getMenu()}
+                  trigger={["click"]}
+                  overlayClassName="submissioncard__heading-dropdown"
+                >
+                  <img
+                    src="/images/overflow.svg"
+                    className="submissioncard__heading-more"
+                  />
+                </Dropdown>
+              )}
           </div>
           <div
             className="submissioncard__content"
             style={{
               ...((uploading ||
-                (submission.sequence_failed &&
-                  submission.sequence_failed.length)) && {
+                _.get(submission, "sequence_failed.length") ||
+                "") && {
                 cursor: "not-allowed"
               })
             }}
             onClick={onSelect && onSelect(submission)}
           >
-            {uploading && (
+            {(uploading ||
+              _.get(submission, "sequence_failed.length") ||
+              "" ||
+              "") && (
               <React.Fragment>
-                <div style={{ height: "30%", padding: "10px" }}>
-                  <Text
-                    type="medium"
-                    textStyle={{ color: "gray" }}
-                    text={`Sequences Remaining: ${_.get(
-                      submission,
-                      "sequence_inProgress.length",
-                      0
-                    )}`}
-                  />
+                <div style={{ padding: "10px" }}>
+                  {(_.get(submission, "sequence_inProgress.length") || "") && (
+                    <Text
+                      type="medium"
+                      textStyle={{ color: "gray" }}
+                      text={`Sequences Remaining: ${_.get(
+                        submission,
+                        "sequence_inProgress.length",
+                        0
+                      )}`}
+                    />
+                  )}
                   <Text
                     type="medium"
                     textStyle={{ color: "#00d592" }}
@@ -225,90 +241,119 @@ class SubmissionCard extends Component {
                       0
                     )}`}
                   />
+                  <Text
+                    type="medium"
+                    textStyle={{ marginTop: "12%", textAlign: "center" }}
+                    text="Upload is in progress..."
+                  />
                 </div>
-                {!_.get(submission, "sequence_inProgress.length") &&
-                  _.get(submission, "sequence_failed.length") && (
+                {_.get(submission, "sequence_inProgress.length") == 0 &&
+                  _.get(submission, "sequence_failed.length") != 0 && (
                     <OmniButton
                       className="submissioncard__content-report"
                       label="View Report"
                       onClick={this.openFailures}
                       type="danger"
+                      buttonStyle={{ borderColor: "unset" }}
                     />
                   )}
               </React.Fragment>
             )}
-            {!uploading && (
-              <React.Fragment>
-                <div className="submissioncard__content__item">
-                  <span className="submissioncard__content__item-label">
-                    {translate("label.dashboard.addedby")}
-                  </span>
-                  <div style={{ whiteSpace: "nowrap" }}>
-                    <Avatar size="small" icon="user" />
-                    <span
-                      className="submissioncard__content__item-text"
-                      style={{ marginLeft: "6px" }}
+            {!uploading &&
+              !(
+                submission.sequence_failed && submission.sequence_failed.length
+              ) && (
+                <React.Fragment>
+                  <div className="submissioncard__content__item">
+                    <p className="submissioncard__content__item-label">
+                      {translate("label.dashboard.addedby")}
+                    </p>
+                    <div
+                      style={{ marginTop: "10px" }}
+                      className="global__center-vert"
                     >
-                      {_.get(submission, "created_by") || "Corabelle Durrad"}
+                      <Suspense fallback={<p>Loading...</p>}>
+                        <LazyImageLoader
+                          type="circle"
+                          width="30px"
+                          height="30px"
+                          path={submission.profile}
+                        />
+                      </Suspense>
+                      <div
+                        className="submissioncard__content__item-text"
+                        style={{
+                          whiteSpace: "nowrap",
+                          marginLeft: "6px",
+                          maxWidth: "75px",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          textAlign: "right"
+                        }}
+                        title={
+                          _.get(submission, "created_by") || "Corabelle Durrad"
+                        }
+                      >
+                        {_.get(submission, "created_by") || "Corabelle Durrad"}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="submissioncard__content__item">
+                    <span className="submissioncard__content__item-label">
+                      {translate("label.dashboard.sequences")}:
+                    </span>
+                    <span className="submissioncard__content__item-text">
+                      {_.get(submission, "sequence_count", "")}
                     </span>
                   </div>
-                </div>
-                <div className="submissioncard__content__item">
-                  <span className="submissioncard__content__item-label">
-                    {translate("label.dashboard.sequences")}:
-                  </span>
-                  <span className="submissioncard__content__item-text">
-                    {_.get(submission, "sequence_count", "")}
-                  </span>
-                </div>
-                <div className="submissioncard__content__item">
-                  <span className="submissioncard__content__item-label">
-                    {translate("label.dashboard.addedon")}:
-                  </span>
-                  <span className="submissioncard__content__item-text">
-                    {getFormattedDate(_.get(submission, "created_at")) ||
-                      "12/01/2018"}
-                  </span>
-                </div>
-                <div className="submissioncard__content__item">
-                  <span className="submissioncard__content__item-label">
-                    {translate("label.dashboard.lastupdated")}:
-                  </span>
-                  <span className="submissioncard__content__item-text">
-                    {getFormattedDate(_.get(submission, "updated_at")) ||
-                      "12/01/2018"}
-                  </span>
-                </div>
-                <div className="submissioncard__content__item">
-                  <span className="submissioncard__content__item-label">
-                    {translate("label.dashboard.submissioncenter")}:
-                  </span>
-                  <span className="submissioncard__content__item-text">
-                    {_.get(submission, "submission_center", "")}
-                  </span>
-                </div>
-                <div
-                  className="global__hr-line"
-                  style={{ marginTop: "20px" }}
-                />
-                <div
-                  className="submissioncard__content__item"
-                  style={{ paddingTop: "4px" }}
-                >
-                  <span className="submissioncard__content__item-label">
-                    {translate("label.dashboard.users")}:
-                  </span>
-                  <div>{customer.number_of_users}</div>
-                </div>
-              </React.Fragment>
-            )}
+                  <div className="submissioncard__content__item">
+                    <span className="submissioncard__content__item-label">
+                      {translate("label.dashboard.addedon")}:
+                    </span>
+                    <span className="submissioncard__content__item-text">
+                      {getFormattedDate(_.get(submission, "created_at")) ||
+                        "12/01/2018"}
+                    </span>
+                  </div>
+                  <div className="submissioncard__content__item">
+                    <span className="submissioncard__content__item-label">
+                      {translate("label.dashboard.lastupdated")}:
+                    </span>
+                    <span className="submissioncard__content__item-text">
+                      {getFormattedDate(_.get(submission, "updated_at")) ||
+                        "12/01/2018"}
+                    </span>
+                  </div>
+                  <div className="submissioncard__content__item">
+                    <span className="submissioncard__content__item-label">
+                      {translate("label.dashboard.submissioncenter")}:
+                    </span>
+                    <span className="submissioncard__content__item-text">
+                      {_.get(submission, "submission_center", "")}
+                    </span>
+                  </div>
+                  <div
+                    className="global__hr-line"
+                    style={{ marginTop: "20px" }}
+                  />
+                  <div
+                    className="submissioncard__content__item"
+                    style={{ paddingTop: "4px" }}
+                  >
+                    <span className="submissioncard__content__item-label">
+                      {translate("label.dashboard.users")}:
+                    </span>
+                    <div>{customer.number_of_users}</div>
+                  </div>
+                </React.Fragment>
+              )}
           </div>
           <Modal
             destroyOnClose
             visible={openFailuresModal}
             closable={false}
             footer={null}
-            width="50%"
+            width="65%"
           >
             <div
               className="licence-modal__header"

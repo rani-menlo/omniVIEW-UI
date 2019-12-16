@@ -110,6 +110,18 @@ export default {
       }
     };
   },
+  deleteSubmission: (data, callback) => {
+    return async dispatch => {
+      ApiActions.request(dispatch);
+      try {
+        const res = await ApplicationApi.deleteSubmission(data);
+        ApiActions.success(dispatch);
+        !res.data.error && callback && callback();
+      } catch (err) {
+        ApiActions.failure(dispatch);
+      }
+    };
+  },
   resetApplications: () => {
     return {
       type: ApplicationActionTypes.RESET_APPLICATIONS

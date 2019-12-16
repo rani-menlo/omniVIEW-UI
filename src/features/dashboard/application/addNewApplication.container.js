@@ -215,7 +215,7 @@ class AddNewApplication extends Component {
         submission_id: selectedSubmission.id,
         additional_details: {
           auth_id: this.state.auth_id,
-          sequence_path: this.state.path
+          sequence_path: path
         }
       });
       if (res.data.error) {
@@ -453,8 +453,8 @@ class AddNewApplication extends Component {
                 }))}
                 validSequences={validSequences}
                 appType={{
-                  key: defaultApplicationType.id,
-                  value: defaultApplicationType.name
+                  key: _.get(defaultApplicationType, "id"),
+                  value: _.get(defaultApplicationType, "name")
                 }}
                 appNumber={defaultApplicationNumber}
               />

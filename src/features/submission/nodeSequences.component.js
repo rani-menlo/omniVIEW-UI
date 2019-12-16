@@ -6,6 +6,7 @@ import NodeSequenceTree from "./nodeSequenceTree";
 import { PermissionCheckbox } from "../../uikit/components";
 import { CHECKBOX } from "../../constants";
 import { Permissions } from "./permissions";
+import { getOrderedSequences } from "../../utils";
 
 class NodeSequences extends Component {
   constructor(props) {
@@ -155,41 +156,44 @@ class NodeSequences extends Component {
         <div className="sequenceslist">
           {sortBy === "submission"
             ? this.getTree()
-            : _.map(this.getList(), sequence => (
-                <div
-                  key={sequence.id}
-                  className={`sequenceslist__sequence global__cursor-pointer ${selected ===
-                    sequence.id && "global__node-selected"}`}
-                  style={{
-                    opacity:
-                      viewPermissions || editPermissions
-                        ? sequence.checkboxValue === CHECKBOX.DESELECTED
-                          ? 0.3
+            : _.map(
+                getOrderedSequences(this.props.sequences, this.state.order),
+                sequence => (
+                  <div
+                    key={sequence.id}
+                    className={`sequenceslist__sequence global__cursor-pointer ${selected ===
+                      sequence.id && "global__node-selected"}`}
+                    style={{
+                      opacity:
+                        viewPermissions || editPermissions
+                          ? sequence.checkboxValue === CHECKBOX.DESELECTED
+                            ? 0.3
+                            : 1
                           : 1
-                        : 1
-                  }}
-                >
-                  {editPermissions && (
-                    <PermissionCheckbox
-                      style={{ marginRight: "10px" }}
-                      value={sequence.checkboxValue}
-                      onChange={this.onCheckboxChange(sequence)}
-                    />
-                  )}
-                  <Icon
-                    type="folder"
-                    theme="filled"
-                    className="global__file-folder"
-                    onClick={this.onSelected(sequence)}
-                  />
-                  <span
-                    className="global__node-text global__cursor-pointer"
-                    onClick={this.onSelected(sequence)}
+                    }}
                   >
-                    {`${submissionLabel}\\${sequence.name}`}
-                  </span>
-                </div>
-              ))}
+                    {editPermissions && (
+                      <PermissionCheckbox
+                        style={{ marginRight: "10px" }}
+                        value={sequence.checkboxValue}
+                        onChange={this.onCheckboxChange(sequence)}
+                      />
+                    )}
+                    <Icon
+                      type="folder"
+                      theme="filled"
+                      className="global__file-folder"
+                      onClick={this.onSelected(sequence)}
+                    />
+                    <span
+                      className="global__node-text global__cursor-pointer"
+                      onClick={this.onSelected(sequence)}
+                    >
+                      {`${submissionLabel}\\${sequence.name}`}
+                    </span>
+                  </div>
+                )
+              )}
         </div>
       </React.Fragment>
     );
