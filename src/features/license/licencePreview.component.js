@@ -77,7 +77,7 @@ const LicencePreview = ({ closeModal, back, licences, visible, submit }) => {
           columns={Columns}
           dataSource={licences}
           pagination={false}
-          scroll={{ y: 200 }}
+          scroll={{ x: true, y: 200 }}
         />
       </div>
       <div style={{ marginTop: "20px", textAlign: "right" }}>

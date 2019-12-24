@@ -229,19 +229,25 @@ class AddCustomer extends Component {
       if (selectedCustomer) {
         const state = this.populateState();
         newState = { ...state, ...newState };
-        this.fetchCustomerAdmins();
-        this.fetchUsers();
+        if (selectedCustomer.is_omnicia == true) {
+          this.fetchOmniAdmins();
+          this.fetchOmniUsers();
+        } else {
+          this.fetchCustomerAdmins();
+          this.fetchUsers();
+        }
       }
       if (history.location.pathname.endsWith("subscriptions")) {
         newState.selectedTab = "subscriptionLicences";
       }
       this.setState(newState);
     }
+    window.scrollTo(0, 0);
   }
 
   fetchCustomerAdmins = (customer = this.props.selectedCustomer, cb) => {
     this.props.dispatch(
-      UsermanagementActions.fetchCustomerAdmins(
+      UsermanagementActions.fetchAdmins(
         {
           customerId: customer.id,
           roles: [ROLE_IDS.CUSTOMER.administrator]
@@ -251,11 +257,32 @@ class AddCustomer extends Component {
     );
   };
 
-  fetchUsers = () => {
+  fetchOmniAdmins = (customer = this.props.selectedCustomer, cb) => {
+    this.props.dispatch(
+      UsermanagementActions.fetchAdmins(
+        {
+          customerId: customer.id,
+          roles: [ROLE_IDS.OMNICIA.administrator]
+        },
+        cb
+      )
+    );
+  };
+
+  fetchUsers = (customer = this.props.selectedCustomer) => {
     this.props.dispatch(
       UsermanagementActions.fetchUsers({
-        customerId: this.props.selectedCustomer.id,
+        customerId: customer.id,
         roles: _.values(ROLE_IDS.CUSTOMER)
+      })
+    );
+  };
+
+  fetchOmniUsers = (customer = this.props.selectedCustomer) => {
+    this.props.dispatch(
+      UsermanagementActions.fetchUsers({
+        customerId: customer.id,
+        roles: _.values(ROLE_IDS.OMNICIA)
       })
     );
   };
@@ -434,6 +461,9 @@ class AddCustomer extends Component {
       last_name: state.lname.value,
       email: state.email.value,
       phone: state.phone.value,
+      ...(this.props.selectedCustomer && {
+        is_omnicia: this.props.selectedCustomeris_omnicia
+      }),
       tbSpace: state.storageTB || 0,
       gbSpace: state.storageGB || 0,
       max_apps: state.storageApplications.value
@@ -530,7 +560,7 @@ class AddCustomer extends Component {
           subscriptions: newLicences
         },
         () => {
-          Toast.success("Subscription Licenses Added!");
+          Toast.success("New License(s) Added!");
           this.onTabChange("subscriptionLicences");
         }
       )
@@ -576,32 +606,44 @@ class AddCustomer extends Component {
     });
   };
 
+  updateCustomerDetails = customer => {
+    const newState = this.populateState(customer);
+    const primaryContact = AddCustomer.getPrimaryContactDetailsState(
+      this.props,
+      this.state,
+      customer.primary_user_id
+    );
+    this.setState(
+      {
+        ...newState,
+        ...primaryContact,
+        allLicences: null
+      },
+      () => {
+        if (this.state.selectedTab === "subscriptionLicences") {
+          this.props.dispatch(
+            UsermanagementActions.getAllLicences(customer.id)
+          );
+        }
+      }
+    );
+  };
+
   onCustomerSelected = customer => {
     this.props.dispatch(UsermanagementActions.resetAllLicences());
     this.props.dispatch(
       CustomerActions.setSelectedCustomer(customer, () => {
-        this.fetchCustomerAdmins(customer, () => {
-          const newState = this.populateState(customer);
-          const primaryContact = AddCustomer.getPrimaryContactDetailsState(
-            this.props,
-            this.state,
-            customer.primary_user_id
-          );
-          this.setState(
-            {
-              ...newState,
-              ...primaryContact,
-              allLicences: null
-            },
-            () => {
-              if (this.state.selectedTab === "subscriptionLicences") {
-                this.props.dispatch(
-                  UsermanagementActions.getAllLicences(customer.id)
-                );
-              }
-            }
-          );
-        });
+        if (customer.is_omnicia == true) {
+          this.fetchOmniAdmins(customer, () => {
+            this.updateCustomerDetails(customer);
+          });
+          this.fetchOmniUsers(customer);
+        } else {
+          this.fetchCustomerAdmins(customer, () => {
+            this.updateCustomerDetails(customer);
+          });
+          this.fetchUsers(customer);
+        }
       })
     );
   };
@@ -839,7 +881,7 @@ class AddCustomer extends Component {
               </p>
               {editCustomer && (
                 <div
-                  className="global__center-vert"
+                  className="addUser__primaryContact global__center-vert"
                   style={{ marginTop: "20px", marginBottom: "20px" }}
                 >
                   <Text
@@ -853,6 +895,7 @@ class AddCustomer extends Component {
                   />
                   <Dropdown
                     overlay={this.getDropdownMenu}
+                    overlayClassName="addUser__primaryContact-dropdown"
                     trigger={["click"]}
                     className="global__center-vert global__cursor-pointer"
                   >
@@ -936,6 +979,7 @@ class AddCustomer extends Component {
                   onChange={this.onPhoneChange}
                 />
               </Row>
+
               {editCustomer && (
                 <React.Fragment>
                   <p className="addUser-heading">
@@ -959,6 +1003,7 @@ class AddCustomer extends Component {
                   />
                 </React.Fragment>
               )}
+
               <p className="addUser-heading">
                 {translate("text.customer.subsoptions")}
               </p>
@@ -1154,7 +1199,7 @@ class AddCustomer extends Component {
               </div>
             </TabPane>
             <TabPane
-              tab="Subscription Licences"
+              tab="Licenses"
               key="subscriptionLicences"
               disabled={!this.props.selectedCustomer}
             >
@@ -1233,7 +1278,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(AddCustomer);
+export default connect(mapStateToProps, mapDispatchToProps)(AddCustomer);

@@ -49,6 +49,22 @@ export default {
       }
     };
   },
+  fetchAddApplication: () => {
+    return async (dispatch, getState) => {
+      ApiActions.request(dispatch);
+      try {
+        const res = await ApplicationApi.fetchAddApplication();
+        dispatch({
+          type: ApplicationActionTypes.ADD_APPLICATION,
+          data: res.data
+        });
+        ApiActions.success(dispatch);
+      } catch (err) {
+        ApiActions.failure(dispatch);
+      }
+    };
+  },
+
   getSubmissionCenters: () => {
     return async dispatch => {
       ApiActions.request(dispatch);
@@ -72,6 +88,33 @@ export default {
         dispatch({
           type: ApplicationActionTypes.UPDATE_SUBMISSION_CENTER
         });
+        ApiActions.success(dispatch);
+        !res.data.error && callback && callback();
+      } catch (err) {
+        ApiActions.failure(dispatch);
+      }
+    };
+  },
+  retryUploads: (data, callback) => {
+    return async dispatch => {
+      ApiActions.request(dispatch);
+      try {
+        const res = await ApplicationApi.retryUploads(data);
+        dispatch({
+          type: ApplicationActionTypes.RETRY_UPLOADS
+        });
+        ApiActions.success(dispatch);
+        !res.data.error && callback && callback();
+      } catch (err) {
+        ApiActions.failure(dispatch);
+      }
+    };
+  },
+  deleteSubmission: (data, callback) => {
+    return async dispatch => {
+      ApiActions.request(dispatch);
+      try {
+        const res = await ApplicationApi.deleteSubmission(data);
         ApiActions.success(dispatch);
         !res.data.error && callback && callback();
       } catch (err) {

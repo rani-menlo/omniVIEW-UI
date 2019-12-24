@@ -88,7 +88,7 @@ class SubmissionView extends Component {
   async componentDidMount() {
     let state = {};
     if (this.parentHeaderRef.current) {
-      state.parentHeaderHeight = this.parentHeaderRef.current.clientHeight + 28;
+      state.parentHeaderHeight = this.parentHeaderRef.current.clientHeight + 38;
     }
     // if user is not admin, by default enable view permissions.
     if (
@@ -655,7 +655,14 @@ class SubmissionView extends Component {
     if (_.get(item, "ID") === "m1") {
       item = { ID: "m1-regional_US Regional" };
     }
-    let selectedNode = this.getNodeFromMap(item);
+    let selectedNode = null;
+    if (_.get(item, "dtd-version")) {
+      selectedNode = this.treeNodesMap()
+        .values()
+        .next().value;
+    } else {
+      selectedNode = this.getNodeFromMap(item);
+    }
 
     // this case
     if (!selectedNode) {
@@ -876,7 +883,7 @@ class SubmissionView extends Component {
 
   getFormFile = () => {
     const { selectedSequence, sequenceJson, lifeCycleJson } = this.props;
-    let formFile = null;
+    let formFile = [];
     const json = selectedSequence ? sequenceJson : lifeCycleJson;
     const m1Regional = _.get(
       json,
@@ -884,11 +891,12 @@ class SubmissionView extends Component {
     );
     _.forEach(m1Regional, (val, key) => {
       if (_.includes(key, "submission-information")) {
-        formFile = _.get(val, "Form FDA 1571.leaf[0]", "");
+        formFile.push(_.get(val, "Form FDA 1571.leaf[0]", null));
+        formFile.push(_.get(val, "Form FDA 356h.leaf[0]", null));
         return false;
       }
     });
-    return formFile;
+    return _.filter(formFile);
   };
 
   onFullyExpand = () => {
@@ -901,6 +909,24 @@ class SubmissionView extends Component {
 
   closeFindModal = () => {
     this.setState({ openFindModal: false });
+  };
+
+  getFilteredUsers = () => {
+    const { administrator, publisher, author } = ROLE_IDS.OMNICIA;
+    const filteredUsers = _.filter(this.props.users, user => {
+      if (
+        user.role_id === administrator ||
+        user.role_id === publisher ||
+        user.role_id === author
+      ) {
+        if (!user.hasAccess) {
+          console.log(user);
+        }
+        return user.hasAccess;
+      }
+      return true;
+    });
+    return filteredUsers;
   };
 
   render() {
@@ -1149,7 +1175,7 @@ class SubmissionView extends Component {
                   <SubmissionViewUsers
                     role={role}
                     searchUsers={this.fetchUsers}
-                    users={users}
+                    users={this.getFilteredUsers()}
                     selectedUser={selectedUser}
                     onUserSelected={this.viewPermissions}
                   />
@@ -1427,7 +1453,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(SubmissionView);
+export default connect(mapStateToProps, mapDispatchToProps)(SubmissionView);

@@ -51,11 +51,11 @@ const UserProfileCard = ({
           size="16px"
           text={getRoleName(_.get(user, "role_name", ""))}
         />
-        <Row style={{ justifyContent: "space-between", width: "100%" }}>
+        {_.get(user, "role_id") !== 1 && (<Row style={{ justifyContent: "space-between", width: "100%" }}>
           <Text
             type="regular"
             size="16px"
-            text={`${translate("label.usermgmt.subscriptionstatus")}:`}
+            text={`${translate("label.usermgmt.licensestatus")}:`}
           />
           <Text
             className={`userProfileCard-${
@@ -65,11 +65,11 @@ const UserProfileCard = ({
             size="16px"
             text={
               _.get(user, "license_status", 0)
-                ? ` ${translate("label.generic.subscribed")}`
-                : ` ${translate("label.generic.unsubscribed")}`
+                ? ` ${translate("label.user.active")}`
+                : ` ${translate("label.user.inactive")}`
             }
           />
-        </Row>
+        </Row>)}
         {_.get(user, "role_id") !== ROLE_IDS.OMNICIA.administrator &&
           _.get(user, "expiryDate") && (
             <Text

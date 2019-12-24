@@ -41,6 +41,15 @@ class ApplicationDetails extends Component {
     };
   }
 
+  componentDidMount() {
+    const { appType, appNumber } = this.props;
+    const { applicationType, applicationNo } = this.state;
+    this.setState({
+      applicationType: { ...applicationType, value: appType },
+      applicationNo: { ...applicationNo, value: appNumber }
+    });
+  }
+
   onSelect = (field, array) => val => {
     const value = _.find(array, item => item.key == val);
     this.setState({ [field]: { value, error: "" } });
@@ -99,7 +108,7 @@ class ApplicationDetails extends Component {
       region_id: state.region.value.key,
       submission_center: state.submissionCenter.value.value,
       application_type_id: state.applicationType.value.key,
-      app_number: +state.applicationNo.value,
+      app_number: state.applicationNo.value,
       no_of_sequences: this.props.validSequences
     };
     submit(obj);
@@ -115,6 +124,7 @@ class ApplicationDetails extends Component {
     } = this.state;
     const { cancel, regions, centers, types, validSequences } = this.props;
     const style = { marginBottom: "10%" };
+    console.log("applicationType", applicationType);
     return (
       <div className="addnewapplication__remote">
         <SelectField
@@ -136,8 +146,10 @@ class ApplicationDetails extends Component {
           placeholder={translate("label.newapplication.submissioncenter")}
         />
         <SelectField
+          key={_.get(applicationType, "value.key")}
           selectFieldClassName="newlicence__field-select"
           style={style}
+          selectedValue={_.get(applicationType, "value.value")}
           options={types}
           error={applicationType.error}
           onChange={this.onSelect("applicationType", types)}
@@ -146,6 +158,7 @@ class ApplicationDetails extends Component {
         />
         <NumericInput
           limit={999999}
+          value={applicationNo.value}
           label={`${translate("label.newapplication.applicationnumber")}*`}
           value={applicationNo.value}
           placeholder={translate("label.newapplication.applicationnumber")}

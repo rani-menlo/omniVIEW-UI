@@ -29,9 +29,20 @@ class AddNewApplication extends Component {
       regions: [],
       submission_centers: [],
       application_types: [],
-      cloud_types: []
+      cloud_types: [],
+      defaultApplicationType: "",
+      defaultApplicationNumber: "",
+      isAddingSequence: false
     };
   }
+
+  componentDidMount() {
+    const isAddingSequence = this.props.history.location.pathname.endsWith(
+      "/sequences/add"
+    );
+    this.setState({ isAddingSequence });
+  }
+
   showLoading = () => {
     this.props.dispatch(ApiActions.requestOnDemand());
   };
@@ -63,6 +74,7 @@ class AddNewApplication extends Component {
   showClouds = () => {
     this.setState({
       selectedCloud: "",
+      selectedFolderError: "",
       showClouds: true,
       enterRemoteDetails: false
     });
@@ -84,29 +96,35 @@ class AddNewApplication extends Component {
     let auth_id = "";
     if (!res.data.error) {
       auth_id = res.data.data.auth_id;
+      res = await ApplicationApi.getContentsOfPath({
+        customer_id: this.props.selectedCustomer.id,
+        ...(!_.isEmpty(remoteDetails.ftp_path) && {
+          ftp_path: remoteDetails.ftp_path
+        })
+      });
+      let remoteFiles = null;
+      if (!res.data.error) {
+        remoteFiles = res.data.data;
+      }
+      this.setState(
+        {
+          remoteDetails,
+          path: remoteDetails.ftp_path,
+          auth_id,
+          remoteFiles,
+          selectedFolderError: "",
+          showRemoteFiles: true,
+          enterRemoteDetails: false,
+          showApplicationDetails: false
+        },
+        this.hideLoading
+      );
+    } else {
+      this.setState(
+        { selectedFolderError: res.data.message },
+        this.hideLoading
+      );
     }
-    res = await ApplicationApi.getContentsOfPath({
-      customer_id: this.props.selectedCustomer.id,
-      ...(!_.isEmpty(remoteDetails.ftp_path) && {
-        ftp_path: remoteDetails.ftp_path
-      })
-    });
-    let remoteFiles = null;
-    if (!res.data.error) {
-      remoteFiles = res.data.data;
-    }
-    this.setState(
-      {
-        remoteDetails,
-        path: remoteDetails.ftp_path,
-        auth_id,
-        remoteFiles,
-        showRemoteFiles: true,
-        enterRemoteDetails: false,
-        showApplicationDetails: false
-      },
-      this.hideLoading
-    );
   };
 
   cancelApplicationDetails = () => {
@@ -161,10 +179,59 @@ class AddNewApplication extends Component {
   };
 
   showApplicationDetails = async selectedFolder => {
-    let { path } = this.state;
+    let { path, isAddingSequence } = this.state;
+    let { selectedCustomer, selectedSubmission } = this.props;
     path = `${path}/${_.get(selectedFolder, "name", "")}`;
     path = _.replace(path, new RegExp("//", "g"), "/");
     this.showLoading();
+    // if we are addding sequence, condition passes
+    if (isAddingSequence) {
+      let res = await ApplicationApi.isValidFTPSequenceFolder({
+        customer_id: selectedCustomer.id,
+        ftp_path: path,
+        submission_id: selectedSubmission.id
+      });
+      if (_.get(res, "data.error")) {
+        this.setState(
+          {
+            selectedFolderError: _.get(res, "data.message")
+          },
+          this.hideLoading
+        );
+        return;
+      }
+      if (!_.get(res, "data.isSequence")) {
+        this.setState(
+          {
+            selectedFolderError:
+              "Invalid folder. Please select a Sequence folder."
+          },
+          this.hideLoading
+        );
+        return;
+      }
+      res = await ApplicationApi.saveSequenceDetails({
+        customer_id: selectedCustomer.id,
+        submission_id: selectedSubmission.id,
+        additional_details: {
+          auth_id: this.state.auth_id,
+          sequence_path: path
+        }
+      });
+      if (res.data.error) {
+        this.setState(
+          { selectedFolderError: res.data.message },
+          this.hideLoading
+        );
+        return;
+      }
+      this.hideLoading();
+      if (!res.data.error) {
+        Toast.success(res.data.message);
+      }
+      this.openApplicationsScreen();
+    }
+    // adding submission
     let res = await ApplicationApi.isValidFTPSubmissionFolder({
       customer_id: this.props.selectedCustomer.id,
       ftp_path: path
@@ -174,6 +241,7 @@ class AddNewApplication extends Component {
       this.setState({ selectedFolderError: message }, this.hideLoading);
       return;
     }
+    const { appNumber, appType } = data;
     const validSequences = _.get(data, "validSequences.length", 0);
     if (!validSequences) {
       this.setState(
@@ -206,6 +274,8 @@ class AddNewApplication extends Component {
         showRemoteFiles: false,
         path,
         application_types,
+        defaultApplicationType: appType,
+        defaultApplicationNumber: appNumber,
         cloud_types,
         regions,
         submission_centers,
@@ -243,6 +313,7 @@ class AddNewApplication extends Component {
   };
 
   openApplicationsScreen = () => {
+    this.setState({ selectedFolderError: "" });
     this.props.history.push("/applications");
   };
 
@@ -270,7 +341,7 @@ class AddNewApplication extends Component {
   };
 
   render() {
-    const { selectedCustomer, loading } = this.props;
+    const { selectedCustomer, selectedSubmission, loading } = this.props;
     const {
       path,
       remoteDetails,
@@ -283,8 +354,11 @@ class AddNewApplication extends Component {
       regions,
       submission_centers,
       application_types,
+      defaultApplicationType,
+      defaultApplicationNumber,
       validSequences,
-      cloud_types
+      cloud_types,
+      isAddingSequence
     } = this.state;
     return (
       <React.Fragment>
@@ -295,7 +369,11 @@ class AddNewApplication extends Component {
             type="extra_bold"
             size="20px"
             className="addUser-companyname"
-            text={_.get(selectedCustomer, "company_name", "")}
+            text={
+              isAddingSequence
+                ? _.get(selectedSubmission, "name", "")
+                : _.get(selectedCustomer, "company_name", "")
+            }
             onClick={this.openApplicationsScreen}
           />
           <div style={{ marginBottom: "15px" }}>
@@ -318,7 +396,9 @@ class AddNewApplication extends Component {
               style={{ opacity: 0.4, cursor: "not-allowed" }}
             >
               {translate("label.button.add", {
-                type: translate("label.dashboard.application")
+                type: isAddingSequence
+                  ? translate("label.dashboard.sequence")
+                  : translate("label.dashboard.application")
               })}
             </span>
           </div>
@@ -345,6 +425,7 @@ class AddNewApplication extends Component {
             )}
             {showRemoteFiles && (
               <RemoteFiles
+                isSequence={isAddingSequence}
                 currentPath={path}
                 rootPath={remoteDetails.ftp_path}
                 remoteFiles={remoteFiles}
@@ -354,7 +435,7 @@ class AddNewApplication extends Component {
                 submit={this.showApplicationDetails}
               />
             )}
-            {showApplicationDetails && (
+            {!isAddingSequence && showApplicationDetails && (
               <ApplicationDetails
                 cancel={this.cancelApplicationDetails}
                 submit={this.saveDetails}
@@ -371,6 +452,11 @@ class AddNewApplication extends Component {
                   value: type.name
                 }))}
                 validSequences={validSequences}
+                appType={{
+                  key: _.get(defaultApplicationType, "id"),
+                  value: _.get(defaultApplicationType, "name")
+                }}
+                appNumber={defaultApplicationNumber}
               />
             )}
           </div>
@@ -383,7 +469,8 @@ class AddNewApplication extends Component {
 function mapStateToProps(state) {
   return {
     loading: state.Api.loading,
-    selectedCustomer: state.Customer.selectedCustomer
+    selectedCustomer: state.Customer.selectedCustomer,
+    selectedSubmission: state.Application.selectedSubmission
   };
 }
 

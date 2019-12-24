@@ -2,9 +2,16 @@ import React from "react";
 import PropTypes from "prop-types";
 import { Checkbox } from "antd";
 
-const OmniCheckbox = ({ style, onCheckboxChange, checked, children }) => {
+const OmniCheckbox = ({
+  style,
+  onCheckboxChange,
+  checked,
+  children,
+  disabled
+}) => {
   return (
     <Checkbox
+      disabled={disabled}
       className="omniCheckbox"
       style={style}
       onChange={onCheckboxChange}

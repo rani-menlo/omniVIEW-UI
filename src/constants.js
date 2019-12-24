@@ -68,6 +68,8 @@ const URI = {
 
   // Submission
   GET_APPLICATIONS: `${path}submission/getSubmissions`,
+  DELETE_SUBMISSION: `${path}submission/deleteSubmission`,
+
   GET_SUBMISSION_CENTERS: `${path}submission/getSubmissionCenters`,
   UPDATE_SUBMISSION_CENTER: `${path}submission/updateSubmissionCenter`,
 
@@ -92,6 +94,7 @@ const URI = {
   REVOKE_LICENSE: `${path}user/revokeLicense`,
   REQUEST_LICENSE: `${path}user/requestLicense`,
   GET_LICENSE_INFO: `${path}user/getLicenseInfo`,
+  RESEND_INVITATION_MAIL: `${path}user/resendInvitationMail`,
 
   // File
   GET_FILE_SIZE: `${path}file/getFileSize`,
@@ -103,6 +106,7 @@ const URI = {
 
   // access
   ASSIGN_FILE_PERMISSIONS: `${path}access/assignFilePermissions`,
+  ADD_APPLICATION: `${path}access/checkAddApplicationAccess`,
   ASSIGN_SUBMISSION_PERMISSIONS: `${path}access/assignSubmissionPermissions`,
   ASSIGN_SEQUENCE_PERMISSIONS: `${path}access/assignSequencePermissions`,
   GET_USERS_OF_SUBMISSIONS: `${path}access/getSubmissionAccessedUsers`,
@@ -118,12 +122,23 @@ const URI = {
   GET_FTP_DETAILS: `${path}upload/getSavedFTPDetails/{customerId}`,
   GET_FTP_CONTENTS: `${path}upload/getContentsOfFTPPath`,
   IS_VALID_FOLDER: `${path}upload/isValidFTPSubmissionFolder`,
+  IS_VALID_SEQUENCE_FOLDER: `${path}upload/isValidFTPSequenceFolder`,
   SUBMISSION_LOOKUP_INFO: `${path}upload/submissionLookUpInfo`,
-  SAVE_SUBMISSION_DETAILS: `${path}upload/saveSubmissionDetails`
+  SAVE_SUBMISSION_DETAILS: `${path}upload/saveSubmissionDetails`,
+  SAVE_SEQUENCE_DETAILS: `${path}upload/saveSequenceDetails`,
+  MONITOR_STATUS: `${path}upload/monitorStatus`,
+  RETRY_UPLOADS: `${path}upload/retrySequence`
 };
 
 const DATE_FORMAT = "MM/DD/YYYY";
 const DEBOUNCE_TIME = 700; //ms
+const POLLING_INTERVAL = 10000; //ms
+const UPLOAD_INPROGRES = 0;
+const UPLOAD_INPROGRES_EXTRA = -1;  // added extra from the backend
+const UPLOAD_FAILED = 1;
+const UPLOAD_SUCCESS = 2;
+const ANALYZING = 3;
+const UPLOAD_PROCESSING = 3;
 
 const VIEWER = {
   GOOGLE_VIEWER_MAX_SIZE: 22 * 1024 * 1024, // 22MB
@@ -131,6 +146,21 @@ const VIEWER = {
 };
 
 const IMAGE_SUPPORT_TYPES = ".JPG, .JPEG, .PNG";
+
+/* This data hardcoded from valid-values.xml file which we got from legacy application.
+It has full bulk data of strings(titles), these titles appear inside STF files as folder names.
+These folder names should follow order as in the valid-values.xml. 
+valid-values.xml follows ascending order but somehow below titles are pushed to top/bottom without any logic
+hence we are following the same by taking these values to push top/bottom after ascending order */
+const VALID_VALUES_XML_DATA = {
+  BOTTOM_LIST: [
+    "Complete Patient List",
+    "List of Patients Having Abnormal Lab Values",
+    "List of Patients Having Adverse Events",
+    "List of Patients Having Serious Adverse Events"
+  ],
+  TOP_LIST: ["Synopsis"]
+};
 
 const CLOUDS = {
   ftp: {
@@ -153,9 +183,17 @@ export {
   DATE_FORMAT,
   VIEWER,
   DEBOUNCE_TIME,
+  POLLING_INTERVAL,
+  UPLOAD_INPROGRES,
+  UPLOAD_INPROGRES_EXTRA,
+  UPLOAD_FAILED,
+  UPLOAD_SUCCESS,
+  ANALYZING,
+  UPLOAD_PROCESSING,
   ROLES,
   ROLE_IDS,
   CHECKBOX,
   IMAGE_SUPPORT_TYPES,
+  VALID_VALUES_XML_DATA,
   CLOUDS
 };

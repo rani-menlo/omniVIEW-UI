@@ -8,7 +8,8 @@ import Row from "../../uikit/components/row/row.component";
 import {
   isLoggedInAuthor,
   isLoggedInOmniciaAdmin,
-  isLoggedInCustomerAdmin
+  isLoggedInCustomerAdmin,
+  getOrderedSequences
 } from "../../utils";
 import { Text } from "../../uikit/components";
 import { Icon } from "antd";
@@ -22,7 +23,7 @@ class NodeProperties extends Component {
     projectJson: PropTypes.object,
     view: PropTypes.oneOf(["current", "lifeCycle"]),
     mode: PropTypes.oneOf(["standard", "qc"]),
-    formFile: PropTypes.object
+    formFile: PropTypes.array
   };
 
   getFileName = fullName => {
@@ -92,14 +93,25 @@ class NodeProperties extends Component {
     this.loadFile(fileHref, lifeCycle.fileID, lifeCycle.title);
   };
 
-  openFormFile = () => {
-    const { formFile } = this.props;
-    const fileHref = formFile["xlink:href"];
-    this.loadFile(fileHref, formFile.fileID, formFile.title);
+  openFormFile = file => () => {
+    const fileHref = file["xlink:href"];
+    this.loadFile(fileHref, file.fileID, file.title);
   };
 
   getStfProperties = () => {
-    const { properties, mode, submission } = this.props;
+    const {
+      properties,
+      mode,
+      submission,
+      lifeCycles: lifeCycleData
+    } = this.props;
+    let lifeCycles = _.intersectionWith(
+      lifeCycleData,
+      [properties.ID],
+      (a, b) => {
+        return _.intersectionWith(a, [b], (a, b) => a.ID === b).length > 0;
+      }
+    );
     return (
       <React.Fragment>
         <RowItems>
@@ -162,7 +174,7 @@ class NodeProperties extends Component {
                   </tr>
                 </thead>
                 <tbody>
-                  {_.map(properties.lifeCycles, (lifeCycle, idx) => (
+                  {_.map(lifeCycles[0], (lifeCycle, idx) => (
                     <tr key={idx}>
                       <td className="properties__life-cycle-table-link">
                         <a
@@ -402,9 +414,89 @@ class NodeProperties extends Component {
     return _.get(properties, "hash", "") && properties.isSequence;
   };
 
+  getFirstSeq = () => {
+    const { sequences, selectedCustomer, selectedSubmission } = this.props;
+    const id = `${_.get(selectedCustomer, "id", "")}_${_.get(
+      selectedSubmission,
+      "id",
+      ""
+    )}`;
+    let sequenceList = sequences[id];
+    sequenceList = getOrderedSequences(sequenceList);
+    const firstSeq = _.get(sequenceList, "[0]");
+    return firstSeq || "";
+  };
+
+  getLastSeq = () => {
+    const { sequences, selectedCustomer, selectedSubmission } = this.props;
+    const id = `${_.get(selectedCustomer, "id", "")}_${_.get(
+      selectedSubmission,
+      "id",
+      ""
+    )}`;
+    let sequenceList = sequences[id];
+    sequenceList = getOrderedSequences(sequenceList);
+    const lastSeq = _.get(sequenceList, `[${sequenceList.length - 1}]`);
+    return lastSeq || "";
+  };
+
   getSequenceProperties = () => {
-    const { projectJson, submission } = this.props;
-    const nextSeq = _.get(projectJson, "next_seq", "");
+    const {
+      projectJson,
+      submission,
+      sequences,
+      selectedSequence,
+      selectedCustomer,
+      selectedSubmission
+    } = this.props;
+
+    const id = `${_.get(selectedCustomer, "id", "")}_${_.get(
+      selectedSubmission,
+      "id",
+      ""
+    )}`;
+    let sequenceList = sequences[id];
+    sequenceList = getOrderedSequences(sequenceList);
+    const currentIndex = _.findIndex(
+      sequenceList,
+      seq => seq.id === _.get(selectedSequence, "id")
+    );
+    if (currentIndex < 0) {
+      return;
+    }
+    const nextSeq = _.get(sequenceList, `[${currentIndex + 1}]`);
+    const previousSeq = _.get(sequenceList, `[${currentIndex - 1}]`);
+    let nextSeqName = "";
+    let previousSeqName = "";
+    nextSeqName = nextSeq && nextSeq.name;
+    nextSeqName =
+      nextSeqName &&
+      `${_.get(submission, "name")}\\${nextSeqName} (${_.get(
+        nextSeq,
+        "submission_type",
+        ""
+      )}-${_.get(nextSeq, "submission_sub_type", "")})`;
+
+    previousSeqName = previousSeq && previousSeq.name;
+    previousSeqName =
+      previousSeqName &&
+      `${_.get(submission, "name")}\\${previousSeqName} (${_.get(
+        previousSeq,
+        "submission_type",
+        ""
+      )}-${_.get(previousSeq, "submission_sub_type", "")})`;
+
+    const currentSeq = `${_.get(submission, "name")}\\${_.get(
+      selectedSequence,
+      "name",
+      ""
+    )} (${_.get(nextSeq || previousSeq, "submission_type", "")}-${_.get(
+      nextSeq || previousSeq,
+      "submission_sub_type",
+      ""
+    )})`;
+
+    /* const nextSeq = _.get(projectJson, "next_seq", "");
     const previousSeq = _.get(projectJson, "pre_seq", "");
     let nextSeqName = "";
     let previousSeqName = "";
@@ -434,7 +526,7 @@ class NodeProperties extends Component {
       nextSeq || previousSeq,
       "submission_sub_type",
       ""
-    )})`;
+    )})`; */
     return (
       <React.Fragment>
         <RowItems>
@@ -473,24 +565,12 @@ class NodeProperties extends Component {
       "[admin][applicant-info][company-name]",
       ""
     );
-    const firstSeq = `${_.get(submission, "name")}\\${_.get(
-      projectJson,
-      "first_seq.name",
-      ""
-    )} (${_.get(projectJson, "first_seq.submission_type", "")}-${_.get(
-      projectJson,
-      "first_seq.submission_sub_type",
-      ""
-    )})`;
-    const lastSeq = `${_.get(submission, "name")}\\${_.get(
-      projectJson,
-      "last_seq.name",
-      ""
-    )} (${_.get(projectJson, "last_seq.submission_type", "")}-${_.get(
-      projectJson,
-      "last_seq.submission_sub_type",
-      ""
-    )})`;
+    const firstSeq = `${_.get(submission, "name")}\\${this.getFirstSeq().name ||
+      ""} (${this.getFirstSeq().submission_type || ""}-${this.getFirstSeq()
+      .submission_sub_type || ""})`;
+    const lastSeq = `${_.get(submission, "name")}\\${this.getLastSeq().name ||
+      ""} (${this.getLastSeq().submission_type || ""}-${this.getLastSeq()
+      .submission_sub_type || ""})`;
     return (
       <React.Fragment>
         <RowItems>
@@ -616,6 +696,15 @@ class NodeProperties extends Component {
         _.get(TypesJson, "[applicant-contact-type]", ""),
         type => type.code === contactType
       );
+
+      // let phones = contact.telephones.telephone;
+      // phones.map((number) =>{
+      //   console.log("number",number.$t)
+      //   console.log("telephone",number)
+      //   let phoneTxt =  `${_.get(number, "[$t]", "")}`;
+      //   console.log("phoneTxt",phoneTxt);
+      // });
+
       text = `${text}(${_.get(contactType, "display", "")}), `;
       text = `${text}${_.get(contact, "[telephones][telephone][$t]", "")}`;
       let phoneType = _.get(
@@ -649,14 +738,16 @@ class NodeProperties extends Component {
       application,
       "[application-information][application-number]"
     );
-    const applicationType = _.get(
-      _.find(
-        _.get(TypesJson, "[application-type]", ""),
-        type => type.code === applicationNumber["application-type"]
-      ),
-      "display",
-      ""
-    );
+    const applicationType =
+      applicationNumber &&
+      _.get(
+        _.find(
+          _.get(TypesJson, "[application-type]", ""),
+          type => type.code === applicationNumber["application-type"]
+        ),
+        "display",
+        ""
+      );
     const submissionInfo = _.get(application, "[submission-information]");
     const submissionType = _.get(
       _.find(
@@ -693,7 +784,11 @@ class NodeProperties extends Component {
         )}
         <RowItems>
           <div className="label">Submission Description:</div>
-          <div className="value">{_.get(projectJson, "description", "")}</div>
+          <div className="value">
+            {(_.size(_.get(applicantInfo, "submission-description", "")) ||
+              "") &&
+              _.get(applicantInfo, "submission-description")}
+          </div>
         </RowItems>
         <RowItems>
           <div className="label">Company Name:</div>
@@ -762,17 +857,20 @@ class NodeProperties extends Component {
             {_.get(sequence, "[submission_sub_type]", "")}
           </div>
         </RowItems>
-        {formFile && (
-          <RowItems>
-            <div className="label">Form: </div>
-            <div className="value link">
-              <a onClick={this.openFormFile}>
-                {this.getFileTypeIcon(_.get(formFile, "[xlink:href]", ""))}
-                {this.getFileName(_.get(formFile, "[xlink:href]", ""))}
-              </a>
-            </div>
-          </RowItems>
-        )}
+        {formFile.length &&
+          _.map(formFile, file => {
+            return (
+              <RowItems key={file}>
+                <div className="label">Form: </div>
+                <div className="value link">
+                  <a onClick={this.openFormFile(file)}>
+                    {this.getFileTypeIcon(_.get(file, "[xlink:href]", ""))}
+                    {this.getFileName(_.get(file, "[xlink:href]", ""))}
+                  </a>
+                </div>
+              </RowItems>
+            );
+          })}
         {leafProperties && (
           <React.Fragment>
             <div className="section-title">Leaf Properties</div>
@@ -851,10 +949,19 @@ class NodeProperties extends Component {
   };
 
   getLifeCycleTable = () => {
-    const { properties, mode } = this.props;
+    const { properties, mode, lifeCycles: lifeCycleData } = this.props;
     if (!properties.fileID || (this.isSTF() && mode === "standard")) {
       return null;
     }
+
+    let lifeCycles = _.intersectionWith(
+      lifeCycleData,
+      [properties.ID],
+      (a, b) => {
+        return _.intersectionWith(a, [b], (a, b) => a.ID === b).length > 0;
+      }
+    );
+
     return (
       <React.Fragment>
         <span className="properties-life-cycle-title">
@@ -874,7 +981,7 @@ class NodeProperties extends Component {
               </tr>
             </thead>
             <tbody>
-              {_.map(properties.lifeCycles, (lifeCycle, idx) => (
+              {_.map(lifeCycles[0], (lifeCycle, idx) => (
                 <tr key={idx}>
                   <td className="properties__life-cycle-table-link link">
                     <div className="global__center-vert">
@@ -959,8 +1066,20 @@ const RowItems = styled(Row)`
 `;
 
 function mapStateToProps(state) {
+  const id = `${_.get(state.Customer.selectedCustomer, "id", "")}_${
+    state.Application.selectedSubmission.id
+  }`;
   return {
-    role: state.Login.role
+    role: state.Login.role,
+    selectedCustomer: state.Customer.selectedCustomer,
+    selectedSubmission: state.Application.selectedSubmission,
+    selectedSequence: state.Submission.selectedSequence,
+    sequences: state.Submission.sequences,
+    lifeCycles: _.get(
+      state,
+      `Submission.lifeCycleJson[${id}].fileLifeCycles`,
+      []
+    )
   };
 }
 

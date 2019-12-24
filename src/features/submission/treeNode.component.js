@@ -4,7 +4,12 @@ import PropTypes from "prop-types";
 import _ from "lodash";
 import uuidv4 from "uuid/v4";
 import { PermissionCheckbox, Text } from "../../uikit/components";
-import { CHECKBOX } from "../../constants";
+import {
+  CHECKBOX,
+  VALID_VALUES_XML_DATA_BOTTOM_LIST,
+  VALID_VALUES_XML_DATA_TOP_LIST,
+  VALID_VALUES_XML_DATA
+} from "../../constants";
 import { isLoggedInCustomerAdmin, isLoggedInOmniciaAdmin } from "../../utils";
 import { translate } from "../../translations/translator";
 
@@ -257,12 +262,29 @@ class TreeNode extends Component {
     });
     const nodesByTitle = _.groupBy(nodes, node => node.value.title);
     let titles = _.map(nodes, node => node.value.title);
+    const bottomList = [],
+      topList = [];
     titles = titles.sort(collator.compare);
-    let lastItem = titles[titles.length - 1];
-    if (lastItem && lastItem.includes("Synopsis")) {
-      _.remove(titles, item => item === lastItem);
-      titles = [lastItem, ...titles];
-    }
+    // ordering based on valid-values.xml data (Refer comment in VALID_VALUES_XML_DATA_BOTTOM_LIST)
+    _.map(VALID_VALUES_XML_DATA.BOTTOM_LIST, item => {
+      const idx = _.findIndex(titles, title => {
+        const flag = title.includes(item);
+        flag && bottomList.push(title);
+        return flag;
+      });
+      idx >= 0 && titles.splice(idx, 1);
+    });
+
+    _.map(VALID_VALUES_XML_DATA.TOP_LIST, item => {
+      const idx = _.findIndex(titles, title => {
+        const flag = title.includes(item);
+        flag && topList.push(title);
+        return flag;
+      });
+      idx >= 0 && titles.splice(idx, 1);
+    });
+
+    titles = [...topList, ...titles, ...bottomList];
     return _.map(titles, title => nodesByTitle[title][0]);
   };
 

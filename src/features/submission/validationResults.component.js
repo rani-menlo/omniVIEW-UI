@@ -7,7 +7,7 @@ import { SubmissionActions } from "../../redux/actions";
 import Loader from "../../uikit/components/loader";
 import _ from "lodash";
 import { getValidationsBySequence } from "../../redux/selectors/validationResults.selector";
-import { Text, Row } from "../../uikit/components";
+import { Text, Row, Toast } from "../../uikit/components";
 import { translate } from "../../translations/translator";
 import { URI, SERVER_URL } from "../../constants";
 
@@ -30,7 +30,11 @@ class ValidationResults extends Component {
 
   componentDidMount() {
     const { sequence } = this.props;
-    sequence && this.props.actions.validateSequence(sequence.id);
+    sequence &&
+      this.props.actions.validateSequence(sequence.id, err => {
+        Toast.error("Internal server error. Please try again later.");
+        this.props.onClose();
+      });
   }
 
   static getDerivedStateFromProps(props, state) {
@@ -84,7 +88,7 @@ class ValidationResults extends Component {
   };
 
   getValidationGroupIcon = validation => {
-    const { group, isFile } = validation;
+    const { group, isFile, isFolder } = validation;
     let img = (
       <Icon type="folder" theme="filled" className="global__file-folder" />
     );
@@ -96,6 +100,9 @@ class ValidationResults extends Component {
           style={{ width: "18px", height: "22px" }}
         />
       );
+    }
+    if (group === "STF" && isFolder) {
+      return img;
     }
     switch (group) {
       case "File Checks":
@@ -290,7 +297,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(ValidationResults);
+export default connect(mapStateToProps, mapDispatchToProps)(ValidationResults);
