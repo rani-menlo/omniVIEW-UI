@@ -225,7 +225,7 @@ export default {
       sequence
     };
   },
-  validateSequence: sequenceId => {
+  validateSequence: (sequenceId, callback) => {
     return async (dispatch, getState) => {
       ApiActions.request(dispatch);
       try {
@@ -236,20 +236,16 @@ export default {
           "id",
           ""
         )}_${sequenceId}`;
-        /* const validations = getState().Submission.validations;
-        if (validations[id]) {
-          data.data = validations[id];
-        } else {
-          const res = await SubmissionApi.validateSquence({ id: sequenceId });
-          data = res.data;
-        } */
         const res = await SubmissionApi.validateSquence({ id: sequenceId });
-        debugger;
-        dispatch({
-          type: SubmissionActionTypes.VALIDATE_SEQUENCE,
-          data: res.data,
-          id
-        });
+        if (res.data.error) {
+          callback && callback(res.data.message);
+        } else {
+          dispatch({
+            type: SubmissionActionTypes.VALIDATE_SEQUENCE,
+            data: res.data,
+            id
+          });
+        }
         ApiActions.success(dispatch);
       } catch (err) {
         ApiActions.failure(dispatch);

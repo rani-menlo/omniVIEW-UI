@@ -7,7 +7,7 @@ import { SubmissionActions } from "../../redux/actions";
 import Loader from "../../uikit/components/loader";
 import _ from "lodash";
 import { getValidationsBySequence } from "../../redux/selectors/validationResults.selector";
-import { Text, Row } from "../../uikit/components";
+import { Text, Row, Toast } from "../../uikit/components";
 import { translate } from "../../translations/translator";
 import { URI, SERVER_URL } from "../../constants";
 
@@ -30,7 +30,11 @@ class ValidationResults extends Component {
 
   componentDidMount() {
     const { sequence } = this.props;
-    sequence && this.props.actions.validateSequence(sequence.id);
+    sequence &&
+      this.props.actions.validateSequence(sequence.id, err => {
+        Toast.error("Internal server error. Please try again later.");
+        this.props.onClose();
+      });
   }
 
   static getDerivedStateFromProps(props, state) {
@@ -98,7 +102,7 @@ class ValidationResults extends Component {
       );
     }
     if (group === "STF" && isFolder) {
-      return img
+      return img;
     }
     switch (group) {
       case "File Checks":
@@ -293,7 +297,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(ValidationResults);
+export default connect(mapStateToProps, mapDispatchToProps)(ValidationResults);

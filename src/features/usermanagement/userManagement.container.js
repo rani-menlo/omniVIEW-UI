@@ -232,7 +232,7 @@ class UserManagementContainer extends Component {
 
     this.props.dispatch(
       UsermanagementActions.deleteusers({ userIds }, async () => {
-        Toast.success(`User${userIds.length > 1 ? "s" : ""} Deleted!`);
+        Toast.success(`User${userIds.length > 1 ? "s" : ""} deleted!`);
         this.props.dispatch(ApiActions.requestOnDemand());
         const res = await CustomerApi.getCustomerById(
           this.props.selectedCustomer.id

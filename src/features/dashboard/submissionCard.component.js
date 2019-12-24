@@ -17,7 +17,10 @@ import {
   POLLING_INTERVAL,
   UPLOAD_SUCCESS,
   UPLOAD_INPROGRES,
-  UPLOAD_FAILED
+  UPLOAD_FAILED,
+  ANALYZING,
+  UPLOAD_PROCESSING,
+  UPLOAD_INPROGRES_EXTRA
 } from "../../constants";
 import { ApiActions } from "../../redux/actions";
 
@@ -63,31 +66,60 @@ class SubmissionCard extends Component {
   }
 
   checkSequenceStatus = (data, submission) => {
-    submission.sequence_inProgress = _.filter(
-      data,
-      seq => seq.status == UPLOAD_INPROGRES
-    );
-    submission.sequence_failed = _.filter(
-      data,
-      seq => seq.status == UPLOAD_FAILED
-    );
-    submission.sequence_success = _.filter(
-      data,
-      seq => seq.status == UPLOAD_SUCCESS
-    );
-    let noUploadInProgress = _.every(
-      data,
-      seq => seq.status != UPLOAD_INPROGRES
-    );
-    if (noUploadInProgress) {
+    const totalNoOfSeq = data.length;
+    const inProgress = [];
+    const failed = [];
+    const success = [];
+    const processing = [];
+    _.map(data, seq => {
+      switch (seq.status) {
+        case UPLOAD_INPROGRES:
+        case UPLOAD_INPROGRES_EXTRA:
+          inProgress.push(seq);
+          break;
+        case UPLOAD_FAILED:
+          failed.push(seq);
+          break;
+        case UPLOAD_SUCCESS:
+          success.push(seq);
+          break;
+        case UPLOAD_PROCESSING:
+          processing.push(seq);
+          break;
+      }
+    });
+    submission.sequence_count = totalNoOfSeq;
+    submission.sequence_inProgress = inProgress;
+    submission.sequence_failed = failed;
+    submission.sequence_success = success;
+    submission.sequence_processing = processing;
+    if (!inProgress.length && processing.length) {
+      submission.analyzing = true;
+    }
+    // if all are processing(Complete) or failed then clear interval
+    if (processing.length == totalNoOfSeq || failed.length == totalNoOfSeq) {
+      submission.is_uploading = false;
+      submission.analyzing = false;
+      this.interval && clearInterval(this.interval);
+    }
+    this.props.updateSubmissions(submission);
+
+    /* let analyzing = _.some(data, seq => seq.status == ANALYZING);
+    submission.analyzing = analyzing;
+    let allAnalyzed = _.every(data, seq => seq.status == ANALYZING);
+    let allFailed = _.every(data, seq => seq.status == UPLOAD_FAILED);
+    // if all analyzed then only it's complete, if all failed then stop polling
+    if (allAnalyzed || allFailed || !submission.sequence_inProgress.length) {
+      submission.analyzing = allAnalyzed || analyzing;
       this.interval && clearInterval(this.interval);
       if (!_.get(submission, "sequence_failed.length", 0)) {
         submission.sequence_count = data.length;
+        submission.is_uploading = false;
       }
       this.props.updateSubmissions(submission);
     } else {
       this.props.updateUploadProgress(submission);
-    }
+    } */
   };
 
   startPolling = async () => {
@@ -108,12 +140,12 @@ class SubmissionCard extends Component {
   };
 
   componentDidMount() {
-    if (this.props.submission.is_uploading) {
+    /* if (this.props.submission.is_uploading) {
       this.startPolling();
       this.interval = setInterval(() => {
         this.startPolling();
       }, POLLING_INTERVAL);
-    }
+    } */
   }
 
   componentWillUnmount() {
@@ -161,6 +193,7 @@ class SubmissionCard extends Component {
           className="submissioncard"
           style={{
             ...((uploading ||
+              submission.analyzing ||
               (submission.sequence_failed &&
                 submission.sequence_failed.length)) && {
               cursor: "not-allowed"
@@ -172,6 +205,7 @@ class SubmissionCard extends Component {
               className="submissioncard__heading-text global__cursor-pointer"
               style={{
                 ...((uploading ||
+                  submission.analyzing ||
                   (submission.sequence_failed &&
                     submission.sequence_failed.length)) && {
                   cursor: "not-allowed"
@@ -182,6 +216,7 @@ class SubmissionCard extends Component {
               {_.get(submission, "name")}
             </span>
             {!uploading &&
+              !submission.analyzing &&
               !(_.get(submission, "sequence_failed.length") || "") && (
                 <Dropdown
                   overlay={getMenu && getMenu()}
@@ -199,6 +234,7 @@ class SubmissionCard extends Component {
             className="submissioncard__content"
             style={{
               ...((uploading ||
+                submission.analyzing ||
                 _.get(submission, "sequence_failed.length") ||
                 "") && {
                 cursor: "not-allowed"
@@ -207,8 +243,8 @@ class SubmissionCard extends Component {
             onClick={onSelect && onSelect(submission)}
           >
             {(uploading ||
+              submission.analyzing ||
               _.get(submission, "sequence_failed.length") ||
-              "" ||
               "") && (
               <React.Fragment>
                 <div style={{ padding: "10px" }}>
@@ -230,22 +266,35 @@ class SubmissionCard extends Component {
                       submission,
                       "sequence_success.length",
                       0
-                    )}`}
+                    ) + _.get(submission, "sequence_processing.length", 0)}`}
                   />
-                  <Text
-                    type="medium"
-                    textStyle={{ color: "red" }}
-                    text={`Sequences Failed: ${_.get(
-                      submission,
-                      "sequence_failed.length",
-                      0
-                    )}`}
-                  />
-                  <Text
-                    type="medium"
-                    textStyle={{ marginTop: "12%", textAlign: "center" }}
-                    text="Upload is in progress..."
-                  />
+                  {(_.get(submission, "sequence_failed.length") || "") && (
+                    <Text
+                      type="medium"
+                      textStyle={{ color: "red" }}
+                      text={`Sequences Failed: ${_.get(
+                        submission,
+                        "sequence_failed.length",
+                        0
+                      )}`}
+                    />
+                  )}
+                  {submission.analyzing && (
+                    <Text
+                      type="medium"
+                      textStyle={{ marginTop: "12%", textAlign: "center" }}
+                      text="Processing uploaded sequence(s)..."
+                    />
+                  )}
+                  {uploading &&
+                    !submission.analyzing &&
+                    !_.get(submission, "sequence_failed.length") && (
+                      <Text
+                        type="medium"
+                        textStyle={{ marginTop: "12%", textAlign: "center" }}
+                        text="Upload is in progress..."
+                      />
+                    )}
                 </div>
                 {_.get(submission, "sequence_inProgress.length") == 0 &&
                   _.get(submission, "sequence_failed.length") != 0 && (
@@ -260,6 +309,7 @@ class SubmissionCard extends Component {
               </React.Fragment>
             )}
             {!uploading &&
+              !submission.analyzing &&
               !(
                 submission.sequence_failed && submission.sequence_failed.length
               ) && (
@@ -285,16 +335,14 @@ class SubmissionCard extends Component {
                         style={{
                           whiteSpace: "nowrap",
                           marginLeft: "6px",
-                          maxWidth: "75px",
+                          maxWidth: "90px",
                           overflow: "hidden",
                           textOverflow: "ellipsis",
                           textAlign: "right"
                         }}
-                        title={
-                          _.get(submission, "created_by") || "Corabelle Durrad"
-                        }
+                        title={_.get(submission, "created_by", "")}
                       >
-                        {_.get(submission, "created_by") || "Corabelle Durrad"}
+                        {_.get(submission, "created_by", "")}
                       </div>
                     </div>
                   </div>
@@ -348,50 +396,6 @@ class SubmissionCard extends Component {
                 </React.Fragment>
               )}
           </div>
-          <Modal
-            destroyOnClose
-            visible={openFailuresModal}
-            closable={false}
-            footer={null}
-            width="65%"
-          >
-            <div
-              className="licence-modal__header"
-              style={{ marginBottom: "15px" }}
-            >
-              <Text type="extra_bold" size="16px" text="Failure Report" />
-              <img
-                src="/images/close.svg"
-                className="licence-modal__header-close"
-                onClick={this.closeFailuresModal}
-              />
-            </div>
-            <Table
-              columns={this.Columns}
-              dataSource={reportData}
-              pagination={false}
-              rowSelection={{
-                onChange: (selectedRowKeys, selectedRows) => {
-                  this.setState({ selectedRows });
-                }
-              }}
-              scroll={{ y: 200 }}
-            />
-            <div style={{ marginTop: "20px", textAlign: "right" }}>
-              <OmniButton
-                type="secondary"
-                label={translate("label.button.cancel")}
-                onClick={this.closeFailuresModal}
-                buttonStyle={{ width: "120px", marginRight: "12px" }}
-              />
-              <OmniButton
-                disabled={!selectedRows.length}
-                label="Retry"
-                buttonStyle={{ width: "120px", marginRight: "10px" }}
-                onClick={this.retryUpload}
-              />
-            </div>
-          </Modal>
         </div>
       </React.Fragment>
     );

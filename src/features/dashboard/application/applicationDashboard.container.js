@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
 import _ from "lodash";
-import { Icon, Dropdown, Menu, Avatar, Modal } from "antd";
+import { Icon, Dropdown, Menu, Avatar, Modal, Table } from "antd";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import SubmissionCard from "../submissionCard.component";
@@ -14,7 +14,15 @@ import {
 } from "../../../redux/actions";
 import Header from "../../header/header.component";
 import styled from "styled-components";
-import { DEBOUNCE_TIME } from "../../../constants";
+import {
+  DEBOUNCE_TIME,
+  POLLING_INTERVAL,
+  UPLOAD_INPROGRES,
+  UPLOAD_INPROGRES_EXTRA,
+  UPLOAD_FAILED,
+  UPLOAD_SUCCESS,
+  UPLOAD_PROCESSING
+} from "../../../constants";
 import {
   isLoggedInOmniciaRole,
   isLoggedInCustomerAdmin,
@@ -45,7 +53,7 @@ import usermanagementActions from "../../../redux/actions/usermanagement.actions
 import LicenceInUseUnAssigned from "../../license/licenceInUseUnAssigned.component";
 import AssignLicence from "../../license/assignLicence.component";
 import AssignLicenceWithUsers from "../../license/assignLicenceWithUsers.component";
-import { CustomerApi } from "../../../redux/api";
+import { CustomerApi, ApplicationApi } from "../../../redux/api";
 import ApplicationProperties from "./applicationProperties.component";
 // import { Customers } from "./sampleCustomers";
 // import  ApplicationApi  from "../../../redux/api/application.api"
@@ -53,6 +61,7 @@ import ApplicationProperties from "./applicationProperties.component";
 class ApplicationDashboard extends Component {
   constructor(props) {
     super(props);
+    this.intervals = new Map();
     this.state = {
       viewBy: "cards",
       pageNo: 1,
@@ -71,6 +80,9 @@ class ApplicationDashboard extends Component {
       checkedSubmissions: [],
       showPropertiesModal: false,
       editingSubmission: null,
+      reportData: [],
+      openFailuresModal: false,
+      selectedFailedUploads: [],
       TableColumns: [
         {
           name: TableColumnNames.CHECKBOX,
@@ -127,6 +139,29 @@ class ApplicationDashboard extends Component {
       this.searchApplications,
       DEBOUNCE_TIME
     );
+    this.uploadFailedColumns = [
+      {
+        title: "Sequence #",
+        dataIndex: "pipeline_name",
+        key: "id",
+        render: text => <Text type="regular" size="14px" text={text || 1001} />,
+        width: 110
+      },
+
+      {
+        title: "Error Description",
+        dataIndex: "error_message",
+        key: "error",
+        render: text => (
+          <Text
+            type="regular"
+            size="14px"
+            text={text}
+            textStyle={{ wordWrap: "break-word", wordBreak: "break-word" }}
+          />
+        )
+      }
+    ];
   }
 
   getColumnWidth = _.memoize(name => {
@@ -139,6 +174,16 @@ class ApplicationDashboard extends Component {
       _.get(props, "submissions.length") &&
       !_.get(state, "submissions.length")
     ) {
+      /* let submissions = props.submissions;
+      _.map(submissions, submission => {
+        if (submission.is_uploading) {
+          ApplicationDashboard.startPolling(submission);
+          const interval = setInterval(() => {
+            ApplicationDashboard.startPolling(submission);
+          }, POLLING_INTERVAL);
+          
+        }
+      }); */
       return {
         submissions: props.submissions
       };
@@ -160,6 +205,87 @@ class ApplicationDashboard extends Component {
       this.setState({ TableColumns });
     }
   }
+
+  componentDidUpdate() {
+    if (!this.state.submissions.length) {
+      return;
+    }
+    _.map(this.state.submissions, submission => {
+      if (submission.is_uploading && !this.intervals.get(submission.id)) {
+        this.startPolling(submission);
+        const interval = setInterval(() => {
+          this.startPolling(submission);
+        }, POLLING_INTERVAL);
+        this.intervals.set(submission.id, interval);
+      }
+    });
+  }
+
+  componentWillUnmount() {
+    this.intervals && this.intervals.clear();
+  }
+
+  startPolling = async submission => {
+    const res = await ApplicationApi.monitorStatus({
+      submission_id: submission.id
+    });
+    if (res) {
+      const { data } = res;
+      if (_.get(data, "result")) {
+        this.checkSequenceStatus(_.get(data, "result", null), submission);
+      } else {
+        const interval = this.intervals.get(submission.id);
+        if (interval) {
+          clearInterval(interval);
+          this.intervals.delete(interval);
+        }
+      }
+    }
+  };
+
+  checkSequenceStatus = (data, submission) => {
+    const totalNoOfSeq = data.length;
+    const inProgress = [];
+    const failed = [];
+    const success = [];
+    const processing = [];
+    _.map(data, seq => {
+      switch (seq.status) {
+        case UPLOAD_INPROGRES:
+        case UPLOAD_INPROGRES_EXTRA:
+          inProgress.push(seq);
+          break;
+        case UPLOAD_FAILED:
+          failed.push(seq);
+          break;
+        case UPLOAD_SUCCESS:
+          success.push(seq);
+          break;
+        case UPLOAD_PROCESSING:
+          processing.push(seq);
+          break;
+      }
+    });
+    submission.sequence_count = totalNoOfSeq;
+    submission.sequence_inProgress = inProgress;
+    submission.sequence_failed = failed;
+    submission.sequence_success = success;
+    submission.sequence_processing = processing;
+    if (!inProgress.length && processing.length) {
+      submission.analyzing = true;
+    }
+    // if all are processing(Complete) or failed then clear interval
+    if (processing.length == totalNoOfSeq || failed.length == totalNoOfSeq) {
+      submission.is_uploading = false;
+      submission.analyzing = false;
+      const interval = this.intervals.get(submission.id);
+      if (interval) {
+        clearInterval(interval);
+        this.intervals.delete(interval);
+      }
+    }
+    this.updateSubmissions(submission);
+  };
 
   onMenuClick = submission => ({ key }) => {
     this.onMenuItemClick(key, submission);
@@ -296,6 +422,7 @@ class ApplicationDashboard extends Component {
   onSubmissionSelected = submission => () => {
     if (
       _.get(submission, "is_uploading") ||
+      _.get(submission, "analyzing") ||
       _.get(submission, "sequence_failed", []).length
     ) {
       return;
@@ -391,7 +518,7 @@ class ApplicationDashboard extends Component {
               customer_id: this.props.selectedCustomer.id
             },
             () => {
-              Toast.success("Application has been Deleted!");
+              Toast.success("Application has been deleted!");
               this.fetchApplications();
             }
           )
@@ -618,9 +745,6 @@ class ApplicationDashboard extends Component {
   updateSubmissions = submission => {
     const { submissions } = this.state;
     let submissionIdx = submissions.findIndex(x => x.id === submission.id);
-    if (!_.get(submission, "sequence_inProgress.length")) {
-      submission.is_uploading = false;
-    }
     submissions[submissionIdx] = submission;
     this.setState({
       submissions
@@ -636,12 +760,36 @@ class ApplicationDashboard extends Component {
     });
   };
 
-  retryUpload = sequences => {
+  retryUpload = () => {
     this.props.dispatch(
-      ApplicationActions.retryUploads({ ids: _.map(sequences, "id") }, () => {
-        this.fetchApplications();
-      })
+      ApplicationActions.retryUploads(
+        { ids: _.map(this.state.selectedFailedUploads, "id") },
+        () => {
+          this.fetchApplications();
+        }
+      )
     );
+  };
+
+  openFailures = submission => async () => {
+    this.props.dispatch(ApiActions.requestOnDemand());
+    const res = await ApplicationApi.monitorStatus({
+      submission_id: submission.id
+    });
+    const { data } = res;
+    const failures = _.filter(
+      _.get(data, "result"),
+      seq => seq.status == UPLOAD_FAILED
+    );
+    this.setState({
+      reportData: failures,
+      openFailuresModal: true
+    });
+    this.props.dispatch(ApiActions.successOnDemand());
+  };
+
+  closeFailuresModal = () => {
+    this.setState({ openFailuresModal: false });
   };
 
   render() {
@@ -656,7 +804,9 @@ class ApplicationDashboard extends Component {
       checkedSubmissions,
       showSubscriptionsInUse,
       showLicenceUnAssigned,
-      messages
+      openFailuresModal,
+      reportData,
+      selectedFailedUploads
     } = this.state;
     const {
       loading,
@@ -818,7 +968,10 @@ class ApplicationDashboard extends Component {
                     key={submission.id}
                     className="maindashboard__list__item"
                     style={{
-                      ...(_.get(submission, "is_uploading") && {
+                      ...((submission.is_uploading ||
+                        submission.analyzing ||
+                        _.get(submission, "sequence_failed.length") ||
+                        "") && {
                         cursor: "not-allowed"
                       })
                     }}
@@ -828,7 +981,12 @@ class ApplicationDashboard extends Component {
                         width={this.getColumnWidth(TableColumnNames.CHECKBOX)}
                       >
                         <OmniCheckbox
-                          disabled={_.get(submission, "is_uploading")}
+                          disabled={
+                            submission.is_uploading ||
+                            submission.analyzing ||
+                            _.get(submission, "sequence_failed.length") ||
+                            true
+                          }
                           checked={submission.checked}
                           onCheckboxChange={this.onCheckboxChange(submission)}
                         />
@@ -848,9 +1006,33 @@ class ApplicationDashboard extends Component {
                       className="maindashboard__list__item-text"
                       onClick={this.onSubmissionSelected(submission)}
                     >
-                      {_.get(submission, "is_uploading")
-                        ? "In Progress"
-                        : _.get(submission, "sequence_count", "")}
+                      {(() => {
+                        if (
+                          _.get(submission, "sequence_inProgress.length") ==
+                            0 &&
+                          _.get(submission, "sequence_failed.length") != 0
+                        ) {
+                          return (
+                            <OmniButton
+                              label="View Report"
+                              onClick={this.openFailures(submission)}
+                              type="danger"
+                              buttonStyle={{
+                                padding: "0px",
+                                width: "80px",
+                                marginLeft: "-10px"
+                              }}
+                            />
+                          );
+                        }
+                        if (_.get(submission, "analyzing")) {
+                          return "Processing uploaded sequence(s)...";
+                        }
+                        if (_.get(submission, "is_uploading")) {
+                          return "Upload is in progress...";
+                        }
+                        return _.get(submission, "sequence_count", 0);
+                      })()}
                     </Column>
                     <Column
                       width={this.getColumnWidth(TableColumnNames.ADDEDBY)}
@@ -886,21 +1068,32 @@ class ApplicationDashboard extends Component {
                     >
                       <div>{this.props.selectedCustomer.number_of_users}</div>
                       <Dropdown
-                        disabled={_.get(submission, "is_uploading")}
+                        disabled={
+                          submission.is_uploading ||
+                          submission.analyzing ||
+                          _.get(submission, "sequence_failed.length")
+                        }
                         overlay={this.getMenu(submission)}
                         trigger={["click"]}
                         overlayClassName="maindashboard__list__item-dropdown"
                       >
                         <img
                           className={
-                            !_.get(submission, "is_uploading") &&
+                            (!submission.is_uploading ||
+                              !submission.analyzing ||
+                              !_.get(submission, "sequence_failed.length")) &&
                             "global__cursor-pointer"
                           }
                           src="/images/overflow-black.svg"
                           style={{
                             width: "20px",
                             height: "20px",
-                            opacity: _.get(submission, "is_uploading") ? 0.2 : 1
+                            opacity:
+                              submission.is_uploading ||
+                              submission.analyzing ||
+                              _.get(submission, "sequence_failed.length")
+                                ? 0.2
+                                : 1
                           }}
                         />
                       </Dropdown>
@@ -972,6 +1165,14 @@ class ApplicationDashboard extends Component {
               )}
             </React.Fragment>
           )}
+          <AssignLicence
+            visible={this.state.showAssignLicenceToUser}
+            licence={this.state.assigningLicence}
+            users={this.state.selectedUsers}
+            closeModal={this.closeAssignLicenceToUserModal}
+            back={this.goBackToUsersModal}
+            submit={this.assignLicence}
+          />
           {showPermissionsModal && (
             <AssignPermissionsModal
               visible={showPermissionsModal}
@@ -997,14 +1198,6 @@ class ApplicationDashboard extends Component {
               onUserSelect={this.onUserSelect}
             />
           )}
-          <AssignLicence
-            visible={this.state.showAssignLicenceToUser}
-            licence={this.state.assigningLicence}
-            users={this.state.selectedUsers}
-            closeModal={this.closeAssignLicenceToUserModal}
-            back={this.goBackToUsersModal}
-            submit={this.assignLicence}
-          />
           {this.state.showPropertiesModal && (
             <ApplicationProperties
               visible
@@ -1012,6 +1205,50 @@ class ApplicationDashboard extends Component {
               submit={this.updateSubmissionCenter}
             />
           )}
+          <Modal
+            destroyOnClose
+            visible={openFailuresModal}
+            closable={false}
+            footer={null}
+            width="65%"
+          >
+            <div
+              className="licence-modal__header"
+              style={{ marginBottom: "15px" }}
+            >
+              <Text type="extra_bold" size="16px" text="Failure Report" />
+              <img
+                src="/images/close.svg"
+                className="licence-modal__header-close"
+                onClick={this.closeFailuresModal}
+              />
+            </div>
+            <Table
+              columns={this.uploadFailedColumns}
+              dataSource={reportData}
+              pagination={false}
+              rowSelection={{
+                onChange: (selectedRowKeys, selectedRows) => {
+                  this.setState({ selectedFailedUploads: selectedRows });
+                }
+              }}
+              scroll={{ y: 200 }}
+            />
+            <div style={{ marginTop: "20px", textAlign: "right" }}>
+              <OmniButton
+                type="secondary"
+                label={translate("label.button.cancel")}
+                onClick={this.closeFailuresModal}
+                buttonStyle={{ width: "120px", marginRight: "12px" }}
+              />
+              <OmniButton
+                disabled={!selectedFailedUploads.length}
+                label="Retry"
+                buttonStyle={{ width: "120px", marginRight: "10px" }}
+                onClick={this.retryUpload}
+              />
+            </div>
+          </Modal>
         </ContentLayout>
       </React.Fragment>
     );
