@@ -76,7 +76,8 @@ class PdfViewer extends Component {
       return <Loader loading={loading} />;
     }
 
-    if (largeFile) {
+    // xml is also throwing to browser, since xml has particular xslt
+    if (largeFile || type === "xml") {
       window.location = mainFileUrl;
       return null;
     }
@@ -88,9 +89,12 @@ class PdfViewer extends Component {
 
     if (type === "doc" || type === "docx" || type === "ppt") {
       url = `https://view.officeapps.live.com/op/embed.aspx?src=${mainFileUrl}`;
-    } else if (type === "xml") {
+    }
+    // commenting below code as it's handeled in the above
+    /* else if (type === "xml") {
       url = `https://docs.google.com/viewer?url=${mainFileUrl}&embedded=true`;
-    } else {
+    }  */
+    else {
       url = mainFileUrl;
     }
 
