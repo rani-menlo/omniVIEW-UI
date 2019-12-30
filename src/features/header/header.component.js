@@ -12,11 +12,13 @@ const Header = ({ style, history, disabled }) => {
     <div className="headerbar" style={style}>
       <img
         src="/images/omnicia-logo.svg"
-        className={`headerbar-logo ${disabled && "global__cursor-not-allowed"}`}
+        className={`headerbar-logo ${
+          disabled ? "global__cursor-not-allowed" : ""
+        }`}
         onClick={goToMain(history, disabled)}
       />
       <div>
-        <ProfileMenu/>
+        <ProfileMenu />
       </div>
     </div>
   );
