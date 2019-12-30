@@ -47,6 +47,10 @@
   cursor: pointer;
 }
 
+.global__cursor-not-allowed {
+  cursor: not-allowed;
+}
+
 .global__hr-line {
   width: 100%;
   height: 1px;

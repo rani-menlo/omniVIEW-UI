@@ -299,10 +299,11 @@ class CreateProfile extends Component {
       phone,
       showChangePassword
     } = this.state;
+    const { user } = this.props;
     return (
       <React.Fragment>
         <Loader loading={this.props.loading} />
-        <Header style={{ marginBottom: "0px" }} />
+        <Header style={{ marginBottom: "0px" }} disabled={user.first_login} />
         <ContentLayout className="createProfile">
           <div style={{ marginBottom: "15px" }}>
             <Text
@@ -569,6 +570,7 @@ class CreateProfile extends Component {
                 type="secondary"
                 label={translate("label.button.cancel")}
                 onClick={this.goBack}
+                disabled={user.first_login}
               />
               <OmniButton
                 type="primary"
@@ -602,7 +604,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(CreateProfile);
+export default connect(mapStateToProps, mapDispatchToProps)(CreateProfile);

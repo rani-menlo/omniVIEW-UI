@@ -35,6 +35,7 @@ class ProfileMenu extends Component {
         <Menu.Item
           className="maindashboard__list__item-dropdown-menu-item"
           onClick={this.editProfile}
+          disabled={this.props.user.first_login}
         >
           <p>
             <img src="/images/edit.svg" />
@@ -48,6 +49,7 @@ class ProfileMenu extends Component {
           <Menu.Item
             className="maindashboard__list__item-dropdown-menu-item"
             onClick={this.manageUsers}
+            disabled={this.props.user.first_login}
           >
             <p>
               <img src="/images/user-management.svg" />
@@ -127,8 +129,5 @@ function mapDispatchToProps(dispatch) {
 }
 
 export default withRouter(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  )(ProfileMenu)
+  connect(mapStateToProps, mapDispatchToProps)(ProfileMenu)
 );
