@@ -7,6 +7,7 @@ class PrivateRoute extends Component {
   render() {
     const isLoggedIn = this.props.login.loggedIn;
     const first_login = _.get(this.props, "user.first_login", false);
+    const authorized = _.get(this.props, "otp.authorized", false);
     const { component: Component, ...rest } = this.props;
 
     return (
@@ -14,7 +15,11 @@ class PrivateRoute extends Component {
         {...rest}
         render={props => {
           if (isLoggedIn) {
-            if (first_login && props.location.pathname != "/profile") {
+            if (
+              first_login &&
+              authorized &&
+              props.location.pathname != "/profile"
+            ) {
               return <Redirect to="/profile" />;
             }
             return <Component {...props} />;

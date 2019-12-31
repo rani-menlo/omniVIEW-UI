@@ -16,7 +16,8 @@ const initialState = {
     invalid_license: false,
     otpReceived: false,
     verified: false,
-    verifying: false
+    verifying: false,
+    authorized: false
   },
   forgotPwdError: ""
 };
@@ -94,6 +95,15 @@ export default (state = initialState, action) => {
           invalid_license,
           verifying: false,
           verified: true
+        }
+      };
+    }
+    case LoginActionTypes.AUTHENTICATED: {
+      return {
+        ...state,
+        otp: {
+          ...state.otp,
+          authorized: true
         }
       };
     }

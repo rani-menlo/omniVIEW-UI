@@ -55,7 +55,7 @@ export default {
       }
     };
   },
-  verifyOtp: data => {
+  verifyOtp: (data) => {
     return async dispatch => {
       try {
         dispatch({
@@ -70,6 +70,11 @@ export default {
       } catch (err) {
         ApiActions.failure(dispatch);
       }
+    };
+  },
+  authenticated: () => {
+    return {
+      type: LoginActionTypes.AUTHENTICATED
     };
   },
   setLoggedInStatus: status => {

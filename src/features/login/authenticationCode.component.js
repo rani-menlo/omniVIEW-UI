@@ -33,6 +33,8 @@ class AuthenticationCode extends Component {
       this.props.history.push("/requestlicense");
       return;
     }
+    this.props.actions.authenticated();
+
     if (user.first_login) {
       this.props.history.push("/profile");
       return;
