@@ -11,6 +11,7 @@ import { translate } from "../../../translations/translator";
 import { CLOUDS } from "../../../constants";
 import { ApplicationApi } from "../../../redux/api";
 import { ApiActions } from "../../../redux/actions";
+import { Breadcrumb } from "antd";
 
 class AddNewApplication extends Component {
   constructor(props) {
@@ -20,6 +21,7 @@ class AddNewApplication extends Component {
       showClouds: true,
       enterRemoteDetails: false,
       path: "",
+      ftp_files_path: [],
       auth_id: "",
       remoteDetails: null,
       remoteFiles: null,
@@ -139,9 +141,7 @@ class AddNewApplication extends Component {
     );
   };
 
-  getContents = async file => {
-    let { path } = this.state;
-    path = `${path}/${file.name}`;
+  getContentsOfPath = async path => {
     this.showLoading();
     const res = await ApplicationApi.getContentsOfPath({
       customer_id: this.props.selectedCustomer.id,
@@ -157,25 +157,26 @@ class AddNewApplication extends Component {
     );
   };
 
+  getContents = async file => {
+    let { path } = this.state;
+    this.setState({
+      ftp_files_path: [...this.state.ftp_files_path, file.name]
+    });
+    path = `${path}/${file.name}`;
+    await this.getContentsOfPath(path);
+  };
+
   goBack = async () => {
     let { path, remoteDetails } = this.state;
     if (!path || remoteDetails.root_path === path) {
       return;
     }
+    //removing the files from path on clicking back folder icon
+    let ftp_files_path = [...this.state.ftp_files_path];
+    ftp_files_path = ftp_files_path.slice(0, -1);
+    this.setState({ ftp_files_path });
     path = path.substring(0, path.lastIndexOf("/"));
-    this.showLoading();
-    const res = await ApplicationApi.getContentsOfPath({
-      customer_id: this.props.selectedCustomer.id,
-      ftp_path: path
-    });
-    let remoteFiles = null;
-    if (!res.data.error) {
-      remoteFiles = res.data.data;
-    }
-    this.setState(
-      { remoteFiles, path, selectedFolderError: "" },
-      this.hideLoading
-    );
+    this.getContentsOfPath(path);
   };
 
   showApplicationDetails = async selectedFolder => {
@@ -340,6 +341,42 @@ class AddNewApplication extends Component {
     return translate("text.newapplication.choosesource");
   };
 
+  //go to the specified path on click of the ftp file name on breadcrumb
+  goToSpecifiedFtpPath = (file_name, index) => () => {
+    let ftp_files_path = [...this.state.ftp_files_path];
+    let path = this.state.remoteDetails.ftp_path;
+    ftp_files_path = ftp_files_path.slice(0, index + 1);
+    let files = ftp_files_path.length ? ftp_files_path.join("/") : "";
+    path = `${path}/${files}`;
+    this.setState({ ftp_files_path, path });
+    this.getContentsOfPath(path);
+  };
+
+  //displaying ftp files path
+  getFtpFilesPath = () => {
+    return (
+      <Breadcrumb separator=">">
+        {this.state.ftp_files_path.map((path, index) => (
+          <Breadcrumb.Item
+            onClick={
+              index != this.state.ftp_files_path.length - 1 &&
+              this.goToSpecifiedFtpPath(path, index)
+            }
+            className="maindashboard-breadcrum"
+            style={{
+              ...(index == this.state.ftp_files_path.length - 1 && {
+                opacity: 0.4,
+                cursor: "not-allowed"
+              })
+            }}
+          >
+            {path}
+          </Breadcrumb.Item>
+        ))}
+      </Breadcrumb>
+    );
+  };
+
   render() {
     const { selectedCustomer, selectedSubmission, loading } = this.props;
     const {
@@ -406,6 +443,7 @@ class AddNewApplication extends Component {
             {this.getTitle()}
           </p>
           <p className="addUser-subtitle">{this.getSubtitle()}</p>
+          <p>{this.getFtpFilesPath()}</p>
           <div className="global__hr-line" style={{ marginBottom: "20px" }} />
           {selectedFolderError && (
             <Text
