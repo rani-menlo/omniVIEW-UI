@@ -15,12 +15,21 @@ class PrivateRoute extends Component {
         {...rest}
         render={props => {
           if (isLoggedIn) {
+            //Forcing the user to redirect to the profile screen if the user is logged in for the first time
             if (
               first_login &&
               authorized &&
               props.location.pathname != "/profile"
             ) {
               return <Redirect to="/profile" />;
+            }
+            //Redirecting to customers screen on clicking of browser back button when user logged into the application
+            if (
+              authorized &&
+              (props.match.path == "/verify/:mode" ||
+                props.match.path == "/auth")
+            ) {
+              return <Redirect to="/customers" />;
             }
             return <Component {...props} />;
           }
