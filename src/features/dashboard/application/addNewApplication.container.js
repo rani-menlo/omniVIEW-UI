@@ -1,17 +1,35 @@
+import { Breadcrumb, Modal, Table } from "antd";
+import _ from "lodash";
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import _ from "lodash";
-import { Loader, ContentLayout, Text, Toast } from "../../../uikit/components";
+import { ApiActions } from "../../../redux/actions";
+import { ApplicationApi } from "../../../redux/api";
+import { translate } from "../../../translations/translator";
+import {
+  ContentLayout,
+  Loader,
+  Text,
+  Toast,
+  OmniButton
+} from "../../../uikit/components";
 import Header from "../../header/header.component";
+import ApplicationDetails from "./applicationDetails.component";
 import ChooseCloud from "./chooseCloud.component";
 import RemoteDetails from "./remoteDetails.component";
 import RemoteFiles from "./remoteFiles.component";
-import ApplicationDetails from "./applicationDetails.component";
-import { translate } from "../../../translations/translator";
-import { CLOUDS } from "../../../constants";
-import { ApplicationApi } from "../../../redux/api";
-import { ApiActions } from "../../../redux/actions";
-import { Breadcrumb } from "antd";
+
+const columns = [
+  {
+    title: "Folder Name",
+    key: "folder",
+    dataIndex: "folder"
+  },
+  {
+    title: "Description",
+    key: "message",
+    dataIndex: "message"
+  }
+];
 
 class AddNewApplication extends Component {
   constructor(props) {
@@ -34,7 +52,10 @@ class AddNewApplication extends Component {
       cloud_types: [],
       defaultApplicationType: "",
       defaultApplicationNumber: "",
-      isAddingSequence: false
+      isAddingSequence: false,
+      openInvalidSequenceModal: false,
+      addApplicationinvalidSeq: [],
+      proceedToAppDetails: false
     };
   }
 
@@ -244,43 +265,55 @@ class AddNewApplication extends Component {
     }
     const { appNumber, appType } = data;
     const validSequences = _.get(data, "validSequences.length", 0);
+    const invalidSequences = _.get(data, "invalidSequences.length", 0);
+    const addApplicationinvalidSeq = _.get(data, "invalidSequences", []);
     if (!validSequences) {
       this.setState(
         {
           selectedFolderError:
-            "Invalid folder. Please select a Submission folder."
+            "Invalid folder. Please select a Submission folder. Click here to view the invalid sequences.",
+          addApplicationinvalidSeq
         },
         this.hideLoading
       );
       return;
     }
+    this.setState({ path, appType, appNumber, validSequences });
+    //will trigger submission lookup information if there are no invalid sequences (or) when user wants to proceed to upload valid sequences by skipping the invalid sequences
+    if (validSequences || !invalidSequences) {
+      this.getSubmissionLookupData();
+    }
+  };
 
-    res = await ApplicationApi.getSubmissionLookupInfo();
+  getSubmissionLookupData = async () => {
+    this.showLoading();
+    let res = await ApplicationApi.getSubmissionLookupInfo();
+    let { error, data, message } = res.data;
     error = res.data.error;
     if (error) {
       this.setState({ selectedFolderError: message }, this.hideLoading);
       return;
     }
-
+    this.closeInvalidSequenceModal();
     const {
       application_types,
       cloud_types,
       regions,
       submission_centers
-    } = res.data.data;
+    } = data;
     this.setState(
       {
         selectedFolderError: "",
         showApplicationDetails: true,
         showRemoteFiles: false,
-        path,
+        // path,
         application_types,
-        defaultApplicationType: appType,
-        defaultApplicationNumber: appNumber,
+        // defaultApplicationType: appType,
+        // defaultApplicationNumber: appNumber,
         cloud_types,
         regions,
-        submission_centers,
-        validSequences
+        submission_centers
+        // validSequences
       },
       this.hideLoading
     );
@@ -377,6 +410,23 @@ class AddNewApplication extends Component {
     );
   };
 
+  openInvalidSeqModal = () => {
+    if (this.state.openInvalidSequenceModal) {
+      return;
+    }
+    this.setState({ openInvalidSequenceModal: true });
+  };
+
+  closeInvalidSequenceModal = () => {
+    this.setState({ openInvalidSequenceModal: false });
+  };
+
+  showAppDetails = () => {
+    this.setState({ proceedToAppDetails: true }, () => {
+      this.getSubmissionLookupData();
+    });
+  };
+
   render() {
     const { selectedCustomer, selectedSubmission, loading } = this.props;
     const {
@@ -395,7 +445,9 @@ class AddNewApplication extends Component {
       defaultApplicationNumber,
       validSequences,
       cloud_types,
-      isAddingSequence
+      isAddingSequence,
+      openInvalidSequenceModal,
+      addApplicationinvalidSeq
     } = this.state;
     return (
       <React.Fragment>
@@ -449,9 +501,73 @@ class AddNewApplication extends Component {
             <Text
               type="regular"
               text={selectedFolderError}
-              className="global__text-red"
+              className="global__text-red global__cursor-pointer"
+              onClick={this.openInvalidSeqModal}
             />
           )}
+          {/* <DraggableModal
+            visible={this.state.openInvalidSequenceModal}
+            draggableAreaClass=".validationResults__header"
+          > */}
+          {/* <Modal
+            destroyOnClose
+            visible={this.state.openInvalidSequenceModal}
+            closable={false}
+            style={{ top: 20 }}
+          >
+            <InvalidSequenceDetails
+              invalidSeqArray={addApplicationinvalidSeq}
+              label="Invalid Sequences"
+              onClose={this.closeInvalidSequenceModal}
+              proceedToAppDetailsScreen={this.showAppDetails}
+            />
+          </Modal> */}
+
+          <Modal
+            destroyOnClose
+            visible={this.state.openInvalidSequenceModal}
+            closable={false}
+            footer={null}
+            width="40%"
+            style={{ top: 20 }}
+          >
+            <div
+              className="licence-modal__header"
+              style={{ marginBottom: "15px" }}
+            >
+              <Text type="extra_bold" size="16px" text="Invalid Sequences" />
+              <img
+                src="/images/close.svg"
+                className="licence-modal__header-close"
+                onClick={this.closeInvalidSequenceModal}
+              />
+            </div>
+            <Table
+              columns={columns}
+              dataSource={addApplicationinvalidSeq}
+              pagination={false}
+              scroll={{ y: 350 }}
+            />
+            <div style={{ marginTop: "20px", textAlign: "right" }}>
+              <div style={{ textAlign: "left" }}>
+                Do you want to continue to upload the valid sequences by
+                skipping the invalid sequences ?
+              </div>
+              <div>
+                <OmniButton
+                  label="Yes"
+                  onClick={this.showAppDetails}
+                  buttonStyle={{ width: "80px", marginRight: "12px" }}
+                />
+                <OmniButton
+                  label="No"
+                  buttonStyle={{ width: "80px", marginRight: "10px" }}
+                  onClick={this.closeInvalidSequenceModal}
+                />
+              </div>
+            </div>
+          </Modal>
+
           <div style={{ marginTop: "20px" }}>
             {showClouds && <ChooseCloud onCloudSelect={this.onCloudSelect} />}
             {enterRemoteDetails && (
