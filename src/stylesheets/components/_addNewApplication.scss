@@ -31,3 +31,6 @@
 .ant-table {
   border: 1px solid #e8e8e8;
 }
+.ant-table-body {
+  overflow-y: auto !important;
+}
