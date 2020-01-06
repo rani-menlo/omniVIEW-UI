@@ -45,6 +45,7 @@ class AddNewApplication extends Component {
       remoteFiles: null,
       showRemoteFiles: false,
       selectedFolderError: "",
+      invalidSeqError: "",
       showApplicationDetails: false,
       regions: [],
       submission_centers: [],
@@ -98,6 +99,7 @@ class AddNewApplication extends Component {
     this.setState({
       selectedCloud: "",
       selectedFolderError: "",
+      invalidSeqError: "",
       showClouds: true,
       enterRemoteDetails: false
     });
@@ -107,7 +109,8 @@ class AddNewApplication extends Component {
     this.setState({
       showRemoteFiles: false,
       enterRemoteDetails: true,
-      selectedFolderError: ""
+      selectedFolderError: "",
+      invalidSeqError: ""
     });
   };
 
@@ -136,6 +139,7 @@ class AddNewApplication extends Component {
           auth_id,
           remoteFiles,
           selectedFolderError: "",
+          invalidSeqError: "",
           showRemoteFiles: true,
           enterRemoteDetails: false,
           showApplicationDetails: false
@@ -156,7 +160,8 @@ class AddNewApplication extends Component {
         showRemoteFiles: true,
         enterRemoteDetails: false,
         showApplicationDetails: false,
-        selectedFolderError: ""
+        selectedFolderError: "",
+        invalidSeqError: ""
       },
       this.goBack
     );
@@ -173,7 +178,7 @@ class AddNewApplication extends Component {
       remoteFiles = res.data.data;
     }
     this.setState(
-      { remoteFiles, path, selectedFolderError: "" },
+      { remoteFiles, path, selectedFolderError: "", invalidSeqError: "" },
       this.hideLoading
     );
   };
@@ -258,6 +263,7 @@ class AddNewApplication extends Component {
       customer_id: this.props.selectedCustomer.id,
       ftp_path: path
     });
+    this.setState({ addApplicationinvalidSeq: [], invalidSeqError: "" });
     let { error, data, message } = res.data;
     if (error) {
       this.setState({ selectedFolderError: message }, this.hideLoading);
@@ -271,7 +277,8 @@ class AddNewApplication extends Component {
       this.setState(
         {
           selectedFolderError:
-            "Invalid folder. Please select a Submission folder. Click here to view the invalid sequences.",
+            "Invalid folder. Please select a Submission folder.",
+          invalidSeqError: "Click here to view the invalid sequences.",
           addApplicationinvalidSeq
         },
         this.hideLoading
@@ -304,6 +311,7 @@ class AddNewApplication extends Component {
     this.setState(
       {
         selectedFolderError: "",
+        invalidSeqError: "",
         showApplicationDetails: true,
         showRemoteFiles: false,
         // path,
@@ -347,7 +355,7 @@ class AddNewApplication extends Component {
   };
 
   openApplicationsScreen = () => {
-    this.setState({ selectedFolderError: "" });
+    this.setState({ selectedFolderError: "", invalidSeqError: "" });
     this.props.history.push("/applications");
   };
 
@@ -437,6 +445,7 @@ class AddNewApplication extends Component {
       enterRemoteDetails,
       showRemoteFiles,
       selectedFolderError,
+      invalidSeqError,
       showApplicationDetails,
       regions,
       submission_centers,
@@ -500,11 +509,24 @@ class AddNewApplication extends Component {
           {selectedFolderError && (
             <Text
               type="regular"
-              text={selectedFolderError}
-              className="global__text-red global__cursor-pointer"
-              onClick={this.openInvalidSeqModal}
+              text={
+                invalidSeqError
+                  ? `${selectedFolderError} ${invalidSeqError}`
+                  : `${selectedFolderError}`
+              }
+              className={`global__text-red ${invalidSeqError &&
+                "global__cursor-pointer"}`}
+              onClick={invalidSeqError ? this.openInvalidSeqModal : ""}
             />
           )}
+          {/* {invalidSeqError && (
+            <Text
+              type="regular"
+              text={invalidSeqError}
+              className="global__text-red "
+              
+            />
+          )} */}
           {/* <DraggableModal
             visible={this.state.openInvalidSequenceModal}
             draggableAreaClass=".validationResults__header"
@@ -529,7 +551,6 @@ class AddNewApplication extends Component {
             closable={false}
             footer={null}
             width="40%"
-            style={{ top: 20 }}
           >
             <div
               className="licence-modal__header"
@@ -546,7 +567,7 @@ class AddNewApplication extends Component {
               columns={columns}
               dataSource={addApplicationinvalidSeq}
               pagination={false}
-              scroll={{ y: 350 }}
+              scroll={{ y: 250 }}
             />
             <div style={{ marginTop: "20px", textAlign: "right" }}>
               <div style={{ textAlign: "left" }}>
