@@ -565,13 +565,15 @@ class CreateProfile extends Component {
               </div>
             )}
             <div className="createProfile__buttons">
-              <OmniButton
-                className="createProfile__buttons-btn"
-                type="secondary"
-                label={translate("label.button.cancel")}
-                onClick={this.goBack}
-                disabled={user.first_login}
-              />
+              {!user.first_login && (
+                <OmniButton
+                  className="createProfile__buttons-btn"
+                  type="secondary"
+                  label={translate("label.button.cancel")}
+                  onClick={this.goBack}
+                  disabled={user.first_login}
+                />
+              )}
               <OmniButton
                 type="primary"
                 className="createProfile__buttons-btn"
@@ -580,7 +582,7 @@ class CreateProfile extends Component {
                     ? translate("label.button.savechanges")
                     : translate("label.button.savesubmit")
                 }
-                buttonStyle={{ marginLeft: "16px" }}
+                buttonStyle={!user.first_login && { marginLeft: "16px" }}
                 onClick={this.save}
               />
             </div>
