@@ -296,6 +296,7 @@ class AddNewApplication extends Component {
     this.setState({
       addApplicationinvalidSeq: [],
       invalidSeqError: "",
+      selectedFolderError: "",
       showInvalidSeqFooter: false
     });
     let { path, isAddingSequence } = this.state;
@@ -304,7 +305,7 @@ class AddNewApplication extends Component {
     path = _.replace(path, new RegExp("//", "g"), "/");
     // if we are addding sequence, condition passes
     if (isAddingSequence) {
-      if(!this.getCheckedPaths().length){
+      if (!this.getCheckedPaths().length) {
         return;
       }
       this.showLoading();
@@ -369,6 +370,7 @@ class AddNewApplication extends Component {
     const validSequences = _.get(data, "validSequences.length", 0);
     const invalidSequences = _.get(data, "invalidSequences.length", 0);
     const addApplicationinvalidSeq = _.get(data, "invalidSequences", []);
+    this.setState({ path, appType, appNumber, validSequences });
     if (!validSequences) {
       this.setState({ showInvalidSeqFooter: true });
     }
@@ -383,7 +385,6 @@ class AddNewApplication extends Component {
       );
       return;
     }
-    this.setState({ path, appType, appNumber, validSequences });
     //will trigger submission lookup information if there are no invalid sequences (or) when user wants to proceed to upload valid sequences by skipping the invalid sequences
     if (validSequences || !invalidSequences) {
       this.getSubmissionLookupData();
@@ -392,6 +393,7 @@ class AddNewApplication extends Component {
 
   getSubmissionLookupData = async () => {
     this.showLoading();
+    let validSequences = this.state.validSequences;
     let res = await ApplicationApi.getSubmissionLookupInfo();
     let { error, data, message } = res.data;
     error = res.data.error;
@@ -415,7 +417,8 @@ class AddNewApplication extends Component {
         application_types,
         cloud_types,
         regions,
-        submission_centers
+        submission_centers,
+        validSequences
       },
       this.hideLoading
     );
