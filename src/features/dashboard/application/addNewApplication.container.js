@@ -296,16 +296,18 @@ class AddNewApplication extends Component {
     this.setState({
       addApplicationinvalidSeq: [],
       invalidSeqError: "",
-      showInvalidSeqFooter: false,
-      checkedAll: false
+      showInvalidSeqFooter: false
     });
     let { path, isAddingSequence } = this.state;
     let { selectedCustomer, selectedSubmission } = this.props;
     path = `${path}/${_.get(selectedFolder, "name", "")}`;
     path = _.replace(path, new RegExp("//", "g"), "/");
-    this.showLoading();
     // if we are addding sequence, condition passes
     if (isAddingSequence) {
+      if(!this.getCheckedPaths().length){
+        return;
+      }
+      this.showLoading();
       let res = await ApplicationApi.isValidFTPSequenceFolder({
         customer_id: selectedCustomer.id,
         ftp_paths: this.getCheckedPaths(),
@@ -352,7 +354,7 @@ class AddNewApplication extends Component {
         return;
       }
     }
-
+    this.showLoading();
     // adding submission
     let res = await ApplicationApi.isValidFTPSubmissionFolder({
       customer_id: this.props.selectedCustomer.id,
