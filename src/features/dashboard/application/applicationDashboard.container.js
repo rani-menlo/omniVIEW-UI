@@ -222,7 +222,12 @@ class ApplicationDashboard extends Component {
   }
 
   componentWillUnmount() {
-    this.intervals && this.intervals.clear();
+    if (this.intervals) {
+      for (const [key, val] of this.intervals.entries()) {
+        clearInterval(val);
+      }
+      this.intervals.clear();
+    }
   }
 
   startPolling = async submission => {
