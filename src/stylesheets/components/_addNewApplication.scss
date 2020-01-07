@@ -28,9 +28,20 @@
     }
   }
 }
-.ant-table {
-  border: 1px solid #e8e8e8;
-}
-.ant-table-body {
-  overflow-y: auto !important;
+.invalid-sequences-table {
+  .ant-table {
+    border: 1px solid #e8e8e8;
+  }
+  .ant-table-body {
+    overflow-y: auto !important;
+  }
+
+  .ant-table-thead > tr > th:first-child,
+  .ant-table-tbody > tr > td:first-child {
+    width: 40%;
+  }
+  .ant-table-thead > tr > th:nth-child(2),
+  .ant-table-tbody > tr > td:nth-child(2) {
+    width: 60%;
+  }
 }

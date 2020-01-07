@@ -8,10 +8,11 @@ import { translate } from "../../../translations/translator";
 import {
   ContentLayout,
   Loader,
+  OmniButton,
   Text,
-  Toast,
-  OmniButton
+  Toast
 } from "../../../uikit/components";
+import { minFourDigitsInString } from "../../../utils";
 import Header from "../../header/header.component";
 import ApplicationDetails from "./applicationDetails.component";
 import ChooseCloud from "./chooseCloud.component";
@@ -56,7 +57,10 @@ class AddNewApplication extends Component {
       isAddingSequence: false,
       openInvalidSequenceModal: false,
       addApplicationinvalidSeq: [],
-      proceedToAppDetails: false
+      proceedToAppDetails: false,
+      checkedAll: false,
+      showCheckAll: false,
+      showInvalidSeqFooter: false
     };
   }
 
@@ -140,6 +144,7 @@ class AddNewApplication extends Component {
           remoteFiles,
           selectedFolderError: "",
           invalidSeqError: "",
+          checkedAll: false,
           showRemoteFiles: true,
           enterRemoteDetails: false,
           showApplicationDetails: false
@@ -169,6 +174,7 @@ class AddNewApplication extends Component {
 
   getContentsOfPath = async path => {
     this.showLoading();
+    let showCheckAll = false;
     const res = await ApplicationApi.getContentsOfPath({
       customer_id: this.props.selectedCustomer.id,
       ftp_path: path
@@ -176,9 +182,19 @@ class AddNewApplication extends Component {
     let remoteFiles = null;
     if (!res.data.error) {
       remoteFiles = res.data.data;
+      showCheckAll = _.some(remoteFiles, file =>
+        minFourDigitsInString(file.name)
+      );
     }
     this.setState(
-      { remoteFiles, path, selectedFolderError: "", invalidSeqError: "" },
+      {
+        remoteFiles,
+        path,
+        selectedFolderError: "",
+        invalidSeqError: "",
+        checkedAll: false,
+        showCheckAll
+      },
       this.hideLoading
     );
   };
@@ -190,6 +206,38 @@ class AddNewApplication extends Component {
     });
     path = `${path}/${file.name}`;
     await this.getContentsOfPath(path);
+  };
+
+  //triggering the event when user clicks on checkbox
+  checkedFolder = (file, event) => {
+    let remoteFiles = [...this.state.remoteFiles];
+    let checkedArray = [];
+    let checkedLength = 0;
+    remoteFiles.forEach(remoteFile => {
+      if (file.name == remoteFile.name) {
+        _.set(file, "checked", event.target.checked);
+      }
+      if (minFourDigitsInString(remoteFile.name)) {
+        checkedArray.push(remoteFile);
+        remoteFile.checked && checkedLength++;
+      }
+    });
+    this.setState({
+      remoteFiles,
+      checkedAll: checkedLength == checkedArray.length
+    });
+  };
+  //triggers when user clicks on checkall button
+  checkedAllFolders = event => {
+    let remoteFiles = this.state.remoteFiles;
+    let checkedAll = false;
+    remoteFiles.map(file => {
+      if (minFourDigitsInString(file.name)) {
+        _.set(file, "checked", event.target.checked);
+        checkedAll = event.target.checked;
+      }
+    });
+    this.setState({ remoteFiles, checkedAll });
   };
 
   goBack = async () => {
@@ -205,7 +253,52 @@ class AddNewApplication extends Component {
     this.getContentsOfPath(path);
   };
 
+  getCheckedPaths = () => {
+    let remoteFiles = [...this.state.remoteFiles];
+    let paths = [];
+    let path = this.state.path;
+    remoteFiles.forEach((file, index) => {
+      if (file.checked) {
+        let checkedPath = `${path}/${_.get(file, "name", "")}`;
+        checkedPath = _.replace(checkedPath, new RegExp("//", "g"), "/");
+        paths.push(checkedPath);
+      }
+    });
+    return paths;
+  };
+
+  proceedToUploadSequence = async () => {
+    this.showLoading();
+    let { selectedCustomer, selectedSubmission } = this.props;
+    const res = await ApplicationApi.saveSequenceDetails({
+      customer_id: selectedCustomer.id,
+      submission_id: selectedSubmission.id,
+      additional_details: {
+        auth_id: this.state.auth_id,
+        sequence_paths: this.getCheckedPaths()
+      }
+    });
+    if (res.data.error) {
+      this.setState(
+        { selectedFolderError: res.data.message },
+        this.hideLoading
+      );
+      return;
+    }
+    this.hideLoading();
+    if (!res.data.error) {
+      Toast.success(res.data.message);
+    }
+    this.openApplicationsScreen();
+  };
+
   showApplicationDetails = async selectedFolder => {
+    this.setState({
+      addApplicationinvalidSeq: [],
+      invalidSeqError: "",
+      showInvalidSeqFooter: false,
+      checkedAll: false
+    });
     let { path, isAddingSequence } = this.state;
     let { selectedCustomer, selectedSubmission } = this.props;
     path = `${path}/${_.get(selectedFolder, "name", "")}`;
@@ -215,7 +308,7 @@ class AddNewApplication extends Component {
     if (isAddingSequence) {
       let res = await ApplicationApi.isValidFTPSequenceFolder({
         customer_id: selectedCustomer.id,
-        ftp_path: path,
+        ftp_paths: this.getCheckedPaths(),
         submission_id: selectedSubmission.id
       });
       if (_.get(res, "data.error")) {
@@ -225,6 +318,27 @@ class AddNewApplication extends Component {
           },
           this.hideLoading
         );
+        return;
+      }
+      //open popup if there are any invalid sequences
+      const validSequences = _.get(res, "data.validSequences.length", 0);
+      const invalidSequences = _.get(res, "data.inValidSequences.length", 0);
+      const addApplicationinvalidSeq = _.get(res, "data.inValidSequences", []);
+      if (!validSequences) {
+        this.setState({ showInvalidSeqFooter: true });
+      }
+      if (invalidSequences) {
+        this.setState(
+          {
+            invalidSeqError: "Few sequence folders might have an issue.",
+            addApplicationinvalidSeq
+          },
+          this.hideLoading
+        );
+        return;
+      }
+      if (validSequences && !invalidSequences) {
+        this.proceedToUploadSequence();
         return;
       }
       if (!_.get(res, "data.isSequence")) {
@@ -237,33 +351,13 @@ class AddNewApplication extends Component {
         );
         return;
       }
-      res = await ApplicationApi.saveSequenceDetails({
-        customer_id: selectedCustomer.id,
-        submission_id: selectedSubmission.id,
-        additional_details: {
-          auth_id: this.state.auth_id,
-          sequence_path: path
-        }
-      });
-      if (res.data.error) {
-        this.setState(
-          { selectedFolderError: res.data.message },
-          this.hideLoading
-        );
-        return;
-      }
-      this.hideLoading();
-      if (!res.data.error) {
-        Toast.success(res.data.message);
-      }
-      this.openApplicationsScreen();
     }
+
     // adding submission
     let res = await ApplicationApi.isValidFTPSubmissionFolder({
       customer_id: this.props.selectedCustomer.id,
       ftp_path: path
     });
-    this.setState({ addApplicationinvalidSeq: [], invalidSeqError: "" });
     let { error, data, message } = res.data;
     if (error) {
       this.setState({ selectedFolderError: message }, this.hideLoading);
@@ -274,11 +368,13 @@ class AddNewApplication extends Component {
     const invalidSequences = _.get(data, "invalidSequences.length", 0);
     const addApplicationinvalidSeq = _.get(data, "invalidSequences", []);
     if (!validSequences) {
+      this.setState({ showInvalidSeqFooter: true });
+    }
+    if (invalidSequences) {
       this.setState(
         {
-          selectedFolderError:
-            "Invalid folder. Please select a Submission folder.",
-          invalidSeqError: "Click here to view the invalid sequences.",
+          invalidSeqError:
+            "Few Sequences in the Application folder might have an issue.",
           addApplicationinvalidSeq
         },
         this.hideLoading
@@ -314,14 +410,10 @@ class AddNewApplication extends Component {
         invalidSeqError: "",
         showApplicationDetails: true,
         showRemoteFiles: false,
-        // path,
         application_types,
-        // defaultApplicationType: appType,
-        // defaultApplicationNumber: appNumber,
         cloud_types,
         regions,
         submission_centers
-        // validSequences
       },
       this.hideLoading
     );
@@ -430,6 +522,9 @@ class AddNewApplication extends Component {
   };
 
   showAppDetails = () => {
+    if (this.isAddingSequence) {
+      this.proceedToUploadSequence();
+    }
     this.setState({ proceedToAppDetails: true }, () => {
       this.getSubmissionLookupData();
     });
@@ -456,7 +551,10 @@ class AddNewApplication extends Component {
       cloud_types,
       isAddingSequence,
       openInvalidSequenceModal,
-      addApplicationinvalidSeq
+      addApplicationinvalidSeq,
+      checkedAll,
+      showCheckAll,
+      showInvalidSeqFooter
     } = this.state;
     return (
       <React.Fragment>
@@ -509,42 +607,23 @@ class AddNewApplication extends Component {
           {selectedFolderError && (
             <Text
               type="regular"
-              text={
-                invalidSeqError
-                  ? `${selectedFolderError} ${invalidSeqError}`
-                  : `${selectedFolderError}`
-              }
-              className={`global__text-red ${invalidSeqError &&
-                "global__cursor-pointer"}`}
-              onClick={invalidSeqError ? this.openInvalidSeqModal : ""}
+              text={selectedFolderError}
+              className="global__text-red"
             />
           )}
-          {/* {invalidSeqError && (
-            <Text
-              type="regular"
-              text={invalidSeqError}
-              className="global__text-red "
-              
-            />
-          )} */}
-          {/* <DraggableModal
-            visible={this.state.openInvalidSequenceModal}
-            draggableAreaClass=".validationResults__header"
-          > */}
-          {/* <Modal
-            destroyOnClose
-            visible={this.state.openInvalidSequenceModal}
-            closable={false}
-            style={{ top: 20 }}
-          >
-            <InvalidSequenceDetails
-              invalidSeqArray={addApplicationinvalidSeq}
-              label="Invalid Sequences"
-              onClose={this.closeInvalidSequenceModal}
-              proceedToAppDetailsScreen={this.showAppDetails}
-            />
-          </Modal> */}
-
+          {invalidSeqError && (
+            <p className="global__text-red">
+              <span>{invalidSeqError}</span>
+              <a
+                onClick={this.openInvalidSeqModal}
+                className="global__cursor-pointer"
+              >
+                {" "}
+                Click here{" "}
+              </a>
+              <span>to view the details.</span>
+            </p>
+          )}
           <Modal
             destroyOnClose
             visible={this.state.openInvalidSequenceModal}
@@ -568,25 +647,35 @@ class AddNewApplication extends Component {
               dataSource={addApplicationinvalidSeq}
               pagination={false}
               scroll={{ y: 250 }}
+              className="invalid-sequences-table"
             />
-            <div style={{ marginTop: "20px", textAlign: "right" }}>
-              <div style={{ textAlign: "left" }}>
-                Do you want to continue to upload the valid sequences by
-                skipping the invalid sequences ?
+            {!showInvalidSeqFooter ? (
+              <div style={{ marginTop: "20px", textAlign: "right" }}>
+                <div style={{ textAlign: "left" }}>
+                  Do you want to continue to upload the valid sequences by
+                  skipping the invalid sequences ?
+                </div>
+                <div>
+                  <OmniButton
+                    label="Yes"
+                    onClick={this.showAppDetails}
+                    buttonStyle={{ width: "80px", marginRight: "12px" }}
+                  />
+                  <OmniButton
+                    label="No"
+                    buttonStyle={{ width: "80px", marginRight: "10px" }}
+                    onClick={this.closeInvalidSequenceModal}
+                  />
+                </div>
               </div>
-              <div>
+            ) : (
+              <div style={{ marginTop: "20px", textAlign: "right" }}>
                 <OmniButton
-                  label="Yes"
-                  onClick={this.showAppDetails}
-                  buttonStyle={{ width: "80px", marginRight: "12px" }}
-                />
-                <OmniButton
-                  label="No"
-                  buttonStyle={{ width: "80px", marginRight: "10px" }}
+                  label="Close"
                   onClick={this.closeInvalidSequenceModal}
                 />
               </div>
-            </div>
+            )}
           </Modal>
 
           <div style={{ marginTop: "20px" }}>
@@ -608,6 +697,10 @@ class AddNewApplication extends Component {
                 openContents={this.getContents}
                 goBack={this.goBack}
                 submit={this.showApplicationDetails}
+                selectFolder={this.checkedFolder}
+                selectAll={this.checkedAllFolders}
+                checkedAll={checkedAll}
+                showCheckAll={showCheckAll}
               />
             )}
             {!isAddingSequence && showApplicationDetails && (

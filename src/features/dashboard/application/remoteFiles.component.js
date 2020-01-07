@@ -1,8 +1,9 @@
-import React, { Component } from "react";
+import { Checkbox, Icon } from "antd";
 import _ from "lodash";
-import { Text, OmniButton } from "../../../uikit/components";
+import React, { Component } from "react";
 import { translate } from "../../../translations/translator";
-import { Icon } from "antd";
+import { OmniButton, Text } from "../../../uikit/components";
+import { minFourDigitsInString } from "../../../utils";
 
 class RemoteFiles extends Component {
   constructor(props) {
@@ -26,55 +27,104 @@ class RemoteFiles extends Component {
     this.props.submit && this.props.submit(this.state.selected);
   };
 
+  //triggers when a checkbox is checked
+  selectFolder = (file, e) => {
+    this.props.selectFolder && this.props.selectFolder(file, e);
+  };
+
+  selectAll = event => {
+    this.props.selectAll && this.props.selectAll(event);
+  };
+
   render() {
     const {
       cancel,
       remoteFiles,
       rootPath,
       currentPath,
-      isSequence
+      isSequence,
+      checkedAll,
+      showCheckAll
     } = this.props;
     const { selected } = this.state;
     return (
       <React.Fragment>
         <div className="addnewapplication__remotefiles">
-          {rootPath != currentPath && (
-            <div
-              className="addnewapplication__remotefiles-file global__center-vert global__cursor-pointer"
-              onDoubleClick={this.goBack}
-            >
-              <img
-                src="/images/folder-back.svg"
-                className="global__file-folder"
-                style={{ width: "22px", height: "22px" }}
-              />
-              <Text type="extra_bold" size="14px" text=".." />
+          {(rootPath != currentPath || (isSequence && showCheckAll)) && (
+            <div className="addnewapplication__remotefiles-file global__center-vert global__cursor-pointer">
+              {rootPath != currentPath && (
+                <div onDoubleClick={this.goBack} style={{ display: "flex" }}>
+                  <img
+                    src="/images/folder-back.svg"
+                    className="global__file-folder"
+                    style={{ width: "22px", height: "22px" }}
+                  />
+                  <Text type="extra_bold" size="14px" text=".." />
+                </div>
+              )}
+              {isSequence && showCheckAll && (
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    width: "100%"
+                  }}
+                >
+                  <Text type="extra_bold" size="14px" text="Select All" />
+                  <Checkbox
+                    style={{ margin: "2px 5px 0 5px" }}
+                    onChange={this.selectAll}
+                    checked={checkedAll}
+                  />
+                </div>
+              )}
             </div>
           )}
-          {_.map(remoteFiles, file => {
+
+          {_.map(remoteFiles, (file, index) => {
             return (
               <div
-                className={`addnewapplication__remotefiles-file global__center-vert global__cursor-pointer ${_.get(
+                key={index}
+                className={`addnewapplication__remotefiles-file global__center-vert global__cursor-pointer ${(_.get(
                   selected,
                   "name"
-                ) === file.name && "global__node-selected"}`}
-                onClick={this.select(file)}
+                ) === file.name ||
+                  file.checked) &&
+                  "global__node-selected"}`}
+                onClick={!isSequence && this.select(file)}
                 onDoubleClick={this.openContents(file)}
               >
-                {file.type === "d" ? (
-                  <Icon
-                    type="folder"
-                    theme="filled"
-                    className="global__file-folder"
-                  />
-                ) : (
-                  <img
-                    src="/images/file-new.svg"
-                    className="global__file-folder"
-                    style={{ width: "18px", height: "21px" }}
-                  />
+                <div style={{ display: "flex", width: "98%" }}>
+                  {file.type === "d" ? (
+                    <Icon
+                      type="folder"
+                      theme="filled"
+                      global__node-selected
+                      className="global__file-folder"
+                    />
+                  ) : (
+                    <img
+                      src="/images/file-new.svg"
+                      className="global__file-folder"
+                      style={{ width: "18px", height: "21px" }}
+                    />
+                  )}
+                  <Text type="regular" size="14px" text={file.name} />
+                </div>
+                {isSequence && minFourDigitsInString(file.name) && (
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "flex-end"
+                    }}
+                  >
+                    <Checkbox
+                      style={{ margin: "2px 5px 0 5px" }}
+                      onChange={e => this.selectFolder(file, e)}
+                      checked={file.checked}
+                    />
+                  </div>
                 )}
-                <Text type="regular" size="14px" text={file.name} />
               </div>
             );
           })}

@@ -7,6 +7,7 @@ import { translate } from "./translations/translator";
 const REGEX_EMAIL = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 const REGEX_PWD = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/;
 const IMAGES = {};
+const MIN_FOUR_DIGITS = /^[0-9]{4}$/;
 
 const isLoggedInOmniciaRole = role => _.get(role, "slug", "").includes("o_");
 const isOmniciaRole = roleName => roleName.includes("o_");
@@ -118,6 +119,10 @@ const getOrderedSequences = (sequences, order) => {
   return order === "desc" ? newArray.reverse() : newArray;
 };
 
+const minFourDigitsInString = val => {
+  return MIN_FOUR_DIGITS.test(val);
+};
+
 export {
   isLoggedInOmniciaRole,
   isOmniciaRole,
@@ -134,5 +139,6 @@ export {
   getCombinedLicences,
   storeImageData,
   getOrderedSequences,
-  getImageData
+  getImageData,
+  minFourDigitsInString
 };
