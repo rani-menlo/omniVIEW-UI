@@ -57,6 +57,7 @@ class AddNewApplication extends Component {
       isAddingSequence: false,
       openInvalidSequenceModal: false,
       addApplicationinvalidSeq: [],
+      validSequencesArray: [],
       proceedToAppDetails: false,
       checkedAll: false,
       showCheckAll: false,
@@ -274,12 +275,13 @@ class AddNewApplication extends Component {
   proceedToUploadSequence = async () => {
     this.showLoading();
     let { selectedCustomer, selectedSubmission } = this.props;
+    const validSequencesArray = this.state.validSequencesArray;
     const res = await ApplicationApi.saveSequenceDetails({
       customer_id: selectedCustomer.id,
       submission_id: selectedSubmission.id,
       additional_details: {
         auth_id: this.state.auth_id,
-        sequence_paths: this.getCheckedPaths()
+        sequence_paths: validSequencesArray
       }
     });
     if (res.data.error) {
@@ -299,6 +301,7 @@ class AddNewApplication extends Component {
   showApplicationDetails = async selectedFolder => {
     this.setState({
       addApplicationinvalidSeq: [],
+      validSequencesArray: [],
       invalidSeqError: "",
       selectedFolderError: "",
       showInvalidSeqFooter: false
@@ -329,15 +332,18 @@ class AddNewApplication extends Component {
       }
       //open popup if there are any invalid sequences
       const validSequences = _.get(res, "data.validSequences.length", 0);
+      const validSequencesArray = _.get(res, "data.validSequences", []);
       const invalidSequences = _.get(res, "data.inValidSequences.length", 0);
       const addApplicationinvalidSeq = _.get(res, "data.inValidSequences", []);
       if (!validSequences) {
         this.setState({ showInvalidSeqFooter: true });
+      } else {
+        this.setState({ validSequencesArray: validSequencesArray });
       }
       if (invalidSequences) {
         this.setState(
           {
-            invalidSeqError: "Few sequence folders might have an issue.",
+            invalidSeqError: "Few Sequence folders might have an issue.",
             addApplicationinvalidSeq
           },
           this.hideLoading
@@ -372,6 +378,7 @@ class AddNewApplication extends Component {
     }
     const { appNumber, appType } = data;
     const validSequences = _.get(data, "validSequences.length", 0);
+    const validSequencesArray = _.get(data, "validSequences", []);
     const invalidSequences = _.get(data, "invalidSequences.length", 0);
     const addApplicationinvalidSeq = _.get(data, "invalidSequences", []);
     const newState = {
@@ -387,6 +394,9 @@ class AddNewApplication extends Component {
     }
     if (!validSequences) {
       newState.showInvalidSeqFooter = true;
+    }
+    if (validSequencesArray) {
+      newState.validSequencesArray = validSequencesArray;
     }
     this.setState({ ...newState }, () => {
       this.hideLoading();
@@ -536,8 +546,9 @@ class AddNewApplication extends Component {
   };
 
   showAppDetails = () => {
-    if (this.isAddingSequence) {
+    if (this.state.isAddingSequence) {
       this.proceedToUploadSequence();
+      return;
     }
     this.setState({ proceedToAppDetails: true }, () => {
       this.getSubmissionLookupData();
