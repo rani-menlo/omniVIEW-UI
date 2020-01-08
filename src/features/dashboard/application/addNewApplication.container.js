@@ -370,30 +370,31 @@ class AddNewApplication extends Component {
     const validSequences = _.get(data, "validSequences.length", 0);
     const invalidSequences = _.get(data, "invalidSequences.length", 0);
     const addApplicationinvalidSeq = _.get(data, "invalidSequences", []);
-    this.setState({ path, appType, appNumber, validSequences });
-    if (!validSequences) {
-      this.setState({ showInvalidSeqFooter: true });
-    }
+    const newState = {
+      path,
+      appType,
+      appNumber,
+      validSequences
+    };
     if (invalidSequences) {
-      this.setState(
-        {
-          invalidSeqError:
-            "Few Sequences in the Application folder might have an issue.",
-          addApplicationinvalidSeq
-        },
-        this.hideLoading
-      );
-      return;
+      newState.invalidSeqError =
+        "Few Sequences in the Application folder might have an issue.";
+      newState.addApplicationinvalidSeq = addApplicationinvalidSeq;
     }
-    //will trigger submission lookup information if there are no invalid sequences (or) when user wants to proceed to upload valid sequences by skipping the invalid sequences
-    if (validSequences || !invalidSequences) {
-      this.getSubmissionLookupData();
+    if (!validSequences) {
+      newState.showInvalidSeqFooter = true;
     }
+    this.setState({ ...newState }, () => {
+      //will trigger submission lookup information if there are no invalid sequences (or) when user wants to proceed to upload valid sequences by skipping the invalid sequences
+      this.hideLoading();
+      if (validSequences || !invalidSequences) {
+        this.getSubmissionLookupData();
+      }
+    });
   };
 
   getSubmissionLookupData = async () => {
     this.showLoading();
-    let validSequences = this.state.validSequences;
     let res = await ApplicationApi.getSubmissionLookupInfo();
     let { error, data, message } = res.data;
     error = res.data.error;
@@ -408,6 +409,7 @@ class AddNewApplication extends Component {
       regions,
       submission_centers
     } = data;
+    console.log(this.state);
     this.setState(
       {
         selectedFolderError: "",
@@ -417,8 +419,7 @@ class AddNewApplication extends Component {
         application_types,
         cloud_types,
         regions,
-        submission_centers,
-        validSequences
+        submission_centers
       },
       this.hideLoading
     );
@@ -559,7 +560,9 @@ class AddNewApplication extends Component {
       addApplicationinvalidSeq,
       checkedAll,
       showCheckAll,
-      showInvalidSeqFooter
+      showInvalidSeqFooter,
+      appNumber,
+      appType
     } = this.state;
     return (
       <React.Fragment>
@@ -726,10 +729,10 @@ class AddNewApplication extends Component {
                 }))}
                 validSequences={validSequences}
                 appType={{
-                  key: _.get(defaultApplicationType, "id"),
-                  value: _.get(defaultApplicationType, "name")
+                  key: _.get(appType, "id"),
+                  value: _.get(appType, "name")
                 }}
-                appNumber={defaultApplicationNumber}
+                appNumber={appNumber}
               />
             )}
           </div>
