@@ -168,7 +168,9 @@ class AddNewApplication extends Component {
         selectedFolderError: "",
         invalidSeqError: ""
       },
-      this.goBack
+      () => {
+        this.goBack(true);
+      }
     );
   };
 
@@ -240,14 +242,16 @@ class AddNewApplication extends Component {
     this.setState({ remoteFiles, checkedAll });
   };
 
-  goBack = async () => {
+  goBack = async appDetails => {
     let { path, remoteDetails } = this.state;
     if (!path || remoteDetails.root_path === path) {
       return;
     }
     //removing the files from path on clicking back folder icon
     let ftp_files_path = [...this.state.ftp_files_path];
-    ftp_files_path = ftp_files_path.slice(0, -1);
+    if (!appDetails) {
+      ftp_files_path = ftp_files_path.slice(0, -1);
+    }
     this.setState({ ftp_files_path });
     path = path.substring(0, path.lastIndexOf("/"));
     this.getContentsOfPath(path);
@@ -385,8 +389,12 @@ class AddNewApplication extends Component {
       newState.showInvalidSeqFooter = true;
     }
     this.setState({ ...newState }, () => {
-      //will trigger submission lookup information if there are no invalid sequences (or) when user wants to proceed to upload valid sequences by skipping the invalid sequences
       this.hideLoading();
+      if (invalidSequences) {
+        return;
+      }
+      //will trigger submission lookup information if there are no invalid sequences (or) when user wants to proceed to upload valid sequences by skipping the invalid sequences
+
       if (validSequences || !invalidSequences) {
         this.getSubmissionLookupData();
       }
