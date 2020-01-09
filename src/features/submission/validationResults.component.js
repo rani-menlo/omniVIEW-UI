@@ -266,8 +266,11 @@ class ValidationResults extends Component {
           </div>
           <div className="validationResults__footer">
             <div
-              className="validationResults__footer__viewreport"
-              onClick={this.openReport}
+              className={`validationResults__footer__viewreport ${!_.get(
+                validationResults,
+                "length"
+              ) && "global__disabled-box"}`}
+              onClick={_.get(validationResults, "length") && this.openReport}
             >
               View Report
             </div>
