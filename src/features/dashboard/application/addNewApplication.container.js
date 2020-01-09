@@ -115,7 +115,8 @@ class AddNewApplication extends Component {
       showRemoteFiles: false,
       enterRemoteDetails: true,
       selectedFolderError: "",
-      invalidSeqError: ""
+      invalidSeqError: "",
+      ftp_files_path: []
     });
   };
 
@@ -629,7 +630,7 @@ class AddNewApplication extends Component {
             {this.getTitle()}
           </p>
           <p className="addUser-subtitle">{this.getSubtitle()}</p>
-          <p>{this.getFtpFilesPath()}</p>
+          {!showApplicationDetails && <p>{this.getFtpFilesPath()}</p>}
           <div className="global__hr-line" style={{ marginBottom: "20px" }} />
           {selectedFolderError && (
             <Text
