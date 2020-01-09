@@ -236,9 +236,15 @@ class ApplicationDashboard extends Component {
     });
     if (res) {
       const { data } = res;
+      const results = _.get(data, "result");
       if (_.get(data, "result")) {
         this.checkSequenceStatus(_.get(data, "result", null), submission);
       } else {
+        if (_.isArray(results)) {
+          setTimeout(() => {
+            this.startPolling(submission);
+          }, POLLING_INTERVAL);
+        }
         const interval = this.intervals.get(submission.id);
         if (interval) {
           clearInterval(interval);
