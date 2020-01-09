@@ -181,8 +181,13 @@ class SubmissionCard extends Component {
   };
 
   render() {
-    const { submission, onSelect, getMenu, customer } = this.props;
-    const { openFailuresModal, reportData, selectedRows } = this.state;
+    const {
+      submission,
+      onSelect,
+      getMenu,
+      customer,
+      openFailures
+    } = this.props;
     const uploading = _.get(submission, "is_uploading");
     const LazyImageLoader = React.lazy(() =>
       import("../../uikit/components/image/imageLoader.component")
@@ -279,16 +284,17 @@ class SubmissionCard extends Component {
                       )}`}
                     />
                   )}
-                  {submission.analyzing && (
-                    <Text
-                      type="medium"
-                      textStyle={{ marginTop: "12%", textAlign: "center" }}
-                      text="Processing uploaded sequence(s)..."
-                    />
-                  )}
+                  {submission.analyzing &&
+                    !(_.get(submission, "sequence_failed.length") || "") && (
+                      <Text
+                        type="medium"
+                        textStyle={{ marginTop: "12%", textAlign: "center" }}
+                        text="Processing uploaded sequence(s)..."
+                      />
+                    )}
                   {uploading &&
                     !submission.analyzing &&
-                    !_.get(submission, "sequence_failed.length") && (
+                    (_.get(submission, "sequence_inProgress.length") || "") && (
                       <Text
                         type="medium"
                         textStyle={{ marginTop: "12%", textAlign: "center" }}
@@ -301,7 +307,7 @@ class SubmissionCard extends Component {
                     <OmniButton
                       className="submissioncard__content-report"
                       label="View Report"
-                      onClick={this.openFailures}
+                      onClick={openFailures}
                       type="danger"
                       buttonStyle={{ borderColor: "unset" }}
                     />

@@ -388,7 +388,7 @@ class ApplicationDashboard extends Component {
 
   fetchApplications = (sortBy = "name", orderBy = "ASC") => {
     this.props.actions.resetApplications();
-    this.setState({ submissions: [] });
+    this.setState({ submissions: [], openFailuresModal: false });
     const { viewBy, pageNo, itemsPerPage, searchText } = this.state;
     const { selectedCustomer } = this.props;
     if (viewBy === "lists") {
@@ -1153,6 +1153,7 @@ class ApplicationDashboard extends Component {
                     updateSubmissions={this.updateSubmissions}
                     updateUploadProgress={this.updateUploadProgress}
                     retryUpload={this.retryUpload}
+                    openFailures={this.openFailures(submission)}
                   />
                 ))}
               </div>
