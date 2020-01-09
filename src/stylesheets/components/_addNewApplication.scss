@@ -15,17 +15,21 @@
     width: 30%;
   }
   &__remotefiles {
-    height: 320px;
+    //height: 320px;
     border-top: 1px solid $shadowed-steel;
     border-bottom: 1px solid $shadowed-steel;
-    overflow-y: auto;
+    // overflow-y: auto;
     &-file {
       height: 30px;
       user-select: none;
-      &:nth-child(even) {
+      &:nth-child(odd) {
         background-color: $froasted-glass;
       }
     }
+  }
+  &__remotefiles_scroll{
+    height: 320px;
+     overflow-y: auto;
   }
 }
 .invalid-sequences-table {
