@@ -55,6 +55,11 @@ class CustomerDashboard extends Component {
       const { user } = this.props;
       this.onCustomerSelected({ ...user.customer })();
     }
+    //To prevent browser back button from going back
+    window.history.pushState(null, document.title, window.location.href);
+    window.addEventListener("popstate", function(event) {
+      window.history.pushState(null, document.title, window.location.href);
+    });
   }
 
   fetchCustomers = (sortBy = "company_name", orderBy = "ASC") => {
@@ -637,7 +642,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(CustomerDashboard);
+export default connect(mapStateToProps, mapDispatchToProps)(CustomerDashboard);
