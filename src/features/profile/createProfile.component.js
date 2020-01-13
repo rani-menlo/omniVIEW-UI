@@ -297,9 +297,17 @@ class CreateProfile extends Component {
   };
 
   onUsernameBlur = () => {
+    let { username } = this.state;
     if (this.state.username.value) {
       this.props.dispatch(
-        LoginActions.checkForUsername({ userName: this.state.username.value })
+        LoginActions.checkForUsername(
+          { userName: this.state.username.value },
+          () => {
+            username.value = this.state.username.value;
+            username.error = "";
+            this.setState({ username });
+          }
+        )
       );
     }
   };

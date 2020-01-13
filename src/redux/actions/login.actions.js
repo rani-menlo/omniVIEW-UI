@@ -39,7 +39,7 @@ export default {
       }
     };
   },
-  checkForUsername: data => {
+  checkForUsername: (data, callback) => {
     return async dispatch => {
       ApiActions.request(dispatch);
       try {
@@ -49,11 +49,13 @@ export default {
           data: res.data
         });
         ApiActions.success(dispatch);
+        !res.data.error && callback();
       } catch (err) {
         ApiActions.failure(dispatch);
       }
     };
   },
+
   sendOtp: data => {
     return async dispatch => {
       ApiActions.request(dispatch);
