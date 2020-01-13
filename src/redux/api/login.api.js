@@ -20,6 +20,9 @@ export default {
   createOrUpdateProfile: data => {
     return api.post(URI.CREATE_UPDATE_PROFILE, data);
   },
+  checkForUsername: data => {
+    return api.post(URI.CHECK_USERNAME_AVAILABILITY, data);
+  },
   logout: () => {
     return api.get(URI.LOGOUT);
   }

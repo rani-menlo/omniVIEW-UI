@@ -62,7 +62,12 @@ class CreateProfile extends Component {
     this.uploadContainer = React.createRef();
   }
 
+  clearUsernameError = () => {
+    this.props.dispatch(LoginActions.setUsernameExistsError(""));
+  };
+
   componentDidMount() {
+    this.clearUsernameError();
     const { history } = this.props;
     const state = this.populateState();
     this.setState({
@@ -86,6 +91,7 @@ class CreateProfile extends Component {
   };
 
   onInputChange = field => e => {
+    this.clearUsernameError();
     const { value } = e.target;
     this.setState({
       [field]: { ...this.state[field], value, error: "" }
@@ -97,12 +103,16 @@ class CreateProfile extends Component {
   };
 
   goBack = () => {
+    this.clearUsernameError();
     this.props.history.push("/customers");
   };
 
   save = () => {
     const state = { ...this.state };
     let error = false;
+    if (this.props.usernameExists) {
+      return;
+    }
     if (!state.username.value) {
       error = true;
       state.username.error = translate("error.form.required", {
@@ -286,6 +296,14 @@ class CreateProfile extends Component {
     this.uploadContainer.current.click();
   };
 
+  onUsernameBlur = () => {
+    if (this.state.username.value) {
+      this.props.dispatch(
+        LoginActions.checkForUsername({ userName: this.state.username.value })
+      );
+    }
+  };
+
   render() {
     const {
       editProfile,
@@ -299,7 +317,7 @@ class CreateProfile extends Component {
       phone,
       showChangePassword
     } = this.state;
-    const { user } = this.props;
+    const { user, usernameExists } = this.props;
     return (
       <React.Fragment>
         <Loader loading={this.props.loading} />
@@ -351,8 +369,9 @@ class CreateProfile extends Component {
                 label={`${translate("label.form.username")}*`}
                 value={username.value}
                 placeholder={translate("label.form.username")}
-                error={username.error}
+                error={username.error || usernameExists}
                 onChange={this.onInputChange("username")}
+                onBlur={this.onUsernameBlur}
               />
             </div>
             {editProfile && !showChangePassword && (
@@ -596,7 +615,8 @@ class CreateProfile extends Component {
 function mapStateToProps(state) {
   return {
     loading: state.Api.loading,
-    user: state.Login.user
+    user: state.Login.user,
+    usernameExists: state.Login.usernameExists
   };
 }
 

@@ -19,7 +19,8 @@ const initialState = {
     verifying: false,
     authorized: false
   },
-  forgotPwdError: ""
+  forgotPwdError: "",
+  usernameExists: ""
 };
 
 export default (state = initialState, action) => {
@@ -173,10 +174,29 @@ export default (state = initialState, action) => {
         user: { ...state.user, ...action.data.data }
       };
     }
+    case LoginActionTypes.CHECK_USERNAME: {
+      let error = "";
+      if (action.data.error) {
+        error = action.data.message;
+      }
+      if (action.error) {
+        error = action.error;
+      }
+      return {
+        ...state,
+        usernameExists: error
+      };
+    }
     case LoginActionTypes.FORGOT_PWD_ERROR: {
       return {
         ...state,
         forgotPwdError: action.error
+      };
+    }
+    case LoginActionTypes.USERNAME_EXISTS_ERROR: {
+      return {
+        ...state,
+        usernameExists: ""
       };
     }
     default:

@@ -39,6 +39,21 @@ export default {
       }
     };
   },
+  checkForUsername: data => {
+    return async dispatch => {
+      ApiActions.request(dispatch);
+      try {
+        const res = await LoginApi.checkForUsername(data);
+        dispatch({
+          type: LoginActionTypes.CHECK_USERNAME,
+          data: res.data
+        });
+        ApiActions.success(dispatch);
+      } catch (err) {
+        ApiActions.failure(dispatch);
+      }
+    };
+  },
   sendOtp: data => {
     return async dispatch => {
       ApiActions.request(dispatch);
@@ -55,7 +70,7 @@ export default {
       }
     };
   },
-  verifyOtp: (data) => {
+  verifyOtp: data => {
     return async dispatch => {
       try {
         dispatch({
@@ -160,6 +175,12 @@ export default {
   setForgotPwdError: error => {
     return {
       type: LoginActionTypes.FORGOT_PWD_ERROR,
+      error
+    };
+  },
+  setUsernameExistsError: error => {
+    return {
+      type: LoginActionTypes.USERNAME_EXISTS_ERROR,
       error
     };
   }

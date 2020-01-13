@@ -11,11 +11,20 @@ const onInputText = (onChange, allowSpaces) => e => {
   onChange && onChange(e);
 };
 
+const onInputTextBlur = (onBlur, allowSpaces) => e => {
+  const { value } = e.target;
+  if (value.includes(" ") && !allowSpaces) {
+    return;
+  }
+  onBlur && onBlur(e);
+};
+
 const InputField = ({
   type,
   label,
   value,
   onChange,
+  onBlur,
   placeholder,
   error,
   style,
@@ -43,6 +52,7 @@ const InputField = ({
             onChange={onInputText(onChange, allowSpaces)}
             value={value}
             className={error && "global__field__error-box"}
+            onBlur={onInputTextBlur(onBlur, allowSpaces)}
           />
         )}
       </FormItem>
@@ -56,6 +66,7 @@ InputField.propTypes = {
   label: PropTypes.string,
   value: PropTypes.string,
   onChange: PropTypes.func,
+  onBlur: PropTypes.func,
   placeholder: PropTypes.string,
   error: PropTypes.string,
   style: PropTypes.object,

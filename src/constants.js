@@ -88,6 +88,7 @@ const URI = {
   UPDATE_USER: `${path}user/updateUsers`,
   DELETE_USER: `${path}user/deleteUsers`,
   CREATE_UPDATE_PROFILE: `${path}user/updateProfile`,
+  CHECK_USERNAME_AVAILABILITY: `${path}user/checkUserNameAvailability`,
   ACTIVATE_DEACTIVATE: `${path}user/activateOrDeactivateUser`,
   UPDATE_SECONDARY_CONTACTS: `${path}user/updateSecondaryContacts`,
   ASSIGN_LICENSE: `${path}user/assignLicense`,
