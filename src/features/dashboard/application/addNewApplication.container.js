@@ -344,7 +344,7 @@ class AddNewApplication extends Component {
       if (invalidSequences) {
         this.setState(
           {
-            invalidSeqError: "Few Sequence folders might have an issue.",
+            invalidSeqError: "An issue occurred during upload.",
             addApplicationinvalidSeq
           },
           this.hideLoading
@@ -389,8 +389,7 @@ class AddNewApplication extends Component {
       validSequences
     };
     if (invalidSequences) {
-      newState.invalidSeqError =
-        "Few Sequences in the Application folder might have an issue.";
+      newState.invalidSeqError = "An issue occurred during upload.";
       newState.addApplicationinvalidSeq = addApplicationinvalidSeq;
     }
     if (!validSequences) {
@@ -649,7 +648,7 @@ class AddNewApplication extends Component {
                 {" "}
                 Click here{" "}
               </a>
-              <span>to view the details.</span>
+              <span>for details.</span>
             </p>
           )}
           <Modal
