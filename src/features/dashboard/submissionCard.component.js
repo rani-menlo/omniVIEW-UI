@@ -255,6 +255,7 @@ class SubmissionCard extends Component {
               "") && (
               <React.Fragment>
                 <div style={{ padding: "10px" }}>
+                  {/* Displaying inProgress sequences by total sequences */}
                   {(_.get(submission, "sequence_inProgress.length") || "") && (
                     <Text
                       type="medium"
@@ -266,6 +267,7 @@ class SubmissionCard extends Component {
                       )} / ${_.get(submission, "sequence_count", 0)}`}
                     />
                   )}
+                  {/* Displaying processing sequences by total sequences when there are no pending sequences */}
                   {!(_.get(submission, "sequence_inProgress.length") || "") &&
                     (_.get(submission, "sequence_processing.length") || "") && (
                       <Text
@@ -278,8 +280,8 @@ class SubmissionCard extends Component {
                         )} / ${_.get(submission, "sequence_count", 0)}`}
                       />
                     )}
+                  {/* Displaying Failed Sequences */}
                   {/* {(_.get(submission, "sequence_failed.length") || "") && ( */}
-                  {/* Failed Sequences */}
                   <Text
                     type="medium"
                     textStyle={{ color: "red" }}
