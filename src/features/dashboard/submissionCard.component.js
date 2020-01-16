@@ -205,6 +205,7 @@ class SubmissionCard extends Component {
             })
           }}
         >
+          {/* Heading of the application card */}
           <div className="submissioncard__heading">
             <span
               className="submissioncard__heading-text global__cursor-pointer"
@@ -235,6 +236,7 @@ class SubmissionCard extends Component {
                 </Dropdown>
               )}
           </div>
+          {/* Content of the application card */}
           <div
             className="submissioncard__content"
             style={{
@@ -256,34 +258,38 @@ class SubmissionCard extends Component {
                   {(_.get(submission, "sequence_inProgress.length") || "") && (
                     <Text
                       type="medium"
-                      textStyle={{ color: "gray" }}
-                      text={`Sequences Remaining: ${_.get(
+                      textStyle={{ color: "#00d592" }}
+                      text={`Sequences Uploaded: ${_.get(
                         submission,
                         "sequence_inProgress.length",
                         0
-                      )}`}
+                      )} / ${_.get(submission, "sequence_count", 0)}`}
                     />
                   )}
+                  {!(_.get(submission, "sequence_inProgress.length") || "") &&
+                    (_.get(submission, "sequence_processing.length") || "") && (
+                      <Text
+                        type="medium"
+                        textStyle={{ color: "#00d592" }}
+                        text={`Sequences Uploaded: ${_.get(
+                          submission,
+                          "sequence_processing.length",
+                          0
+                        )} / ${_.get(submission, "sequence_count", 0)}`}
+                      />
+                    )}
+                  {/* {(_.get(submission, "sequence_failed.length") || "") && ( */}
+                  {/* Failed Sequences */}
                   <Text
                     type="medium"
-                    textStyle={{ color: "#00d592" }}
-                    text={`Sequences Uploaded: ${_.get(
+                    textStyle={{ color: "red" }}
+                    text={`Sequences Failed: ${_.get(
                       submission,
-                      "sequence_success.length",
+                      "sequence_failed.length",
                       0
-                    ) + _.get(submission, "sequence_processing.length", 0)}`}
+                    )}`}
                   />
-                  {(_.get(submission, "sequence_failed.length") || "") && (
-                    <Text
-                      type="medium"
-                      textStyle={{ color: "red" }}
-                      text={`Sequences Failed: ${_.get(
-                        submission,
-                        "sequence_failed.length",
-                        0
-                      )}`}
-                    />
-                  )}
+                  {/* )} */}
                   {submission.analyzing &&
                     !(_.get(submission, "sequence_failed.length") || "") && (
                       <Text
@@ -314,6 +320,8 @@ class SubmissionCard extends Component {
                   )}
               </React.Fragment>
             )}
+
+            {/* Sequence is uploaded successfully and able to access the application */}
             {!uploading &&
               !submission.analyzing &&
               !(
