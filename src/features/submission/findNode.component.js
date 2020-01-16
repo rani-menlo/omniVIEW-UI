@@ -84,7 +84,7 @@ class FindNode extends Component {
   };
 
   onItemSelected = item => () => {
-    this.setState({ selected: `${item.ID}_${item.name}_${item.title}` });
+    this.setState({ selected: `${item.hash}` });
     this.props.dispatch(SubmissionActions.findSelectedResult(item));
     this.props.onItemSelected && this.props.onItemSelected(item);
   };
@@ -253,10 +253,9 @@ class FindNode extends Component {
                   return (
                     <div
                       className={`validationResults__table__body__find__result global__center-vert global__cursor-pointer ${selected ===
-                        `${search.ID}_${search.name}_${search.title}` &&
-                        "global__node-selected"}`}
+                        `${search.hash}` && "global__node-selected"}`}
                       onClick={this.onItemSelected(search)}
-                      key={search.name}
+                      key={search.hash}
                     >
                       <div
                         className="global__center-vert"
@@ -321,6 +320,7 @@ class FindNode extends Component {
 }
 
 function mapStateToProps(state, props) {
+  console.log(state, "state in find noDe");
   return {
     selectedSequence: state.Submission.selectedSequence,
     selectedSubmission: state.Application.selectedSubmission,
@@ -340,7 +340,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(FindNode);
+export default connect(mapStateToProps, mapDispatchToProps)(FindNode);

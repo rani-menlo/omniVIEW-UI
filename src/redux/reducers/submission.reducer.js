@@ -1,4 +1,5 @@
 import _ from "lodash";
+import uuidv4 from "uuid/v4";
 import { SubmissionActionTypes } from "../actionTypes";
 
 const initialState = {
@@ -64,6 +65,10 @@ export default (state = initialState, action) => {
         find: {
           ...state.find,
           searchResults: action.data.data,
+          searchResults: _.map(action.data.data, obj => ({
+            ...obj,
+            hash: uuidv4()
+          })),
           searchText: action.text
         }
       };
@@ -74,7 +79,7 @@ export default (state = initialState, action) => {
         ...state,
         find: {
           ...state.find,
-          selected: `${search.ID}_${search.name}_${search.title}`
+          selected: `${search.hash}`
         }
       };
     }
