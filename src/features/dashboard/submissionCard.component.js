@@ -255,16 +255,21 @@ class SubmissionCard extends Component {
               "") && (
               <React.Fragment>
                 <div style={{ padding: "10px" }}>
-                  {/* Displaying inProgress sequences by total sequences */}
+                  {/* Displaying uploaded sequences by total sequences */}
                   {(_.get(submission, "sequence_inProgress.length") || "") && (
                     <Text
                       type="medium"
                       textStyle={{ color: "#00d592" }}
                       text={`Sequences Uploaded: ${_.get(
                         submission,
-                        "sequence_inProgress.length",
+                        "sequence_success.length",
                         0
-                      )} / ${_.get(submission, "sequence_count", 0)}`}
+                      ) +
+                        _.get(
+                          submission,
+                          "sequence_processing.length",
+                          0
+                        )} / ${_.get(submission, "sequence_count", 0)}`}
                     />
                   )}
                   {/* Displaying processing sequences by total sequences when there are no pending sequences */}
