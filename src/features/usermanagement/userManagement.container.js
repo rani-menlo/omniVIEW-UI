@@ -386,6 +386,7 @@ class UserManagementContainer extends Component {
               UsermanagementActions.fetchUsers({
                 customerId: selectedCustomer.id,
                 search: searchText,
+                isList: false, //backend team needs this flag for sorting the list based on the lastest updated user
                 ...this.selectedFilters
               })
             );
