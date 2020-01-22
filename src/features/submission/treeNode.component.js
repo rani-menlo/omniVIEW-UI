@@ -410,9 +410,16 @@ class TreeNode extends Component {
         return;
       }
       let itemId = item.ID;
-      _.map(array, leaf => {
+      _.map(array, (leaf, index) => {
         if (!leaf || leaf.ID === itemId) {
           return;
+        }
+        //OMNG-650 - We are excluding 1816 validations related sequences in the structure
+        if (!leaf || _.get(leaf, "version", "").includes("STF")) {
+          const index = array.indexOf(leaf);
+          if (index > -1) {
+            array.splice(index, 1);
+          }
         }
         let modifiedFile = leaf["modified-file"];
         modifiedFile =

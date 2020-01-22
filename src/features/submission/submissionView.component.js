@@ -643,9 +643,14 @@ class SubmissionView extends Component {
   };
 
   getNodeFromMap = item => {
-    const label = `${_.get(item, "name", "")}_${_.get(item, "title", "")}`;
-    let node = this.treeNodesMap.get(item.ID) || this.treeNodesMap.get(label);
-    return node;
+    if (item.error_no != 1816) {
+      const label = `${_.get(item, "name", "")}_${_.get(item, "title", "")}`;
+      let node = this.treeNodesMap.get(item.ID) || this.treeNodesMap.get(label);
+      return node;
+    } else {
+      let node = this.treeNodesMap.entries().next(0).value;
+      return node[1];
+    }
   };
 
   selectChildNode = item => {
