@@ -327,7 +327,7 @@ class TreeNode extends Component {
               // subFoldr.lifeCycles = subFoldr.lifeCycles.concat(v.leaf);
               v.lifeCycles = item.lifeCycles;
             }
-            if (_.get(subFoldr, "[k].leaf")) {
+            if (_.get(subFoldr, `[${k}].leaf`)) {
               let leaf = [...subFoldr[k].leaf, ...v.leaf];
               if (view === "current") {
                 leaf = this.setLatestFiles(leaf);
@@ -421,13 +421,15 @@ class TreeNode extends Component {
             array.splice(index, 1);
           }
         }
-        let modifiedFile = leaf["modified-file"];
-        modifiedFile =
-          modifiedFile &&
-          modifiedFile.substring(modifiedFile.lastIndexOf("#") + 1);
-        if (modifiedFile === itemId) {
-          _.remove(newArray, { ID: itemId });
-        }
+        //removed this piece of code inorder to display both new and appended files
+        //in both current view and life cycle view
+        // let modifiedFile = leaf["modified-file"];
+        // modifiedFile =
+        //   modifiedFile &&
+        //   modifiedFile.substring(modifiedFile.lastIndexOf("#") + 1);
+        // if (modifiedFile === itemId) {
+        //   _.remove(newArray, { ID: itemId });
+        // }
       });
     });
     return newArray;
