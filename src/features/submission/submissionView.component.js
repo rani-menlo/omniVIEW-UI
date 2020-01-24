@@ -645,7 +645,9 @@ class SubmissionView extends Component {
   getNodeFromMap = item => {
     if (item.error_no != 1816) {
       const label = `${_.get(item, "name", "")}_${_.get(item, "title", "")}`;
-      let node = this.treeNodesMap.get(item.ID) || this.treeNodesMap.get(label);
+      const folderID = _.get(item, "folderID", "");
+      const key = folderID ? folderID : label;
+      let node = this.treeNodesMap.get(item.ID) || this.treeNodesMap.get(key);
       return node;
     } else {
       let node = this.treeNodesMap.entries().next(0).value;
@@ -703,7 +705,9 @@ class SubmissionView extends Component {
       if (existingNode && _.get(node, "state.properties.STF")) {
         const name = _.get(node, "state.properties.name", "");
         const title = _.get(node, "state.properties.title", "");
-        this.treeNodesMap.set(`${name}_${title}`, node);
+        const folderId = _.get(node, "state.properties.folderID", "");
+        const key = folderId ? folderId : `${name}_${title}`;
+        this.treeNodesMap.set(key, node);
       } else {
         this.treeNodesMap.set(id, node);
       }
@@ -713,7 +717,9 @@ class SubmissionView extends Component {
     } else {
       const name = _.get(node, "state.properties.name", "");
       const title = _.get(node, "state.properties.title", "");
-      this.treeNodesMap.set(`${name}_${title}`, node);
+      const folderId = _.get(node, "state.properties.folderID", "");
+      const key = folderId ? folderId : `${name}_${title}`;
+      this.treeNodesMap.set(key, node);
     }
     _.forEach(node.nodeRefs, nodeRef => {
       this.searchNode(_.get(nodeRef, "current"), item);
