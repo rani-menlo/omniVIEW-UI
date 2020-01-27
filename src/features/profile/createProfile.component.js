@@ -298,7 +298,16 @@ class CreateProfile extends Component {
 
   onUsernameBlur = () => {
     let { username } = this.state;
+    let { user } = this.props;
+    // Not triggering the api call if the logged in person enters
+    // his username without any change
     if (this.state.username.value) {
+      if (
+        !user.first_login &&
+        _.isEqual(user.user_name.toLowerCase(), username.value.toLowerCase())
+      ) {
+        return;
+      }
       this.props.dispatch(
         LoginActions.checkForUsername(
           { userName: this.state.username.value },
