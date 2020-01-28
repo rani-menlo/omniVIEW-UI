@@ -40,7 +40,7 @@ class AddNewApplication extends Component {
       showClouds: true,
       enterRemoteDetails: false,
       path: "",
-      ftp_files_path: [],
+      ftp_files_path: ["root"],
       auth_id: "",
       remoteDetails: null,
       remoteFiles: null,
@@ -500,11 +500,23 @@ class AddNewApplication extends Component {
 
   //go to the specified path on click of the ftp file name on breadcrumb
   goToSpecifiedFtpPath = (file_name, index) => () => {
+    //If user clicks on root
+    if (file_name == "root" && index == 0) {
+      let ftp_files_path = [...this.state.ftp_files_path];
+      ftp_files_path = ["root"];
+      let path = `${this.state.remoteDetails.ftp_path}`;
+      this.setState({ ftp_files_path, path }, () => {
+        this.getContentsOfPath(path);
+      });
+      return;
+    }
     let ftp_files_path = [...this.state.ftp_files_path];
     let path = this.state.remoteDetails.ftp_path;
     ftp_files_path = ftp_files_path.slice(0, index + 1);
+    ftp_files_path = _.tail(ftp_files_path);
     let files = ftp_files_path.length ? ftp_files_path.join("/") : "";
     path = `${path}/${files}`;
+    ftp_files_path = ["root", ...ftp_files_path];
     this.setState({ ftp_files_path, path });
     this.getContentsOfPath(path);
   };
@@ -629,7 +641,9 @@ class AddNewApplication extends Component {
             {this.getTitle()}
           </p>
           <p className="addUser-subtitle">{this.getSubtitle()}</p>
-          {!showApplicationDetails && <p>{this.getFtpFilesPath()}</p>}
+          {!showApplicationDetails && showRemoteFiles && (
+            <p>{this.getFtpFilesPath()}</p>
+          )}
           <div className="global__hr-line" style={{ marginBottom: "20px" }} />
           {selectedFolderError && (
             <Text
