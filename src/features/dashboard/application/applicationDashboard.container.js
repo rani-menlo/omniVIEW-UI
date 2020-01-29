@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
+import uuid from "uuid/v4";
 import _ from "lodash";
 import { Icon, Dropdown, Menu, Avatar, Modal, Table } from "antd";
 import { connect } from "react-redux";
@@ -224,6 +225,7 @@ class ApplicationDashboard extends Component {
   componentWillUnmount() {
     if (this.intervals) {
       for (const [key, val] of this.intervals.entries()) {
+        clearTimeout(val);
         clearInterval(val);
       }
       this.intervals.clear();
@@ -241,9 +243,10 @@ class ApplicationDashboard extends Component {
         this.checkSequenceStatus(_.get(data, "result", null), submission);
       } else {
         if (_.isArray(results)) {
-          setTimeout(() => {
+          const timeout = setTimeout(() => {
             this.startPolling(submission);
           }, POLLING_INTERVAL);
+          this.intervals.set(uuid(), timeout);
         }
         const interval = this.intervals.get(submission.id);
         if (interval) {
