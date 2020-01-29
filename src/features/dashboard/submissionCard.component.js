@@ -66,95 +66,6 @@ class SubmissionCard extends Component {
     ];
   }
 
-  checkSequenceStatus = (data, submission) => {
-    const totalNoOfSeq = data.length;
-    const inProgress = [];
-    const failed = [];
-    const success = [];
-    const processing = [];
-    _.map(data, seq => {
-      switch (seq.status) {
-        case UPLOAD_INPROGRES:
-        case UPLOAD_INPROGRES_EXTRA:
-          inProgress.push(seq);
-          break;
-        case UPLOAD_FAILED:
-          failed.push(seq);
-          break;
-        case UPLOAD_SUCCESS:
-          success.push(seq);
-          break;
-        case UPLOAD_PROCESSING:
-          processing.push(seq);
-          break;
-      }
-    });
-    submission.sequence_count = totalNoOfSeq;
-    submission.sequence_inProgress = inProgress;
-    submission.sequence_failed = failed;
-    submission.sequence_success = success;
-    submission.sequence_processing = processing;
-    if (!inProgress.length && processing.length) {
-      submission.analyzing = true;
-    }
-    // if all are processing(Complete) or failed then clear interval
-    if (processing.length == totalNoOfSeq || failed.length == totalNoOfSeq) {
-      submission.is_uploading = false;
-      submission.analyzing = false;
-      this.interval && clearInterval(this.interval);
-    }
-    this.props.updateSubmissions(submission);
-
-    /* let analyzing = _.some(data, seq => seq.status == ANALYZING);
-    submission.analyzing = analyzing;
-    let allAnalyzed = _.every(data, seq => seq.status == ANALYZING);
-    let allFailed = _.every(data, seq => seq.status == UPLOAD_FAILED);
-    // if all analyzed then only it's complete, if all failed then stop polling
-    if (allAnalyzed || allFailed || !submission.sequence_inProgress.length) {
-      submission.analyzing = allAnalyzed || analyzing;
-      this.interval && clearInterval(this.interval);
-      if (!_.get(submission, "sequence_failed.length", 0)) {
-        submission.sequence_count = data.length;
-        submission.is_uploading = false;
-      }
-      this.props.updateSubmissions(submission);
-    } else {
-      this.props.updateUploadProgress(submission);
-    } */
-  };
-
-  startPolling = async () => {
-    const res = await ApplicationApi.monitorStatus({
-      submission_id: this.props.submission.id
-    });
-    if (res) {
-      const { data } = res;
-      if (_.get(data, "result.length", 0)) {
-        this.checkSequenceStatus(
-          _.get(data, "result", null),
-          this.props.submission
-        );
-      } else {
-        this.interval && clearInterval(this.interval);
-      }
-    }
-  };
-
-  componentDidMount() {
-    /* if (this.props.submission.is_uploading) {
-      this.startPolling();
-      this.interval = setInterval(() => {
-        this.startPolling();
-      }, POLLING_INTERVAL);
-    } */
-  }
-
-  componentWillUnmount() {
-    if (this.interval) {
-      clearTimeout(this.interval);
-    }
-  }
-
   openFailures = async () => {
     this.props.dispatch(ApiActions.requestOnDemand());
     const res = await ApplicationApi.monitorStatus({
@@ -291,18 +202,17 @@ class SubmissionCard extends Component {
                     />
                   )}
                   {/* Displaying processing sequences by total sequences when there are no pending sequences */}
-                  {!(_.get(submission, "sequence_inProgress.length") || "") &&
-                    (_.get(submission, "sequence_processing.length") || "") && (
-                      <Text
-                        type="medium"
-                        textStyle={{ color: "#00d592" }}
-                        text={`Sequences Uploaded: ${_.get(
-                          submission,
-                          "sequence_processing.length",
-                          0
-                        )} / ${_.get(submission, "sequence_count", 0)}`}
-                      />
-                    )}
+                  {!(_.get(submission, "sequence_inProgress.length") || "") && (
+                    <Text
+                      type="medium"
+                      textStyle={{ color: "#00d592" }}
+                      text={`Sequences Uploaded: ${_.get(
+                        submission,
+                        "sequence_processing.length",
+                        0
+                      )} / ${_.get(submission, "sequence_count", 0)}`}
+                    />
+                  )}
                   {/* Displaying Failed Sequences */}
                   {/* {(_.get(submission, "sequence_failed.length") || "") && ( */}
                   <Text
