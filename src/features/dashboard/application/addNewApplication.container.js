@@ -382,6 +382,8 @@ class AddNewApplication extends Component {
     const validSequencesArray = _.get(data, "validSequences", []);
     const invalidSequences = _.get(data, "invalidSequences.length", 0);
     const addApplicationinvalidSeq = _.get(data, "invalidSequences", []);
+    //we are removing the last selectedFolder from path once we get the response
+    path = path.substring(0, path.lastIndexOf("/"));
     const newState = {
       path,
       appType,
