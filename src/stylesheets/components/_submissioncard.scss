@@ -65,6 +65,10 @@
       }
       &-text {
         @include text-normal;
+        &-crossreficon {
+          margin-left: -85px;
+          margin-top: -3px;
+        }
       }
     }
     &-report {
