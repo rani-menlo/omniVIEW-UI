@@ -1239,11 +1239,15 @@ class ApplicationDashboard extends Component {
               columns={this.uploadFailedColumns}
               dataSource={reportData}
               pagination={false}
-              rowSelection={{
-                onChange: (selectedRowKeys, selectedRows) => {
-                  this.setState({ selectedFailedUploads: selectedRows });
-                }
-              }}
+              rowSelection={
+                user.is_secondary_contact || isAdmin(role.name)
+                  ? {
+                      onChange: (selectedRowKeys, selectedRows) => {
+                        this.setState({ selectedFailedUploads: selectedRows });
+                      }
+                    }
+                  : ""
+              }
               scroll={{ y: 200 }}
             />
             <div style={{ marginTop: "20px", textAlign: "right" }}>
@@ -1253,12 +1257,18 @@ class ApplicationDashboard extends Component {
                 onClick={this.closeFailuresModal}
                 buttonStyle={{ width: "120px", marginRight: "12px" }}
               />
-              <OmniButton
-                disabled={!selectedFailedUploads.length}
-                label="Retry"
-                buttonStyle={{ width: "120px", marginRight: "10px" }}
-                onClick={this.retryUpload}
-              />
+              {/* As per the ticket OMNG-682 we are allowing retry option only for
+              secondary contact and admins*/}
+              {user.is_secondary_contact || isAdmin(role.name) ? (
+                <OmniButton
+                  disabled={!selectedFailedUploads.length}
+                  label="Retry"
+                  buttonStyle={{ width: "120px", marginRight: "10px" }}
+                  onClick={this.retryUpload}
+                />
+              ) : (
+                ""
+              )}
             </div>
           </Modal>
         </ContentLayout>
