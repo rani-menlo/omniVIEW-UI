@@ -425,11 +425,17 @@ class UserManagementContainer extends Component {
   };
 
   sortColumn = (sortBy, orderBy) => {
+    const { viewBy } = this.state;
     this.selectedFilters = {
       ...this.selectedFilters,
       sortBy: [sortBy],
       order: orderBy
     };
+    if (viewBy === "lists") {
+      let filterObj = { ...this.selectedFilters };
+      _.set(filterObj, "sort", true);
+      this.selectedFilters = filterObj;
+    }
     this.fetchUsers();
   };
 
