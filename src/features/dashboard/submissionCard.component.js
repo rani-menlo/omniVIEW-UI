@@ -38,7 +38,8 @@ class SubmissionCard extends Component {
     this.state = {
       reportData: [],
       openFailuresModal: false,
-      selectedRows: []
+      selectedRows: [],
+      crossRefs: false
     };
     this.Columns = [
       {
@@ -180,6 +181,22 @@ class SubmissionCard extends Component {
     this.setState({ openFailuresModal: false });
   };
 
+  //Opens this modal to display the cross referenced sequences
+  openCrossrefsModal = e => {
+    e.stopPropagation();
+    if (this.state.crossRefs) {
+      return;
+    }
+    this.setState({ crossRefs: true });
+  };
+
+  closeCrossrefsModal = e => {
+    e.stopPropagation();
+    this.setState({ crossRefs: false }, () => {
+      e.stopPropagation();
+    });
+  };
+
   render() {
     const {
       submission,
@@ -188,6 +205,7 @@ class SubmissionCard extends Component {
       customer,
       openFailures
     } = this.props;
+    const { crossRefs } = this.state;
     const uploading = _.get(submission, "is_uploading");
     const LazyImageLoader = React.lazy(() =>
       import("../../uikit/components/image/imageLoader.component")
@@ -374,7 +392,17 @@ class SubmissionCard extends Component {
                     <span className="submissioncard__content__item-text">
                       {_.get(submission, "sequence_count", "")}
                     </span>
+                    {_.get(submission, "broken_x_ref", "") != 0 && (
+                      <span className="submissioncard__content__item-text-crossreficon">
+                        <img
+                          src="/images/info_icon.png"
+                          className=""
+                          onClick={this.openCrossrefsModal}
+                        />
+                      </span>
+                    )}
                   </div>
+
                   <div className="submissioncard__content__item">
                     <span className="submissioncard__content__item-label">
                       {translate("label.dashboard.addedon")}:
@@ -418,6 +446,44 @@ class SubmissionCard extends Component {
               )}
           </div>
         </div>
+        {/* Cross referenced sequences info */}
+        <Modal
+          destroyOnClose
+          visible={crossRefs}
+          closable={false}
+          footer={null}
+          width="45%"
+          centered
+        >
+          <div
+            className="licence-modal__header"
+            style={{ marginBottom: "15px" }}
+          >
+            <Text
+              type="extra_bold"
+              size="16px"
+              text="Additional Information - Cross-Reference Sequences Not Found"
+            />
+            <img
+              src="/images/close.svg"
+              className="licence-modal__header-close"
+              onClick={this.closeCrossrefsModal}
+            />
+          </div>
+          <p>
+            {_.get(submission, "broken_x_ref", "") == 1
+              ? `A sequence in the Application has a cross-reference to another Sequence that is not yet uploaded`
+              : `${_.get(
+                  submission,
+                  "broken_x_ref",
+                  ""
+                )} sequences in the Application have the cross-references to other Sequences that are not yet uploaded`}
+          </p>
+
+          <div style={{ marginTop: "20px", textAlign: "right" }}>
+            <OmniButton label="Close" onClick={this.closeCrossrefsModal} />
+          </div>
+        </Modal>
       </React.Fragment>
     );
   }
