@@ -72,8 +72,8 @@ class CustomerCard extends Component {
           <div className="customercard__content__item">
             <img src="/images/users.svg" />
             <span className="customercard__content__item-text">
-              {`${_.get(customer, "number_of_users", "0")} ${_.toLower(
-                translate("label.dashboard.users")
+              {`${_.get(customer, "number_of_users", "0")} ${translate(
+                "label.dashboard.users"
               )}`}
             </span>
           </div>
@@ -81,8 +81,8 @@ class CustomerCard extends Component {
           <div className="customercard__content__item">
             <img src="/images/applications.svg" />
             <span className="customercard__content__item-text">
-              {`${_.get(customer, "number_of_submissions", "0")} ${_.toLower(
-                translate("label.dashboard.applications")
+              {`${_.get(customer, "number_of_submissions", "0")} ${translate(
+                "label.dashboard.applications"
               )}`}
             </span>
           </div>
