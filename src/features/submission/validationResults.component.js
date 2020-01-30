@@ -212,54 +212,59 @@ class ValidationResults extends Component {
                   </tr>
                 </thead>
                 <tbody key={sort}>
-                  {_.map(validationResults, (validation, idx) => {
-                    return (
-                      <tr
-                        key={idx}
-                        onClick={this.onItemSelected(validation, idx)}
-                        className={`global__cursor-pointer ${selected === idx &&
-                          "global__node-selected"}`}
-                      >
-                        <td className="col-node">
-                          <div
-                            style={{ display: "flex", alignItems: "center" }}
-                          >
-                            <span>
-                              {this.getValidationGroupIcon(validation)}
-                            </span>
+                  {validationResults && validationResults.length ? (
+                    _.map(validationResults, (validation, idx) => {
+                      return (
+                        <tr
+                          key={idx}
+                          onClick={this.onItemSelected(validation, idx)}
+                          className={`global__cursor-pointer ${selected ===
+                            idx && "global__node-selected"}`}
+                        >
+                          <td className="col-node">
+                            <div
+                              style={{ display: "flex", alignItems: "center" }}
+                            >
+                              <span>
+                                {this.getValidationGroupIcon(validation)}
+                              </span>
+                              <span
+                                style={{
+                                  wordBreak: "break-word"
+                                }}
+                              >
+                                {_.get(validation, "displayName", "") ||
+                                  (_.size(validation.title) > 0
+                                    ? _.replace(validation.title, " [ ]", "")
+                                    : "")}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="col-error">{validation.error_no}</td>
+                          <td className="col-severity">
+                            <img
+                              src={this.getAlertIcon(validation.severity)}
+                              style={{ marginRight: "8px" }}
+                            />
+                            <span>{validation.severity}</span>
+                          </td>
+                          <td className="col-description">
                             <span
                               style={{
                                 wordBreak: "break-word"
                               }}
                             >
-                              {_.get(validation, "displayName", "") ||
-                                (_.size(validation.title) > 0
-                                  ? _.replace(validation.title, " [ ]", "")
-                                  : "")}
+                              {`${
+                                validation.description
+                              }${validation.extraInfo || ""}`}
                             </span>
-                          </div>
-                        </td>
-                        <td className="col-error">{validation.error_no}</td>
-                        <td className="col-severity">
-                          <img
-                            src={this.getAlertIcon(validation.severity)}
-                            style={{ marginRight: "8px" }}
-                          />
-                          <span>{validation.severity}</span>
-                        </td>
-                        <td className="col-description">
-                          <span
-                            style={{
-                              wordBreak: "break-word"
-                            }}
-                          >
-                            {`${validation.description}${validation.extraInfo ||
-                              ""}`}
-                          </span>
-                        </td>
-                      </tr>
-                    );
-                  })}
+                          </td>
+                        </tr>
+                      );
+                    })
+                  ) : (
+                    <tr>No Errors Found</tr>
+                  )}
                 </tbody>
               </table>
             </div>
