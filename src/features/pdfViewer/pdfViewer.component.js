@@ -3,7 +3,7 @@ import { SERVER_URL, VIEWER } from "../../constants";
 import API from "../../redux/api";
 import { URI } from "../../constants";
 import _ from "lodash";
-import Loader from "../../uikit/components/loader";
+import { Loader, Text } from "../../uikit/components";
 
 class PdfViewer extends Component {
   constructor(props) {
@@ -12,7 +12,8 @@ class PdfViewer extends Component {
       loading: false,
       url: "",
       type: "",
-      largeFile: false
+      largeFile: false,
+      errorMsg: false
     };
   }
 
@@ -21,25 +22,30 @@ class PdfViewer extends Component {
     let largeFile = false;
     this.setState({ loading: true });
     if (params.fileId) {
-      const res = await API.get(URI.GET_FILE_SIZE, {
-        params: {
-          fileId: params.fileId
+      try {
+        const res = await API.get(URI.GET_FILE_SIZE, {
+          params: {
+            fileId: params.fileId
+          }
+        });
+        const { data } = res.data;
+        const fileSize = Number(data);
+        if (
+          params.type === "doc" ||
+          params.type === "docx" ||
+          params.type === "ppt"
+        ) {
+          if (fileSize > VIEWER.OFFICE_VIEWER_MAX_SIZE) {
+            largeFile = true;
+          }
+        } else if (params.type === "xml") {
+          if (fileSize > VIEWER.GOOGLE_VIEWER_MAX_SIZE) {
+            largeFile = true;
+          }
         }
-      });
-      const { data } = res.data;
-      const fileSize = Number(data);
-      if (
-        params.type === "doc" ||
-        params.type === "docx" ||
-        params.type === "ppt"
-      ) {
-        if (fileSize > VIEWER.OFFICE_VIEWER_MAX_SIZE) {
-          largeFile = true;
-        }
-      } else if (params.type === "xml") {
-        if (fileSize > VIEWER.GOOGLE_VIEWER_MAX_SIZE) {
-          largeFile = true;
-        }
+      } catch (err) {
+        console.log();
+        this.setState({ loading: false, errorMsg: true });
       }
     }
     let reqParam = this.props.location.search;
@@ -69,11 +75,19 @@ class PdfViewer extends Component {
   }
 
   render() {
-    const { url: mainFileUrl, type, loading, largeFile } = this.state;
+    const { url: mainFileUrl, type, loading, largeFile, errorMsg } = this.state;
     let url = `${window.location.origin}/web/viewer.html?file=${mainFileUrl}`;
 
     if (loading) {
       return <Loader loading={loading} />;
+    }
+    //if there is no file
+    if (errorMsg) {
+      return (
+        <>
+          <Text type="extra_bold" size="15px" text="File not Found" />
+        </>
+      );
     }
 
     // xml is also throwing to browser, since xml has particular xslt
