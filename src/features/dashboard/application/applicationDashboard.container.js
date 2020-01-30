@@ -241,19 +241,17 @@ class ApplicationDashboard extends Component {
       const results = _.get(data, "result");
       if (_.get(data, "result.length")) {
         this.checkSequenceStatus(_.get(data, "result", null), submission);
-      } else {
-        if (_.isArray(results)) {
-          const timeout = setTimeout(() => {
-            this.startPolling(submission);
-          }, POLLING_INTERVAL);
-          this.intervals.set(uuid(), timeout);
-        }
-        const interval = this.intervals.get(submission.id);
-        if (interval) {
-          clearInterval(interval);
-          this.intervals.delete(interval);
-        }
-      }
+      } 
+      // else {
+      //   if (_.isArray(results)) {
+      //     return
+      //   }
+      //   const interval = this.intervals.get(submission.id);
+      //   if (interval) {
+      //     clearInterval(interval);
+      //     this.intervals.delete(interval);
+      //   }
+      // }
     }
   };
 
