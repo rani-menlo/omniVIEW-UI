@@ -382,12 +382,12 @@ class SubmissionCard extends Component {
           </div>
           <p>
             {_.get(submission, "broken_x_ref", "") == 1
-              ? `A sequence in the Application has a cross-reference to another Sequence that is not yet uploaded`
+              ? `A Sequence in the Application has a cross-reference to another Sequence that is not yet uploaded`
               : `${_.get(
                   submission,
                   "broken_x_ref",
                   ""
-                )} sequences in the Application have the cross-references to other Sequences that are not yet uploaded`}
+                )} Sequences in the Application have the cross-references to other Sequences that are not yet uploaded`}
           </p>
 
           <div style={{ marginTop: "20px", textAlign: "right" }}>
