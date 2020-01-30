@@ -35,6 +35,13 @@
     table {
       width: 100%;
     }
+    .no_validation_sequences {
+      display: block;
+      margin-top: 0 auto;
+      margin: 40% 125%;
+      width: 100%;
+    }
+
     &__header {
       width: 100%;
     }
@@ -141,7 +148,7 @@
       right: 0px !important;
     }
     > input {
-      padding-left: 20px !important
+      padding-left: 20px !important;
     }
   }
 }
