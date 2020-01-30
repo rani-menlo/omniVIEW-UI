@@ -61,7 +61,8 @@ class AddNewApplication extends Component {
       proceedToAppDetails: false,
       checkedAll: false,
       showCheckAll: false,
-      showInvalidSeqFooter: false
+      showInvalidSeqFooter: false,
+      selectedFolderPath: ""
     };
   }
 
@@ -307,7 +308,7 @@ class AddNewApplication extends Component {
       selectedFolderError: "",
       showInvalidSeqFooter: false
     });
-    let { path, isAddingSequence } = this.state;
+    let { path, isAddingSequence, selectedFolderPath } = this.state;
     let { selectedCustomer, selectedSubmission } = this.props;
     path = `${path}/${_.get(selectedFolder, "name", "")}`;
     path = _.replace(path, new RegExp("//", "g"), "/");
@@ -372,6 +373,7 @@ class AddNewApplication extends Component {
       customer_id: this.props.selectedCustomer.id,
       ftp_path: path
     });
+    selectedFolderPath = path;
     let { error, data, message } = res.data;
     if (error) {
       this.setState({ selectedFolderError: message }, this.hideLoading);
@@ -385,6 +387,7 @@ class AddNewApplication extends Component {
     //we are removing the last selectedFolder from path once we get the response
     path = path.substring(0, path.lastIndexOf("/"));
     const newState = {
+      selectedFolderPath,
       path,
       appType,
       appNumber,
@@ -454,7 +457,7 @@ class AddNewApplication extends Component {
     obj.cloud_type_id = 1;
     obj.additional_details = {
       auth_id: this.state.auth_id,
-      submission_path: this.state.path
+      submission_path: this.state.selectedFolderPath
     };
     this.showLoading();
     const res = await ApplicationApi.saveSubmissionDetails(obj);
