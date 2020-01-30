@@ -422,14 +422,15 @@ class TreeNode extends Component {
           }
         }
         //removed this piece of code inorder to display both new and appended files
-        //in both current view and life cycle view
-        // let modifiedFile = leaf["modified-file"];
-        // modifiedFile =
-        //   modifiedFile &&
-        //   modifiedFile.substring(modifiedFile.lastIndexOf("#") + 1);
-        // if (modifiedFile === itemId) {
-        //   _.remove(newArray, { ID: itemId });
-        // }
+        //in both current view and life cycle view - OMNG-568
+        //Need to check for appended and latest files in Current view - Sprint-21
+        let modifiedFile = leaf["modified-file"];
+        modifiedFile =
+          modifiedFile &&
+          modifiedFile.substring(modifiedFile.lastIndexOf("#") + 1);
+        if (modifiedFile === itemId) {
+          _.remove(newArray, { ID: itemId });
+        }
       });
     });
     return newArray;
