@@ -476,7 +476,7 @@ class UserManagementContainer extends Component {
   };
 
   closeActivateDeactivateModal = () => {
-    this.setState({ showDeactivateModal: false, selectedUser: null });
+    this.setState({ showDeactivateModal: false });
   };
 
   activateDeactivate = () => {
