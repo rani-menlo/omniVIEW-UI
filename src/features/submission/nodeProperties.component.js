@@ -799,7 +799,9 @@ class NodeProperties extends Component {
         </RowItems>
         <RowItems>
           <div className="label">Company ID:</div>
-          <div className="value">{_.get(applicantInfo, "id", "")}</div>
+          <div className="value">
+            {!_.isEmpty(_.get(applicantInfo)) ? _.get(applicantInfo) : ""}
+          </div>
         </RowItems>
         <div className="global__hr-line" style={{ background: "#bfc4c7" }} />
         {_.map(this.getContacts(applicantInfo), contact => {
