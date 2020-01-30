@@ -372,7 +372,7 @@ class SubmissionCard extends Component {
             <Text
               type="extra_bold"
               size="16px"
-              text="Additional Information - Cross-Reference Sequences Not Found"
+              text="Information: Cross-referenced Sequences Not Found"
             />
             <img
               src="/images/close.svg"
