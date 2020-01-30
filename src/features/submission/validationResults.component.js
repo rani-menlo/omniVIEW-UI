@@ -212,7 +212,7 @@ class ValidationResults extends Component {
                   </tr>
                 </thead>
                 <tbody key={sort}>
-                  {!validationResults && !validationResults.length ? (
+                  {validationResults && validationResults.length ? (
                     _.map(validationResults, (validation, idx) => {
                       return (
                         <tr

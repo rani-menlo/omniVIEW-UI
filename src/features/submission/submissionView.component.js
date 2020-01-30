@@ -991,7 +991,7 @@ class SubmissionView extends Component {
               <div className="submissionview__profilebar__title">
                 <img
                   src="/images/omniview-cloud.svg"
-                  style={{ height: "25px", width: "106px" }}
+                  style={{ height: "25px", width: "105px" }}
                 />
               </div>
               <div className="submissionview__profilebar__section">
