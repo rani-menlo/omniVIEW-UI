@@ -5,8 +5,9 @@ const Footer = ({ alignToBottom }) => (
     className="footer"
     style={alignToBottom && { position: "absolute", bottom: 0, width: "100%" }}
   >
-    Copyright &copy; 2003-2019 Omnicia Inc. &nbsp;&nbsp;&nbsp;&nbsp; Terms of
-    Use &nbsp;&nbsp;&nbsp;&nbsp; Privacy Policy
+    Copyright &copy; 2003-{new Date().getFullYear()} Omnicia Inc.
+    &nbsp;&nbsp;&nbsp;&nbsp; Terms of Use &nbsp;&nbsp;&nbsp;&nbsp; Privacy
+    Policy
   </div>
 );
 
