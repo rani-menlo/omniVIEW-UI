@@ -401,7 +401,7 @@ class AddNewApplication extends Component {
     if (invalidSequences && !validSequences) {
       newState.invalidSeqError = "";
       newState.selectedFolderError =
-        "Invalid Application folder. Please select an Application Type folder.";
+        "Invalid Application folder. Please select an Application folder that has at least one valid Sequence to upload.";
     }
     if (!validSequences) {
       newState.showInvalidSeqFooter = true;
