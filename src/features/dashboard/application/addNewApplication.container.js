@@ -308,6 +308,7 @@ class AddNewApplication extends Component {
       selectedFolderError: "",
       showInvalidSeqFooter: false
     });
+
     let { path, isAddingSequence, selectedFolderPath } = this.state;
     let { selectedCustomer, selectedSubmission } = this.props;
     path = `${path}/${_.get(selectedFolder, "name", "")}`;
@@ -366,6 +367,9 @@ class AddNewApplication extends Component {
         );
         return;
       }
+    }
+    if (!selectedFolder) {
+      return;
     }
     this.showLoading();
     // adding submission
