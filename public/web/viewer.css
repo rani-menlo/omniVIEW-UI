@@ -2387,6 +2387,18 @@ html[dir="rtl"] #documentPropertiesOverlay .row > * {
   display: none;
 }
 
+.toolbarButton.download::before,
+.toolbarButton.print::before {
+  display: none;
+}
+
+#download {
+  display: none;
+}
+#print {
+  display: none;
+}
+
 @media all and (max-width: 900px) {
   #toolbarViewerMiddle {
     display: table;
