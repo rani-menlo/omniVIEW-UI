@@ -393,9 +393,15 @@ class AddNewApplication extends Component {
       appNumber,
       validSequences
     };
+
     if (invalidSequences) {
       newState.invalidSeqError = "An issue occurred during upload.";
       newState.addApplicationinvalidSeq = addApplicationinvalidSeq;
+    }
+    if (invalidSequences && !validSequences) {
+      newState.invalidSeqError = "";
+      newState.selectedFolderError =
+        "Invalid Application folder. Please select an Application Type folder.";
     }
     if (!validSequences) {
       newState.showInvalidSeqFooter = true;
@@ -417,6 +423,7 @@ class AddNewApplication extends Component {
   };
 
   getSubmissionLookupData = async () => {
+    let path = this.state.selectedFolderPath;
     this.showLoading();
     let res = await ApplicationApi.getSubmissionLookupInfo();
     let { error, data, message } = res.data;
@@ -442,7 +449,8 @@ class AddNewApplication extends Component {
         application_types,
         cloud_types,
         regions,
-        submission_centers
+        submission_centers,
+        path
       },
       this.hideLoading
     );
