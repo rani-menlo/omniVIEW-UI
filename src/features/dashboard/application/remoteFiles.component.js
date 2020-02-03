@@ -17,6 +17,7 @@ class RemoteFiles extends Component {
 
   openContents = file => () => {
     this.props.openContents && this.props.openContents(file);
+    this.setState({ selected: null });
   };
 
   goBack = () => {
@@ -24,7 +25,9 @@ class RemoteFiles extends Component {
   };
 
   submit = () => {
-    this.props.submit && this.props.submit(this.state.selected);
+    if (this.state.selected) {
+      this.props.submit && this.props.submit(this.state.selected);
+    }
   };
 
   //triggers when a checkbox is checked
