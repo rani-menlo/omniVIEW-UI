@@ -379,6 +379,10 @@ class AddNewApplication extends Component {
     });
     selectedFolderPath = path;
     let { error, data, message } = res.data;
+    if (message == "Invalid folder. Please select a Submission folder.") {
+      message =
+        "Invalid Application folder. Please select an Application folder that has at least one valid Sequence to upload.";
+    }
     if (error) {
       this.setState({ selectedFolderError: message }, this.hideLoading);
       return;
