@@ -428,8 +428,11 @@ class TreeNode extends Component {
         modifiedFile =
           modifiedFile &&
           modifiedFile.substring(modifiedFile.lastIndexOf("#") + 1);
-        if (modifiedFile === itemId) {
-          _.remove(newArray, { ID: itemId });
+        //removing the files except appended files
+        if (leaf["operation"] != "append") {
+          if (modifiedFile === itemId) {
+            _.remove(newArray, { ID: itemId });
+          }
         }
       });
     });
