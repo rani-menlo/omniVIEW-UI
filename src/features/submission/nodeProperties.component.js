@@ -245,7 +245,8 @@ class NodeProperties extends Component {
                                       <Text
                                         type="regular"
                                         size="12px"
-                                        text={studyCateg.value || ""}
+                                        // text={studyCateg.value || ""}
+                                        text={`[${studyCateg["$t"]}]`}
                                       />
                                     </td>
                                   </tr>
