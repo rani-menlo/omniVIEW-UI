@@ -8,6 +8,7 @@
     }
   }
   &__header {
+    margin-bottom: 20px;
     @include text-bold-active(30px);
     text-align: center;
     &-addButton {
