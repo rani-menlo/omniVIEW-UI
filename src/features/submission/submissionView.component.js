@@ -647,8 +647,7 @@ class SubmissionView extends Component {
       const label = `${_.get(item, "name", "")}_${_.get(item, "title", "")}`;
       const folderID = _.get(item, "folderID", "");
       const key = folderID ? folderID : label;
-      let node =
-        this.treeNodesMap.get(item.ID) || this.treeNodesMap.get(key);
+      let node = this.treeNodesMap.get(item.ID) || this.treeNodesMap.get(key);
       return node;
     } else {
       let node = this.treeNodesMap.entries().next(0).value;
@@ -1223,6 +1222,7 @@ class SubmissionView extends Component {
                   <div className="panels__tree__permissions">
                     <Row>
                       <ImageLoader
+                        key={_.get(this.state.selectedUser, "profile")}
                         path={_.get(this.state.selectedUser, "profile")}
                         width="35px"
                         height="35px"
