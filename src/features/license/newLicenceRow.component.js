@@ -85,7 +85,7 @@ class NewLicenceRow extends Component {
   };
 
   render() {
-    const { applications, durations } = this.props;
+    const { applications, durations, rows } = this.props;
     const { application, duration, quantity } = this.state;
     return (
       <div className="newlicence">
@@ -119,12 +119,14 @@ class NewLicenceRow extends Component {
           onChange={this.onQuantityChange}
           limit={999}
         />
-        <Icon
-          type="minus-circle"
-          theme="filled"
-          onClick={this.remove}
-          className="newlicence-remove"
-        />
+        {rows.length > 1 && (
+          <Icon
+            type="minus-circle"
+            theme="filled"
+            onClick={this.remove}
+            className="newlicence-remove"
+          />
+        )}
       </div>
     );
   }

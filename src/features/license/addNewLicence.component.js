@@ -119,6 +119,7 @@ class AddNewLicence extends Component {
               applications={lookupLicences.types}
               durations={lookupLicences.licences}
               removeRow={this.removeRow}
+              rows={this.state.rows}
             />
           ))}
         </div>
@@ -169,7 +170,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(AddNewLicence);
+export default connect(mapStateToProps, mapDispatchToProps)(AddNewLicence);
