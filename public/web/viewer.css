@@ -2383,21 +2383,32 @@ html[dir="rtl"] #documentPropertiesOverlay .row > * {
 }
 
 .toolbarButton.download,
-.toolbarButton.print {
+.toolbarButton.print,
+.toolbarButton.openFile,
+.toolbarButton.bookmark {
   display: none;
 }
 
 .toolbarButton.download::before,
-.toolbarButton.print::before {
+.toolbarButton.print::before,
+.toolbarButton.openFile::before,
+.toolbarButton.bookmark::before {
   display: none;
 }
 
-#download {
+#download,
+#print,
+#openFile,
+#viewBookmark {
   display: none;
 }
-#print {
+/* #print {
   display: none;
 }
+
+#openFile {
+  display: none;
+} */
 
 @media all and (max-width: 900px) {
   #toolbarViewerMiddle {
