@@ -287,7 +287,16 @@ class AddUser extends Component {
     const checked = e.target.checked;
     let newLicences = [...this.state.licences];
     const idx = _.findIndex(newLicences, li => li.id === licence.id);
-    if (!checked) {
+    if (checked) {
+      //removing checked property from all objects in licenses array
+      newLicences = _.map(newLicences, licence => _.omit(licence, "checked"));
+      newLicences[idx].checked = checked;
+      this.setState({
+        licences: newLicences,
+        selectedLicences: [newLicences[idx]],
+        selectedLicenceError: ""
+      });
+    } else {
       newLicences[idx].checked = checked;
       const newSelectedLicences = [...this.state.selectedLicences];
       _.remove(newSelectedLicences, li => li.id === licence.id);
@@ -295,19 +304,6 @@ class AddUser extends Component {
         licences: newLicences,
         selectedLicences: newSelectedLicences
       });
-    } else {
-      const checkedLicecnce = _.map(
-        this.state.selectedLicences,
-        licence.app_name
-      );
-      if (!checkedLicecnce.length) {
-        newLicences[idx].checked = checked;
-        this.setState({
-          licences: newLicences,
-          selectedLicences: [...this.state.selectedLicences, newLicences[idx]],
-          selectedLicenceError: ""
-        });
-      }
     }
   };
 
@@ -352,9 +348,13 @@ class AddUser extends Component {
               className="maindashboard-breadcrum"
               style={{ opacity: 0.4, cursor: "not-allowed" }}
             >
-              {`${translate("label.usermgmt.add")} ${translate(
+              {/* {`${translate("label.usermgmt.add")} ${translate(
                 "label.dashboard.user"
-              )}`}
+              )}`} */}
+              {editUser
+                ? translate("label.usermgmt.edit")
+                : translate("label.usermgmt.add")}{" "}
+              {translate("label.dashboard.user")}
             </span>
           </div>
           <p className="addUser-title">
@@ -478,35 +478,38 @@ class AddUser extends Component {
               </div>
             </React.Fragment>
           )}
-          {
-            editUser && 
-            _.get(selectedUser, "role_id") !== 1 &&
+          {editUser && _.get(selectedUser, "role_id") !== 1 && (
             <p className="addUser-heading">
-            {translate("label.usermgmt.licensestatus")}:
-            <span
-              className={`userManagement__group__users__user__info-text-${
-                _.get(selectedUser, "license_status", 0) ? "active" : "inactive"
-              }`}
-            >
-              {_.get(selectedUser, "license_status", 0)
-                ? ` ${translate("label.user.active")}`
-                : ` ${translate("label.user.inactive")}`}
-            </span>
-          </p>
-          }
+              {translate("label.usermgmt.licensestatus")}:
+              <span
+                className={`userManagement__group__users__user__info-text-${
+                  _.get(selectedUser, "license_status", 0)
+                    ? "active"
+                    : "inactive"
+                }`}
+              >
+                {_.get(selectedUser, "license_status", 0)
+                  ? ` ${translate("label.user.active")}`
+                  : ` ${translate("label.user.inactive")}`}
+              </span>
+            </p>
+          )}
 
-        {(selectedUser !== 1 && editUser && _.get(selectedUser, "role_id") !== 1) ? (
-        <React.Fragment>
-          <p className="addUser-heading">
-            {`${translate("label.usermgmt.expires")}: ${
-              _.get(selectedUser, "license_status")
-                ? getFormattedDate(_.get(selectedUser, "expiryDate"))
-                : "N/A"
-            }`}
-          </p>
-        </React.Fragment> )  : (
-          ""
-        )}
+          {selectedUser !== 1 &&
+          editUser &&
+          _.get(selectedUser, "role_id") !== 1 ? (
+            <React.Fragment>
+              <p className="addUser-heading">
+                {`${translate("label.usermgmt.expires")}: ${
+                  _.get(selectedUser, "license_status")
+                    ? getFormattedDate(_.get(selectedUser, "expiryDate"))
+                    : "N/A"
+                }`}
+              </p>
+            </React.Fragment>
+          ) : (
+            ""
+          )}
           <div className="addUser__section">
             <p className="addUser__section-label">
               {translate("text.user.selectrolemsg")}
@@ -545,7 +548,7 @@ class AddUser extends Component {
               ))}
             </RadioGroup>
           </div>
-          
+
           {!editUser && (
             <React.Fragment>
               <p className="addUser__section addUser__section-label">
@@ -712,7 +715,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(AddUser);
+export default connect(mapStateToProps, mapDispatchToProps)(AddUser);
