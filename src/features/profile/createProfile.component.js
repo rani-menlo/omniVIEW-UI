@@ -16,7 +16,7 @@ import { translate } from "../../translations/translator";
 import { isEmail, isPhone, isValidPwd } from "../../utils";
 import { LoginActions } from "../../redux/actions";
 import { Upload, Avatar, Checkbox } from "antd";
-import { IMAGE_SUPPORT_TYPES } from "../../constants";
+import { IMAGE_SUPPORT_TYPES, DEBOUNCE_TIME } from "../../constants";
 
 class CreateProfile extends Component {
   constructor(props) {
@@ -93,9 +93,16 @@ class CreateProfile extends Component {
   onInputChange = field => e => {
     this.clearUsernameError();
     const { value } = e.target;
-    this.setState({
-      [field]: { ...this.state[field], value, error: "" }
-    });
+    this.setState(
+      {
+        [field]: { ...this.state[field], value, error: "" }
+      },
+      () => {
+        if (field == "username") {
+          this.changeUsername();
+        }
+      }
+    );
   };
 
   onPhoneChange = value => {
@@ -296,7 +303,7 @@ class CreateProfile extends Component {
     this.uploadContainer.current.click();
   };
 
-  onUsernameBlur = () => {
+  changeUsername = _.debounce(() => {
     let { username } = this.state;
     let { user } = this.props;
     // Not triggering the api call if the logged in person enters
@@ -319,7 +326,7 @@ class CreateProfile extends Component {
         )
       );
     }
-  };
+  }, DEBOUNCE_TIME);
 
   render() {
     const {
@@ -388,7 +395,7 @@ class CreateProfile extends Component {
                 placeholder={translate("label.form.username")}
                 error={username.error || usernameExists}
                 onChange={this.onInputChange("username")}
-                onBlur={this.onUsernameBlur}
+                //onBlur={this.onUsernameBlur}
               />
             </div>
             {editProfile && !showChangePassword && (
