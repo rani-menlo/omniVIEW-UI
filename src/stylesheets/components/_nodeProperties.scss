@@ -19,7 +19,7 @@
 
     .label {
       @include text-normal(12px);
-      color: rgba($black, 0.5);
+      color: rgba($black, 1);
       width: 40%;
     }
 
@@ -54,8 +54,8 @@
         border-top: solid 1px $ash-blue;
         border-bottom: solid 1px $ash-blue;
         > th {
-          @include text-normal(12px);
-          opacity: 0.5;
+          @include text-bold(12px);
+          //opacity: 0.5;
           padding: 6px 12px;
           border-right: solid 1px $ash-blue;
         }
