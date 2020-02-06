@@ -714,6 +714,11 @@ class SubmissionView extends Component {
     } else if (_.get(node, "[state][properties][dtd-version]")) {
       const label = this.getSequenceLabel();
       this.treeNodesMap.set(`${label}_${label}`, node);
+    } else if (_.get(node, "[state][properties][folder]") == "us") {
+      const name = _.get(node, "state.properties.name", "");
+      const title = _.get(node, "state.properties.title", "");
+      const label = `${name}_${title}`;
+      this.treeNodesMap.set(label, node);
     } else {
       const name = _.get(node, "state.properties.name", "");
       const title = _.get(node, "state.properties.title", "");
