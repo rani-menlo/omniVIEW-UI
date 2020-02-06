@@ -241,7 +241,7 @@ class ApplicationDashboard extends Component {
       const results = _.get(data, "result");
       if (_.get(data, "result.length")) {
         this.checkSequenceStatus(_.get(data, "result", null), submission);
-      } 
+      }
       // else {
       //   if (_.isArray(results)) {
       //     return
@@ -996,8 +996,7 @@ class ApplicationDashboard extends Component {
                           disabled={
                             submission.is_uploading ||
                             submission.analyzing ||
-                            _.get(submission, "sequence_failed.length") ||
-                            true
+                            _.get(submission, "sequence_failed.length")
                           }
                           checked={submission.checked}
                           onCheckboxChange={this.onCheckboxChange(submission)}

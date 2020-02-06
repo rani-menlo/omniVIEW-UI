@@ -292,10 +292,10 @@ class UserManagementContainer extends Component {
             </Menu.Item>
           )}
         <Menu.Item
-          className="maindashboard__list__item-dropdown-menu-item"
+          className={`maindashboard__list__item-dropdown-menu-item ${this.props
+            .user.id === usr.user_id && "disabled"}`}
           onClick={this.openActivateDeactivateModal(usr)}
           disabled={this.props.user.id === usr.user_id}
-          style={{ opacity: "0.2" }}
         >
           <p
             style={{
