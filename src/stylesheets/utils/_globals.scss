@@ -141,3 +141,8 @@
 p {
   margin-bottom: 1px !important;
 }
+
+.disabled {
+  opacity: 0.2;
+  cursor: not-allowed !important;
+}

@@ -44,7 +44,7 @@ class AssignPermissions extends Component {
         this.props.dispatch(
           UsermanagementActions.fetchUsers({
             customerId: selectedCustomer.id,
-            includeLoggedInUser: false,
+            includeLoggedInUser: false
           })
         );
         return;
@@ -308,7 +308,9 @@ class AssignPermissions extends Component {
               <Dropdown
                 overlay={this.getMenu}
                 trigger={["click"]}
-                className="assign-permissions-modal__subheader__dropdown"
+                className={`assign-permissions-modal__subheader__dropdown ${!this
+                  .state.users.length && "disabled"}`}
+                disabled={!this.state.users.length}
               >
                 <div>
                   <Text
@@ -334,7 +336,8 @@ class AssignPermissions extends Component {
                     ? "sort-ascending"
                     : "sort-descending"
                 }
-                onClick={this.sort}
+                className={`${!this.state.users.length && "disabled"}`}
+                onClick={this.state.users.length && this.sort}
                 style={{ fontSize: "24px", marginRight: "10px" }}
               />
             </div>
@@ -398,6 +401,16 @@ class AssignPermissions extends Component {
                     </div>
                   );
                 })}
+              {!this.state.users.length && (
+                <Row className="maindashboard__nodata">
+                  <Text
+                    type="regular"
+                    size="14px"
+                    text="No Users Found"
+                    textStyle={{ marginTop: "45px" }}
+                  />
+                </Row>
+              )}
               {this.state.noUsersError && (
                 <Row className="maindashboard__nodata">
                   <Icon
@@ -425,6 +438,7 @@ class AssignPermissions extends Component {
             label="Update"
             buttonStyle={{ width: "120px" }}
             onClick={this.update}
+            disabled={!this.state.users.length}
           />
         </div>
       </Modal>
@@ -446,7 +460,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(AssignPermissions);
+export default connect(mapStateToProps, mapDispatchToProps)(AssignPermissions);
