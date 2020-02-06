@@ -43,7 +43,8 @@ class AssignPermissions extends Component {
       if (assignGlobalPermissions) {
         this.props.dispatch(
           UsermanagementActions.fetchUsers({
-            customerId: selectedCustomer.id
+            customerId: selectedCustomer.id,
+            includeLoggedInUser: false,
           })
         );
         return;

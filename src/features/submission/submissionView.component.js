@@ -586,6 +586,7 @@ class SubmissionView extends Component {
           customerId: selectedCustomer.id,
           submissionId: selectedSubmission.id,
           isOmnicia: true,
+          includeLoggedInUser: false,
           ...filters
         })
       );

@@ -43,6 +43,7 @@ class AssignLicenceWithUsers extends Component {
         this.props.dispatch(
           UsermanagementActions.fetchUsers({
             customerId: this.props.selectedCustomer.id,
+            includeLoggedInUser: false,
             roles: _.values(ROLE_IDS.OMNICIA) 
           })
         ); 
@@ -50,6 +51,7 @@ class AssignLicenceWithUsers extends Component {
         this.props.dispatch(
           UsermanagementActions.fetchUsers({
             customerId: selectedCustomer.id,
+            includeLoggedInUser: false,
             roles: _.values(ROLE_IDS.CUSTOMER)
           })
         );

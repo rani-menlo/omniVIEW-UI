@@ -378,6 +378,7 @@ class UserManagementContainer extends Component {
                 search: searchText,
                 page: pageNo,
                 limit: itemsPerPage,
+                includeLoggedInUser: true,
                 ...this.selectedFilters
               })
             );
@@ -386,6 +387,7 @@ class UserManagementContainer extends Component {
               UsermanagementActions.fetchUsers({
                 customerId: selectedCustomer.id,
                 search: searchText,
+                includeLoggedInUser: true,
                 isList: false, //backend team needs this flag for sorting the list based on the lastest updated user
                 ...this.selectedFilters
               })

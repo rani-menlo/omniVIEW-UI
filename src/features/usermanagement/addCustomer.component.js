@@ -273,6 +273,7 @@ class AddCustomer extends Component {
     this.props.dispatch(
       UsermanagementActions.fetchUsers({
         customerId: customer.id,
+        includeLoggedInUser: false,
         roles: _.values(ROLE_IDS.CUSTOMER)
       })
     );
@@ -282,6 +283,7 @@ class AddCustomer extends Component {
     this.props.dispatch(
       UsermanagementActions.fetchUsers({
         customerId: customer.id,
+        includeLoggedInUser: false,
         roles: _.values(ROLE_IDS.OMNICIA)
       })
     );
