@@ -294,6 +294,8 @@ class UserManagementContainer extends Component {
         <Menu.Item
           className="maindashboard__list__item-dropdown-menu-item"
           onClick={this.openActivateDeactivateModal(usr)}
+          disabled={this.props.user.id !== usr.user_id}
+          style={{ opacity: "0.2" }}
         >
           <p
             style={{
@@ -1106,6 +1108,7 @@ function mapStateToProps(state) {
     loading: state.Api.loading,
     role: state.Login.role,
     selectedCustomer: state.Customer.selectedCustomer,
+    user: state.Login.user,
     users: state.Usermanagement.users,
     usersCount: state.Usermanagement.usersCount
   };
