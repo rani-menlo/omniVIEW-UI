@@ -170,6 +170,7 @@ const PDF_ROUTER = "viewer/pdf";
             ),
             scaleSelect: document.getElementById("scaleSelect"),
             customScaleOption: document.getElementById("customScaleOption"),
+            previous_view: document.getElementById("previous_view"),
             previous: document.getElementById("previous"),
             next: document.getElementById("next"),
             zoomIn: document.getElementById("zoomIn"),
@@ -470,6 +471,7 @@ const PDF_ROUTER = "viewer/pdf";
       };
       var PDFViewerApplication = {
         initialBookmark: document.location.hash.substring(1),
+        previousVisitedPage: 0,
         initialized: false,
         fellback: false,
         appConfig: null,
@@ -1082,9 +1084,9 @@ const PDF_ROUTER = "viewer/pdf";
         get page() {
           return this.pdfViewer.currentPageNumber;
         },
-        get printing() {
-          return !!this.printService;
-        },
+        // get printing() {
+        //   return !!this.printService;
+        // },
         get supportsPrinting() {
           return PDFPrintServiceFactory.instance.supportsPrinting;
         },
@@ -1261,10 +1263,12 @@ const PDF_ROUTER = "viewer/pdf";
                         //custom data  Feb 1 2019
                         parameters.docBaseUrl = SERVER_URL;
                         // adding token as custom header
-                        const token = localStorage.getItem('omniview_user_token');
+                        const token = localStorage.getItem(
+                          "omniview_user_token"
+                        );
                         console.log("****", token);
                         const header = {
-                          'x-auth-token': token
+                          "x-auth-token": token
                         };
                         parameters.httpHeaders = header;
                         if (typeof file === "string") {
@@ -1984,6 +1988,7 @@ const PDF_ROUTER = "viewer/pdf";
           eventBus.on("lastpage", webViewerLastPage);
           eventBus.on("nextpage", webViewerNextPage);
           eventBus.on("previouspage", webViewerPreviousPage);
+          eventBus.on("previous_view", webViewerPreviousView);
           eventBus.on("zoomin", webViewerZoomIn);
           eventBus.on("zoomout", webViewerZoomOut);
           eventBus.on("pagenumberchanged", webViewerPageNumberChanged);
@@ -2527,6 +2532,11 @@ const PDF_ROUTER = "viewer/pdf";
       function webViewerPreviousPage() {
         PDFViewerApplication.page--;
       }
+      function webViewerPreviousView() {
+        let page = Number(PDFViewerApplication.previousVisitedPage);
+        PDFViewerApplication.toolbar.setPageNumber(page);
+        PDFViewerApplication.page = page;
+      }
       function webViewerZoomIn() {
         PDFViewerApplication.zoomIn();
       }
@@ -2693,6 +2703,9 @@ const PDF_ROUTER = "viewer/pdf";
         originalString = originalString.split("fileid=");
         var fileId = "";
         console.log("originalString", originalString);
+        // if (evt.target.tagName == "A") {
+        //   PDFViewerApplication.previousVisitedPage = PDFViewerApplication.pdfViewer.currentPageNumber
+        // }
         if (originalString.length > 1) {
           fileId = originalString[1];
         } else {
@@ -2707,8 +2720,8 @@ const PDF_ROUTER = "viewer/pdf";
         hrefsublink = hrefsublink.replace(SERVER_URL, "");
 
         var orginal = `${SERVER_URL}/${PDF_ROUTER}?fileid=${fileId}&path=${hrefsublink}`;
-
         console.log("after---->", orginal);
+        
 
         if (evt.target.href) {
           var evthtml = evt.target.outerHTML;
@@ -11455,6 +11468,11 @@ const PDF_ROUTER = "viewer/pdf";
           {
             key: "_setCurrentPageNumber",
             value: function _setCurrentPageNumber(val) {
+              //setting the previously visited page number
+              if(this._currentPageNumber != val) {
+                console.log("_setCurrentPageNumber", this._currentPageNumber);
+                PDFViewerApplication.previousVisitedPage = this._currentPageNumber;
+              }
               var resetCurrentPageView =
                 arguments.length > 1 && arguments[1] !== undefined
                   ? arguments[1]
@@ -14620,6 +14638,7 @@ const PDF_ROUTER = "viewer/pdf";
           {
             key: "setPageNumber",
             value: function setPageNumber(pageNumber, pageLabel) {
+              console.log("setPageNumber", pageNumber);
               this.pageNumber = pageNumber;
               this.pageLabel = pageLabel;
               this._updateUIState(false);
@@ -14659,11 +14678,13 @@ const PDF_ROUTER = "viewer/pdf";
               var _this = this;
 
               var eventBus = this.eventBus,
-                items = this.items;
-
+              items = this.items;
               var self = this;
               items.previous.addEventListener("click", function() {
                 eventBus.dispatch("previouspage", { source: self });
+              });
+              items.previous_view.addEventListener("click", function() {
+                eventBus.dispatch("previous_view", { source: self });
               });
               items.next.addEventListener("click", function() {
                 eventBus.dispatch("nextpage", { source: self });
@@ -17235,7 +17256,6 @@ const PDF_ROUTER = "viewer/pdf";
         },
         renderPages: function renderPages() {
           var _this = this;
-
           var pageCount = this.pagesOverview.length;
           var renderNextPage = function renderNextPage(resolve, reject) {
             _this.throwIfInactive();
