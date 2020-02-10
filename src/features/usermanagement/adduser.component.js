@@ -312,7 +312,13 @@ class AddUser extends Component {
   };
 
   render() {
-    const { departments, loading, selectedUser, selectedCustomer } = this.props;
+    const {
+      departments,
+      loading,
+      selectedUser,
+      selectedCustomer,
+      user
+    } = this.props;
     const {
       fname,
       lname,
@@ -459,6 +465,9 @@ class AddUser extends Component {
                     size="small"
                     onClick={this.onStatusClick}
                     checked={statusActive}
+                    disabled={
+                      _.get(selectedUser, "user_id") == _.get(user, "id")
+                    }
                   />
                   <p
                     className={`addUser__account__status-${
@@ -703,6 +712,7 @@ function mapStateToProps(state) {
     loading: state.Api.loading,
     selectedUser: state.Usermanagement.selectedUser,
     role: state.Login.role,
+    user: state.Login.user,
     departments: state.Usermanagement.departments,
     licences: state.Usermanagement.licences,
     selectedCustomer: state.Customer.selectedCustomer
