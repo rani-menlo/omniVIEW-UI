@@ -72,6 +72,7 @@ class NodeSequenceTree extends Component {
       viewPermissions,
       onCheckboxChange
     } = this.props;
+    const childsArray = _.sortBy(_.get(sequence, "childs"), "name") || []
     return (
       <React.Fragment>
         <div
@@ -110,7 +111,7 @@ class NodeSequenceTree extends Component {
           </span>
         </div>
         {this.state.expand &&
-          _.map(sequence.childs, seq => (
+          _.map(childsArray, seq => (
             <NodeSequenceTree
               key={seq.id}
               sequence={seq}
