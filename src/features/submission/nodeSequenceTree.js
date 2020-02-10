@@ -56,9 +56,7 @@ class NodeSequenceTree extends Component {
 
   getLabel = () => {
     const { sequence, submissionLabel } = this.props;
-    return `${submissionLabel}\\${sequence.name} (${sequence.submission_type}-${
-      sequence.submission_sub_type
-    })`;
+    return `${submissionLabel}\\${sequence.name} (${sequence.submission_type}-${sequence.submission_sub_type})`;
   };
 
   render() {
@@ -72,7 +70,8 @@ class NodeSequenceTree extends Component {
       viewPermissions,
       onCheckboxChange
     } = this.props;
-    const childsArray = _.sortBy(_.get(sequence, "childs"), "name") || []
+    //sorting the sequence child array
+    const childsArray = _.sortBy(_.get(sequence, "childs"), "name") || [];
     return (
       <React.Fragment>
         <div
