@@ -17414,6 +17414,10 @@ const PDF_ROUTER = "viewer/pdf";
         },
         true
       );
+      //preventing the right click on pdf
+      window.addEventListener('contextmenu', event => {
+        event.preventDefault()
+      })
       if (hasAttachEvent) {
         document.attachEvent("onkeydown", function(event) {
           event = event || window.event;
