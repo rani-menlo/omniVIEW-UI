@@ -860,7 +860,7 @@ class NodeProperties extends Component {
             {_.get(sequence, "[submission_sub_type]", "")}
           </div>
         </RowItems>
-        {formFile.length &&
+        {formFile.length > 0 &&
           _.map(formFile, file => {
             return (
               <RowItems key={file}>
