@@ -46,7 +46,8 @@ import {
   AssignPermissionsModal,
   Text,
   Toast,
-  ImageLoader
+  ImageLoader,
+  DraggableModal
 } from "../../../uikit/components";
 import { translate } from "../../../translations/translator";
 import submissionActions from "../../../redux/actions/submission.actions";
@@ -240,7 +241,11 @@ class ApplicationDashboard extends Component {
       const { data } = res;
       const results = _.get(data, "result");
       if (_.get(data, "result.length")) {
-        this.checkSequenceStatus(_.get(data, "result", null), submission);
+        this.checkSequenceStatus(
+          _.get(data, "result", null),
+          submission,
+          _.get(data, "is_uploading")
+        );
       }
       // else {
       //   if (_.isArray(results)) {
@@ -255,7 +260,7 @@ class ApplicationDashboard extends Component {
     }
   };
 
-  checkSequenceStatus = (data, submission) => {
+  checkSequenceStatus = (data, submission, is_uploadingFlag) => {
     const totalNoOfSeq = data.length;
     const inProgress = [];
     const failed = [];
@@ -278,6 +283,7 @@ class ApplicationDashboard extends Component {
           break;
       }
     });
+    submission.is_uploading = is_uploadingFlag;
     submission.sequence_count = totalNoOfSeq;
     submission.sequence_inProgress = inProgress;
     submission.sequence_failed = failed;
@@ -287,9 +293,24 @@ class ApplicationDashboard extends Component {
       submission.analyzing = true;
     }
     // if all are processing(Complete) or failed then clear interval
-    if (processing.length == totalNoOfSeq || failed.length == totalNoOfSeq) {
-      submission.is_uploading = false;
+    if (processing.length == totalNoOfSeq) {
+      submission.analyzing = true;
+    }
+    //If all are in processing state(status = 3) and the is_uploading is false
+    if (processing.length == totalNoOfSeq && !submission.is_uploading) {
       submission.analyzing = false;
+      const interval = this.intervals.get(submission.id);
+      if (interval) {
+        clearInterval(interval);
+        this.intervals.delete(interval);
+      }
+    }
+    if (
+      !submission.is_uploading ||
+      (!inProgress.length && (failed.length || failed.length == totalNoOfSeq))
+    ) {
+      submission.analyzing = false;
+      submission.is_uploading = false;
       const interval = this.intervals.get(submission.id);
       if (interval) {
         clearInterval(interval);
