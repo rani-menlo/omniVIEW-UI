@@ -126,10 +126,7 @@ class SubmissionCard extends Component {
         <div
           className="submissioncard"
           style={{
-            ...((uploading ||
-              submission.analyzing ||
-              (submission.sequence_failed &&
-                submission.sequence_failed.length)) && {
+            ...((uploading || submission.analyzing) && {
               cursor: "not-allowed"
             })
           }}
@@ -139,10 +136,7 @@ class SubmissionCard extends Component {
             <span
               className="submissioncard__heading-text global__cursor-pointer"
               style={{
-                ...((uploading ||
-                  submission.analyzing ||
-                  (submission.sequence_failed &&
-                    submission.sequence_failed.length)) && {
+                ...((uploading || submission.analyzing) && {
                   cursor: "not-allowed"
                 })
               }}
@@ -151,11 +145,11 @@ class SubmissionCard extends Component {
               {_.get(submission, "name")}
             </span>
             {!uploading &&
-              !submission.analyzing &&
-              !(_.get(submission, "sequence_failed.length") || "") && (
+              !submission.analyzing && (
                 <Dropdown
                   overlay={getMenu && getMenu()}
                   trigger={["click"]}
+                  onClick={getMenu}
                   overlayClassName="submissioncard__heading-dropdown"
                 >
                   <img
@@ -201,16 +195,21 @@ class SubmissionCard extends Component {
                         )} / ${_.get(submission, "sequence_count", 0)}`}
                     />
                   )}
-                  {/* Displaying processing sequences by total sequences when there are no pending sequences */}
+                  {/* Displaying processing sequences and sucess sequences by total sequences when there are no pending sequences */}
                   {!(_.get(submission, "sequence_inProgress.length") || "") && (
                     <Text
                       type="medium"
                       textStyle={{ color: "#00d592" }}
                       text={`Sequences Uploaded: ${_.get(
                         submission,
-                        "sequence_processing.length",
+                        "sequence_success.length",
                         0
-                      )} / ${_.get(submission, "sequence_count", 0)}`}
+                      ) +
+                        _.get(
+                          submission,
+                          "sequence_processing.length",
+                          0
+                        )} / ${_.get(submission, "sequence_count", 0)}`}
                     />
                   )}
                   {/* Displaying Failed Sequences */}
@@ -255,7 +254,6 @@ class SubmissionCard extends Component {
                   )}
               </React.Fragment>
             )}
-
             {/* Sequence is uploaded successfully and able to access the application */}
             {!uploading &&
               !submission.analyzing &&
