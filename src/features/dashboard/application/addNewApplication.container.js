@@ -567,6 +567,11 @@ class AddNewApplication extends Component {
     );
   };
 
+  getResfreshedFiles = () => {
+    let { path } = this.state;
+    this.getContentsOfPath(path);
+  };
+
   openInvalidSeqModal = () => {
     if (this.state.openInvalidSequenceModal) {
       return;
@@ -663,7 +668,28 @@ class AddNewApplication extends Component {
           </p>
           <p className="addUser-subtitle">{this.getSubtitle()}</p>
           {!showApplicationDetails && showRemoteFiles && (
-            <p>{this.getFtpFilesPath()}</p>
+            <p
+              style={{
+                display: "inline-block",
+                maxWidth: "650px",
+                wordBreak: "break-all"
+              }}
+            >
+              {this.getFtpFilesPath()}
+            </p>
+          )}
+          {!showApplicationDetails && showRemoteFiles && (
+            <div>
+              <OmniButton
+                label="Refresh"
+                onClick={this.getResfreshedFiles}
+                buttonStyle={{
+                  width: "80px",
+                  float: "right",
+                  marginTop: "-35px"
+                }}
+              />
+            </div>
           )}
           <div className="global__hr-line" style={{ marginBottom: "20px" }} />
           {selectedFolderError && (
