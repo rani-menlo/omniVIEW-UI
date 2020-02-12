@@ -309,68 +309,82 @@ class ApplicationDashboard extends Component {
     };
     return (
       <Menu onClick={this.onMenuClick(submission)}>
-        <Menu.Item key="edit">
-          <div className="global__center-vert">
-            <img src="/images/edit.svg" style={style} />
-            <Text
-              type="regular"
-              size="12px"
-              text={translate("label.menu.editproperties")}
-            />
-          </div>
-        </Menu.Item>
-        <Menu.Item key="openinomniview">
-          <div className="global__center-vert">
-            <img src="/images/omni-view-cloud.png" style={style} />
-            <Text
-              type="regular"
-              size="12px"
-              text={translate("label.menu.openinomniview")}
-            />
-          </div>
-        </Menu.Item>
-        <Menu.Item disabled>
-          <div className="global__center-vert">
-            <img src="/images/omni-file.jpg" style={style} />
-            <Text
-              type="regular"
-              size="12px"
-              text={translate("label.menu.openinomnifile")}
-            />
-          </div>
-        </Menu.Item>
-        <Menu.Item key="window">
-          <div className="global__center-vert">
-            <img src="/images/new-window.png" style={style} />
-            <Text
-              type="regular"
-              size="12px"
-              text={translate("label.menu.openinnewwindow")}
-            />
-          </div>
-        </Menu.Item>
-        {(isLoggedInOmniciaAdmin(this.props.role) ||
-          isLoggedInCustomerAdmin(this.props.role)) && [
-          <Menu.Item
-            key="permissions"
-            style={{ borderTop: "1px solid rgba(74, 74, 74, 0.25)" }}
-          >
-            <div className="global__center-vert">
-              <img src="/images/assign.svg" style={style} />
-              <Text
-                type="regular"
-                size="12px"
-                text={translate("label.node.assignuseraccess")}
-              />
-            </div>
-          </Menu.Item>,
-          <Menu.Item key="sequence">
-            <div className="global__center-vert">
-              <img src="/images/plus-black.svg" style={style} />
-              <Text type="regular" size="12px" text="Add Sequence" />
-            </div>
-          </Menu.Item>
-        ]}
+        {!submission.is_uploading &&
+          !_.get(submission, "sequence_failed.length", "") && (
+            <Menu.Item key="edit">
+              <div className="global__center-vert">
+                <img src="/images/edit.svg" style={style} />
+                <Text
+                  type="regular"
+                  size="12px"
+                  text={translate("label.menu.editproperties")}
+                />
+              </div>
+            </Menu.Item>
+          )}
+        {!submission.is_uploading &&
+          !_.get(submission, "sequence_failed.length", "") && (
+            <Menu.Item key="openinomniview">
+              <div className="global__center-vert">
+                <img src="/images/omni-view-cloud.png" style={style} />
+                <Text
+                  type="regular"
+                  size="12px"
+                  text={translate("label.menu.openinomniview")}
+                />
+              </div>
+            </Menu.Item>
+          )}
+        {!submission.is_uploading &&
+          !_.get(submission, "sequence_failed.length", "") && (
+            <Menu.Item disabled>
+              <div className="global__center-vert">
+                <img src="/images/omni-file.jpg" style={style} />
+                <Text
+                  type="regular"
+                  size="12px"
+                  text={translate("label.menu.openinomnifile")}
+                />
+              </div>
+            </Menu.Item>
+          )}
+        {!submission.is_uploading &&
+          !_.get(submission, "sequence_failed.length", "") && (
+            <Menu.Item key="window">
+              <div className="global__center-vert">
+                <img src="/images/new-window.png" style={style} />
+                <Text
+                  type="regular"
+                  size="12px"
+                  text={translate("label.menu.openinnewwindow")}
+                />
+              </div>
+            </Menu.Item>
+          )}
+        {isLoggedInOmniciaAdmin(this.props.role) ||
+          isLoggedInCustomerAdmin(this.props.role) ||
+          (!submission.is_uploading &&
+            !_.get(submission, "sequence_failed.length", "") && [
+              <Menu.Item
+                key="permissions"
+                style={{ borderTop: "1px solid rgba(74, 74, 74, 0.25)" }}
+              >
+                <div className="global__center-vert">
+                  <img src="/images/assign.svg" style={style} />
+                  <Text
+                    type="regular"
+                    size="12px"
+                    text={translate("label.node.assignuseraccess")}
+                  />
+                </div>
+              </Menu.Item>,
+              <Menu.Item key="sequence">
+                <div className="global__center-vert">
+                  <img src="/images/plus-black.svg" style={style} />
+                  <Text type="regular" size="12px" text="Add Sequence" />
+                </div>
+              </Menu.Item>
+            ])}
         {(isLoggedInOmniciaAdmin(this.props.role) ||
           isLoggedInCustomerAdmin(this.props.role)) && (
           <Menu.Item key="delete">
