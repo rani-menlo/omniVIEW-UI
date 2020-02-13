@@ -829,7 +829,6 @@ class ApplicationDashboard extends Component {
   };
 
   openFailures = submission => async () => {
-    window.scrollTo(0, 0);
     this.props.dispatch(ApiActions.requestOnDemand());
     const res = await ApplicationApi.monitorStatus({
       submission_id: submission.id
@@ -839,6 +838,7 @@ class ApplicationDashboard extends Component {
       _.get(data, "result"),
       seq => seq.status == UPLOAD_FAILED
     );
+    window.scrollTo(0, 0);
     this.setState({
       reportData: failures,
       openFailuresModal: true
