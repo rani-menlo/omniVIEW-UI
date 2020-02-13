@@ -224,6 +224,10 @@ class ApplicationDashboard extends Component {
   }
 
   componentWillUnmount() {
+    this.clearAllIntervals();
+  }
+
+  clearAllIntervals = () => {
     if (this.intervals) {
       for (const [key, val] of this.intervals.entries()) {
         clearTimeout(val);
@@ -231,7 +235,7 @@ class ApplicationDashboard extends Component {
       }
       this.intervals.clear();
     }
-  }
+  };
 
   startPolling = async submission => {
     const res = await ApplicationApi.monitorStatus({
@@ -257,6 +261,15 @@ class ApplicationDashboard extends Component {
       //     this.intervals.delete(interval);
       //   }
       // }
+    }
+  };
+
+  //clearInterval
+  clearSubmissionInterval = submissionId => {
+    const interval = this.intervals.get(submissionId);
+    if (interval) {
+      clearInterval(interval);
+      this.intervals.delete(interval);
     }
   };
 
@@ -299,11 +312,7 @@ class ApplicationDashboard extends Component {
     //If all are in processing state(status = 3) and the is_uploading is false
     if (processing.length == totalNoOfSeq && !submission.is_uploading) {
       submission.analyzing = false;
-      const interval = this.intervals.get(submission.id);
-      if (interval) {
-        clearInterval(interval);
-        this.intervals.delete(interval);
-      }
+      this.clearSubmissionInterval(submission.id);
     }
     if (
       !submission.is_uploading ||
@@ -311,11 +320,7 @@ class ApplicationDashboard extends Component {
     ) {
       submission.analyzing = false;
       submission.is_uploading = false;
-      const interval = this.intervals.get(submission.id);
-      if (interval) {
-        clearInterval(interval);
-        this.intervals.delete(interval);
-      }
+      this.clearSubmissionInterval(submission.id);
     }
     this.updateSubmissions(submission);
   };
@@ -385,7 +390,7 @@ class ApplicationDashboard extends Component {
         {(isLoggedInOmniciaAdmin(this.props.role) ||
           isLoggedInCustomerAdmin(this.props.role)) &&
           !submission.is_uploading &&
-            !_.get(submission, "sequence_failed.length", "") && [
+          !_.get(submission, "sequence_failed.length", "") && [
             <Menu.Item
               key="permissions"
               style={{ borderTop: "1px solid rgba(74, 74, 74, 0.25)" }}
@@ -462,7 +467,10 @@ class ApplicationDashboard extends Component {
         assignPermissions: false,
         TableColumns
       },
-      () => this.fetchApplications()
+      () => {
+        this.clearAllIntervals();
+        this.fetchApplications();
+      }
     );
   };
 
@@ -1115,9 +1123,7 @@ class ApplicationDashboard extends Component {
                       <div>{this.props.selectedCustomer.number_of_users}</div>
                       <Dropdown
                         disabled={
-                          submission.is_uploading ||
-                          submission.analyzing ||
-                          _.get(submission, "sequence_failed.length")
+                          submission.is_uploading || submission.analyzing
                         }
                         overlay={this.getMenu(submission)}
                         trigger={["click"]}
@@ -1126,8 +1132,7 @@ class ApplicationDashboard extends Component {
                         <img
                           className={
                             (!submission.is_uploading ||
-                              !submission.analyzing ||
-                              !_.get(submission, "sequence_failed.length")) &&
+                              !submission.analyzing) &&
                             "global__cursor-pointer"
                           }
                           src="/images/overflow-black.svg"
@@ -1135,9 +1140,7 @@ class ApplicationDashboard extends Component {
                             width: "20px",
                             height: "20px",
                             opacity:
-                              submission.is_uploading ||
-                              submission.analyzing ||
-                              _.get(submission, "sequence_failed.length")
+                              submission.is_uploading || submission.analyzing
                                 ? 0.2
                                 : 1
                           }}
@@ -1252,15 +1255,18 @@ class ApplicationDashboard extends Component {
               submit={this.updateSubmissionCenter}
             />
           )}
-          <Modal
-            destroyOnClose
-            visible={openFailuresModal}
-            closable={false}
-            footer={null}
-            width="65%"
-          >
+        </ContentLayout>
+        <DraggableModal
+          // destroyOnClose
+          visible={openFailuresModal}
+          // closable={false}
+          // footer={null}
+          // width="65%"
+          draggableAreaClass=".failureResults__header"
+        >
+          <div className="failureResults">
             <div
-              className="licence-modal__header"
+              className="failureResults__header"
               style={{ marginBottom: "15px" }}
             >
               <Text type="extra_bold" size="16px" text="Failure Report" />
@@ -1270,22 +1276,31 @@ class ApplicationDashboard extends Component {
                 onClick={this.closeFailuresModal}
               />
             </div>
-            <Table
-              columns={this.uploadFailedColumns}
-              dataSource={reportData}
-              pagination={false}
-              rowSelection={
-                user.is_secondary_contact || isAdmin(role.name)
-                  ? {
-                      onChange: (selectedRowKeys, selectedRows) => {
-                        this.setState({ selectedFailedUploads: selectedRows });
-                      }
-                    }
-                  : ""
-              }
-              scroll={{ y: 200 }}
-            />
-            <div style={{ marginTop: "20px", textAlign: "right" }}>
+            <div className="failureResults__table">
+              <div className="failureResults__table__body">
+                <Table
+                  columns={this.uploadFailedColumns}
+                  dataSource={reportData}
+                  pagination={false}
+                  rowSelection={
+                    user.is_secondary_contact || isAdmin(role.name)
+                      ? {
+                          onChange: (selectedRowKeys, selectedRows) => {
+                            this.setState({
+                              selectedFailedUploads: selectedRows
+                            });
+                          }
+                        }
+                      : ""
+                  }
+                  scroll={{ y: 200 }}
+                />
+              </div>
+            </div>
+            <div
+              style={{ margin: "20px 0", textAlign: "right" }}
+              className="failureResults__footer"
+            >
               <OmniButton
                 type="secondary"
                 label={translate("label.button.cancel")}
@@ -1305,8 +1320,8 @@ class ApplicationDashboard extends Component {
                 ""
               )}
             </div>
-          </Modal>
-        </ContentLayout>
+          </div>
+        </DraggableModal>
       </React.Fragment>
     );
   }
