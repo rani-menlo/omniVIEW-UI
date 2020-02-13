@@ -1256,6 +1256,7 @@ class ApplicationDashboard extends Component {
             />
           )}
         </ContentLayout>
+        {/* Draggable view report modal in application dashboard */}
         <DraggableModal
           // destroyOnClose
           visible={openFailuresModal}
