@@ -574,6 +574,8 @@ class ApplicationDashboard extends Component {
             },
             () => {
               Toast.success("Application has been deleted!");
+              //clearing all the intervals after deleting the submission
+              this.clearAllIntervals();
               this.fetchApplications();
             }
           )
