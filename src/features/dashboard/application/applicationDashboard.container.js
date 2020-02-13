@@ -829,6 +829,7 @@ class ApplicationDashboard extends Component {
   };
 
   openFailures = submission => async () => {
+    window.scrollTo(0, 0);
     this.props.dispatch(ApiActions.requestOnDemand());
     const res = await ApplicationApi.monitorStatus({
       submission_id: submission.id
