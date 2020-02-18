@@ -745,15 +745,16 @@ class AddNewApplication extends Component {
               </p>
             )}
           {!showApplicationDetails && showRemoteFiles && (
-            <div>
-              <OmniButton
-                label="Refresh"
-                onClick={this.getResfreshedFiles}
-                buttonStyle={{
-                  width: "80px",
-                  float: "right",
-                  marginTop: "-35px"
-                }}
+            <div
+              onClick={this.getResfreshedFiles}
+              className={`refresh ${
+                selectedCloud == "AFS" ? "afs" : "non-afs"
+              }`}
+              title="Refresh"
+            >
+              <img
+                src="/images/refresh.png"
+                style={{ width: "22px", height: "22px" }}
               />
             </div>
           )}

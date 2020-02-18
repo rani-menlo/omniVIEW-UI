@@ -49,3 +49,14 @@
     width: 60%;
   }
 }
+.refresh{
+  display: inline-block;
+  float: right;
+  cursor: pointer;
+  &.afs{
+    margin-top: -22px;
+  }
+  &.non-afs{
+    margin-top: -3px;
+  }
+}
