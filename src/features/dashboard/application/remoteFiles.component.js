@@ -45,7 +45,8 @@ class RemoteFiles extends Component {
       currentPath,
       isSequence,
       checkedAll,
-      showCheckAll
+      showCheckAll,
+      cloud
     } = this.props;
     const { selected } = this.state;
     return (
@@ -98,10 +99,10 @@ class RemoteFiles extends Component {
                     file.checked) &&
                     "global__node-selected"}`}
                   onClick={!isSequence && this.select(file)}
-                  onDoubleClick={this.openContents(file)}
+                  onDoubleClick={cloud != "AFS" && this.openContents(file)}
                 >
                   <div style={{ display: "flex", width: "98%" }}>
-                    {file.type === "d" ? (
+                    {file.type === "d" || !file.is_file ? (
                       <Icon
                         type="folder"
                         theme="filled"
@@ -134,6 +135,14 @@ class RemoteFiles extends Component {
                 </div>
               );
             })}
+            {cloud == "AFS" && remoteFiles.length == 0 && (
+              <Text
+                type="extra_bold"
+                size="14px"
+                text="No folders found."
+                textStyle={{ textAlign: "center", marginTop: "100px" }}
+              />
+            )}
           </div>
         </div>
         <div style={{ textAlign: "right", marginTop: "10px" }}>

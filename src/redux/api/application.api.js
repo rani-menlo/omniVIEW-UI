@@ -35,11 +35,14 @@ export default {
   saveFTPDetails: details => api.post(URI.SAVE_FTP_DETAILS, details),
   getFTPDetails: customerId =>
     api.get(URI.GET_FTP_DETAILS.replace("{customerId}", customerId)),
+  getCustomerAfsFolders: data => api.post(URI.GET_CUSTOMER_AFS_FOLDERS, data),
   getContentsOfPath: data => api.post(URI.GET_FTP_CONTENTS, data),
+  isValidAFSSubmissionFolder: data => api.post(URI.IS_AFS_FOLDER, data),
   isValidFTPSubmissionFolder: data => api.post(URI.IS_VALID_FOLDER, data),
   isValidFTPSequenceFolder: data =>
     api.post(URI.IS_VALID_SEQUENCE_FOLDER, data),
   getSubmissionLookupInfo: () => api.get(URI.SUBMISSION_LOOKUP_INFO),
+  saveAfsSubmissionDetails: data => api.post(URI.SAVE_AFS_SUBMISSION_DETAILS, data),
   saveSubmissionDetails: data => api.post(URI.SAVE_SUBMISSION_DETAILS, data),
   saveSequenceDetails: data => api.post(URI.SAVE_SEQUENCE_DETAILS, data),
   monitorStatus: data => api.post(URI.MONITOR_STATUS, data),

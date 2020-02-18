@@ -3,20 +3,28 @@ import _ from "lodash";
 import PropTypes from "prop-types";
 import { OmniButton } from "../../../uikit/components";
 import { CLOUDS } from "../../../constants";
+import { connect } from "react-redux";
+import { isLoggedInOmniciaAdmin } from "../../../utils";
 
 const onSelect = (cb, cloud) => () => {
   cb && cb(cloud);
 };
 
-const ChooseCloud = ({ onCloudSelect }) => {
+const ChooseCloud = ({ onCloudSelect, role }) => {
   const buttonStyle = {
     width: "12%",
     height: "100px"
   };
+  let clouds = CLOUDS;
+  //omitting the afs cloud if the logged in user is not o_odmin
+  if (!isLoggedInOmniciaAdmin(role)) {
+    clouds = _.omit(clouds, "afs");
+  }
   return (
     <div className="addnewapplication__cloud">
-      {_.map(CLOUDS, (val, key) => (
+      {_.map(clouds, (val, key) => (
         <OmniButton
+          key={key}
           disabled={val.disabled}
           type="primary"
           label={val.name}
@@ -32,4 +40,10 @@ ChooseCloud.propTypes = {
   onCloudSelect: PropTypes.func
 };
 
-export default ChooseCloud;
+function mapStateToProps(state) {
+  return {
+    role: state.Login.role
+  };
+}
+
+export default connect(mapStateToProps)(ChooseCloud);

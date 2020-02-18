@@ -121,10 +121,13 @@ const URI = {
   //upload
   SAVE_FTP_DETAILS: `${path}upload/checkAndSaveFTPDetails`,
   GET_FTP_DETAILS: `${path}upload/getSavedFTPDetails/{customerId}`,
+  GET_CUSTOMER_AFS_FOLDERS: `${path}upload/listCustomerAFS`,
   GET_FTP_CONTENTS: `${path}upload/getContentsOfFTPPath`,
+  IS_AFS_FOLDER: `${path}upload/isValidAFSSubmissionFolder`,
   IS_VALID_FOLDER: `${path}upload/isValidFTPSubmissionFolder`,
   IS_VALID_SEQUENCE_FOLDER: `${path}upload/isValidFTPSequenceFolder`,
   SUBMISSION_LOOKUP_INFO: `${path}upload/submissionLookUpInfo`,
+  SAVE_AFS_SUBMISSION_DETAILS: `${path}upload/saveAFSSubmission`,
   SAVE_SUBMISSION_DETAILS: `${path}upload/saveSubmissionDetails`,
   SAVE_SEQUENCE_DETAILS: `${path}upload/saveSequenceDetails`,
   MONITOR_STATUS: `${path}upload/monitorStatus`,
@@ -135,7 +138,7 @@ const DATE_FORMAT = "MM/DD/YYYY";
 const DEBOUNCE_TIME = 700; //ms
 const POLLING_INTERVAL = 10000; //ms
 const UPLOAD_INPROGRES = 0;
-const UPLOAD_INPROGRES_EXTRA = -1;  // added extra from the backend
+const UPLOAD_INPROGRES_EXTRA = -1; // added extra from the backend
 const UPLOAD_FAILED = 1;
 const UPLOAD_SUCCESS = 2;
 const ANALYZING = 3;
@@ -166,6 +169,10 @@ const VALID_VALUES_XML_DATA = {
 const CLOUDS = {
   ftp: {
     name: "FTP",
+    disabled: false
+  },
+  afs: {
+    name: "AFS",
     disabled: false
   },
   oneDrive: {

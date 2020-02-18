@@ -81,7 +81,41 @@ class AddNewApplication extends Component {
     this.props.dispatch(ApiActions.successOnDemand());
   };
 
+  //if the source type is AFS/site-to-site vpm connection
+  getEachCustomerAFSFolders = async cloud => {
+    let remoteDetails = {};
+    _.set(remoteDetails, "ftp_path", `/${this.props.selectedCustomer.id}`);
+    this.showLoading();
+    const res = await ApplicationApi.getCustomerAfsFolders({
+      customer_id: this.props.selectedCustomer.id
+    });
+    let remoteFiles = null;
+    if (!res.data.error) {
+      remoteFiles = res.data.data;
+    }
+    this.setState(
+      {
+        selectedCloud: cloud.name,
+        showClouds: false,
+        remoteDetails,
+        path: remoteDetails.ftp_path,
+        remoteFiles,
+        selectedFolderError: "",
+        invalidSeqError: "",
+        checkedAll: false,
+        showRemoteFiles: true,
+        enterRemoteDetails: false,
+        showApplicationDetails: false
+      },
+      this.hideLoading
+    );
+  };
+
   onCloudSelect = async cloud => {
+    if (cloud.name == "AFS") {
+      this.getEachCustomerAFSFolders(cloud);
+      return;
+    }
     this.showLoading();
     const res = await ApplicationApi.getFTPDetails(
       this.props.selectedCustomer.id
@@ -107,7 +141,8 @@ class AddNewApplication extends Component {
       selectedFolderError: "",
       invalidSeqError: "",
       showClouds: true,
-      enterRemoteDetails: false
+      enterRemoteDetails: false,
+      showRemoteFiles: false
     });
   };
 
@@ -172,7 +207,9 @@ class AddNewApplication extends Component {
         invalidSeqError: ""
       },
       () => {
-        this.goBack(true);
+        this.state.selectedCloud == "AFS"
+          ? this.getEachCustomerAFSFolders({ name: this.state.selectedCloud })
+          : this.goBack(true);
       }
     );
   };
@@ -372,11 +409,23 @@ class AddNewApplication extends Component {
       return;
     }
     this.showLoading();
+    let res = null;
     // adding submission
-    let res = await ApplicationApi.isValidFTPSubmissionFolder({
-      customer_id: this.props.selectedCustomer.id,
-      ftp_path: path
-    });
+    //As per the ticket OMNG-722 - Implement submission validations for AFS type cloud
+    if (this.state.selectedCloud == "AFS") {
+      res = await ApplicationApi.isValidAFSSubmissionFolder({
+        customer_id: this.props.selectedCustomer.id,
+        ...(!_.isEmpty(path) && {
+          afs_path: path
+        })
+      });
+    } else {
+      //Implement submission validations for FTP cloud
+      res = await ApplicationApi.isValidFTPSubmissionFolder({
+        customer_id: this.props.selectedCustomer.id,
+        ftp_path: path
+      });
+    }
     selectedFolderPath = path;
     let { error, data, message } = res.data;
     if (message == "Invalid folder. Please select a Submission folder.") {
@@ -470,13 +519,23 @@ class AddNewApplication extends Component {
 
   saveDetails = async obj => {
     obj.customer_id = this.props.selectedCustomer.id;
+    //we need to remove cloud_type_id for cloud type AFS later
     obj.cloud_type_id = 1;
-    obj.additional_details = {
-      auth_id: this.state.auth_id,
-      submission_path: this.state.selectedFolderPath
-    };
+    if (this.state.selectedCloud == "AFS") {
+      obj.additional_details = {
+        submission_path: this.state.selectedFolderPath
+      };
+    } else {
+      obj.additional_details = {
+        auth_id: this.state.auth_id,
+        submission_path: this.state.selectedFolderPath
+      };
+    }
     this.showLoading();
-    const res = await ApplicationApi.saveSubmissionDetails(obj);
+    const res =
+      this.state.selectedCloud == "AFS"
+        ? await ApplicationApi.saveAfsSubmissionDetails(obj)
+        : await ApplicationApi.saveSubmissionDetails(obj);
     if (res.data.error) {
       this.setState(
         { selectedFolderError: res.data.message },
@@ -568,6 +627,10 @@ class AddNewApplication extends Component {
   };
 
   getResfreshedFiles = () => {
+    if (this.state.selectedCloud == "AFS") {
+      this.getEachCustomerAFSFolders({ name: this.state.selectedCloud });
+      return;
+    }
     let { path } = this.state;
     this.getContentsOfPath(path);
   };
@@ -594,11 +657,12 @@ class AddNewApplication extends Component {
   };
 
   render() {
-    const { selectedCustomer, selectedSubmission, loading } = this.props;
+    const { selectedCustomer, selectedSubmission, loading, role } = this.props;
     const {
       path,
       remoteDetails,
       remoteFiles,
+      selectedCloud,
       showClouds,
       enterRemoteDetails,
       showRemoteFiles,
@@ -667,17 +731,19 @@ class AddNewApplication extends Component {
             {this.getTitle()}
           </p>
           <p className="addUser-subtitle">{this.getSubtitle()}</p>
-          {!showApplicationDetails && showRemoteFiles && (
-            <p
-              style={{
-                display: "inline-block",
-                maxWidth: "650px",
-                wordBreak: "break-all"
-              }}
-            >
-              {this.getFtpFilesPath()}
-            </p>
-          )}
+          {!showApplicationDetails &&
+            showRemoteFiles &&
+            selectedCloud != "AFS" && (
+              <p
+                style={{
+                  display: "inline-block",
+                  maxWidth: "650px",
+                  wordBreak: "break-all"
+                }}
+              >
+                {this.getFtpFilesPath()}
+              </p>
+            )}
           {!showApplicationDetails && showRemoteFiles && (
             <div>
               <OmniButton
@@ -767,7 +833,9 @@ class AddNewApplication extends Component {
           </Modal>
 
           <div style={{ marginTop: "20px" }}>
-            {showClouds && <ChooseCloud onCloudSelect={this.onCloudSelect} />}
+            {showClouds && (
+              <ChooseCloud onCloudSelect={this.onCloudSelect} role={role} />
+            )}
             {enterRemoteDetails && (
               <RemoteDetails
                 details={remoteDetails}
@@ -781,7 +849,11 @@ class AddNewApplication extends Component {
                 currentPath={path}
                 rootPath={remoteDetails.ftp_path}
                 remoteFiles={remoteFiles}
-                cancel={this.enterRemoteDetails}
+                cancel={
+                  selectedCloud == "AFS"
+                    ? this.showClouds
+                    : this.enterRemoteDetails
+                }
                 openContents={this.getContents}
                 goBack={this.goBack}
                 submit={this.showApplicationDetails}
@@ -789,6 +861,7 @@ class AddNewApplication extends Component {
                 selectAll={this.checkedAllFolders}
                 checkedAll={checkedAll}
                 showCheckAll={showCheckAll}
+                cloud={selectedCloud}
               />
             )}
             {!isAddingSequence && showApplicationDetails && (
@@ -826,7 +899,8 @@ function mapStateToProps(state) {
   return {
     loading: state.Api.loading,
     selectedCustomer: state.Customer.selectedCustomer,
-    selectedSubmission: state.Application.selectedSubmission
+    selectedSubmission: state.Application.selectedSubmission,
+    role: state.Login.role
   };
 }
 
