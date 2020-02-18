@@ -1297,7 +1297,7 @@ class ApplicationDashboard extends Component {
                         }
                       : ""
                   }
-                  scroll={{ y: 200 }}
+                  //scroll={{ y: 200 }}
                 />
               </div>
             </div>
