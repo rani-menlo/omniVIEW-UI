@@ -822,6 +822,7 @@ class ApplicationDashboard extends Component {
       ApplicationActions.retryUploads(
         { ids: _.map(this.state.selectedFailedUploads, "id") },
         () => {
+          this.clearAllIntervals();
           this.fetchApplications();
         }
       )
