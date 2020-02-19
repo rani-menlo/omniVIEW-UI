@@ -1,10 +1,12 @@
 .assign-permissions-modal {
+  height: 100%;
   > .ant-modal {
     width: 720px !important;
   }
   &__columns {
     display: flex;
     margin-top: 15px;
+    height: calc(100% - 165px);
     &-left {
       width: 45%;
       margin-right: 40px;
@@ -13,10 +15,11 @@
       width: 100%;
     }
     &-content {
-      height: 250px;
+      //height: 250px;
+      height: 80%;
       border-radius: 4px;
       border: solid 1px $shadowed-steel;
-      overflow-y: auto;
+      overflow: auto;
       &-item {
         padding: 12px;
         border-bottom: 1px solid $shadowed-steel;

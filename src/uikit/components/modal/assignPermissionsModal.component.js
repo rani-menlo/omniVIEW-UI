@@ -8,7 +8,7 @@ import { translate } from "../../../translations/translator";
 import { ROLES, ROLE_IDS } from "../../../constants";
 import PermissionCheckbox from "../checkbox/permissionCheckbox.component";
 import { UsermanagementActions } from "../../../redux/actions";
-import { Loader, OmniButton, ImageLoader } from "..";
+import { Loader, OmniButton, ImageLoader, DraggableModal } from "..";
 import { getRoleNameByRoleId, getRoleName, isAdmin } from "../../../utils";
 import submissionActions from "../../../redux/actions/submission.actions";
 import Row from "../row/row.component";
@@ -214,234 +214,240 @@ class AssignPermissions extends Component {
       fileLevelAccessObj
     } = this.props;
     return (
-      <Modal
-        destroyOnClose
+      <DraggableModal
+        // destroyOnClose
         visible={visible}
-        closable={false}
-        footer={null}
-        wrapClassName="assign-permissions-modal"
+        // closable={false}
+        // footer={null}
+        draggableAreaClass=".assign-permissions-modal__header"
+        minHeight="55%"
       >
-        <div className="assign-permissions-modal__header">
-          <img
-            src={`/images/${
-              assignGlobalPermissions ? "global-permissions" : "assign"
-            }.svg`}
-            style={{ marginRight: "8px" }}
-          />
+        <div className="assign-permissions-modal">
+          <div className="assign-permissions-modal__header">
+            <img
+              src={`/images/${
+                assignGlobalPermissions ? "global-permissions" : "assign"
+              }.svg`}
+              style={{ marginRight: "8px" }}
+            />
+            <Text
+              type="extra_bold"
+              size="16px"
+              text={
+                assignGlobalPermissions
+                  ? translate("label.dashboard.assignglobalpermissions")
+                  : translate("label.dashboard.assignpermissions")
+              }
+            />
+            <img
+              src="/images/close.svg"
+              className="assign-permissions-modal__header-close"
+              onClick={closeModal}
+            />
+          </div>
           <Text
-            type="extra_bold"
-            size="16px"
+            type="regular"
+            opacity={0.5}
+            size="14px"
             text={
               assignGlobalPermissions
-                ? translate("label.dashboard.assignglobalpermissions")
-                : translate("label.dashboard.assignpermissions")
+                ? translate("text.permissions.global")
+                : fileLevelAccessObj
+                ? translate("text.permissions.filelevel")
+                : translate("text.permissions.individual")
             }
           />
-          <img
-            src="/images/close.svg"
-            className="assign-permissions-modal__header-close"
-            onClick={closeModal}
-          />
-        </div>
-        <Text
-          type="regular"
-          opacity={0.5}
-          size="14px"
-          text={
-            assignGlobalPermissions
-              ? translate("text.permissions.global")
-              : fileLevelAccessObj
-              ? translate("text.permissions.filelevel")
-              : translate("text.permissions.individual")
-          }
-        />
-        <div className="assign-permissions-modal__columns">
-          {!assignGlobalPermissions && (
-            <div className="assign-permissions-modal__columns-left">
-              <Text
-                type="bold"
-                opacity={0.5}
-                size="14px"
-                text={`Assigning to:`}
-              />
-              <div
-                className="assign-permissions-modal__columns-content"
-                style={{ marginTop: "12px" }}
-              >
-                {fileLevelAccessObj ? (
-                  <div className="assign-permissions-modal__columns-content-item global__center-vert">
-                    {fileLevelAccessObj.isFolder ? (
-                      <Icon
-                        type="folder"
-                        theme="filled"
-                        className="global__file-folder"
-                      />
-                    ) : (
-                      <img
-                        src="/images/file-new.svg"
-                        className="global__file-folder"
-                        style={{ width: "18px", height: "21px" }}
-                      />
-                    )}
-                    <Text
-                      type="medium"
-                      size="14px"
-                      text={fileLevelAccessObj.label}
-                    />
-                  </div>
-                ) : (
-                  _.map(submissions, submission => (
-                    <Text
-                      key={submission.id}
-                      type="medium"
-                      size="14px"
-                      text={submission.name}
-                      className="assign-permissions-modal__columns-content-item"
-                    />
-                  ))
-                )}
-              </div>
-            </div>
-          )}
-          <div className="assign-permissions-modal__columns-right">
-            <div className="assign-permissions-modal__subheader">
-              <Dropdown
-                overlay={this.getMenu}
-                trigger={["click"]}
-                className={`assign-permissions-modal__subheader__dropdown ${!this
-                  .state.users.length && "disabled"}`}
-                disabled={!this.state.users.length}
-              >
-                <div>
-                  <Text
-                    type="bold"
-                    opacity={0.5}
-                    textStyle={{ marginRight: "4px" }}
-                    size="14px"
-                    text={`${translate("label.generic.view")}:`}
-                  />
-                  <Text
-                    type="extra_bold"
-                    opacity={0.5}
-                    textStyle={{ marginRight: "4px" }}
-                    size="14px"
-                    text={this.state.selectedRole.name}
-                  />
-                  <Icon type="down" />
-                </div>
-              </Dropdown>
-              <Icon
-                type={
-                  this.state.order === "asc"
-                    ? "sort-ascending"
-                    : "sort-descending"
-                }
-                className={`${!this.state.users.length && "disabled"}`}
-                onClick={this.state.users.length && this.sort}
-                style={{ fontSize: "24px", marginRight: "10px" }}
-              />
-            </div>
-            <div className="assign-permissions-modal__columns-content">
-              {!this.state.noUsersError &&
-                _.map(this.state.users, user => {
-                  return (
-                    <div
-                      key={user.id}
-                      className={`assign-permissions-modal__columns-content-user ${user.checked &&
-                        "assign-permissions-modal__columns-content-user-selected"}`}
-                    >
-                      <ImageLoader
-                        path={_.get(user, "profile")}
-                        width="36px"
-                        height="36px"
-                        type="circle"
-                        style={{ marginRight: "10px" }}
-                        globalAccess={_.get(user, "has_global_access")}
-                      />
-                      {/* <Avatar size={36} icon="user" /> */}
-                      <div>
-                        <Text
-                          type="regular"
-                          size="14px"
-                          text={`${user.first_name} ${user.last_name}`}
+          <div className="assign-permissions-modal__columns">
+            {!assignGlobalPermissions && (
+              <div className="assign-permissions-modal__columns-left">
+                <Text
+                  type="bold"
+                  opacity={0.5}
+                  size="14px"
+                  text={`Assigning to:`}
+                />
+                <div
+                  className="assign-permissions-modal__columns-content"
+                  style={{ marginTop: "12px" }}
+                >
+                  {fileLevelAccessObj ? (
+                    <div className="assign-permissions-modal__columns-content-item global__center-vert">
+                      {fileLevelAccessObj.isFolder ? (
+                        <Icon
+                          type="folder"
+                          theme="filled"
+                          className="global__file-folder"
                         />
+                      ) : (
+                        <img
+                          src="/images/file-new.svg"
+                          className="global__file-folder"
+                          style={{ width: "18px", height: "21px" }}
+                        />
+                      )}
+                      <Text
+                        type="medium"
+                        size="14px"
+                        text={fileLevelAccessObj.label}
+                      />
+                    </div>
+                  ) : (
+                    _.map(submissions, submission => (
+                      <Text
+                        key={submission.id}
+                        type="medium"
+                        size="14px"
+                        text={submission.name}
+                        className="assign-permissions-modal__columns-content-item"
+                      />
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
+            <div className="assign-permissions-modal__columns-right">
+              <div className="assign-permissions-modal__subheader">
+                <Dropdown
+                  overlay={this.getMenu}
+                  trigger={["click"]}
+                  className={`assign-permissions-modal__subheader__dropdown ${!this
+                    .state.users.length && "disabled"}`}
+                  disabled={!this.state.users.length}
+                >
+                  <div>
+                    <Text
+                      type="bold"
+                      opacity={0.5}
+                      textStyle={{ marginRight: "4px" }}
+                      size="14px"
+                      text={`${translate("label.generic.view")}:`}
+                    />
+                    <Text
+                      type="extra_bold"
+                      opacity={0.5}
+                      textStyle={{ marginRight: "4px" }}
+                      size="14px"
+                      text={this.state.selectedRole.name}
+                    />
+                    <Icon type="down" />
+                  </div>
+                </Dropdown>
+                <Icon
+                  type={
+                    this.state.order === "asc"
+                      ? "sort-ascending"
+                      : "sort-descending"
+                  }
+                  className={`${!this.state.users.length && "disabled"}`}
+                  onClick={this.state.users.length && this.sort}
+                  style={{ fontSize: "24px", marginRight: "10px" }}
+                />
+              </div>
+              <div className="assign-permissions-modal__columns-content">
+                {!this.state.noUsersError &&
+                  _.map(this.state.users, user => {
+                    return (
+                      <div
+                        key={user.id}
+                        className={`assign-permissions-modal__columns-content-user ${user.checked &&
+                          "assign-permissions-modal__columns-content-user-selected"}`}
+                      >
+                        <ImageLoader
+                          path={_.get(user, "profile")}
+                          width="36px"
+                          height="36px"
+                          type="circle"
+                          style={{ marginRight: "10px" }}
+                          globalAccess={_.get(user, "has_global_access")}
+                        />
+                        {/* <Avatar size={36} icon="user" /> */}
+                        <div>
+                          <Text
+                            type="regular"
+                            size="14px"
+                            text={`${user.first_name} ${user.last_name}`}
+                          />
+                          <Text
+                            type="regular"
+                            size="14px"
+                            opacity={0.5}
+                            text={_.capitalize(
+                              getRoleNameByRoleId(
+                                _.get(user, "roles[0].id") ||
+                                  _.get(user, "role_id")
+                              )
+                            )}
+                          />
+                        </div>
                         <Text
                           type="regular"
                           size="14px"
                           opacity={0.5}
-                          text={_.capitalize(
-                            getRoleNameByRoleId(
-                              _.get(user, "roles[0].id") ||
-                                _.get(user, "role_id")
-                            )
+                          text={
+                            (assignGlobalPermissions
+                              ? user.has_global_access
+                              : user.hasAccess) && user.checked
+                              ? translate("label.generic.assigned")
+                              : ""
+                          }
+                          textStyle={{
+                            marginLeft: "auto",
+                            marginRight: "10px"
+                          }}
+                        />
+                        <PermissionCheckbox
+                          disabled={isAdmin(
+                            _.get(user, "roles[0].slug") ||
+                              _.get(user, "role_name")
                           )}
+                          value={+user.checked}
+                          onChange={this.onCheckboxChange(user)}
                         />
                       </div>
-                      <Text
-                        type="regular"
-                        size="14px"
-                        opacity={0.5}
-                        text={
-                          (assignGlobalPermissions
-                            ? user.has_global_access
-                            : user.hasAccess) && user.checked
-                            ? translate("label.generic.assigned")
-                            : ""
-                        }
-                        textStyle={{ marginLeft: "auto", marginRight: "10px" }}
-                      />
-                      <PermissionCheckbox
-                        disabled={isAdmin(
-                          _.get(user, "roles[0].slug") ||
-                            _.get(user, "role_name")
-                        )}
-                        value={+user.checked}
-                        onChange={this.onCheckboxChange(user)}
-                      />
-                    </div>
-                  );
-                })}
-              {!this.state.users.length && (
-                <Row className="maindashboard__nodata">
-                  <Text
-                    type="regular"
-                    size="14px"
-                    text="No Users Found"
-                    textStyle={{ marginTop: "45px" }}
-                  />
-                </Row>
-              )}
-              {this.state.noUsersError && (
-                <Row className="maindashboard__nodata">
-                  <Icon
-                    style={{ fontSize: "20px" }}
-                    type="exclamation-circle"
-                    className="maindashboard__nodata-icon"
-                  />
-                  {translate("error.dashboard.notfound", {
-                    type: translate("label.dashboard.users")
+                    );
                   })}
-                </Row>
-              )}
+                {!this.state.users.length && (
+                  <Row className="maindashboard__nodata">
+                    <Text
+                      type="regular"
+                      size="14px"
+                      text="No Users Found"
+                      textStyle={{ marginTop: "45px" }}
+                    />
+                  </Row>
+                )}
+                {this.state.noUsersError && (
+                  <Row className="maindashboard__nodata">
+                    <Icon
+                      style={{ fontSize: "20px" }}
+                      type="exclamation-circle"
+                      className="maindashboard__nodata-icon"
+                    />
+                    {translate("error.dashboard.notfound", {
+                      type: translate("label.dashboard.users")
+                    })}
+                  </Row>
+                )}
+              </div>
             </div>
+            <div />
           </div>
-          <div />
+          <div style={{ marginTop: "12px", textAlign: "right" }}>
+            <OmniButton
+              type="secondary"
+              label="Cancel"
+              onClick={closeModal}
+              buttonStyle={{ width: "120px", marginRight: "12px" }}
+            />
+            <OmniButton
+              label="Update"
+              buttonStyle={{ width: "120px" }}
+              onClick={this.update}
+              disabled={!this.state.users.length}
+            />
+          </div>
         </div>
-        <div style={{ marginTop: "12px", textAlign: "right" }}>
-          <OmniButton
-            type="secondary"
-            label="Cancel"
-            onClick={closeModal}
-            buttonStyle={{ width: "120px", marginRight: "12px" }}
-          />
-          <OmniButton
-            label="Update"
-            buttonStyle={{ width: "120px" }}
-            onClick={this.update}
-            disabled={!this.state.users.length}
-          />
-        </div>
-      </Modal>
+      </DraggableModal>
     );
   }
 }
