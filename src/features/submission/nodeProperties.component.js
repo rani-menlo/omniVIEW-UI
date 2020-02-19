@@ -630,6 +630,29 @@ class NodeProperties extends Component {
           <div className="label">Xml Tag:</div>
           <div className="value">{properties.name || ""}</div>
         </RowItems>
+        {_.has(properties, "promotional-material-doc-type") && (
+          <RowItems>
+            <div className="label">Promotional Material Doc Type:</div>
+            <div className="value">
+              {_.get(properties, "promotional-material-doc-type", "")}
+            </div>
+          </RowItems>
+        )}
+        {_.has(properties, "promotional-material-type") && (
+          <RowItems>
+            <div className="label">Promotional Material Type:</div>
+            <div className="value">
+              {_.get(properties, "promotional-material-type", "")}
+            </div>
+          </RowItems>
+        )}
+        {_.has(properties, "material-id") && (
+          <RowItems>
+            <div className="label">Material Id:</div>
+            <div className="value">{_.get(properties, "material-id", "")}</div>
+          </RowItems>
+        )}
+
         {_.has(properties, "indication") && (
           <RowItems>
             <div className="label">Indication:</div>
