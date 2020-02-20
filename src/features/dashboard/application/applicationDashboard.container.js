@@ -1244,22 +1244,31 @@ class ApplicationDashboard extends Component {
               onAssignLicenseClick={this.openUsersModal}
             />
           )}
-          {this.state.showUsersModal && (
-            <AssignLicenceWithUsers
-              licence={this.state.assigningLicence}
-              selectedUsers={this.state.selectedUsers}
-              closeModal={this.closeUsersModal}
-              onUserSelect={this.onUserSelect}
-            />
-          )}
-          {this.state.showPropertiesModal && (
-            <ApplicationProperties
-              visible
-              closeModal={this.closePropertiesModal}
-              submit={this.updateSubmissionCenter}
-            />
-          )}
         </ContentLayout>
+        {this.state.showUsersModal && (
+          <AssignLicenceWithUsers
+            licence={this.state.assigningLicence}
+            selectedUsers={this.state.selectedUsers}
+            closeModal={this.closeUsersModal}
+            onUserSelect={this.onUserSelect}
+          />
+        )}
+        {this.state.showPropertiesModal && (
+          <ApplicationProperties
+            visible
+            closeModal={this.closePropertiesModal}
+            submit={this.updateSubmissionCenter}
+          />
+        )}
+        {/* Assign Global Permissions Modal */}
+        {showPermissionsModal && (
+          <AssignPermissionsModal
+            visible={showPermissionsModal}
+            assignGlobalPermissions={assignGlobalPermissions}
+            closeModal={this.closePermissionsModal}
+            submissions={checkedSubmissions}
+          />
+        )}
         {/* Draggable view report modal in application dashboard */}
         <DraggableModal
           // destroyOnClose

@@ -1,5 +1,6 @@
 .licence-modal {
   height: 100%;
+  padding: 14px;
   > .ant-modal {
     width: 600px !important;
   }
@@ -60,6 +61,13 @@
         // overflow: auto;
         margin-bottom: 10px;
       }
+    }
+  }
+  &__lsit {
+    height: calc(100% - 140px);
+    &__edit-properties {
+      height: 100%;
+      overflow: auto;
     }
   }
 }
