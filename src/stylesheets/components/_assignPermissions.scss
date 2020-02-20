@@ -1,12 +1,13 @@
 .assign-permissions-modal {
   height: 100%;
+  padding: 14px;
   > .ant-modal {
     width: 720px !important;
   }
   &__columns {
     display: flex;
     margin-top: 15px;
-    height: calc(100% - 165px);
+    height: calc(100% - 145px);
     &-left {
       width: 45%;
       margin-right: 40px;
@@ -38,6 +39,7 @@
   &__header {
     display: flex;
     margin-bottom: 15px;
+    cursor: move;
     &-close {
       width: 20px;
       height: 20px;
