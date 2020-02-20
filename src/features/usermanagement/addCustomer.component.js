@@ -1242,13 +1242,6 @@ class AddCustomer extends Component {
             back={this.goBackToUsersModal}
             submit={this.assignLicence}
           />
-          {this.state.openAddNewLicenceModal && (
-            <AddNewLicence
-              visible={this.state.openAddNewLicenceModal}
-              closeModal={this.closeModal}
-              addNewLicence={this.addNewLicence}
-            />
-          )}
           <DeactivateModal
             isActive={this.state.statusActive}
             visible={this.state.showDeactivateModal}
@@ -1258,6 +1251,13 @@ class AddCustomer extends Component {
             submit={this.deactivate}
           />
         </ContentLayout>
+        {this.state.openAddNewLicenceModal && (
+          <AddNewLicence
+            visible={this.state.openAddNewLicenceModal}
+            closeModal={this.closeModal}
+            addNewLicence={this.addNewLicence}
+          />
+        )}
       </React.Fragment>
     );
   }

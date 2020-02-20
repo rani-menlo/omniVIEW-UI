@@ -1,10 +1,12 @@
 .licence-modal {
+  height: 100%;
   > .ant-modal {
     width: 600px !important;
   }
   &__header {
     display: flex;
     margin-bottom: 15px;
+    cursor: move;
     &-close {
       width: 20px;
       height: 20px;
@@ -45,10 +47,19 @@
       margin: 20px 0px;
     }
   }
-  &__rows {
-    margin-top: 20px;
-    max-height: 200px;
-    overflow: auto;
-    margin-bottom: 10px;
+  &__table {
+    height: calc(100% - 110px);
+    &__body {
+      height: 100%;
+      overflow: auto;
+      border: 1px solid $shadowed-steel;
+      padding: 10px;
+      &__rows {
+        margin-top: 20px;
+        // max-height: 200px;
+        // overflow: auto;
+        margin-bottom: 10px;
+      }
+    }
   }
 }
