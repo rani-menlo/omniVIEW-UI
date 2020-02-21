@@ -1,12 +1,13 @@
 .licence-modal {
   height: 100%;
-  padding: 14px;
+  padding: 0 14px 14px 14px;
   > .ant-modal {
     width: 600px !important;
   }
   &__header {
     display: flex;
     margin-bottom: 15px;
+    padding-top: 14px;
     cursor: move;
     &-close {
       width: 20px;

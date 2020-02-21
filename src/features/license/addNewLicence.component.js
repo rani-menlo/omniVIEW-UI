@@ -87,6 +87,7 @@ class AddNewLicence extends Component {
         // footer={null}
         // wrapClassName="licence-modal"
         draggableAreaClass=".licence-modal__header"
+        minHeight="28%"
       >
         <div className="licence-modal">
           <div

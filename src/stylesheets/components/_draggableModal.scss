@@ -1,10 +1,13 @@
 .draggable-modal {
   position: absolute !important;
   top: 15%;
-  left: 15%;
+  left: 20%;
   background: white;
   padding: 10px;
   box-shadow: 0px 0px 10px 0px;
   z-index: 100;
   // overflow: hidden;
+  &.adjust-position {
+    left: 30% !important;
+  }
 }

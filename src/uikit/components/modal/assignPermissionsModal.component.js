@@ -222,7 +222,6 @@ class AssignPermissions extends Component {
         draggableAreaClass=".assign-permissions-modal__header"
         minHeight="55%"
         minWidth="40%"
-        width="52%"
       >
         <div className="assign-permissions-modal">
           <div className="assign-permissions-modal__header">

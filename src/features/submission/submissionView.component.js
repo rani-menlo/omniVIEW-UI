@@ -1407,7 +1407,7 @@ class SubmissionView extends Component {
           </DraggableModal>
           <DraggableModal
             minWidth="35%"
-            minHeight="42%"
+            minHeight="45%"
             visible={this.state.openFindModal}
             draggableAreaClass=".validationResults__header"
           >
