@@ -42,7 +42,7 @@ class OpenSubmissionsModal extends Component {
       _.get(props, "submissions.length") &&
       !_.get(state, "submissions.length")
     ) {
-      const submissions = _.filter(props.submissions, ['is_uploading', false]);
+      const submissions = _.filter(props.submissions, ["is_uploading", false]);
       return {
         submissions: submissions
       };
@@ -74,7 +74,7 @@ class OpenSubmissionsModal extends Component {
     });
 
     if (isLoggedInOmniciaRole(this.props.role)) {
-      this.fetchCustomers();
+      //this.fetchCustomers();
     } else {
       const { user } = this.props;
       this.onCustomerSelected({ ...user.customer })();
@@ -83,7 +83,7 @@ class OpenSubmissionsModal extends Component {
   }
 
   onCustomerSelected = customer => () => {
-    this.setState({ selectedCustomer: customer });
+    // this.setState({ selectedCustomer: customer });
     this.props.actions.setSelectedCustomer(customer);
   };
 
@@ -105,7 +105,12 @@ class OpenSubmissionsModal extends Component {
         activeTab: activeKey
       },
       () => {
-        this.fetchApplications();
+        if (activeKey === "1") {
+          if (this.state.selectedCustomer.id !== this.props.selectedCustomer.id) {
+            this.setState({ selectedCustomer: this.props.selectedCustomer });
+            this.fetchApplications();
+          }
+        }
       }
     );
   };
@@ -201,7 +206,7 @@ class OpenSubmissionsModal extends Component {
                           return (
                             <tr
                               key={idx}
-                              className={`global__cursor-pointer ${selectedCustomer.id ===
+                              className={`global__cursor-pointer ${this.props.selectedCustomer.id ===
                                 customer.id && "global__node-selected"}`}
                               onClick={this.onCustomerSelected(customer)}
                               key={customer.id}
@@ -253,7 +258,9 @@ class OpenSubmissionsModal extends Component {
               label="Open"
               buttonStyle={{ width: "80px" }}
               onClick={
-                activeTab == "1" ? this.openSubmission : () => this.changeTab("1")
+                activeTab == "1"
+                  ? this.openSubmission
+                  : () => this.changeTab("1")
               }
             />
           </div>
