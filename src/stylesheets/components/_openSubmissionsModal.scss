@@ -1,0 +1,117 @@
+.open-submissions-modal {
+  height: 100%;
+  padding: 0 6px 6px 6px;
+  &__dialog > .ant-modal {
+    width: 75% !important;
+    height: 75% !important;
+    .ant-modal-content {
+      height: 100% !important;
+    }
+    .ant-modal-body {
+      height: 100%;
+    }
+  }
+  &__tabs {
+    height: calc(100% - 65px);
+    // height: calc(100% - 130px);
+    // border: 1px solid $shadowed-steel;
+    // border-radius: 4px;
+
+    //antd tab scss
+    .ant-tabs-bar {
+      display: flex;
+      justify-content: center;
+      border: none;
+      margin: 0;
+    }
+    .ant-tabs-nav .ant-tabs-tab {
+      font-family: Heebo-Regular;
+      font-size: 12px;
+      font-weight: normal;
+      font-stretch: normal;
+      font-style: normal;
+      line-height: 1.33;
+      letter-spacing: normal;
+      text-align: center;
+      color: #000000;
+    }
+    .ant-tabs-nav .ant-tabs-tab-active {
+      font-weight: 800 !important;
+      color: #000000 !important;
+    }
+    .ant-tabs-ink-bar {
+      height: 4px !important;
+    }
+
+    .ant-tabs {
+      height: 100%;
+      .ant-tabs-top-content {
+        height: 85%;
+      }
+    }
+    .ant-tabs .ant-tabs-top-content > .ant-tabs-tabpane {
+      .open-submissions-moda__tabs__table {
+        height: 100%;
+        border: 1px solid $shadowed-steel;
+        border-radius: 4px;
+      }
+
+      .open-submissions-modal__tabs__table__body {
+        height: 100%;
+        overflow: auto;
+        > table {
+          overflow: auto;
+          width: 100%;
+        }
+        > table > tbody {
+          overflow: auto;
+          width: 100%;
+
+          > tr {
+            height: 35px;
+            border-right: 1px solid $shadowed-steel;
+          }
+          > td {
+            padding: 0 13px;
+          }
+          > tr:last-child {
+            border: 0px;
+          }
+          > tr:nth-child(even) {
+            background-color: $froasted-glass;
+          }
+        }
+        .no_validation_sequences {
+          display: flex;
+          justify-content: center;
+          padding-top: 18%;
+        }
+      }
+    }
+  }
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: move;
+    padding-top: 6px;
+    .open-folder {
+      width: 20px;
+      margin: -3px 8px 0 0;
+    }
+    &-close {
+      font-size: 18px;
+      color: $black;
+      cursor: pointer;
+    }
+  }
+  &__footer {
+    position: absolute;
+    bottom: 5px;
+    width: 98.2%;
+    display: flex;
+    justify-content: flex-end;
+    margin: 8px 0 16px 0;
+    padding-right: 20px;
+  }
+}

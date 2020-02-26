@@ -1,49 +1,49 @@
-import React, { Component } from "react";
-import { Redirect } from "react-router-dom";
-import { Icon, Tabs, Modal, Menu, Avatar } from "antd";
+import { Icon, Menu, Modal, Tabs } from "antd";
 import _ from "lodash";
+import React, { Component } from "react";
 import { connect } from "react-redux";
+import { Redirect } from "react-router-dom";
 import { bindActionCreators } from "redux";
 import styled from "styled-components";
-import TreeNode from "./treeNode.component";
-import NodeProperties from "./nodeProperties.component";
-import NodeSequences from "./nodeSequences.component";
+import { CHECKBOX, ROLE_IDS } from "../../constants";
 import {
+  ApiActions,
   SubmissionActions,
-  UsermanagementActions,
-  ApiActions
+  UsermanagementActions
 } from "../../redux/actions";
-import ValidationResults from "./validationResults.component";
+import usermanagementActions from "../../redux/actions/usermanagement.actions";
+import { UsermanagementApi } from "../../redux/api";
 import {
-  Sidebar,
-  Loader,
-  Footer,
-  DraggableModal,
-  Text,
-  OmniButton,
-  Row,
-  AssignPermissionsModal,
-  ImageLoader
-} from "../../uikit/components";
-import {
-  getSequenceJson,
   getLifeCycleJson,
+  getSequenceJson,
   getSequences
 } from "../../redux/selectors/submissionView.selector";
-import ProfileMenu from "../header/profileMenu.component";
-import SubmissionViewUsers from "./submissionViewUsers.component";
 import { translate } from "../../translations/translator";
-import { CHECKBOX, ROLE_IDS } from "../../constants";
-import { Permissions } from "./permissions";
 import {
-  isLoggedInAuthor,
-  isLoggedInOmniciaAdmin,
+  AssignPermissionsModal,
+  DraggableModal,
+  Footer,
+  ImageLoader,
+  Loader,
+  OmniButton,
+  OpenSubmissionsModal,
+  Row,
+  Sidebar,
+  Text
+} from "../../uikit/components";
+import {
+  isAdmin,
   isLoggedInCustomerAdmin,
-  isAdmin
+  isLoggedInOmniciaAdmin
 } from "../../utils";
-import usermanagementActions from "../../redux/actions/usermanagement.actions";
+import ProfileMenu from "../header/profileMenu.component";
 import FindNode from "./findNode.component";
-import { UsermanagementApi } from "../../redux/api";
+import NodeProperties from "./nodeProperties.component";
+import NodeSequences from "./nodeSequences.component";
+import { Permissions } from "./permissions";
+import SubmissionViewUsers from "./submissionViewUsers.component";
+import TreeNode from "./treeNode.component";
+import ValidationResults from "./validationResults.component";
 
 const TabPane = Tabs.TabPane;
 
@@ -70,6 +70,7 @@ class SubmissionView extends Component {
       editPermissions: false,
       sequences: [],
       showPermissionsModal: false,
+      openSubmissions: false,
       selectedNode: null,
       proUser: false,
       enableValidateSequence: false,
@@ -85,7 +86,7 @@ class SubmissionView extends Component {
     this.treeNodesMap = new Map();
   }
 
-  async componentDidMount() {
+  loadInitialData = async () => {
     let state = {};
     if (this.parentHeaderRef.current) {
       state.parentHeaderHeight = this.parentHeaderRef.current.clientHeight + 38;
@@ -117,6 +118,10 @@ class SubmissionView extends Component {
       this.setState({ ...state });
     }
     this.initData();
+  };
+
+  componentDidMount() {
+    this.loadInitialData();
   }
 
   componentWillUnmount() {
@@ -946,6 +951,31 @@ class SubmissionView extends Component {
     return filteredUsers;
   };
 
+  openSubmissionModal = () => {
+    let { openSubmissions } = this.state;
+    openSubmissions = !openSubmissions;
+    this.setState({ openSubmissions });
+  };
+
+  closeSubmissionModal = () => {
+    this.setState({ openSubmissions: false });
+  };
+
+  onOpenSumbissions = () => {
+    this.props.dispatch(
+      SubmissionActions.resetSequences(this.props.selectedSubmission.id)
+    );
+    this.setState(
+      {
+        sequences: [],
+      },
+      () => {
+        this.closeSubmissionModal();
+        this.loadInitialData();
+      }
+    );
+  };
+
   render() {
     const {
       loading,
@@ -969,9 +999,9 @@ class SubmissionView extends Component {
       editPermissions,
       showPermissionsModal,
       fileLevelAccessObj,
-      enableValidateSequence
+      enableValidateSequence,
+      openSubmissions
     } = this.state;
-
     if (!selectedSubmission) {
       return <Redirect to="/applications" />;
     }
@@ -1005,17 +1035,12 @@ class SubmissionView extends Component {
             </div>
             <div className="submissionview__header">
               <div
-                className="icon_text_border"
-                style={{ border: 0, cursor: "not-allowed" }}
+                className="icon_text_border global__cursor-pointer"
+                style={{ padding: "5px 16px 5px 8px", marginLeft: "10px" }}
+                onClick={this.openSubmissionModal}
               >
-                <img
-                  src="/images/open-folder.svg"
-                  className="global__icon"
-                  style={{ opacity: 0.2 }}
-                />
-                <span className="text" style={{ opacity: 0.2 }}>
-                  Open
-                </span>
+                <img src="/images/open-folder.svg" className="global__icon" />
+                <span className="text">Open</span>
               </div>
               {/* <Icon type="close-circle" theme="filled" className="global__icon" /> */}
               {/* <Icon type="interation" theme="filled" className="global__icon" /> */}
@@ -1424,6 +1449,23 @@ class SubmissionView extends Component {
             fileLevelAccessObj={fileLevelAccessObj}
           />
         )}
+        {openSubmissions && (
+          // <OpenSubmissionsModal
+          //   visible={openSubmissions}
+          //   closeModal={this.closeSubmissionModal}
+          // />
+          <DraggableModal
+            visible={openSubmissions}
+            draggableAreaClass=".open-submissions-modal__header"
+            minHeight="47%"
+          >
+            <OpenSubmissionsModal
+              onClose={this.closeSubmissionModal}
+              onOpenSubmission={this.onOpenSumbissions}
+            />
+          </DraggableModal>
+        )}
+
         {/*  <Modal
           visible={this.state.openValidationModal}
           closable={false}

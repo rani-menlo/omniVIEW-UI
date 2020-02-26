@@ -280,5 +280,9 @@
   "label.menu.openinomniview": "Open in omniVIEW",
   "label.menu.openinomnifile": "Open in omniFILE",
   "label.menu.openinnewwindow": "Open in new Window",
-  "label.menu.editproperties": "Edit Properties"
+  "label.menu.editproperties": "Edit Properties",
+
+  "label.submissions.open": "Open eCTD Submission",
+  "label.submissions.recent": "Recent",
+  "label.submissions.customers": "Customers"
 }
