@@ -52,7 +52,6 @@ export {
   Toast,
   CircularLocalImageFile,
   ImageLoader,
-  AssignPermissionsModal
   AssignPermissionsModal,
-  OpenSubmissionsModal,
+  OpenSubmissionsModal
 };

@@ -1227,14 +1227,14 @@ class ApplicationDashboard extends Component {
             back={this.goBackToUsersModal}
             submit={this.assignLicence}
           />
-          {showPermissionsModal && (
+          {/* {showPermissionsModal && (
             <AssignPermissionsModal
               visible={showPermissionsModal}
               assignGlobalPermissions={assignGlobalPermissions}
               closeModal={this.closePermissionsModal}
               submissions={checkedSubmissions}
             />
-          )}
+          )} */}
           {(showSubscriptionsInUse || showLicenceUnAssigned) && (
             <LicenceInUseUnAssigned
               type={showSubscriptionsInUse ? "inuse" : "unassigned"}
