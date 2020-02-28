@@ -284,5 +284,6 @@
 
   "label.submissions.open": "Open eCTD Submission",
   "label.submissions.recent": "Recent",
-  "label.submissions.customers": "Customers"
+  "label.submissions.customers": "Customers",
+  "label.button.export": "Export to PDF"
 }

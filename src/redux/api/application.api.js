@@ -47,5 +47,7 @@ export default {
   saveSequenceDetails: data => api.post(URI.SAVE_SEQUENCE_DETAILS, data),
   monitorStatus: data => api.post(URI.MONITOR_STATUS, data),
   retryUploads: data => api.post(URI.RETRY_UPLOADS, data),
-  deleteSubmission: data => api.post(URI.DELETE_SUBMISSION, data)
+  deleteSubmission: data => api.post(URI.DELETE_SUBMISSION, data),
+  deleteSequences: data => api.post(URI.DELETE_SEQUENCES, data),
+  exportViewReportPDF: data => api.post(URI.GENERATEPDF, data)
 };

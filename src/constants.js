@@ -76,6 +76,7 @@ const URI = {
   // Sequence
   GET_SEQUENCES: `${path}sequence/getSequences`,
   GET_SEQUENCES_WITH_PERMISSIONS: `${path}sequence/getSequences`,
+  DELETE_SEQUENCES: `${path}upload/deleteSequences`,
 
   // Validation
   VALIDATE_SEQUENCE: `${path}validation/sequenceValidation`,
@@ -131,7 +132,8 @@ const URI = {
   SAVE_SUBMISSION_DETAILS: `${path}upload/saveSubmissionDetails`,
   SAVE_SEQUENCE_DETAILS: `${path}upload/saveSequenceDetails`,
   MONITOR_STATUS: `${path}upload/monitorStatus`,
-  RETRY_UPLOADS: `${path}upload/retrySequence`
+  RETRY_UPLOADS: `${path}upload/retrySequence`,
+  GENERATEPDF: `${path}upload/generateErrorReport`
 };
 
 const DATE_FORMAT = "MM/DD/YYYY";

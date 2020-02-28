@@ -85,6 +85,7 @@ class ApplicationDashboard extends Component {
       reportData: [],
       openFailuresModal: false,
       selectedFailedUploads: [],
+      submissionViewReport: "",
       TableColumns: [
         {
           name: TableColumnNames.CHECKBOX,
@@ -842,13 +843,23 @@ class ApplicationDashboard extends Component {
     window.scrollTo(0, 0);
     this.setState({
       reportData: failures,
-      openFailuresModal: true
+      openFailuresModal: true,
+      submissionViewReport: submission
     });
     this.props.dispatch(ApiActions.successOnDemand());
   };
 
   closeFailuresModal = () => {
     this.setState({ openFailuresModal: false });
+  };
+
+  //Export to PDF
+  exportToPDF = async () => {
+    const res = await ApplicationApi.exportViewReportPDF({
+      submission_id: this.state.submissionViewReport.id
+    });
+    console.log("rse", res);
+    const { data } = res;
   };
 
   render() {
@@ -1333,6 +1344,12 @@ class ApplicationDashboard extends Component {
               ) : (
                 ""
               )}
+              <OmniButton
+                type="secondary"
+                label={translate("label.button.export")}
+                onClick={this.exportToPDF}
+                buttonStyle={{ width: "120px", marginLeft: "12px" }}
+              />
             </div>
           </div>
         </DraggableModal>
