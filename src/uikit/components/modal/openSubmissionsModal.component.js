@@ -149,7 +149,7 @@ class OpenSubmissionsModal extends Component {
         </div>
         <div className="open-submissions-modal__tabs">
           <Tabs activeKey={activeTab} onChange={this.changeTab}>
-            <TabPane tab={translate("label.submissions.recent")} key="1">
+            <TabPane tab={translate("label.dashboard.applications")} key="1">
               <div className="open-submissions-moda__tabs__table">
                 <div className="open-submissions-modal__tabs__table__body">
                   <table>
