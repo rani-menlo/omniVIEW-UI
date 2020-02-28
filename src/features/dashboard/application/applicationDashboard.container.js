@@ -862,6 +862,36 @@ class ApplicationDashboard extends Component {
     const { data } = res;
   };
 
+  showLoading = () => {
+    this.props.dispatch(ApiActions.requestOnDemand());
+  };
+
+  hideLoading = () => {
+    this.props.dispatch(ApiActions.successOnDemand());
+  };
+
+  //delete sequences
+  deleteSequences = async () => {
+    this.showLoading();
+    let selectedFailedUploads = [...this.state.selectedFailedUploads];
+    let sequences = selectedFailedUploads.flatMap(i => i.pipeline_name);
+    const res = await ApplicationApi.deleteSequences({
+      customer_id: this.props.selectedCustomer.id,
+      submission_id: this.state.submissionViewReport.id,
+      sequences: sequences
+    });
+    this.hideLoading();
+    if (!res.data.error) {
+      this.closeFailuresModal();
+      Toast.success("Sequence has been deleted!");
+      //clearing all the intervals after deleting the submission
+      this.clearAllIntervals();
+      this.fetchApplications();
+    } else {
+      Toast.error("Please try again");
+    }
+  };
+
   render() {
     const {
       viewBy,
@@ -1344,6 +1374,12 @@ class ApplicationDashboard extends Component {
               ) : (
                 ""
               )}
+              <OmniButton
+                disabled={!selectedFailedUploads.length}
+                label="Delete"
+                buttonStyle={{ width: "120px", marginRight: "10px" }}
+                onClick={this.deleteSequences}
+              />
               <OmniButton
                 type="secondary"
                 label={translate("label.button.export")}
