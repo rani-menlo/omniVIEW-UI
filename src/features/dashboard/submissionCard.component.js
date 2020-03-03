@@ -20,7 +20,7 @@ import {
   UPLOAD_FAILED,
   ANALYZING,
   UPLOAD_PROCESSING,
-  UPLOAD_INPROGRES_EXTRA
+  SCRIPT_ERROR
 } from "../../constants";
 import { ApiActions } from "../../redux/actions";
 
@@ -118,6 +118,7 @@ class SubmissionCard extends Component {
     } = this.props;
     const { crossRefs } = this.state;
     const uploading = _.get(submission, "is_uploading");
+    const is_submission = _.get(submission, "is_submission");
     const LazyImageLoader = React.lazy(() =>
       import("../../uikit/components/image/imageLoader.component")
     );
@@ -144,20 +145,19 @@ class SubmissionCard extends Component {
             >
               {_.get(submission, "name")}
             </span>
-            {!uploading &&
-              !submission.analyzing && (
-                <Dropdown
-                  overlay={getMenu && getMenu()}
-                  trigger={["click"]}
-                  onClick={getMenu}
-                  overlayClassName="submissioncard__heading-dropdown"
-                >
-                  <img
-                    src="/images/overflow.svg"
-                    className="submissioncard__heading-more"
-                  />
-                </Dropdown>
-              )}
+            {!uploading && !submission.analyzing && (
+              <Dropdown
+                overlay={getMenu && getMenu()}
+                trigger={["click"]}
+                onClick={getMenu}
+                overlayClassName="submissioncard__heading-dropdown"
+              >
+                <img
+                  src="/images/overflow.svg"
+                  className="submissioncard__heading-more"
+                />
+              </Dropdown>
+            )}
           </div>
           {/* Content of the application card */}
           <div
@@ -165,7 +165,10 @@ class SubmissionCard extends Component {
             style={{
               ...((uploading ||
                 submission.analyzing ||
-                _.get(submission, "sequence_failed.length") ||
+                (_.get(submission, "sequence_failed.length") &&
+                  is_submission == 1) ||
+                // _.get(submission, "sequence_failed.length") ==
+                //   _.get(submission, "sequence_count") ||
                 "") && {
                 cursor: "not-allowed"
               })
@@ -174,7 +177,8 @@ class SubmissionCard extends Component {
           >
             {(uploading ||
               submission.analyzing ||
-              _.get(submission, "sequence_failed.length") ||
+              (_.get(submission, "sequence_failed.length") &&
+                is_submission == 1) ||
               "") && (
               <React.Fragment>
                 <div style={{ padding: "10px" }}>
@@ -214,6 +218,8 @@ class SubmissionCard extends Component {
                   )}
                   {/* Displaying Failed Sequences */}
                   {/* {(_.get(submission, "sequence_failed.length") || "") && ( */}
+                  {/* {_.get(submission, "sequence_failed.length") ==
+                    _.get(submission, "sequence_count") && ( */}
                   <Text
                     type="medium"
                     textStyle={{ color: "red" }}
@@ -223,6 +229,7 @@ class SubmissionCard extends Component {
                       0
                     )}`}
                   />
+                  {/* )} */}
                   {/* )} */}
                   {submission.analyzing &&
                     !(_.get(submission, "sequence_failed.length") || "") && (
@@ -257,9 +264,10 @@ class SubmissionCard extends Component {
             {/* Sequence is uploaded successfully and able to access the application */}
             {!uploading &&
               !submission.analyzing &&
-              !(
-                submission.sequence_failed && submission.sequence_failed.length
-              ) && (
+              // !(
+              //   submission.sequence_failed && submission.sequence_failed.length
+              // ) &&
+              is_submission == 0 && (
                 <React.Fragment>
                   <div className="submissioncard__content__item">
                     <p className="submissioncard__content__item-label">
@@ -298,19 +306,32 @@ class SubmissionCard extends Component {
                       {translate("label.dashboard.sequences")}:
                     </span>
                     <span className="submissioncard__content__item-text">
-                      {_.get(submission, "sequence_count", "")}
+                      {_.get(submission, "sequence_count", 0)}
                     </span>
-                    {_.get(submission, "broken_x_ref", "") != 0 && (
-                      <span className="submissioncard__content__item-text-crossreficon">
-                        <img
-                          src="/images/info_icon.png"
-                          className=""
-                          onClick={this.openCrossrefsModal}
-                        />
-                      </span>
-                    )}
+                    {_.get(submission, "broken_x_ref", "") != 0 &&
+                      !(
+                        submission.sequence_failed &&
+                        submission.sequence_failed.length
+                      ) && (
+                        <span className="submissioncard__content__item-text-crossreficon">
+                          <img
+                            src="/images/info_icon.png"
+                            className=""
+                            onClick={this.openCrossrefsModal}
+                          />
+                        </span>
+                      )}
+                    {_.get(submission, "sequence_failed") &&
+                      _.get(submission, "sequence_failed.length") != 0 && (
+                        <span className="submissioncard__content__item-text-crossreficon">
+                          <img
+                            src="/images/error.png"
+                            className=""
+                            onClick={openFailures}
+                          />
+                        </span>
+                      )}
                   </div>
-
                   <div className="submissioncard__content__item">
                     <span className="submissioncard__content__item-label">
                       {translate("label.dashboard.addedon")}:

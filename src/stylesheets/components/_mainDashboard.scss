@@ -126,42 +126,67 @@
       cursor: pointer;
     }
   }
-  &__table {
-    height: calc(100% - 120px);
-    border: 1px solid $shadowed-steel;
-    // border-radius: 4px;
-    // margin-top: 10px;
-
-    &__header {
-      width: 100%;
+  &__list {
+    &.no-crossrefs {
+      height: 95%;
+      border: none;
     }
+    &.crossrefs {
+      height: 65%;
+      border: 1px solid $shadowed-steel;
+    }
+    padding: 10px;
+    &__table {
+      height: calc(100% - 100px);
+      border: 1px solid $shadowed-steel;
+      // border-radius: 4px;
+      // margin-top: 10px;
 
-    &__body {
-      table {
+      &__header {
         width: 100%;
       }
-      height: 100%;
-      overflow: auto;
-      thead > tr {
-        background: $froasted-glass;
-      }
-      tbody {
+
+      &__body {
+        table {
+          width: 100%;
+        }
+        height: 100%;
         overflow: auto;
-        width: 100%;
+        thead > tr {
+          background: $froasted-glass;
+        }
+        tbody {
+          overflow: auto;
+          width: 100%;
+        }
+        tbody > tr:last-child {
+          border-bottom: none;
+        }
       }
-      tbody > tr:last-child {
-        border-bottom: none;
-      }
+    }
+    &__footer {
+      //position: absolute;
+      bottom: 5px;
+      width: 100%;
+      padding-right: 20px;
     }
   }
-  &__footer {
-    position: absolute;
-    bottom: 5px;
-    width: 100%;
-    padding-right: 20px;
+  &__info-list {
+    border: 1px solid $shadowed-steel;
+    padding: 10px;
+    margin: 10px 0;
   }
 }
 
 // .failureResults__table .ant-table-scroll {
 //   height: 240px; // Same as your scroll.y value
+// }
+
+// .deleteSequencesModal {
+//   .ant-modal-confirm-body .ant-modal-confirm-content {
+//     margin-top: 0;
+//   }
+//   .ant-modal-confirm .ant-modal-confirm-btns .ant-btn {
+//     width: 75px;
+//   }
 // }

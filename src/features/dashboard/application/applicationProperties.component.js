@@ -141,7 +141,7 @@ class ApplicationProperties extends Component {
               </Dropdown>
             </div>
           </div>
-          <div style={{ marginTop: "40px", textAlign: "right" }}>
+          <div style={{ marginTop: "30px", textAlign: "right" }}>
             <OmniButton
               type="secondary"
               label={translate("label.button.cancel")}

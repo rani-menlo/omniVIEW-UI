@@ -284,5 +284,11 @@
 
   "label.submissions.open": "Open eCTD Submission",
   "label.submissions.recent": "Recent",
-  "label.submissions.customers": "Customers"
+  "label.submissions.customers": "Customers",
+  "label.button.export": "Export to PDF",
+
+  "label.button.delete": "Delete",
+  "label.deleteSequences.heading": "Delete Sequences",
+  "label.deleteSequences.warning": "The application will be temporarily inaccessible while sequences are being deleted.",
+  "label.deleteAllSequences.warning": "You have chosen to delete all the Sequences, instead, do you wish to select"
 }

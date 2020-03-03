@@ -88,7 +88,7 @@ class ValidationResults extends Component {
   };
 
   getValidationGroupIcon = validation => {
-    const { group, isFile, isFolder } = validation;
+    const { group, isFile, isFolder, isSTF } = validation;
     let img = (
       <Icon type="folder" theme="filled" className="global__file-folder" />
     );
@@ -96,6 +96,24 @@ class ValidationResults extends Component {
       return (
         <img
           src="/images/file-new.svg"
+          className="global__file-folder"
+          style={{ width: "18px", height: "22px" }}
+        />
+      );
+    }
+    if (group == "General" && isFile) {
+      return (
+        <img
+          src="/images/file-new.svg"
+          className="global__file-folder"
+          style={{ width: "18px", height: "22px" }}
+        />
+      );
+    }
+    if (group == "General" && isSTF) {
+      img = (
+        <img
+          src={`/images/file-${isFile ? "new" : "stf"}.svg`}
           className="global__file-folder"
           style={{ width: "18px", height: "22px" }}
         />

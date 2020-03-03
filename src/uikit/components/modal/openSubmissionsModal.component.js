@@ -106,7 +106,9 @@ class OpenSubmissionsModal extends Component {
       },
       () => {
         if (activeKey === "1") {
-          if (this.state.selectedCustomer.id !== this.props.selectedCustomer.id) {
+          if (
+            this.state.selectedCustomer.id !== this.props.selectedCustomer.id
+          ) {
             this.setState({ selectedCustomer: this.props.selectedCustomer });
             this.fetchApplications();
           }
@@ -149,7 +151,7 @@ class OpenSubmissionsModal extends Component {
         </div>
         <div className="open-submissions-modal__tabs">
           <Tabs activeKey={activeTab} onChange={this.changeTab}>
-            <TabPane tab={translate("label.submissions.recent")} key="1">
+            <TabPane tab={translate("label.dashboard.applications")} key="1">
               <div className="open-submissions-moda__tabs__table">
                 <div className="open-submissions-modal__tabs__table__body">
                   <table>
@@ -196,53 +198,56 @@ class OpenSubmissionsModal extends Component {
                 </div>
               </div>
             </TabPane>
-            <TabPane tab={translate("label.submissions.customers")} key="2">
-              <div className="open-submissions-moda__tabs__table">
-                <div className="open-submissions-modal__tabs__table__body">
-                  <table>
-                    <tbody>
-                      {customers && customers.length ? (
-                        _.map(customers, (customer, idx) => {
-                          return (
-                            <tr
-                              key={idx}
-                              className={`global__cursor-pointer ${this.props.selectedCustomer.id ===
-                                customer.id && "global__node-selected"}`}
-                              onClick={this.onCustomerSelected(customer)}
-                              key={customer.id}
-                            >
-                              <td className="">
-                                <div
-                                  style={{
-                                    display: "flex",
-                                    alignItems: "center"
-                                  }}
-                                >
-                                  <Icon
-                                    type="folder"
-                                    theme="filled"
-                                    className="global__file-folder"
-                                  />
-                                  <Text
-                                    type="regular"
-                                    size="14px"
-                                    text={customer.company_name}
-                                  />
-                                </div>
-                              </td>
-                            </tr>
-                          );
-                        })
-                      ) : (
-                        <tr className="no_validation_sequences">
-                          No Customers Found
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
+            {isLoggedInOmniciaRole(this.props.role) && (
+              <TabPane tab={translate("label.submissions.customers")} key="2">
+                <div className="open-submissions-moda__tabs__table">
+                  <div className="open-submissions-modal__tabs__table__body">
+                    <table>
+                      <tbody>
+                        {customers && customers.length ? (
+                          _.map(customers, (customer, idx) => {
+                            return (
+                              <tr
+                                key={idx}
+                                className={`global__cursor-pointer ${this.props
+                                  .selectedCustomer.id === customer.id &&
+                                  "global__node-selected"}`}
+                                onClick={this.onCustomerSelected(customer)}
+                                key={customer.id}
+                              >
+                                <td className="">
+                                  <div
+                                    style={{
+                                      display: "flex",
+                                      alignItems: "center"
+                                    }}
+                                  >
+                                    <Icon
+                                      type="folder"
+                                      theme="filled"
+                                      className="global__file-folder"
+                                    />
+                                    <Text
+                                      type="regular"
+                                      size="14px"
+                                      text={customer.company_name}
+                                    />
+                                  </div>
+                                </td>
+                              </tr>
+                            );
+                          })
+                        ) : (
+                          <tr className="no_validation_sequences">
+                            No Customers Found
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
-              </div>
-            </TabPane>
+              </TabPane>
+            )}
           </Tabs>
         </div>
 

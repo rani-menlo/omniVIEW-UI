@@ -1,62 +1,61 @@
-import React, { Component } from "react";
-import { Redirect } from "react-router-dom";
-import uuid from "uuid/v4";
+import { Dropdown, Icon, Menu, Modal, Table } from "antd";
 import _ from "lodash";
-import { Icon, Dropdown, Menu, Avatar, Modal, Table } from "antd";
+import React, { Component } from "react";
 import { connect } from "react-redux";
+import { Redirect } from "react-router-dom";
 import { bindActionCreators } from "redux";
-import SubmissionCard from "../submissionCard.component";
-import {
-  ApplicationActions,
-  SubmissionActions,
-  UsermanagementActions,
-  CustomerActions,
-  ApiActions
-} from "../../../redux/actions";
-import Header from "../../header/header.component";
 import styled from "styled-components";
 import {
   DEBOUNCE_TIME,
   POLLING_INTERVAL,
-  UPLOAD_INPROGRES,
-  UPLOAD_INPROGRES_EXTRA,
+  SCRIPT_ERROR,
   UPLOAD_FAILED,
-  UPLOAD_SUCCESS,
-  UPLOAD_PROCESSING
+  UPLOAD_INPROGRES,
+  UPLOAD_PROCESSING,
+  UPLOAD_SUCCESS
 } from "../../../constants";
 import {
-  isLoggedInOmniciaRole,
-  isLoggedInCustomerAdmin,
-  getFormattedDate,
-  isLoggedInOmniciaAdmin,
-  isAdmin
-} from "../../../utils";
-import {
-  Loader,
-  Footer,
-  TableHeader,
-  Row,
-  Pagination,
-  OmniCheckbox,
-  OmniButton,
-  SearchBox,
-  ListViewGridView,
-  SubHeader,
-  ContentLayout,
-  AssignPermissionsModal,
-  Text,
-  Toast,
-  ImageLoader,
-  DraggableModal
-} from "../../../uikit/components";
-import { translate } from "../../../translations/translator";
+  ApiActions,
+  ApplicationActions,
+  CustomerActions,
+  UsermanagementActions
+} from "../../../redux/actions";
 import submissionActions from "../../../redux/actions/submission.actions";
 import usermanagementActions from "../../../redux/actions/usermanagement.actions";
-import LicenceInUseUnAssigned from "../../license/licenceInUseUnAssigned.component";
+import { ApplicationApi, CustomerApi } from "../../../redux/api";
+import { translate } from "../../../translations/translator";
+import {
+  AssignPermissionsModal,
+  ContentLayout,
+  DraggableModal,
+  ImageLoader,
+  ListViewGridView,
+  Loader,
+  OmniButton,
+  OmniCheckbox,
+  Pagination,
+  Row,
+  SearchBox,
+  SubHeader,
+  TableHeader,
+  Text,
+  Toast
+} from "../../../uikit/components";
+import SequencesModal from "../../../uikit/components/modal/sequencesModal.component";
+import {
+  getFormattedDate,
+  isAdmin,
+  isLoggedInCustomerAdmin,
+  isLoggedInOmniciaAdmin,
+  isLoggedInOmniciaRole
+} from "../../../utils";
+import Header from "../../header/header.component";
 import AssignLicence from "../../license/assignLicence.component";
 import AssignLicenceWithUsers from "../../license/assignLicenceWithUsers.component";
-import { CustomerApi, ApplicationApi } from "../../../redux/api";
+import LicenceInUseUnAssigned from "../../license/licenceInUseUnAssigned.component";
+import SubmissionCard from "../submissionCard.component";
 import ApplicationProperties from "./applicationProperties.component";
+import { ExclamationCircleOutlined } from "@ant-design/icons";
 // import { Customers } from "./sampleCustomers";
 // import  ApplicationApi  from "../../../redux/api/application.api"
 
@@ -70,6 +69,7 @@ class ApplicationDashboard extends Component {
       itemsPerPage: 5,
       searchText: "",
       submissions: [],
+      showSequencesModal: false,
       assignGlobalPermissions: false,
       assignPermissions: false,
       showPermissionsModal: false,
@@ -85,6 +85,8 @@ class ApplicationDashboard extends Component {
       reportData: [],
       openFailuresModal: false,
       selectedFailedUploads: [],
+      openDeleteSequencesConfirmModal: false,
+      submissionViewReport: "",
       TableColumns: [
         {
           name: TableColumnNames.CHECKBOX,
@@ -248,7 +250,8 @@ class ApplicationDashboard extends Component {
         this.checkSequenceStatus(
           _.get(data, "result", null),
           submission,
-          _.get(data, "is_uploading")
+          _.get(data, "is_uploading"),
+          _.get(data, "is_submission")
         );
       }
       // else {
@@ -273,7 +276,7 @@ class ApplicationDashboard extends Component {
     }
   };
 
-  checkSequenceStatus = (data, submission, is_uploadingFlag) => {
+  checkSequenceStatus = (data, submission, is_uploadingFlag, is_submission) => {
     const totalNoOfSeq = data.length;
     const inProgress = [];
     const failed = [];
@@ -282,10 +285,10 @@ class ApplicationDashboard extends Component {
     _.map(data, seq => {
       switch (seq.status) {
         case UPLOAD_INPROGRES:
-        case UPLOAD_INPROGRES_EXTRA:
           inProgress.push(seq);
           break;
         case UPLOAD_FAILED:
+        case SCRIPT_ERROR:
           failed.push(seq);
           break;
         case UPLOAD_SUCCESS:
@@ -302,6 +305,7 @@ class ApplicationDashboard extends Component {
     submission.sequence_failed = failed;
     submission.sequence_success = success;
     submission.sequence_processing = processing;
+    submission.is_submission = is_submission;
     if (!inProgress.length && processing.length) {
       submission.analyzing = true;
     }
@@ -335,62 +339,58 @@ class ApplicationDashboard extends Component {
     };
     return (
       <Menu onClick={this.onMenuClick(submission)}>
-        {!submission.is_uploading &&
-          !_.get(submission, "sequence_failed.length", "") && (
-            <Menu.Item key="edit">
-              <div className="global__center-vert">
-                <img src="/images/edit.svg" style={style} />
-                <Text
-                  type="regular"
-                  size="12px"
-                  text={translate("label.menu.editproperties")}
-                />
-              </div>
-            </Menu.Item>
-          )}
-        {!submission.is_uploading &&
-          !_.get(submission, "sequence_failed.length", "") && (
-            <Menu.Item key="openinomniview">
-              <div className="global__center-vert">
-                <img src="/images/omni-view-cloud.png" style={style} />
-                <Text
-                  type="regular"
-                  size="12px"
-                  text={translate("label.menu.openinomniview")}
-                />
-              </div>
-            </Menu.Item>
-          )}
-        {!submission.is_uploading &&
-          !_.get(submission, "sequence_failed.length", "") && (
-            <Menu.Item disabled>
-              <div className="global__center-vert">
-                <img src="/images/omni-file.jpg" style={style} />
-                <Text
-                  type="regular"
-                  size="12px"
-                  text={translate("label.menu.openinomnifile")}
-                />
-              </div>
-            </Menu.Item>
-          )}
-        {!submission.is_uploading &&
-          !_.get(submission, "sequence_failed.length", "") && (
-            <Menu.Item key="window">
-              <div className="global__center-vert">
-                <img src="/images/new-window.png" style={style} />
-                <Text
-                  type="regular"
-                  size="12px"
-                  text={translate("label.menu.openinnewwindow")}
-                />
-              </div>
-            </Menu.Item>
-          )}
+        {!submission.is_uploading && submission.is_submission == 0 && (
+          <Menu.Item key="edit">
+            <div className="global__center-vert">
+              <img src="/images/edit.svg" style={style} />
+              <Text
+                type="regular"
+                size="12px"
+                text={translate("label.menu.editproperties")}
+              />
+            </div>
+          </Menu.Item>
+        )}
+        {!submission.is_uploading && submission.is_submission == 0 && (
+          <Menu.Item key="openinomniview">
+            <div className="global__center-vert">
+              <img src="/images/omni-view-cloud.png" style={style} />
+              <Text
+                type="regular"
+                size="12px"
+                text={translate("label.menu.openinomniview")}
+              />
+            </div>
+          </Menu.Item>
+        )}
+        {!submission.is_uploading && submission.is_submission == 0 && (
+          <Menu.Item disabled>
+            <div className="global__center-vert">
+              <img src="/images/omni-file.jpg" style={style} />
+              <Text
+                type="regular"
+                size="12px"
+                text={translate("label.menu.openinomnifile")}
+              />
+            </div>
+          </Menu.Item>
+        )}
+        {!submission.is_uploading && submission.is_submission == 0 && (
+          <Menu.Item key="window">
+            <div className="global__center-vert">
+              <img src="/images/new-window.png" style={style} />
+              <Text
+                type="regular"
+                size="12px"
+                text={translate("label.menu.openinnewwindow")}
+              />
+            </div>
+          </Menu.Item>
+        )}
         {(isLoggedInOmniciaAdmin(this.props.role) ||
           isLoggedInCustomerAdmin(this.props.role)) &&
           !submission.is_uploading &&
-          !_.get(submission, "sequence_failed.length", "") && [
+          submission.is_submission == 0 && [
             <Menu.Item
               key="permissions"
               style={{ borderTop: "1px solid rgba(74, 74, 74, 0.25)" }}
@@ -411,6 +411,24 @@ class ApplicationDashboard extends Component {
               </div>
             </Menu.Item>
           ]}
+        {/* {(isLoggedInOmniciaAdmin(this.props.role) ||
+          isLoggedInCustomerAdmin(this.props.role)) && (
+          <Menu.Item key="delete_sequences">
+            <div className="global__center-vert global__text-red">
+              <Icon
+                type="close-circle"
+                theme="outlined"
+                style={{ fontSize: "18px", marginRight: "4px" }}
+              />
+              <Text
+                type="regular"
+                size="12px"
+                text="Delete Sequences"
+                className="global__text-red"
+              />
+            </div>
+          </Menu.Item>
+        )} */}
         {(isLoggedInOmniciaAdmin(this.props.role) ||
           isLoggedInCustomerAdmin(this.props.role)) && (
           <Menu.Item key="delete">
@@ -478,7 +496,9 @@ class ApplicationDashboard extends Component {
     if (
       _.get(submission, "is_uploading") ||
       _.get(submission, "analyzing") ||
-      _.get(submission, "sequence_failed", []).length
+      // _.get(submission, "sequence_failed", []).length ==
+      //   _.get(submission, "sequence_count") ||
+      _.get(submission, "is_submission") == 1
     ) {
       return;
     }
@@ -554,6 +574,10 @@ class ApplicationDashboard extends Component {
     } else if (key === "delete") {
       this.removeSubmission(submission);
     }
+    //  else if (key == "delete_sequences") {
+    //   this.props.actions.setSelectedSubmission(submission);
+    //   this.openSequencesModal();
+    // }
   };
 
   removeSubmission = submission => {
@@ -647,6 +671,14 @@ class ApplicationDashboard extends Component {
   openPermissionsModal = () => {
     this.props.dispatch(usermanagementActions.resetUsersOfFileOrSubmission());
     this.setState({ showPermissionsModal: true });
+  };
+
+  openSequencesModal = () => {
+    this.setState({ showSequencesModal: true });
+  };
+
+  closeSequencesModal = () => {
+    this.setState({ showSequencesModal: false });
   };
 
   assignGlobalPermissions = () => {
@@ -829,7 +861,8 @@ class ApplicationDashboard extends Component {
     );
   };
 
-  openFailures = submission => async () => {
+  openFailures = submission => async e => {
+    e.stopPropagation();
     this.props.dispatch(ApiActions.requestOnDemand());
     const res = await ApplicationApi.monitorStatus({
       submission_id: submission.id
@@ -837,18 +870,114 @@ class ApplicationDashboard extends Component {
     const { data } = res;
     const failures = _.filter(
       _.get(data, "result"),
-      seq => seq.status == UPLOAD_FAILED
+      seq => seq.status == UPLOAD_FAILED || SCRIPT_ERROR
     );
     window.scrollTo(0, 0);
     this.setState({
       reportData: failures,
-      openFailuresModal: true
+      openFailuresModal: true,
+      submissionViewReport: submission
     });
     this.props.dispatch(ApiActions.successOnDemand());
   };
 
   closeFailuresModal = () => {
-    this.setState({ openFailuresModal: false });
+    this.setState({ openFailuresModal: false, selectedFailedUploads: [] });
+  };
+
+  //Export to PDF
+  exportToPDF = () => {
+    this.showLoading();
+    const res = ApplicationApi.exportViewReportPDF({
+      submission_id: this.state.submissionViewReport.id
+    })
+      .then(res => {
+        this.hideLoading();
+        const defaultFilename = "Report.pdf";
+        var data = new Blob([res.data]);
+        if (typeof window.navigator.msSaveBlob === "function") {
+          // If it is IE that support download blob directly.
+          window.navigator.msSaveBlob(data, defaultFilename);
+        } else {
+          var blob = data;
+          var link = document.createElement("a");
+          link.href = window.URL.createObjectURL(blob);
+          link.download = defaultFilename;
+          document.body.appendChild(link);
+          link.click(); // create an <a> element and simulate the click operation.
+        }
+      })
+      .catch(error => {
+        this.hideLoading();
+        console.log(error);
+      });
+  };
+
+  showLoading = () => {
+    this.props.dispatch(ApiActions.requestOnDemand());
+  };
+
+  hideLoading = () => {
+    this.props.dispatch(ApiActions.successOnDemand());
+  };
+
+  //open delete sequences confirmation modal if user selects all the sequences
+  //in the failure report window
+  showDeleteSeqConfirmModal = () => {
+    Modal.confirm({
+      className: "omnimodal",
+      title: translate("label.generic.delete"),
+      content:
+        "You chose to delete all the Sequences that will remove the Application Card from the Dashboard page. Do you wish to continue?",
+      okText: translate("label.generic.delete"),
+      cancelText: translate("label.button.cancel"),
+      onOk: () => {
+        this.deleteSequences();
+      },
+      onCancel: () => {}
+    });
+  };
+
+  //check if user selects all the sequences or not for the deletion
+  getDeleteSequencesData = () => {
+    let selectedFailedUploads = [...this.state.selectedFailedUploads];
+    const reportData = [...this.state.reportData];
+    if (selectedFailedUploads.length == reportData.length) {
+      this.showDeleteSeqConfirmModal();
+    } else {
+      this.deleteSequences();
+    }
+  };
+
+  //delete sequences
+  deleteSequences = async () => {
+    this.showLoading();
+    const reportData = [...this.state.reportData];
+    let selectedFailedUploads = [...this.state.selectedFailedUploads];
+    let sequences = selectedFailedUploads.flatMap(i => i.pipeline_name);
+    const res = await ApplicationApi.deleteSequences({
+      customer_id: this.props.selectedCustomer.id,
+      submission_id: this.state.submissionViewReport.id,
+      sequences: sequences
+    });
+    this.hideLoading();
+    if (!res.data.error) {
+      this.closeFailuresModal();
+      let sequences = "";
+      if (selectedFailedUploads.length === reportData.length) {
+        sequences = "Application has";
+      } else if (selectedFailedUploads.length > 1) {
+        sequences = "Sequences have";
+      } else {
+        sequences = "Sequence has";
+      }
+      Toast.success(`${sequences} been deleted!`);
+      //clearing all the intervals after deleting the submission
+      this.clearAllIntervals();
+      this.fetchApplications();
+    } else {
+      Toast.error("Please try again");
+    }
   };
 
   render() {
@@ -865,14 +994,16 @@ class ApplicationDashboard extends Component {
       showLicenceUnAssigned,
       openFailuresModal,
       reportData,
-      selectedFailedUploads
+      selectedFailedUploads,
+      showSequencesModal
     } = this.state;
     const {
       loading,
       selectedCustomer,
       submissionCount,
       role,
-      user
+      user,
+      selectedSubmission
     } = this.props;
     if (!selectedCustomer) {
       return <Redirect to="/customers" />;
@@ -1227,14 +1358,6 @@ class ApplicationDashboard extends Component {
             back={this.goBackToUsersModal}
             submit={this.assignLicence}
           />
-          {showPermissionsModal && (
-            <AssignPermissionsModal
-              visible={showPermissionsModal}
-              assignGlobalPermissions={assignGlobalPermissions}
-              closeModal={this.closePermissionsModal}
-              submissions={checkedSubmissions}
-            />
-          )}
           {(showSubscriptionsInUse || showLicenceUnAssigned) && (
             <LicenceInUseUnAssigned
               type={showSubscriptionsInUse ? "inuse" : "unassigned"}
@@ -1260,6 +1383,13 @@ class ApplicationDashboard extends Component {
             submit={this.updateSubmissionCenter}
           />
         )}
+        {showSequencesModal && (
+          <SequencesModal
+            visible
+            closeModal={this.closeSequencesModal}
+            submission={this.props.selectedSubmission}
+          />
+        )}
         {/* Assign Global Permissions Modal */}
         {showPermissionsModal && (
           <AssignPermissionsModal
@@ -1271,70 +1401,139 @@ class ApplicationDashboard extends Component {
         )}
         {/* Draggable view report modal in application dashboard */}
         <DraggableModal
-          // destroyOnClose
           visible={openFailuresModal}
-          // closable={false}
-          // footer={null}
-          // width="65%"
+          minWidth={
+            _.get(selectedSubmission, "broken_x_ref", "") != 0 ? "40%" : "29%"
+          }
+          minHeight={
+            _.get(selectedSubmission, "broken_x_ref", "") != 0 ? "65%" : "36%"
+          }
           draggableAreaClass=".failureResults__header"
         >
+          {/* Failure sequences list block starts*/}
           <div className="failureResults">
-            <div
-              className="failureResults__header"
-              style={{ marginBottom: "15px" }}
-            >
-              <Text type="extra_bold" size="16px" text="Failure Report" />
+            <div className="failureResults__header" style={{ margin: "0 8px" }}>
+              <Text
+                type="extra_bold"
+                size="16px"
+                text={
+                  _.get(selectedSubmission, "broken_x_ref", "") == 0
+                    ? "Failure Report"
+                    : ""
+                }
+              />
               <img
                 src="/images/close.svg"
                 className="licence-modal__header-close"
                 onClick={this.closeFailuresModal}
               />
             </div>
-            <div className="failureResults__table">
-              <div className="failureResults__table__body">
-                <Table
-                  columns={this.uploadFailedColumns}
-                  dataSource={reportData}
-                  pagination={false}
-                  rowSelection={
-                    user.is_secondary_contact || isAdmin(role.name)
-                      ? {
-                          onChange: (selectedRowKeys, selectedRows) => {
-                            this.setState({
-                              selectedFailedUploads: selectedRows
-                            });
+            {/* Cross references list when there are both cross-references and failed sequences */}
+            {_.get(selectedSubmission, "broken_x_ref", "") != 0 && (
+              <div className="failureResults__info-list">
+                <img
+                  src="/images/info_icon.png"
+                  style={{ height: "20px", margin: "-4px 5px 0 0" }}
+                />
+                <Text
+                  type="extra_bold"
+                  size="16px"
+                  text="Information: Cross-referenced Sequences Not Found"
+                  textStyle={{ display: "inline-block" }}
+                />
+                <p>
+                  {_.get(selectedSubmission, "broken_x_ref", "") == 1
+                    ? `A Sequence in the Application has a cross-reference to another Sequence that is not yet uploaded`
+                    : `${_.get(
+                        selectedSubmission,
+                        "broken_x_ref",
+                        ""
+                      )} Sequences in the Application have the cross-references to other Sequences that are not yet uploaded`}
+                </p>
+              </div>
+            )}
+            {/* Failure sequences list*/}
+            <div
+              className={`failureResults__list ${
+                _.get(selectedSubmission, "broken_x_ref", "") == 0
+                  ? "no-crossrefs"
+                  : "crossrefs"
+              }`}
+            >
+              {_.get(selectedSubmission, "broken_x_ref", "") != 0 && (
+                <div className="">
+                  <img
+                    src="/images/error.png"
+                    className=""
+                    style={{ height: "20px", margin: "-4px 5px 0 0" }}
+                  />
+                  <Text
+                    type="extra_bold"
+                    size="16px"
+                    text="Failure Report"
+                    textStyle={{ display: "inline-block" }}
+                  />
+                </div>
+              )}
+              <div className="failureResults__list__table">
+                <div className="failureResults__list__table__body">
+                  <Table
+                    columns={this.uploadFailedColumns}
+                    dataSource={reportData}
+                    pagination={false}
+                    rowSelection={
+                      user.is_secondary_contact || isAdmin(role.name)
+                        ? {
+                            onChange: (selectedRowKeys, selectedRows) => {
+                              this.setState({
+                                selectedFailedUploads: selectedRows
+                              });
+                            }
                           }
-                        }
-                      : ""
-                  }
-                  //scroll={{ y: 200 }}
+                        : ""
+                    }
+                    //scroll={{ y: 200 }}
+                  />
+                </div>
+              </div>
+              <div
+                style={{ textAlign: "right" }}
+                className="failureResults__list__footer"
+              >
+                <OmniButton
+                  type="secondary"
+                  label={translate("label.button.cancel")}
+                  onClick={this.closeFailuresModal}
+                  buttonStyle={{ width: "120px", margin: "10px 10px 0 0" }}
+                />
+                {/* As per the ticket OMNG-682 we are allowing retry option only for
+              secondary contact and admins*/}
+                {user.is_secondary_contact || isAdmin(role.name) ? (
+                  <OmniButton
+                    disabled={!selectedFailedUploads.length}
+                    label="Retry"
+                    buttonStyle={{ width: "120px", margin: "10px 10px 0 0" }}
+                    onClick={this.retryUpload}
+                  />
+                ) : (
+                  ""
+                )}
+                <OmniButton
+                  disabled={!selectedFailedUploads.length}
+                  label="Delete"
+                  buttonStyle={{ width: "120px", margin: "10px 10px 0 0" }}
+                  onClick={this.getDeleteSequencesData}
+                />
+                <OmniButton
+                  type="primary"
+                  label={translate("label.button.export")}
+                  onClick={this.exportToPDF}
+                  buttonStyle={{ width: "120px", margin: "10px 10px 0 0" }}
                 />
               </div>
             </div>
-            <div
-              style={{ margin: "20px 0", textAlign: "right" }}
-              className="failureResults__footer"
-            >
-              <OmniButton
-                type="secondary"
-                label={translate("label.button.cancel")}
-                onClick={this.closeFailuresModal}
-                buttonStyle={{ width: "120px", marginRight: "12px" }}
-              />
-              {/* As per the ticket OMNG-682 we are allowing retry option only for
-              secondary contact and admins*/}
-              {user.is_secondary_contact || isAdmin(role.name) ? (
-                <OmniButton
-                  disabled={!selectedFailedUploads.length}
-                  label="Retry"
-                  buttonStyle={{ width: "120px", marginRight: "10px" }}
-                  onClick={this.retryUpload}
-                />
-              ) : (
-                ""
-              )}
-            </div>
           </div>
+          {/* Failure sequences list ends */}
         </DraggableModal>
       </React.Fragment>
     );

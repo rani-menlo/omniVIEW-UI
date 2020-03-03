@@ -8,7 +8,13 @@ import { minFourDigitsInString } from "../../../utils";
 class RemoteFiles extends Component {
   constructor(props) {
     super(props);
-    this.state = { selected: null };
+    this.remoteFilesScroll = React.createRef();
+    this.state = { selected: null, remoteFilesTableHeight: "" };
+  }
+
+  componentDidMount() {
+    let height = this.remoteFilesScroll.current.offsetHeight;
+    this.setState({ remoteFilesTableHeight: height });
   }
 
   select = file => () => {
@@ -48,7 +54,7 @@ class RemoteFiles extends Component {
       showCheckAll,
       cloud
     } = this.props;
-    const { selected } = this.state;
+    const { selected, remoteFilesTableHeight } = this.state;
     return (
       <React.Fragment>
         <div className="addnewapplication__remotefiles">
@@ -73,7 +79,7 @@ class RemoteFiles extends Component {
                     display: "flex",
                     justifyContent: "flex-end",
                     width: "100%",
-                    marginRight: "15px"
+                    marginRight: remoteFilesTableHeight > 320 ? "15px" : "0"
                   }}
                 >
                   <Text type="extra_bold" size="14px" text="Select All" />
@@ -87,7 +93,10 @@ class RemoteFiles extends Component {
             </div>
           )}
 
-          <div className="addnewapplication__remotefiles_scroll">
+          <div
+            ref={this.remoteFilesScroll}
+            className="addnewapplication__remotefiles_scroll"
+          >
             {_.map(remoteFiles, (file, index) => {
               return (
                 <div
