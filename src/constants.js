@@ -139,12 +139,12 @@ const URI = {
 const DATE_FORMAT = "MM/DD/YYYY";
 const DEBOUNCE_TIME = 700; //ms
 const POLLING_INTERVAL = 10000; //ms
-const UPLOAD_INPROGRES = 0;
-const UPLOAD_INPROGRES_EXTRA = -1; // added extra from the backend
-const UPLOAD_FAILED = 1;
-const UPLOAD_SUCCESS = 2;
+const UPLOAD_INPROGRES = 0; //Upload inprogress
+const SCRIPT_ERROR = -1; // Scripts errors (i.e. SCRIPT_ERROR)
+const UPLOAD_FAILED = 1; // File Transfer Failed (i.e.TRANSFER_ERROR)
+const UPLOAD_SUCCESS = 2; //Uploaded done but scripts yet to run
 const ANALYZING = 3;
-const UPLOAD_PROCESSING = 3;
+const UPLOAD_PROCESSING = 3; //scripts running
 
 const VIEWER = {
   GOOGLE_VIEWER_MAX_SIZE: 22 * 1024 * 1024, // 22MB
@@ -195,7 +195,7 @@ export {
   DEBOUNCE_TIME,
   POLLING_INTERVAL,
   UPLOAD_INPROGRES,
-  UPLOAD_INPROGRES_EXTRA,
+  SCRIPT_ERROR,
   UPLOAD_FAILED,
   UPLOAD_SUCCESS,
   ANALYZING,
