@@ -55,7 +55,7 @@ import AssignLicenceWithUsers from "../../license/assignLicenceWithUsers.compone
 import LicenceInUseUnAssigned from "../../license/licenceInUseUnAssigned.component";
 import SubmissionCard from "../submissionCard.component";
 import ApplicationProperties from "./applicationProperties.component";
-import { ExclamationCircleOutlined } from "@ant-design/icons";
+import { ExclamationCircleOutlined } from "@ant-design/icons" ;
 // import { Customers } from "./sampleCustomers";
 // import  ApplicationApi  from "../../../redux/api/application.api"
 
