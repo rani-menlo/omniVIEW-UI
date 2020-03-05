@@ -173,10 +173,10 @@ const CLOUDS = {
     name: "FTP",
     disabled: false
   },
-  afs: {
-    name: "AFS",
-    disabled: false
-  },
+  // afs: {
+  //   name: "AFS",
+  //   disabled: false
+  // },
   oneDrive: {
     name: "ONE DRIVE",
     disabled: true

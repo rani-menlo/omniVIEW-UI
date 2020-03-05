@@ -16,6 +16,17 @@
       margin-left: auto;
     }
   }
+  &__headers-confirm {
+    display: flex;
+    margin-bottom: 15px;
+    padding-top: 14px;
+    &-close {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      margin-left: auto;
+    }
+  }
   &__content {
     height: 250px;
     border-radius: 4px;
