@@ -3,21 +3,16 @@ import { connect } from "react-redux";
 import _ from "lodash";
 import PropTypes from "prop-types";
 import DraggableModal from "./draggableModal.component";
-import { isLoggedInOmniciaRole, getOrderedSequences } from "../../../utils";
-import { bindActionCreators } from "redux";
-import { ApplicationActions, SubmissionActions } from "../../../redux/actions";
+import { getOrderedSequences } from "../../../utils";
 import Text from "../text/text.component";
 
 import { getSequences } from "../../../redux/selectors/submissionView.selector";
 import { translate } from "../../../translations/translator";
-import { Tabs, Checkbox, Icon, Button, Table } from "antd";
-
-const { TabPane } = Tabs;
+import { Button, Table } from "antd";
 
 class SequencesModal extends Component {
   static propTypes = {
-    closeModal: PropTypes.func,
-    onItemSelected: PropTypes.func
+    closeModal: PropTypes.func
   };
 
   constructor(props) {
@@ -74,79 +69,7 @@ class SequencesModal extends Component {
           <div className="sequences-modal__table">
             <div className="sequences-modal__table__body">
               <table>
-                {/* <thead>
-                  <tr>
-                    <td style={{ width: "20px" }}>
-                      <Checkbox />
-                    </td>
-                    <td>Select All</td>
-                  </tr>
-                </thead> */}
-
                 <tbody>
-                  {/* <tr>
-                    <td style={{ width: "20px" }}>
-                      <Checkbox />
-                    </td>
-                    <td>
-                      <div style={{ display: "flex" }}>
-                        <Icon
-                          type="folder"
-                          theme="filled"
-                          className="global__file-folder"
-                        />
-                        <Text
-                          type="regular"
-                          size="12px"
-                          text="ind180410\0001 (Original Application-Presubmission)"
-                          textStyle={{ marginTop: "3px" }}
-                        />
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style={{ width: "20px" }}>
-                      <Checkbox />
-                    </td>
-                    <td>
-                      <div style={{ display: "flex" }}>
-                        <Icon
-                          type="folder"
-                          theme="filled"
-                          className="global__file-folder"
-                        />
-                        <Text
-                          type="regular"
-                          size="12px"
-                          text="ind180410\0002 (Original Application-Presubmission)"
-                          textStyle={{ marginTop: "3px" }}
-                        />
-                      </div>
-                    </td>
-                  </tr> */}
-                  {/* {_.map(getOrderedSequences(sequences, order), sequence => (
-                    <tr>
-                      <td style={{ width: "20px" }}>
-                        <Checkbox />
-                      </td>
-                      <td>
-                        <div style={{ display: "flex" }}>
-                          <Icon
-                            type="folder"
-                            theme="filled"
-                            className="global__file-folder"
-                          />
-                          <Text
-                            type="regular"
-                            size="12px"
-                            text={`${submissionLabel}\\${sequence.name}`}
-                            textStyle={{ marginTop: "3px" }}
-                          />
-                        </div>
-                      </td>
-                    </tr>
-                  ))} */}
-
                   <Table
                     columns={this.sequenceColumns}
                     dataSource={orderedSequences}
@@ -158,7 +81,6 @@ class SequencesModal extends Component {
                         });
                       }
                     }}
-                    // scroll={{ y: 200 }}
                   />
                 </tbody>
               </table>
@@ -217,19 +139,8 @@ class SequencesModal extends Component {
 
 function mapStateToProps(state) {
   return {
-    loading: state.Api.loading,
-    role: state.Login.role,
-    user: state.Login.user,
-    access: state.Application.access,
     sequences: getSequences(state)
   };
 }
 
-function mapDispatchToProps(dispatch) {
-  return {
-    dispatch,
-    actions: bindActionCreators({ ...SubmissionActions }, dispatch)
-  };
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(SequencesModal);
+export default connect(mapStateToProps)(SequencesModal);
