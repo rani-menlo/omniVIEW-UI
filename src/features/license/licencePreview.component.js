@@ -52,7 +52,7 @@ const LicencePreview = ({ closeModal, back, licences, visible, submit }) => {
       footer={null}
       wrapClassName="licence-modal"
     >
-      <div className="licence-modal__header" style={{ marginBottom: "unset" }}>
+      <div className="licence-modal__headers-confirm" style={{ marginBottom: "unset" }}>
         <Text
           type="extra_bold"
           size="16px"
@@ -62,7 +62,7 @@ const LicencePreview = ({ closeModal, back, licences, visible, submit }) => {
         />
         <img
           src="/images/close.svg"
-          className="licence-modal__header-close"
+          className="licence-modal__headers-confirm-close"
           onClick={closeModal}
         />
       </div>

@@ -17,6 +17,7 @@ import {
 import {
   ApiActions,
   ApplicationActions,
+  SubmissionActions,
   CustomerActions,
   UsermanagementActions
 } from "../../../redux/actions";
@@ -55,7 +56,8 @@ import AssignLicenceWithUsers from "../../license/assignLicenceWithUsers.compone
 import LicenceInUseUnAssigned from "../../license/licenceInUseUnAssigned.component";
 import SubmissionCard from "../submissionCard.component";
 import ApplicationProperties from "./applicationProperties.component";
-import { ExclamationCircleOutlined } from "@ant-design/icons" ;
+import { ExclamationCircleOutlined } from "@ant-design/icons";
+import { getSequences } from "../../../redux/selectors/submissionView.selector";
 // import { Customers } from "./sampleCustomers";
 // import  ApplicationApi  from "../../../redux/api/application.api"
 
@@ -70,6 +72,7 @@ class ApplicationDashboard extends Component {
       searchText: "",
       submissions: [],
       showSequencesModal: false,
+      selectedSubmissionMenu: "",
       assignGlobalPermissions: false,
       assignPermissions: false,
       showPermissionsModal: false,
@@ -85,8 +88,9 @@ class ApplicationDashboard extends Component {
       reportData: [],
       openFailuresModal: false,
       selectedFailedUploads: [],
+      selectedSequences: [],
+      allUploadedSequences: [],
       openDeleteSequencesConfirmModal: false,
-      submissionViewReport: "",
       TableColumns: [
         {
           name: TableColumnNames.CHECKBOX,
@@ -189,7 +193,10 @@ class ApplicationDashboard extends Component {
         }
       }); */
       return {
-        submissions: props.submissions
+        submissions: _.map(props.submissions, sub => ({
+          ...sub,
+          ref: React.createRef()
+        }))
       };
     }
     return null;
@@ -359,6 +366,7 @@ class ApplicationDashboard extends Component {
                 type="regular"
                 size="12px"
                 text={translate("label.menu.openinomniview")}
+                textStyle={{ marginLeft: "-4px" }}
               />
             </div>
           </Menu.Item>
@@ -371,6 +379,7 @@ class ApplicationDashboard extends Component {
                 type="regular"
                 size="12px"
                 text={translate("label.menu.openinomnifile")}
+                textStyle={{ marginLeft: "-1px" }}
               />
             </div>
           </Menu.Item>
@@ -383,6 +392,7 @@ class ApplicationDashboard extends Component {
                 type="regular"
                 size="12px"
                 text={translate("label.menu.openinnewwindow")}
+                textStyle={{ marginLeft: "-3px" }}
               />
             </div>
           </Menu.Item>
@@ -401,17 +411,23 @@ class ApplicationDashboard extends Component {
                   type="regular"
                   size="12px"
                   text={translate("label.node.assignuseraccess")}
+                  textStyle={{ marginLeft: "-1px" }}
                 />
               </div>
             </Menu.Item>,
             <Menu.Item key="sequence">
               <div className="global__center-vert">
                 <img src="/images/plus-black.svg" style={style} />
-                <Text type="regular" size="12px" text="Add Sequence" />
+                <Text
+                  type="regular"
+                  size="12px"
+                  text="Add Sequence"
+                  textStyle={{ marginLeft: "1px" }}
+                />
               </div>
             </Menu.Item>
           ]}
-        {/* {(isLoggedInOmniciaAdmin(this.props.role) ||
+        {(isLoggedInOmniciaAdmin(this.props.role) ||
           isLoggedInCustomerAdmin(this.props.role)) && (
           <Menu.Item key="delete_sequences">
             <div className="global__center-vert global__text-red">
@@ -425,10 +441,11 @@ class ApplicationDashboard extends Component {
                 size="12px"
                 text="Delete Sequences"
                 className="global__text-red"
+                textStyle={{ marginLeft: "2px" }}
               />
             </div>
           </Menu.Item>
-        )} */}
+        )}
         {(isLoggedInOmniciaAdmin(this.props.role) ||
           isLoggedInCustomerAdmin(this.props.role)) && (
           <Menu.Item key="delete">
@@ -443,6 +460,7 @@ class ApplicationDashboard extends Component {
                 size="12px"
                 text="Delete Application"
                 className="global__text-red"
+                textStyle={{ marginLeft: "-4px" }}
               />
             </div>
           </Menu.Item>
@@ -573,11 +591,10 @@ class ApplicationDashboard extends Component {
       this.props.history.push("/sequences/add");
     } else if (key === "delete") {
       this.removeSubmission(submission);
+    } else if (key == "delete_sequences") {
+      this.props.actions.setSelectedSubmission(submission);
+      this.openSequencesModal(submission);
     }
-    //  else if (key == "delete_sequences") {
-    //   this.props.actions.setSelectedSubmission(submission);
-    //   this.openSequencesModal();
-    // }
   };
 
   removeSubmission = submission => {
@@ -673,12 +690,37 @@ class ApplicationDashboard extends Component {
     this.setState({ showPermissionsModal: true });
   };
 
-  openSequencesModal = () => {
-    this.setState({ showSequencesModal: true });
+  //get all sucessfully uploaded sequences for a particular submission
+  getUploadedSequences = submission => {
+    const { user } = this.props;
+    if (submission) {
+      // fetch sequences
+      this.props.dispatch(
+        SubmissionActions.fetchSequences(submission.id, user)
+      );
+      window.scrollTo(0, 0);
+    }
   };
 
+  //Upon sequences modal on click of delete sequences menu item
+  openSequencesModal = submission => {
+    this.getUploadedSequences(submission);
+    this.setState({
+      showSequencesModal: true,
+      selectedSubmissionMenu: submission
+    });
+  };
+  //closing sequences modal
   closeSequencesModal = () => {
-    this.setState({ showSequencesModal: false });
+    this.state.selectedSubmissionMenu.ref.current.scrollIntoView({
+      behavior: "smooth"
+    });
+    this.setState({
+      showSequencesModal: false,
+      selectedSubmissionMenu: "",
+      selectedSequences: [],
+      allUploadedSequences: []
+    });
   };
 
   assignGlobalPermissions = () => {
@@ -870,18 +912,21 @@ class ApplicationDashboard extends Component {
     const { data } = res;
     const failures = _.filter(
       _.get(data, "result"),
-      seq => seq.status == UPLOAD_FAILED || SCRIPT_ERROR
+      seq => seq.status == UPLOAD_FAILED || seq.status == SCRIPT_ERROR
     );
     window.scrollTo(0, 0);
     this.setState({
       reportData: failures,
       openFailuresModal: true,
-      submissionViewReport: submission
+      selectedSubmissionMenu: submission
     });
     this.props.dispatch(ApiActions.successOnDemand());
   };
 
   closeFailuresModal = () => {
+    this.state.selectedSubmissionMenu.ref.current.scrollIntoView({
+      behavior: "smooth"
+    });
     this.setState({ openFailuresModal: false, selectedFailedUploads: [] });
   };
 
@@ -889,7 +934,7 @@ class ApplicationDashboard extends Component {
   exportToPDF = () => {
     this.showLoading();
     const res = ApplicationApi.exportViewReportPDF({
-      submission_id: this.state.submissionViewReport.id
+      submission_id: this.state.selectedSubmissionMenu.id
     })
       .then(res => {
         this.hideLoading();
@@ -923,7 +968,7 @@ class ApplicationDashboard extends Component {
 
   //open delete sequences confirmation modal if user selects all the sequences
   //in the failure report window
-  showDeleteSeqConfirmModal = () => {
+  showDeleteSeqConfirmModal = type => {
     Modal.confirm({
       className: "omnimodal",
       title: translate("label.generic.delete"),
@@ -932,52 +977,90 @@ class ApplicationDashboard extends Component {
       okText: translate("label.generic.delete"),
       cancelText: translate("label.button.cancel"),
       onOk: () => {
-        this.deleteSequences();
+        this.deleteSequences(type);
       },
       onCancel: () => {}
     });
   };
 
   //check if user selects all the sequences or not for the deletion
-  getDeleteSequencesData = () => {
+  getDeleteSequencesData = type => {
+    //if user selects sequences from the successfully uploaded sequences modal
+    if (type == "sucessfully_uploaded_sequences") {
+      let selectedSequences = [...this.state.selectedSequences];
+      const allUploadedSequences = [...this.state.allUploadedSequences];
+      if (selectedSequences.length == allUploadedSequences.length) {
+        this.showDeleteSeqConfirmModal("sucessfully_uploaded_sequences");
+      } else {
+        this.deleteSequences("sucessfully_uploaded_sequences");
+      }
+      return;
+    }
+    //if user select sequences from the failure report modal
     let selectedFailedUploads = [...this.state.selectedFailedUploads];
     const reportData = [...this.state.reportData];
     if (selectedFailedUploads.length == reportData.length) {
-      this.showDeleteSeqConfirmModal();
+      this.showDeleteSeqConfirmModal("failed_sequences");
     } else {
-      this.deleteSequences();
+      this.deleteSequences("failed_sequences");
     }
   };
 
+  //showing delete error once submission or sequence get deleted successfully
+  showErrorMsg = (sequences, allSequences) => {
+    let deleteMsg = "";
+    if (sequences.length === allSequences.length) {
+      deleteMsg = "Application has";
+    } else if (sequences.length > 1) {
+      deleteMsg = "Sequences have";
+    } else {
+      deleteMsg = "Sequence has";
+    }
+    Toast.success(`${deleteMsg} been deleted!`);
+    //clearing all the intervals after deleting the submission
+    this.clearAllIntervals();
+    //refresing the application once delete operation is done
+    this.fetchApplications();
+  };
+
   //delete sequences
-  deleteSequences = async () => {
+  deleteSequences = async type => {
     this.showLoading();
     const reportData = [...this.state.reportData];
     let selectedFailedUploads = [...this.state.selectedFailedUploads];
-    let sequences = selectedFailedUploads.flatMap(i => i.pipeline_name);
+    const allUploadedSequences = [...this.state.allUploadedSequences];
+    let selectedSequences = [...this.state.selectedSequences];
+    let sequences =
+      type == "failed_sequences"
+        ? selectedFailedUploads.flatMap(i => i.pipeline_name)
+        : selectedSequences.flatMap(i => i.name);
     const res = await ApplicationApi.deleteSequences({
       customer_id: this.props.selectedCustomer.id,
-      submission_id: this.state.submissionViewReport.id,
+      submission_id: this.state.selectedSubmissionMenu.id,
       sequences: sequences
     });
     this.hideLoading();
     if (!res.data.error) {
       this.closeFailuresModal();
-      let sequences = "";
-      if (selectedFailedUploads.length === reportData.length) {
-        sequences = "Application has";
-      } else if (selectedFailedUploads.length > 1) {
-        sequences = "Sequences have";
+      this.closeSequencesModal();
+      if (type == "sucessfully_uploaded_sequences") {
+        this.props.dispatch(
+          submissionActions.resetSequences(this.state.selectedSubmissionMenu.id)
+        );
+        this.showErrorMsg(selectedSequences, allUploadedSequences);
       } else {
-        sequences = "Sequence has";
+        this.showErrorMsg(selectedFailedUploads, reportData);
       }
-      Toast.success(`${sequences} been deleted!`);
-      //clearing all the intervals after deleting the submission
-      this.clearAllIntervals();
-      this.fetchApplications();
     } else {
       Toast.error("Please try again");
     }
+  };
+
+  //function triggers when delete button is clicked from sucessfully uploaded sequences modal
+  deleteUploadedSequences = (selectedSequences, allUploadedSequences) => {
+    this.setState({ selectedSequences, allUploadedSequences }, () => {
+      this.getDeleteSequencesData("sucessfully_uploaded_sequences");
+    });
   };
 
   render() {
@@ -995,7 +1078,8 @@ class ApplicationDashboard extends Component {
       openFailuresModal,
       reportData,
       selectedFailedUploads,
-      showSequencesModal
+      showSequencesModal,
+      selectedSubmissionMenu
     } = this.state;
     const {
       loading,
@@ -1323,17 +1407,19 @@ class ApplicationDashboard extends Component {
             <React.Fragment>
               <div className="maindashboard__cards">
                 {_.map(submissions, submission => (
-                  <SubmissionCard
-                    key={submission.id}
-                    submission={submission}
-                    customer={selectedCustomer}
-                    onSelect={this.onSubmissionSelected}
-                    getMenu={this.getMenu(submission)}
-                    updateSubmissions={this.updateSubmissions}
-                    updateUploadProgress={this.updateUploadProgress}
-                    retryUpload={this.retryUpload}
-                    openFailures={this.openFailures(submission)}
-                  />
+                  <div ref={submission.ref}>
+                    <SubmissionCard
+                      key={submission.id}
+                      submission={submission}
+                      customer={selectedCustomer}
+                      onSelect={this.onSubmissionSelected}
+                      getMenu={this.getMenu(submission)}
+                      updateSubmissions={this.updateSubmissions}
+                      updateUploadProgress={this.updateUploadProgress}
+                      retryUpload={this.retryUpload}
+                      openFailures={this.openFailures(submission)}
+                    />
+                  </div>
                 ))}
               </div>
               {!_.get(submissions, "length") && (
@@ -1383,11 +1469,13 @@ class ApplicationDashboard extends Component {
             submit={this.updateSubmissionCenter}
           />
         )}
+        {/* Modal to display successfully uploaded sequences */}
         {showSequencesModal && (
           <SequencesModal
             visible
             closeModal={this.closeSequencesModal}
-            submission={this.props.selectedSubmission}
+            submission={selectedSubmissionMenu}
+            onDelete={this.deleteUploadedSequences}
           />
         )}
         {/* Assign Global Permissions Modal */}
@@ -1403,10 +1491,14 @@ class ApplicationDashboard extends Component {
         <DraggableModal
           visible={openFailuresModal}
           minWidth={
-            _.get(selectedSubmission, "broken_x_ref", "") != 0 ? "40%" : "29%"
+            _.get(selectedSubmissionMenu, "broken_x_ref", "") != 0
+              ? "40%"
+              : "29%"
           }
           minHeight={
-            _.get(selectedSubmission, "broken_x_ref", "") != 0 ? "65%" : "36%"
+            _.get(selectedSubmissionMenu, "broken_x_ref", "") != 0
+              ? "65%"
+              : "36%"
           }
           draggableAreaClass=".failureResults__header"
         >
@@ -1417,7 +1509,7 @@ class ApplicationDashboard extends Component {
                 type="extra_bold"
                 size="16px"
                 text={
-                  _.get(selectedSubmission, "broken_x_ref", "") == 0
+                  _.get(selectedSubmissionMenu, "broken_x_ref", "") == 0
                     ? "Failure Report"
                     : ""
                 }
@@ -1429,7 +1521,7 @@ class ApplicationDashboard extends Component {
               />
             </div>
             {/* Cross references list when there are both cross-references and failed sequences */}
-            {_.get(selectedSubmission, "broken_x_ref", "") != 0 && (
+            {_.get(selectedSubmissionMenu, "broken_x_ref") != 0 && (
               <div className="failureResults__info-list">
                 <img
                   src="/images/info_icon.png"
@@ -1442,10 +1534,10 @@ class ApplicationDashboard extends Component {
                   textStyle={{ display: "inline-block" }}
                 />
                 <p>
-                  {_.get(selectedSubmission, "broken_x_ref", "") == 1
+                  {_.get(selectedSubmissionMenu, "broken_x_ref", "") == 1
                     ? `A Sequence in the Application has a cross-reference to another Sequence that is not yet uploaded`
                     : `${_.get(
-                        selectedSubmission,
+                        selectedSubmissionMenu,
                         "broken_x_ref",
                         ""
                       )} Sequences in the Application have the cross-references to other Sequences that are not yet uploaded`}
@@ -1455,12 +1547,12 @@ class ApplicationDashboard extends Component {
             {/* Failure sequences list*/}
             <div
               className={`failureResults__list ${
-                _.get(selectedSubmission, "broken_x_ref", "") == 0
+                _.get(selectedSubmissionMenu, "broken_x_ref") == 0
                   ? "no-crossrefs"
                   : "crossrefs"
               }`}
             >
-              {_.get(selectedSubmission, "broken_x_ref", "") != 0 && (
+              {_.get(selectedSubmissionMenu, "broken_x_ref") != 0 && (
                 <div className="">
                   <img
                     src="/images/error.png"
@@ -1522,7 +1614,7 @@ class ApplicationDashboard extends Component {
                   disabled={!selectedFailedUploads.length}
                   label="Delete"
                   buttonStyle={{ width: "120px", margin: "10px 10px 0 0" }}
-                  onClick={this.getDeleteSequencesData}
+                  onClick={e => this.getDeleteSequencesData("failed_sequences")}
                 />
                 <OmniButton
                   type="primary"
@@ -1563,14 +1655,18 @@ function mapStateToProps(state) {
     submissionCount: state.Application.submissionCount,
     selectedSubmission: state.Application.selectedSubmission,
     user: state.Login.user,
-    access: state.Application.access
+    access: state.Application.access,
+    sequences: getSequences(state)
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
     dispatch,
-    actions: bindActionCreators({ ...ApplicationActions }, dispatch)
+    actions: bindActionCreators(
+      { ...ApplicationActions, SubmissionActions },
+      dispatch
+    )
   };
 }
 

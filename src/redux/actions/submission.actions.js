@@ -7,7 +7,7 @@ import { Toast } from "../../uikit/components";
 // import lifecyclejson from "./life.json";
 
 export default {
-  fetchSequences: submissionId => {
+  fetchSequences: (submissionId, user) => {
     return async (dispatch, getState) => {
       ApiActions.request(dispatch);
       try {
@@ -18,11 +18,12 @@ export default {
         if (sequences[id]) {
           data.data = sequences[id];
         } else {
-          const res = await SubmissionApi.fetchSequences({ id: submissionId });
+          const res = await SubmissionApi.fetchSequences({
+            id: submissionId,
+            userId: user.id ? user.id : user.user_id
+          });
           data = res.data;
         }
-        const res = await SubmissionApi.fetchSequences({ id: submissionId });
-        data = res.data;
         dispatch({
           type: SubmissionActionTypes.FETCH_SEQUENCES,
           data,

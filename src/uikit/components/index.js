@@ -25,6 +25,7 @@ import { default as CircularLocalImageFile } from "./image/circularLocalImageFil
 import { default as ImageLoader } from "./image/imageLoader.component";
 import { default as AssignPermissionsModal } from "./modal/assignPermissionsModal.component";
 import { default as OpenSubmissionsModal } from "./modal/openSubmissionsModal.component";
+import { default as SequencesModal } from "./modal/sequencesModal.component"; 
 
 export {
   OmniButton,
@@ -52,7 +53,7 @@ export {
   Toast,
   CircularLocalImageFile,
   ImageLoader,
-  AssignPermissionsModal
   AssignPermissionsModal,
   OpenSubmissionsModal,
+  SequencesModal
 };

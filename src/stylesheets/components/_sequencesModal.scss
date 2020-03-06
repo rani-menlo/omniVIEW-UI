@@ -1,0 +1,97 @@
+.sequences-modal {
+  height: 100%;
+  &__dialog > .ant-modal {
+    width: 75% !important;
+    height: 75% !important;
+    .ant-modal-content {
+      height: 100% !important;
+    }
+    .ant-modal-body {
+      height: 100%;
+    }
+  }
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: move;
+    &-close {
+      font-size: 18px;
+      color: $black;
+      cursor: pointer;
+    }
+
+    &__title {
+      &-text {
+        @include text-normal(16px);
+      }
+    }
+  }
+  &__table {
+    height: calc(100% - 95px);
+    border: 1px solid $shadowed-steel;
+    border-radius: 4px;
+    margin-top: 10px;
+    table {
+      width: 100%;
+    }
+    .no_validation_sequences {
+      display: block;
+      margin-top: 0 auto;
+      margin: 40% 125%;
+      width: 100%;
+    }
+
+    &__header {
+      width: 100%;
+    }
+    &__body {
+      height: 100%;
+      overflow: auto;
+      > table > tbody {
+        overflow: auto;
+        width: 100%;
+      }
+    }
+
+    td {
+      height: 35px;
+      padding-left: 13px;
+      @include text-normal(14px);
+    }
+
+    thead > tr {
+      background: $froasted-glass;
+    }
+    tr:nth-child(even) {
+      background-color: $froasted-glass;
+    }
+  }
+  &__footer {
+    position: absolute;
+    bottom: 5px;
+    width: 100%;
+    display: flex;
+    position: relative;
+    top: 2px;
+    // justify-content: space-between;
+    margin-top: 12px;
+    &-text {
+      width: 62%;
+      display: flex;
+      justify-content: start;
+      margin-right: 10px;
+    }
+    &-image {
+      width: 20px;
+      height: 20px;
+      margin-top: 4px;
+    }
+    &-buttons {
+      display: flex;
+      width: 38%;
+      justify-content: flex-end;
+      margin-left: 10px;
+    }
+  }
+}
