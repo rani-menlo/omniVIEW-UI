@@ -49,6 +49,7 @@ class AddNewApplication extends Component {
       invalidSeqError: "",
       showApplicationDetails: false,
       regions: [],
+      selectedRegion: "",
       submission_centers: [],
       application_types: [],
       cloud_types: [],
@@ -436,7 +437,8 @@ class AddNewApplication extends Component {
       this.setState({ selectedFolderError: message }, this.hideLoading);
       return;
     }
-    const { appNumber, appType } = data;
+    const { appNumber, appType, regions } = data;
+    const selectedRegion = regions;
     const validSequences = _.get(data, "validSequences.length", 0);
     const validSequencesArray = _.get(data, "validSequences", []);
     const invalidSequences = _.get(data, "invalidSequences.length", 0);
@@ -447,7 +449,9 @@ class AddNewApplication extends Component {
       selectedFolderPath,
       path,
       appType,
+      selectedRegion,
       appNumber,
+      regions,
       validSequences
     };
 
@@ -683,7 +687,8 @@ class AddNewApplication extends Component {
       showCheckAll,
       showInvalidSeqFooter,
       appNumber,
-      appType
+      appType,
+      selectedRegion
     } = this.state;
     return (
       <React.Fragment>
@@ -882,6 +887,10 @@ class AddNewApplication extends Component {
                   value: type.name
                 }))}
                 validSequences={validSequences}
+                selectedRegion={{
+                  key: _.get(selectedRegion, "id"),
+                  value: _.get(selectedRegion, "name")
+                }}
                 appType={{
                   key: _.get(appType, "id"),
                   value: _.get(appType, "name")

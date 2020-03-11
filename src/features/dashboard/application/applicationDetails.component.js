@@ -42,10 +42,11 @@ class ApplicationDetails extends Component {
   }
 
   componentDidMount() {
-    const { appType, appNumber } = this.props;
-    const { applicationType, applicationNo } = this.state;
+    const { appType, appNumber, selectedRegion } = this.props;
+    const { applicationType, applicationNo, region } = this.state;
     this.setState({
       applicationType: { ...applicationType, value: appType },
+      region: { ...region, value: selectedRegion },
       applicationNo: { ...applicationNo, value: appNumber }
     });
   }
@@ -124,12 +125,13 @@ class ApplicationDetails extends Component {
     } = this.state;
     const { cancel, regions, centers, types, validSequences } = this.props;
     const style = { marginBottom: "10%" };
-    console.log("applicationType", applicationType);
     return (
       <div className="addnewapplication__remote">
         <SelectField
+          key={_.get(region, "value.key")}
           style={style}
           selectFieldClassName="newlicence__field-select"
+          selectedValue={_.get(region, "value.value")}
           options={regions}
           error={region.error}
           onChange={this.onSelect("region", regions)}
