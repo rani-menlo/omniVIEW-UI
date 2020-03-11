@@ -1596,7 +1596,7 @@ class ApplicationDashboard extends Component {
                   type="secondary"
                   label={translate("label.button.cancel")}
                   onClick={this.closeFailuresModal}
-                  buttonStyle={{ width: "120px", margin: "10px 10px 0 0" }}
+                  buttonStyle={{ width: "120px", margin: "10px 0 0 10px" }}
                 />
                 {/* As per the ticket OMNG-682 we are allowing retry option only for
               secondary contact and admins*/}
@@ -1604,7 +1604,7 @@ class ApplicationDashboard extends Component {
                   <OmniButton
                     disabled={!selectedFailedUploads.length}
                     label="Retry"
-                    buttonStyle={{ width: "120px", margin: "10px 10px 0 0" }}
+                    buttonStyle={{ width: "120px", margin: "10px 0 0 10px" }}
                     onClick={this.retryUpload}
                   />
                 ) : (
@@ -1613,14 +1613,14 @@ class ApplicationDashboard extends Component {
                 <OmniButton
                   disabled={!selectedFailedUploads.length}
                   label="Delete"
-                  buttonStyle={{ width: "120px", margin: "10px 10px 0 0" }}
+                  buttonStyle={{ width: "120px", margin: "10px 0 0 10px" }}
                   onClick={e => this.getDeleteSequencesData("failed_sequences")}
                 />
                 <OmniButton
                   type="primary"
                   label={translate("label.button.export")}
                   onClick={this.exportToPDF}
-                  buttonStyle={{ width: "120px", margin: "10px 10px 0 0" }}
+                  buttonStyle={{ width: "120px", margin: "10px 0 0 10px" }}
                 />
               </div>
             </div>
