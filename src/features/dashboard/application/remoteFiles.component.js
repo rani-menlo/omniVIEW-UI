@@ -9,12 +9,7 @@ class RemoteFiles extends Component {
   constructor(props) {
     super(props);
     this.remoteFilesScroll = React.createRef();
-    this.state = { selected: null, remoteFilesTableHeight: "" };
-  }
-
-  componentDidMount() {
-    let height = this.remoteFilesScroll.current.offsetHeight;
-    this.setState({ remoteFilesTableHeight: height });
+    this.state = { selected: null };
   }
 
   select = file => () => {
@@ -54,7 +49,7 @@ class RemoteFiles extends Component {
       showCheckAll,
       cloud
     } = this.props;
-    const { selected, remoteFilesTableHeight } = this.state;
+    const { selected } = this.state;
     return (
       <React.Fragment>
         <div className="addnewapplication__remotefiles">
@@ -79,7 +74,10 @@ class RemoteFiles extends Component {
                     display: "flex",
                     justifyContent: "flex-end",
                     width: "100%",
-                    marginRight: remoteFilesTableHeight > 320 ? "15px" : "0"
+                    marginRight:
+                      this.remoteFilesScroll.current.scrollHeight > 320
+                        ? "15px"
+                        : "0"
                   }}
                 >
                   <Text type="extra_bold" size="14px" text="Select All" />
