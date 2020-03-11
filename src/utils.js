@@ -123,6 +123,34 @@ const minFourDigitsInString = val => {
   return MIN_FOUR_DIGITS.test(val);
 };
 
+//get DTD version, (Jira ticket OMNG-764, Sprint-23)
+const getDTDVersion = m1Json => {
+  return m1Json["dtd-version"];
+};
+
+//get DTD 2.01 version date, (Jira ticket OMNG-764, Sprint-23)
+const getV2_2Date = m1Json => {
+  const submissionDate = _.get(
+    m1Json,
+    "[admin][applicant-info][date-of-submission][date]"
+  );
+  const submission_date = getDTD2_2_FormattedDate(
+    _.get(submissionDate, "[$t]", ""),
+    _.get(submissionDate, "[format]", "")
+  );
+  return submission_date;
+};
+
+//get DTD 2.01 version date format, (Jira ticket OMNG-764, Sprint-23)
+const getDTD2_2_FormattedDate = (date, format) => {
+  format = format == "yyyymmdd" ? "YYYY.MM.DD" : format;
+  let dateFormat = format ? format.toUpperCase() : "YYYY.MM.DD";
+  if (!date) {
+    return "";
+  }
+  return moment(date).format(dateFormat);
+};
+
 export {
   isLoggedInOmniciaRole,
   isOmniciaRole,
@@ -140,5 +168,8 @@ export {
   storeImageData,
   getOrderedSequences,
   getImageData,
-  minFourDigitsInString
+  minFourDigitsInString,
+  getDTDVersion,
+  getDTD2_2_FormattedDate,
+  getV2_2Date
 };

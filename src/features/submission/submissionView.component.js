@@ -34,7 +34,10 @@ import {
 import {
   isAdmin,
   isLoggedInCustomerAdmin,
-  isLoggedInOmniciaAdmin
+  isLoggedInOmniciaAdmin,
+  getDTDVersion,
+  getDTD2_2_FormattedDate,
+  getV2_2Date
 } from "../../utils";
 import ProfileMenu from "../header/profileMenu.component";
 import FindNode from "./findNode.component";
@@ -492,16 +495,39 @@ class SubmissionView extends Component {
   };
 
   getSequenceLabel = () => {
-    const { selectedSubmission, selectedSequence } = this.props;
-    return `${_.get(selectedSubmission, "name", "")}\\${_.get(
+    const {
+      selectedSubmission,
       selectedSequence,
-      "name",
-      ""
-    )} (${_.get(selectedSequence, "submission_type", "")}-${_.get(
-      selectedSequence,
-      "submission_sub_type",
-      ""
-    )})`;
+      sequenceJson,
+      lifeCycleJson
+    } = this.props;
+    //As per the (Jira ticket OMNG-764, Sprint-23), we are displaying sequence label
+    //based on DTD versions 2.01 and 3.3
+    //For DTD version 2.01, we dont have submission_sub_type,
+    //so we are appending submission date to the selected submission name
+    const m1Json = selectedSequence
+      ? _.get(sequenceJson, "[fda-regional:fda-regional]", "")
+      : _.get(lifeCycleJson, "[fda-regional:fda-regional]", "");
+    const dtd_version = getDTDVersion(m1Json);
+    let sequenceLabel =
+      dtd_version == "2.01"
+        ? `${_.get(selectedSubmission, "name", "")}\\${_.get(
+            selectedSequence,
+            "name",
+            ""
+          )} (${_.get(selectedSequence, "submission_type", "")}) ${getV2_2Date(
+            m1Json
+          )}`
+        : `${_.get(selectedSubmission, "name", "")}\\${_.get(
+            selectedSequence,
+            "name",
+            ""
+          )} (${_.get(selectedSequence, "submission_type", "")}-${_.get(
+            selectedSequence,
+            "submission_sub_type",
+            ""
+          )})`;
+    return sequenceLabel;
   };
 
   getTreeLabel = () => {
@@ -967,7 +993,7 @@ class SubmissionView extends Component {
     );
     this.setState(
       {
-        sequences: [],
+        sequences: []
       },
       () => {
         this.closeSubmissionModal();
@@ -1195,6 +1221,15 @@ class SubmissionView extends Component {
                     onSortByChanged={this.onSequenceSortByChanged}
                     viewPermissions={viewPermissions}
                     editPermissions={editPermissions}
+                    m1Json={
+                      selectedSequence
+                        ? _.get(sequenceJson, "[fda-regional:fda-regional]", "")
+                        : _.get(
+                            lifeCycleJson,
+                            "[fda-regional:fda-regional]",
+                            ""
+                          )
+                    }
                   />
                 </div>
                 {isAdmin(role.name) && (

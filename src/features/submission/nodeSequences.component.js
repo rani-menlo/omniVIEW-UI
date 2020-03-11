@@ -56,7 +56,8 @@ class NodeSequences extends Component {
       selected,
       submissionLabel,
       viewPermissions,
-      editPermissions
+      editPermissions,
+      m1Json
     } = this.props;
     return _.map(sequences, sequence => (
       <NodeSequenceTree
@@ -68,6 +69,7 @@ class NodeSequences extends Component {
         onCheckboxChange={this.onCheckboxChange}
         viewPermissions={viewPermissions}
         editPermissions={editPermissions}
+        m1Json={m1Json}
       />
     ));
   };

@@ -9,7 +9,9 @@ import {
   isLoggedInAuthor,
   isLoggedInOmniciaAdmin,
   isLoggedInCustomerAdmin,
-  getOrderedSequences
+  getOrderedSequences,
+  getDTD2_2_FormattedDate,
+  getDTDVersion
 } from "../../utils";
 import { Text } from "../../uikit/components";
 import { Icon } from "antd";
@@ -754,6 +756,7 @@ class NodeProperties extends Component {
     });
   };
 
+  //displaying DTD version 3.3 M1 properties
   getM1Properties = () => {
     const {
       m1Json,
@@ -961,6 +964,169 @@ class NodeProperties extends Component {
     );
   };
 
+  //displaying DTD version 2.2(2.01) M1 properties (Jira ticket OMNG-764, Sprint-23)
+  getM1PropertiesFor2_2 = () => {
+    const { m1Json, properties } = this.props;
+    const m1Properties = m1Json["m1-regional-properties"];
+    const applicantInfo = _.get(m1Json, "[admin][applicant-info]");
+    const productDescription = _.get(m1Json, "[admin][product-description]");
+    const applicationInformation = _.get(
+      m1Json,
+      "[admin][application-information]"
+    );
+    const submissionInfo = _.get(applicationInformation, "[submission]");
+
+    const leafProperties =
+      this.isM1() &&
+      _.get(
+        m1Json,
+        "m1-administrative-information-and-prescribing-information.leaf[0]"
+      );
+    return (
+      <React.Fragment>
+        {!this.isRootSequence() && (
+          <RowItems>
+            <div className="label">Title:</div>
+            <div className="value">{properties.title || ""}</div>
+          </RowItems>
+        )}
+        {!this.isRootSequence() && (
+          <RowItems>
+            <div className="label">Index Type:</div>
+            <div className="value">
+              {_.get(m1Properties, "title", "") ||
+                _.get(leafProperties, "title", "")}
+            </div>
+          </RowItems>
+        )}
+        <RowItems>
+          <div className="label">Company Name:</div>
+          <div className="value">
+            {(_.size(_.get(applicantInfo, "[company-name]", "")) || "") &&
+              _.get(applicantInfo, "[company-name]")}
+          </div>
+        </RowItems>
+        <RowItems>
+          <div className="label">Submission date:</div>
+          <div className="value">
+            {getDTD2_2_FormattedDate(
+              _.get(applicantInfo["date-of-submission"], "[date][$t]", ""),
+              _.get(applicantInfo["date-of-submission"], "[date][format]", "")
+            )}
+          </div>
+        </RowItems>
+        <div className="global__hr-line" style={{ background: "#bfc4c7" }} />
+        <RowItems>
+          <div className="label">Application Number:</div>
+          <div className="value">
+            {_.get(productDescription, "[application-number]", "")}
+          </div>
+        </RowItems>
+        <RowItems>
+          <div className="label">Product Name:</div>
+          <div className="value">
+            {_.get(productDescription, "[prod-name][0][$t]", "")}
+          </div>
+        </RowItems>
+        <RowItems>
+          <div className="label">Proprietary Name:</div>
+          <div className="value">
+            {_.get(productDescription, "[prod-name][1][$t]", "")}
+          </div>
+        </RowItems>
+        <RowItems>
+          <div className="label">Chemical Name:</div>
+          <div className="value">
+            {_.get(productDescription, "[prod-name][2][$t]", "")}
+          </div>
+        </RowItems>
+        <RowItems>
+          <div className="label">Code Name:</div>
+          <div className="value">
+            {_.get(productDescription, "[prod-name][3][$t]", "")}
+          </div>
+        </RowItems>
+        <RowItems>
+          <div className="label">Application Type:</div>
+          <div className="value">
+            {_.get(applicationInformation, "[application-type]", "")}
+          </div>
+        </RowItems>
+        <RowItems>
+          <div className="label">Submission Type:</div>
+          <div className="value">
+            {_.get(submissionInfo, "[submission-type]", "")}
+          </div>
+        </RowItems>
+        <RowItems>
+          <div className="label">Sequence Number:</div>
+          <div className="value">
+            {_.get(submissionInfo, "[sequence-number]", "")}
+          </div>
+        </RowItems>
+        <RowItems>
+          <div className="label">Related Sequence:</div>
+          <div className="value">
+            {_.get(submissionInfo, "[related-sequence-number]", "")}
+          </div>
+        </RowItems>
+
+        {leafProperties && (
+          <React.Fragment>
+            <div className="section-title">Leaf Properties</div>
+            <RowItems>
+              <div className="label">Title:</div>
+              <div className="value">{leafProperties.title || ""}</div>
+            </RowItems>
+            <RowItems>
+              <div className="label">File Name:</div>
+              <div className="value">
+                {this.getFileTypeIcon(
+                  this.getFileName(leafProperties["xlink:href"])
+                )}
+                {this.getFileName(leafProperties["xlink:href"])}
+              </div>
+            </RowItems>
+            <RowItems>
+              <div className="label">eCTD Operation:</div>
+              <div className="value">{leafProperties.operation || ""}</div>
+            </RowItems>
+            <RowItems>
+              <div className="label">Leaf ID:</div>
+              <div className="value">{leafProperties.ID || ""}</div>
+            </RowItems>
+            <RowItems>
+              <div className="label">File Link(Href):</div>
+              <div className="value">{leafProperties["xlink:href"] || ""}</div>
+            </RowItems>
+            <RowItems>
+              <div className="label">Checksum:</div>
+              <div className="value">{leafProperties.checksum || ""}</div>
+            </RowItems>
+            <RowItems>
+              <div className="label">Checksum Type:</div>
+              <div className="value">
+                {leafProperties["checksum-type"] || ""}
+              </div>
+            </RowItems>
+            <RowItems>
+              <div className="label">Xlink Type:</div>
+              <div className="value">{leafProperties["xlink:type"]}</div>
+            </RowItems>
+
+            <RowItems>
+              <div className="label">Containing Folder:</div>
+              <div className="value global__center-vert">
+                {this.getFileTypeIcon("folder")}
+                us
+              </div>
+            </RowItems>
+          </React.Fragment>
+        )}
+      </React.Fragment>
+    );
+  };
+
   getLifeCycleId = lifeCycle => {
     const { submission } = this.props;
     return `${_.get(submission, "name", "")}\\${lifeCycle.sequence} : ${
@@ -1061,7 +1227,7 @@ class NodeProperties extends Component {
   };
 
   render() {
-    const { properties, role } = this.props;
+    const { properties, role, m1Json } = this.props;
     if (
       !properties ||
       (!isLoggedInCustomerAdmin(role) &&
@@ -1078,12 +1244,19 @@ class NodeProperties extends Component {
             <React.Fragment>
               {this.getSequenceProperties()}
               <div className="section-title">M1 Properties</div>
-              {this.getM1Properties()}
+              {getDTDVersion(m1Json) == "2.01"
+                ? this.getM1PropertiesFor2_2()
+                : this.getM1Properties()}
             </React.Fragment>
           )}
           {this.isFolder() && this.getFolderProperties()}
           {this.isSTF() && this.getStfProperties()}
-          {this.isM1() && this.getM1Properties()}
+          {this.isM1() &&
+            getDTDVersion(m1Json) == "3.3" &&
+            this.getM1Properties()}
+          {this.isM1() &&
+            getDTDVersion(m1Json) == "2.01" &&
+            this.getM1PropertiesFor2_2()}
           {this.getLeafProperties()}
         </div>
         {this.getLifeCycleTable()}
