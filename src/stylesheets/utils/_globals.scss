@@ -120,17 +120,14 @@
     > .ant-modal-body {
       > .ant-modal-confirm-body-wrapper {
         > .ant-modal-confirm-btns {
+          @include text-bold-active(12px);
           > .ant-btn:first-child {
             border-color: $black !important;
             @include text-bold-active(12px);
-            &:active,
-            &:hover,
-            &:focus {
-              border-color: $black !important;
-              > span {
-                @include text-bold-active(12px);
-              }
-            }
+          }
+          > .ant-btn-primary {
+            @include text-bold-active(12px);
+            color: white;
           }
         }
       }

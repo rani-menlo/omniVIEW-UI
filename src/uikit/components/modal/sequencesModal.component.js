@@ -118,12 +118,15 @@ class SequencesModal extends Component {
                   !selectedSequences.length && selectedSequences.length <= 0
                 }
                 style={{
-                  opacity:
-                    !selectedSequences.length && selectedSequences.length <= 0
-                      ? 0.25
-                      : 1
+                  background: "red",
+                  color: "white",
+                  fontWeight: 800,
+                  fontSize: "12px",
+                  width: "85px",
+                  marginLeft: "10px",
+                  border: "none"
                 }}
-                className="sequences-modal__footer-buttons__delete-button"
+                className={!selectedSequences.length && selectedSequences.length <= 0 && "disabled"}
                 onClick={this.delete}
               >
                 Delete
