@@ -11,7 +11,8 @@ import {
   isLoggedInCustomerAdmin,
   getOrderedSequences,
   getDTD2_2_FormattedDate,
-  getDTDVersion
+  getDTDVersion,
+  getV2_2Date
 } from "../../utils";
 import { Text } from "../../uikit/components";
 import { Icon } from "antd";
@@ -450,7 +451,8 @@ class NodeProperties extends Component {
       sequences,
       selectedSequence,
       selectedCustomer,
-      selectedSubmission
+      selectedSubmission,
+      m1Json
     } = this.props;
 
     const id = `${_.get(selectedCustomer, "id", "")}_${_.get(
@@ -489,15 +491,21 @@ class NodeProperties extends Component {
         ""
       )}-${_.get(previousSeq, "submission_sub_type", "")})`;
 
-    const currentSeq = `${_.get(submission, "name")}\\${_.get(
-      selectedSequence,
-      "name",
-      ""
-    )} (${_.get(nextSeq || previousSeq, "submission_type", "")}-${_.get(
-      nextSeq || previousSeq,
-      "submission_sub_type",
-      ""
-    )})`;
+    const currentSeq =
+      getDTDVersion(m1Json) == "2.01"
+        ? `${_.get(submission, "name")}\\${this.getFirstSeq().name ||
+            ""} (${this.getFirstSeq().submission_type || ""}) ${getV2_2Date(
+            m1Json
+          )}`
+        : `${_.get(submission, "name")}\\${_.get(
+            selectedSequence,
+            "name",
+            ""
+          )} (${_.get(nextSeq || previousSeq, "submission_type", "")}-${_.get(
+            nextSeq || previousSeq,
+            "submission_sub_type",
+            ""
+          )})`;
 
     /* const nextSeq = _.get(projectJson, "next_seq", "");
     const previousSeq = _.get(projectJson, "pre_seq", "");
@@ -558,22 +566,42 @@ class NodeProperties extends Component {
 
   getRootProperties = () => {
     const { m1Json, projectJson, submission } = this.props;
-    const label = _.get(
-      m1Json,
-      "[admin][application-set][application][application-information][application-number][$t]",
-      ""
-    );
+
+    const label =
+      getDTDVersion(m1Json) == "2.01"
+        ? _.get(m1Json, "[admin][product-description][application-number]", "")
+        : _.get(
+            m1Json,
+            "[admin][application-set][application][application-information][application-number][$t]",
+            ""
+          );
     const companyName = _.get(
       m1Json,
       "[admin][applicant-info][company-name]",
       ""
     );
-    const firstSeq = `${_.get(submission, "name")}\\${this.getFirstSeq().name ||
-      ""} (${this.getFirstSeq().submission_type || ""}-${this.getFirstSeq()
-      .submission_sub_type || ""})`;
-    const lastSeq = `${_.get(submission, "name")}\\${this.getLastSeq().name ||
-      ""} (${this.getLastSeq().submission_type || ""}-${this.getLastSeq()
-      .submission_sub_type || ""})`;
+    //As per the Jira ticket OMNG-764 (Sprint-23), we are displaying submission date as
+    //we dont have submission-sub-type in DTD vdersion 2.2 for both first sequence and
+    //last sequence
+    const firstSeq =
+      getDTDVersion(m1Json) == "2.01"
+        ? `${_.get(submission, "name")}\\${this.getFirstSeq().name ||
+            ""} (${this.getFirstSeq().submission_type || ""}) ${getV2_2Date(
+            m1Json
+          )}`
+        : `${_.get(submission, "name")}\\${this.getFirstSeq().name ||
+            ""} (${this.getFirstSeq().submission_type ||
+            ""}-${this.getFirstSeq().submission_sub_type || ""})`;
+
+    const lastSeq =
+      getDTDVersion(m1Json) == "2.01"
+        ? `${_.get(submission, "name")}\\${this.getFirstSeq().name ||
+            ""} (${this.getFirstSeq().submission_type || ""}) ${getV2_2Date(
+            m1Json
+          )}`
+        : `${_.get(submission, "name")}\\${this.getLastSeq().name ||
+            ""} (${this.getLastSeq().submission_type || ""}-${this.getLastSeq()
+            .submission_sub_type || ""})`;
     return (
       <React.Fragment>
         <RowItems>
@@ -1015,7 +1043,6 @@ class NodeProperties extends Component {
             )}
           </div>
         </RowItems>
-        <div className="global__hr-line" style={{ background: "#bfc4c7" }} />
         <RowItems>
           <div className="label">Application Number:</div>
           <div className="value">
