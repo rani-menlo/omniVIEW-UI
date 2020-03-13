@@ -125,7 +125,7 @@ const minFourDigitsInString = val => {
 
 //get DTD version, (Jira ticket OMNG-764, Sprint-23)
 const getDTDVersion = m1Json => {
-  return m1Json["dtd-version"];
+  return m1Json && m1Json["dtd-version"] ? m1Json["dtd-version"] : "";
 };
 
 //get DTD 2.01 version date, (Jira ticket OMNG-764, Sprint-23)
