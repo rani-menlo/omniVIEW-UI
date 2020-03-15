@@ -42,8 +42,10 @@ class SequencesModal extends Component {
   componentDidMount() {}
 
   delete = () => {
+    const { sequences } = this.props;
+    let orderedSequences = getOrderedSequences(sequences, this.state.order);
     this.props.onDelete &&
-      this.props.onDelete(this.state.selectedSequences, this.props.sequences);
+      this.props.onDelete(this.state.selectedSequences, orderedSequences);
   };
 
   render() {
@@ -51,7 +53,7 @@ class SequencesModal extends Component {
     const { order, selectedSequences } = this.state;
     const submissionLabel = _.get(submission, "name", "");
     const orderedSequences = getOrderedSequences(sequences, order);
-    console.log("sequences", orderedSequences);
+    console.log("sequences", orderedSequences, this.props);
     return (
       <DraggableModal
         visible={visible}
@@ -126,7 +128,11 @@ class SequencesModal extends Component {
                   marginLeft: "10px",
                   border: "none"
                 }}
-                className={!selectedSequences.length && selectedSequences.length <= 0 && "disabled"}
+                className={
+                  !selectedSequences.length &&
+                  selectedSequences.length <= 0 &&
+                  "disabled"
+                }
                 onClick={this.delete}
               >
                 Delete

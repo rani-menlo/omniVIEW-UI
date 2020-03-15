@@ -1042,11 +1042,11 @@ class ApplicationDashboard extends Component {
     this.hideLoading();
     if (!res.data.error) {
       this.closeFailuresModal();
-      this.closeSequencesModal();
       if (type == "sucessfully_uploaded_sequences") {
         this.props.dispatch(
           submissionActions.resetSequences(this.state.selectedSubmissionMenu.id)
         );
+        this.closeSequencesModal();
         this.showErrorMsg(selectedSequences, allUploadedSequences);
       } else {
         this.showErrorMsg(selectedFailedUploads, reportData);
