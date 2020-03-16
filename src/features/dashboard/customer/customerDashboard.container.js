@@ -502,18 +502,20 @@ class CustomerDashboard extends Component {
                   />
                 ))}
               </div>
-              {searchText && !customers.length && (
-                <Row className="maindashboard__nodata">
-                  <Icon
-                    style={{ fontSize: "20px" }}
-                    type="exclamation-circle"
-                    className="maindashboard__nodata-icon"
-                  />
-                  {translate("error.dashboard.notfound", {
-                    type: translate("label.dashboard.customers")
-                  })}
-                </Row>
-              )}
+              {searchText &&
+                !_.get(this.props, "customers") &&
+                  !_.get(this.props, "customers.length") && (
+                  <Row className="maindashboard__nodata">
+                    <Icon
+                      style={{ fontSize: "20px" }}
+                      type="exclamation-circle"
+                      className="maindashboard__nodata-icon"
+                    />
+                    {translate("error.dashboard.notfound", {
+                      type: translate("label.dashboard.customers")
+                    })}
+                  </Row>
+                )}
             </React.Fragment>
           )}
           <DeactivateModal

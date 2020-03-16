@@ -407,16 +407,17 @@ class AssignPermissions extends Component {
                       </div>
                     );
                   })}
-                {!this.state.users.length && (
-                  <Row className="maindashboard__nodata">
-                    <Text
-                      type="regular"
-                      size="14px"
-                      text="No Users Found"
-                      textStyle={{ marginTop: "45px" }}
-                    />
-                  </Row>
-                )}
+                {!_.get(this.props, "users") &&
+                  !_.get(this.props, "users.length") && (
+                    <Row className="maindashboard__nodata">
+                      <Text
+                        type="regular"
+                        size="14px"
+                        text="No Users Found"
+                        textStyle={{ marginTop: "45px" }}
+                      />
+                    </Row>
+                  )}
                 {this.state.noUsersError && (
                   <Row className="maindashboard__nodata">
                     <Icon

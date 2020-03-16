@@ -137,18 +137,20 @@ class SubmissionViewUsers extends Component {
               </div>
             </div>
           ))}
-          {this.props.users != null && !this.props.users.length && (
-            <Row className="maindashboard__nodata">
-              <Icon
-                style={{ fontSize: "20px" }}
-                type="exclamation-circle"
-                className="maindashboard__nodata-icon"
-              />
-              {translate("error.dashboard.notfound", {
-                type: translate("label.dashboard.users")
-              })}
-            </Row>
-          )}
+          {this.props.users != null &&
+            !_.get(this.props, "users") &&
+            !_.get(this.props, "users.length") && (
+              <Row className="maindashboard__nodata">
+                <Icon
+                  style={{ fontSize: "20px" }}
+                  type="exclamation-circle"
+                  className="maindashboard__nodata-icon"
+                />
+                {translate("error.dashboard.notfound", {
+                  type: translate("label.dashboard.users")
+                })}
+              </Row>
+            )}
         </div>
       </div>
     );
