@@ -85,6 +85,7 @@
     .panel {
       background-color: $froasted-glass;
       height: 100%;
+      min-width: 245px;
       &-sequences {
         border-right: solid 0.2px;
         &__users {
@@ -104,6 +105,7 @@
       }
     }
     .panels__tree {
+      min-width: 600px;
       &__structure {
         overflow-y: auto;
         overflow-x: hidden;
@@ -184,4 +186,20 @@ tabs {
 
 .splitter-layout {
   position: relative !important;
+  &.first-pane {
+    &.disable-splitter {
+      > .layout-splitter {
+        height: 1px;
+        cursor: pointer;
+      }
+    }
+  }
+  &.second-pane {
+    &.disable-splitter {
+      > .layout-splitter {
+        height: 1px;
+        cursor: pointer;
+      }
+    }
+  }
 }

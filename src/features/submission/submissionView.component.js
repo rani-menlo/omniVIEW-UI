@@ -47,6 +47,8 @@ import { Permissions } from "./permissions";
 import SubmissionViewUsers from "./submissionViewUsers.component";
 import TreeNode from "./treeNode.component";
 import ValidationResults from "./validationResults.component";
+import SplitterLayout from "react-splitter-layout";
+import "react-splitter-layout/lib/index.css";
 
 const TabPane = Tabs.TabPane;
 
@@ -62,7 +64,9 @@ class SubmissionView extends Component {
       selectedMode: "standard",
       sequenceSortBy: "submission",
       nodeProperties: null,
-      treePanelWidth: 50,
+      treePanelWidth: 100,
+      sequencesPaneWidth: 20,
+      propertiesWidth: 37,
       openValidationModal: false,
       openFindModal: false,
       parentHeaderHeight: 0,
@@ -381,23 +385,27 @@ class SubmissionView extends Component {
 
   togglePropertiesPane = () => {
     const propertiesExpand = !this.state.propertiesExpand;
-    const treePanelWidth = propertiesExpand
-      ? this.state.treePanelWidth - 30
-      : this.state.treePanelWidth + 30;
+    // const treePanelWidth = propertiesExpand
+    //   ? this.state.treePanelWidth - 30
+    //   : this.state.treePanelWidth + 30;
+    const propertiesWidth = propertiesExpand ? 37 : 0;
     this.setState({
       propertiesExpand,
-      treePanelWidth
+      // treePanelWidth,
+      propertiesWidth
     });
   };
 
   toggleSequencesPane = () => {
     const sequencesExpand = !this.state.sequencesExpand;
-    const treePanelWidth = sequencesExpand
-      ? this.state.treePanelWidth - 20
-      : this.state.treePanelWidth + 20;
+    // const treePanelWidth = sequencesExpand
+    //   ? this.state.treePanelWidth - 20
+    //   : this.state.treePanelWidth + 20;
+    const sequencesPaneWidth = sequencesExpand ? 20 : 0;
     this.setState({
       sequencesExpand,
-      treePanelWidth
+      // treePanelWidth,
+      sequencesPaneWidth
     });
   };
 
@@ -1026,7 +1034,9 @@ class SubmissionView extends Component {
       showPermissionsModal,
       fileLevelAccessObj,
       enableValidateSequence,
-      openSubmissions
+      openSubmissions,
+      sequencesPaneWidth,
+      propertiesWidth
     } = this.state;
     if (!selectedSubmission) {
       return <Redirect to="/applications" />;
@@ -1196,263 +1206,325 @@ class SubmissionView extends Component {
               height: `calc(100% - ${this.state.parentHeaderHeight}px)`
             }}
           >
-            <Sidebar
-              containerStyle={{ width: "20%", height: "100%" }}
-              direction="ltr"
-              expand={this.state.sequencesExpand}
+            <SplitterLayout
+              key={sequencesPaneWidth}
+              percentage
+              primaryIndex={1}
+              primaryMinSize={50}
+              secondaryMinSize={15}
+              secondaryInitialSize={sequencesPaneWidth}
+              customClassName={`first-pane ${!this.state.sequencesExpand &&
+                "disable-splitter"}`}
             >
-              <div className="panel panel-sequences">
-                <div
-                  style={{
-                    height: showUsersSection
-                      ? "45%"
-                      : isAdmin(role.name)
-                      ? "calc(100% - 33px)"
-                      : "100%"
-                  }}
-                >
-                  <NodeSequences
-                    onSequenceCheckboxChange={this.onSequenceCheckboxChange}
-                    submissionLabel={_.get(selectedSubmission, "name", "")}
-                    selected={_.get(selectedSequence, "id", 0)}
-                    sequences={sequences}
-                    onSelectedSequence={this.onSelectedSequence}
-                    sortBy={sequenceSortBy}
-                    onSortByChanged={this.onSequenceSortByChanged}
-                    viewPermissions={viewPermissions}
-                    editPermissions={editPermissions}
-                    m1Json={
-                      selectedSequence
-                        ? _.get(sequenceJson, "[fda-regional:fda-regional]", "")
-                        : _.get(
-                            lifeCycleJson,
-                            "[fda-regional:fda-regional]",
-                            ""
-                          )
-                    }
-                  />
-                </div>
-                {isAdmin(role.name) && (
+              <Sidebar
+                // containerStyle={{ width: "20%", height: "100%" }}
+                containerStyle={{ height: "100%" }}
+                direction="ltr"
+                expand={this.state.sequencesExpand}
+              >
+                <div className="panel panel-sequences">
                   <div
-                    className="panel-sequences__users global__cursor-pointer"
-                    onClick={this.openUsersSection}
+                    style={{
+                      height: showUsersSection
+                        ? "45%"
+                        : isAdmin(role.name)
+                        ? "calc(100% - 33px)"
+                        : "100%"
+                    }}
                   >
-                    <Text
-                      type="bold"
-                      opacity={0.7}
-                      text={translate("label.dashboard.users")}
-                    />
-                    <Icon
-                      type={showUsersSection ? "up" : "down"}
-                      className="global__cursor-pointer"
+                    <NodeSequences
+                      onSequenceCheckboxChange={this.onSequenceCheckboxChange}
+                      submissionLabel={_.get(selectedSubmission, "name", "")}
+                      selected={_.get(selectedSequence, "id", 0)}
+                      sequences={sequences}
+                      onSelectedSequence={this.onSelectedSequence}
+                      sortBy={sequenceSortBy}
+                      onSortByChanged={this.onSequenceSortByChanged}
+                      viewPermissions={viewPermissions}
+                      editPermissions={editPermissions}
+                      m1Json={
+                        selectedSequence
+                          ? _.get(
+                              sequenceJson,
+                              "[fda-regional:fda-regional]",
+                              ""
+                            )
+                          : _.get(
+                              lifeCycleJson,
+                              "[fda-regional:fda-regional]",
+                              ""
+                            )
+                      }
                     />
                   </div>
-                )}
-                {showUsersSection && (
-                  <SubmissionViewUsers
-                    role={role}
-                    searchUsers={this.fetchUsers}
-                    users={this.getFilteredUsers()}
-                    selectedUser={selectedUser}
-                    onUserSelected={this.viewPermissions}
-                  />
-                )}
-              </div>
-            </Sidebar>
-            <div
-              ref={this.treeContainerRef}
-              className="panels__tree"
-              style={{ width: `${this.state.treePanelWidth}%` }}
-            >
-              {showEditMessage && (
-                <div className="panels__tree__editblock">
-                  <Text
-                    className="panels__tree__editblock-text"
-                    type="medium"
-                    size="12px"
-                    text={translate("text.submission.editpermissions")}
-                  />
-                  {/* <Text
+                  {isAdmin(role.name) && (
+                    <div
+                      className="panel-sequences__users global__cursor-pointer"
+                      onClick={this.openUsersSection}
+                    >
+                      <Text
+                        type="bold"
+                        opacity={0.7}
+                        text={translate("label.dashboard.users")}
+                      />
+                      <Icon
+                        type={showUsersSection ? "up" : "down"}
+                        className="global__cursor-pointer"
+                      />
+                    </div>
+                  )}
+                  {showUsersSection && (
+                    <SubmissionViewUsers
+                      role={role}
+                      searchUsers={this.fetchUsers}
+                      users={this.getFilteredUsers()}
+                      selectedUser={selectedUser}
+                      onUserSelected={this.viewPermissions}
+                    />
+                  )}
+                </div>
+              </Sidebar>
+              <SplitterLayout
+                key={propertiesWidth}
+                percentage
+                secondaryInitialSize={propertiesWidth}
+                primaryMinSize={25}
+                secondaryMinSize={20}
+                customClassName={`second-pane ${!this.state.propertiesExpand &&
+                  "disable-splitter"}`}
+              >
+                <SplitterLayout
+                  percentage
+                  vertical
+                  customClassName="third-pane"
+                >
+                  <div
+                    ref={this.treeContainerRef}
+                    className="panels__tree"
+                    style={{ width: `${this.state.treePanelWidth}%` }}
+                  >
+                    {showEditMessage && (
+                      <div className="panels__tree__editblock">
+                        <Text
+                          className="panels__tree__editblock-text"
+                          type="medium"
+                          size="12px"
+                          text={translate("text.submission.editpermissions")}
+                        />
+                        {/* <Text
                     className="panels__tree__editblock-text global__cursor-pointer"
                     onClick={this.hideEditMessage}
                     type="bold"
                     size="12px"
                     text={translate("label.generic.ok")}
                   /> */}
-                </div>
-              )}
+                      </div>
+                    )}
 
-              {viewPermissions &&
-                (isLoggedInOmniciaAdmin(role) ||
-                  isLoggedInCustomerAdmin(role)) && (
-                  <div className="panels__tree__permissions">
-                    <Row>
-                      <ImageLoader
-                        key={_.get(this.state.selectedUser, "profile")}
-                        path={_.get(this.state.selectedUser, "profile")}
-                        width="35px"
-                        height="35px"
-                        type="circle"
-                        style={{ marginRight: "8px" }}
-                        globalAccess={_.get(
-                          this.state.selectedUser,
-                          "has_global_access"
-                        )}
-                      />
-                      <Text
-                        type="medium"
-                        text={`${translate("text.generic.viewingpermissions", {
-                          user: `${_.get(
-                            this.state.selectedUser,
-                            "first_name",
-                            ""
-                          )} ${_.get(this.state.selectedUser, "last_name", "")}`
-                        })} ${
-                          selectedView === "current"
-                            ? translate("text.generic.editlifecycle")
-                            : ""
-                        }`}
-                      />
-                    </Row>
-                    <Row>
-                      <OmniButton
-                        type="secondary"
-                        label={translate("label.button.close")}
-                        buttonStyle={{ marginRight: "8px" }}
-                        onClick={this.hidePermissions}
-                      />
-                      {(selectedView === "lifeCycle" ||
-                        selectedSequence !== null) && (
-                        <OmniButton
-                          type={
-                            !isAdmin(
-                              _.get(this.state, "selectedUser.role_name")
-                            ) &&
-                            _.get(this.state, "selectedUser.has_global_access")
-                              ? "danger"
-                              : "primary"
-                          }
-                          disabled={isAdmin(
-                            _.get(this.state, "selectedUser.role_name")
-                          )}
-                          label={
-                            !isAdmin(
-                              _.get(this.state, "selectedUser.role_name")
-                            ) &&
-                            _.get(this.state, "selectedUser.has_global_access")
-                              ? translate("label.button.editpermissionsglobal")
-                              : translate("label.button.editpermissions")
-                          }
-                          buttonStyle={{ borderColor: "transparent" }}
-                          onClick={this.enableEditingPermissions}
-                        />
+                    {viewPermissions &&
+                      (isLoggedInOmniciaAdmin(role) ||
+                        isLoggedInCustomerAdmin(role)) && (
+                        <div className="panels__tree__permissions">
+                          <Row>
+                            <ImageLoader
+                              key={_.get(this.state.selectedUser, "profile")}
+                              path={_.get(this.state.selectedUser, "profile")}
+                              width="35px"
+                              height="35px"
+                              type="circle"
+                              style={{ marginRight: "8px" }}
+                              globalAccess={_.get(
+                                this.state.selectedUser,
+                                "has_global_access"
+                              )}
+                            />
+                            <Text
+                              type="medium"
+                              text={`${translate(
+                                "text.generic.viewingpermissions",
+                                {
+                                  user: `${_.get(
+                                    this.state.selectedUser,
+                                    "first_name",
+                                    ""
+                                  )} ${_.get(
+                                    this.state.selectedUser,
+                                    "last_name",
+                                    ""
+                                  )}`
+                                }
+                              )} ${
+                                selectedView === "current"
+                                  ? translate("text.generic.editlifecycle")
+                                  : ""
+                              }`}
+                            />
+                          </Row>
+                          <Row>
+                            <OmniButton
+                              type="secondary"
+                              label={translate("label.button.close")}
+                              buttonStyle={{ marginRight: "8px" }}
+                              onClick={this.hidePermissions}
+                            />
+                            {(selectedView === "lifeCycle" ||
+                              selectedSequence !== null) && (
+                              <OmniButton
+                                type={
+                                  !isAdmin(
+                                    _.get(this.state, "selectedUser.role_name")
+                                  ) &&
+                                  _.get(
+                                    this.state,
+                                    "selectedUser.has_global_access"
+                                  )
+                                    ? "danger"
+                                    : "primary"
+                                }
+                                disabled={isAdmin(
+                                  _.get(this.state, "selectedUser.role_name")
+                                )}
+                                label={
+                                  !isAdmin(
+                                    _.get(this.state, "selectedUser.role_name")
+                                  ) &&
+                                  _.get(
+                                    this.state,
+                                    "selectedUser.has_global_access"
+                                  )
+                                    ? translate(
+                                        "label.button.editpermissionsglobal"
+                                      )
+                                    : translate("label.button.editpermissions")
+                                }
+                                buttonStyle={{ borderColor: "transparent" }}
+                                onClick={this.enableEditingPermissions}
+                              />
+                            )}
+                          </Row>
+                        </div>
                       )}
-                    </Row>
+
+                    {editPermissions && (
+                      <div className="panels__tree__permissions">
+                        <Row>
+                          <ImageLoader
+                            path={_.get(this.state.selectedUser, "profile")}
+                            width="35px"
+                            height="35px"
+                            type="circle"
+                            style={{ marginRight: "8px" }}
+                            globalAccess={_.get(
+                              this.state.selectedUser,
+                              "has_global_access"
+                            )}
+                          />
+                          <Text
+                            type="medium"
+                            text={translate("text.generic.editingpermissions", {
+                              user: `${_.get(
+                                this.state.selectedUser,
+                                "first_name",
+                                ""
+                              )} ${_.get(
+                                this.state.selectedUser,
+                                "last_name",
+                                ""
+                              )}`
+                            })}
+                          />
+                        </Row>
+                        <Row>
+                          <OmniButton
+                            type="secondary"
+                            label={translate("label.button.cancel")}
+                            buttonStyle={{ marginRight: "8px" }}
+                            onClick={this.disableEditingPermissions}
+                          />
+                          <OmniButton
+                            // disabled={!Permissions.hasChanges()}
+                            type="primary"
+                            label={translate("label.button.savechanges")}
+                            onClick={this.saveEditedPermissions}
+                          />
+                        </Row>
+                      </div>
+                    )}
+                    <div
+                      className="panels__tree__structure"
+                      style={{
+                        height: showEditMessage
+                          ? "83%"
+                          : isAdmin(
+                              _.get(this.state, "selectedUser.role_name")
+                            ) &&
+                            (viewPermissions || editPermissions)
+                          ? "90%"
+                          : "100%"
+                      }}
+                    >
+                      <TreeNode
+                        ref={this.treeRef}
+                        parentNode={this.treeRef}
+                        role={role}
+                        key={this.createKey()}
+                        label={this.getTreeLabel()}
+                        content={this.getContent()}
+                        expand={this.state.treeExpand}
+                        fullyExpanded={this.onFullyExpand}
+                        onNodeSelected={this.onNodeSelected}
+                        selectedNodeId={this.state.selectedNodeId}
+                        mode={selectedMode}
+                        view={selectedView}
+                        submission={selectedSubmission}
+                        viewPermissions={viewPermissions}
+                        editPermissions={editPermissions}
+                        onCheckChange={this.onCheckChange}
+                        onExpandNode={this.onExpandNode}
+                        openPermissionsModal={this.openPermissionsModal}
+                        selectInLifeCycle={this.selectInLifeCycle}
+                        defaultExpand
+                      />
+                    </div>
                   </div>
-                )}
-
-              {editPermissions && (
-                <div className="panels__tree__permissions">
-                  <Row>
-                    <ImageLoader
-                      path={_.get(this.state.selectedUser, "profile")}
-                      width="35px"
-                      height="35px"
-                      type="circle"
-                      style={{ marginRight: "8px" }}
-                      globalAccess={_.get(
-                        this.state.selectedUser,
-                        "has_global_access"
-                      )}
+                </SplitterLayout>
+                <Sidebar
+                  // containerStyle={{ width: "30%", height: "100%" }}
+                  containerStyle={{ height: "100%", width: "100%" }}
+                  direction="rtl"
+                  expand={this.state.propertiesExpand}
+                >
+                  <div className="panel panel-properties">
+                    <NodeProperties
+                      properties={this.state.nodeProperties}
+                      formFile={this.getFormFile()}
+                      m1Json={
+                        selectedSequence
+                          ? _.get(
+                              sequenceJson,
+                              "[fda-regional:fda-regional]",
+                              ""
+                            )
+                          : _.get(
+                              lifeCycleJson,
+                              "[fda-regional:fda-regional]",
+                              ""
+                            )
+                      }
+                      projectJson={
+                        selectedSequence
+                          ? _.get(sequenceJson, "[project]", "")
+                          : _.get(lifeCycleJson, "[project]", "")
+                      }
+                      sequence={selectedSequence || _.get(sequences, "[0]", "")}
+                      submission={selectedSubmission}
+                      view={selectedView}
+                      mode={selectedMode}
                     />
-                    <Text
-                      type="medium"
-                      text={translate("text.generic.editingpermissions", {
-                        user: `${_.get(
-                          this.state.selectedUser,
-                          "first_name",
-                          ""
-                        )} ${_.get(this.state.selectedUser, "last_name", "")}`
-                      })}
-                    />
-                  </Row>
-                  <Row>
-                    <OmniButton
-                      type="secondary"
-                      label={translate("label.button.cancel")}
-                      buttonStyle={{ marginRight: "8px" }}
-                      onClick={this.disableEditingPermissions}
-                    />
-                    <OmniButton
-                      // disabled={!Permissions.hasChanges()}
-                      type="primary"
-                      label={translate("label.button.savechanges")}
-                      onClick={this.saveEditedPermissions}
-                    />
-                  </Row>
-                </div>
-              )}
-              <div
-                className="panels__tree__structure"
-                style={{
-                  height: showEditMessage
-                    ? "83%"
-                    : isAdmin(_.get(this.state, "selectedUser.role_name")) &&
-                      (viewPermissions || editPermissions)
-                    ? "90%"
-                    : "100%"
-                }}
-              >
-                <TreeNode
-                  ref={this.treeRef}
-                  parentNode={this.treeRef}
-                  role={role}
-                  key={this.createKey()}
-                  label={this.getTreeLabel()}
-                  content={this.getContent()}
-                  expand={this.state.treeExpand}
-                  fullyExpanded={this.onFullyExpand}
-                  onNodeSelected={this.onNodeSelected}
-                  selectedNodeId={this.state.selectedNodeId}
-                  mode={selectedMode}
-                  view={selectedView}
-                  submission={selectedSubmission}
-                  viewPermissions={viewPermissions}
-                  editPermissions={editPermissions}
-                  onCheckChange={this.onCheckChange}
-                  onExpandNode={this.onExpandNode}
-                  openPermissionsModal={this.openPermissionsModal}
-                  selectInLifeCycle={this.selectInLifeCycle}
-                  defaultExpand
-                />
-              </div>
-            </div>
-            <Sidebar
-              containerStyle={{ width: "30%", height: "100%" }}
-              direction="rtl"
-              expand={this.state.propertiesExpand}
-            >
-              <div className="panel panel-properties">
-                <NodeProperties
-                  properties={this.state.nodeProperties}
-                  formFile={this.getFormFile()}
-                  m1Json={
-                    selectedSequence
-                      ? _.get(sequenceJson, "[fda-regional:fda-regional]", "")
-                      : _.get(lifeCycleJson, "[fda-regional:fda-regional]", "")
-                  }
-                  projectJson={
-                    selectedSequence
-                      ? _.get(sequenceJson, "[project]", "")
-                      : _.get(lifeCycleJson, "[project]", "")
-                  }
-                  sequence={selectedSequence || _.get(sequences, "[0]", "")}
-                  submission={selectedSubmission}
-                  view={selectedView}
-                  mode={selectedMode}
-                />
-              </div>
-            </Sidebar>
+                  </div>
+                </Sidebar>
+              </SplitterLayout>
+            </SplitterLayout>
           </div>
           <DraggableModal
             visible={this.state.openValidationModal}
