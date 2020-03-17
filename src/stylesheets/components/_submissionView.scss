@@ -187,17 +187,53 @@ tabs {
 .splitter-layout {
   position: relative !important;
   &.first-pane {
+    &.layout-changing {
+      > .layout-splitter {
+        background-color: transparent !important;
+      }
+    }
+    > .layout-splitter {
+      flex: 0 0 auto;
+      width: 12px;
+      height: 100%;
+      cursor: ew-resize;
+      background-color: transparent;
+      position: relative;
+      left: -4px;
+      &:hover {
+        background-color: transparent !important;
+      }
+    }
     &.disable-splitter {
       > .layout-splitter {
         height: 1px;
         cursor: pointer;
+        width: 0;
       }
     }
   }
   &.second-pane {
+    &.layout-changing {
+      > .layout-splitter {
+        background-color: transparent !important;
+      }
+    }
+    > .layout-splitter {
+      flex: 0 0 auto;
+      width: 12px;
+      height: 100%;
+      cursor: ew-resize;
+      background-color: transparent;
+      position: relative;
+      right: -4px;
+      &:hover {
+        background-color: transparent !important;
+      }
+    }
     &.disable-splitter {
       > .layout-splitter {
         height: 1px;
+        width: 0;
         cursor: pointer;
       }
     }
