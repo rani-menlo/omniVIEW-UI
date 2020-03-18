@@ -503,8 +503,8 @@ class CustomerDashboard extends Component {
                 ))}
               </div>
               {searchText &&
-                !_.get(this.props, "customers") &&
-                  !_.get(this.props, "customers.length") && (
+                this.props.getCustomers_flag &&
+                !_.get(this.props, "customers.length") && (
                   <Row className="maindashboard__nodata">
                     <Icon
                       style={{ fontSize: "20px" }}
@@ -633,7 +633,8 @@ function mapStateToProps(state) {
     role: state.Login.role,
     user: state.Login.user,
     customers: state.Customer.customers,
-    customerCount: state.Customer.customerCount
+    customerCount: state.Customer.customerCount,
+    getCustomers_flag: state.Customer.getCustomers_flag
   };
 }
 
