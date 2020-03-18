@@ -4,6 +4,7 @@ import _ from "lodash";
 const initialState = {
   customers: [],
   customerCount: 0,
+  getCustomers_flag: false,
   selectedCustomer: null,
   subscriptionsInUse: [],
   licencesUnAssigned: [],
@@ -19,7 +20,8 @@ export default (state = initialState, action) => {
       return {
         ...state,
         customers: action.data.data,
-        customerCount: action.data.customerCount
+        customerCount: action.data.customerCount,
+        getCustomers_flag: true
       };
     }
     case CustomerActionTypes.ADD_CUSTOMER: {
