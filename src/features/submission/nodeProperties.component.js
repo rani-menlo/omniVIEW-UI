@@ -998,6 +998,7 @@ class NodeProperties extends Component {
     const m1Properties = m1Json["m1-regional-properties"];
     const applicantInfo = _.get(m1Json, "[admin][applicant-info]");
     const productDescription = _.get(m1Json, "[admin][product-description]");
+    const productNames = _.get(productDescription, "[prod-name]");
     const applicationInformation = _.get(
       m1Json,
       "[admin][application-information]"
@@ -1052,25 +1053,57 @@ class NodeProperties extends Component {
         <RowItems>
           <div className="label">Product Name:</div>
           <div className="value">
-            {_.get(productDescription, "[prod-name][0][$t]", "")}
+            {_.some(productNames, ["type", "established"])
+              ? _.get(
+                  productDescription,
+                  `[prod-name][${productNames.findIndex(
+                    product => product.type === "established"
+                  )}][$t]`,
+                  ""
+                )
+              : ""}
           </div>
         </RowItems>
         <RowItems>
           <div className="label">Proprietary Name:</div>
           <div className="value">
-            {_.get(productDescription, "[prod-name][1][$t]", "")}
+            {_.some(productNames, ["type", "proprietary"])
+              ? _.get(
+                  productDescription,
+                  `[prod-name][${productNames.findIndex(
+                    product => product.type === "proprietary"
+                  )}][$t]`,
+                  ""
+                )
+              : ""}
           </div>
         </RowItems>
         <RowItems>
           <div className="label">Chemical Name:</div>
           <div className="value">
-            {_.get(productDescription, "[prod-name][2][$t]", "")}
+            {_.some(productNames, ["type", "chemical"])
+              ? _.get(
+                  productDescription,
+                  `[prod-name][${productNames.findIndex(
+                    product => product.type === "chemical"
+                  )}][$t]`,
+                  ""
+                )
+              : ""}
           </div>
         </RowItems>
         <RowItems>
           <div className="label">Code Name:</div>
           <div className="value">
-            {_.get(productDescription, "[prod-name][3][$t]", "")}
+            {_.some(productNames, ["type", "code"])
+              ? _.get(
+                  productDescription,
+                  `[prod-name][${productNames.findIndex(
+                    product => product.type === "code"
+                  )}][$t]`,
+                  ""
+                )
+              : ""}
           </div>
         </RowItems>
         <RowItems>
@@ -1136,10 +1169,10 @@ class NodeProperties extends Component {
                 {leafProperties["checksum-type"] || ""}
               </div>
             </RowItems>
-            <RowItems>
+            {/* <RowItems>
               <div className="label">Xlink Type:</div>
               <div className="value">{leafProperties["xlink:type"]}</div>
-            </RowItems>
+            </RowItems> */}
 
             <RowItems>
               <div className="label">Containing Folder:</div>
