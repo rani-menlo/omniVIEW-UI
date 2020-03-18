@@ -72,7 +72,6 @@ class OpenSubmissionsModal extends Component {
       selectedSubmission: _.get(this.props, "selectedSubmission", ""),
       selectedCustomer: _.get(this.props, "selectedCustomer", "")
     });
-
     if (isLoggedInOmniciaRole(this.props.role)) {
       //this.fetchCustomers();
     } else {
@@ -126,18 +125,14 @@ class OpenSubmissionsModal extends Component {
       selectedSubmission,
       activeTab
     } = this.state;
-    console.log(
-      this.props,
-      this.state,
-      submissions,
-      selectedCustomer,
-      selectedSubmission,
-      "thi.state"
-    );
+    // let submissionsList =
+    //   _.get(this.props, "submissions") &&
+    //   _.filter(this.props.submissions, ["is_uploading", false]);
+    // console.log("submissionsList", submissionsList);
     return (
       <div className="open-submissions-modal">
         <div className="open-submissions-modal__header">
-          <img class="open-folder" src="/images/open-folder.svg" />
+          <img className="open-folder" src="/images/open-folder.svg" />
           <Text
             type="regular"
             size="16px"
@@ -156,43 +151,46 @@ class OpenSubmissionsModal extends Component {
                 <div className="open-submissions-modal__tabs__table__body">
                   <table>
                     <tbody>
-                      {submissions && submissions.length ? (
-                        _.map(submissions, (submission, idx) => {
-                          return (
-                            <tr
-                              key={idx}
-                              className={`global__cursor-pointer ${selectedSubmission.id ===
-                                submission.id && "global__node-selected"}`}
-                              onClick={this.onItemSelected(submission)}
-                              key={submission.id}
-                            >
-                              <td className="">
-                                <div
-                                  style={{
-                                    display: "flex",
-                                    alignItems: "center"
-                                  }}
-                                >
-                                  <Icon
-                                    type="folder"
-                                    theme="filled"
-                                    className="global__file-folder"
-                                  />
-                                  <Text
-                                    type="regular"
-                                    size="14px"
-                                    text={submission.name}
-                                  />
-                                </div>
-                              </td>
-                            </tr>
-                          );
-                        })
-                      ) : (
-                        <tr className="no_validation_sequences">
-                          No Submissions Found
-                        </tr>
-                      )}
+                      {_.map(submissions, (submission, idx) => {
+                        return (
+                          <tr
+                            key={idx}
+                            className={`global__cursor-pointer ${selectedSubmission.id ===
+                              submission.id && "global__node-selected"}`}
+                            onClick={this.onItemSelected(submission)}
+                            key={submission.id}
+                          >
+                            <td className="">
+                              <div
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center"
+                                }}
+                              >
+                                <Icon
+                                  type="folder"
+                                  theme="filled"
+                                  className="global__file-folder"
+                                />
+                                <Text
+                                  type="regular"
+                                  size="14px"
+                                  text={submission.name}
+                                />
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                      {!this.props.submissions &&
+                        !_.filter(this.props.submissions, [
+                          "is_uploading",
+                          false
+                        ]).length && (
+                          <tr className="no_validation_sequences">
+                            No Submissions Found
+                          </tr>
+                        )}
                     </tbody>
                   </table>
                 </div>
@@ -279,7 +277,9 @@ function mapStateToProps(state) {
   return {
     role: state.Login.role,
     user: state.Login.user,
-    submissions: state.Application.submissions,
+    submissions: state.Application.submissions
+      ? state.Application.submissions
+      : "",
     customers: state.Customer.customers,
     selectedCustomer: state.Customer.selectedCustomer,
     selectedSubmission: state.Application.selectedSubmission
