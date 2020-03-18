@@ -1369,18 +1369,19 @@ class ApplicationDashboard extends Component {
                   </Row>
                 ))}
               </div>
-              {!_.get(submissions, "length") && (
-                <Row className="maindashboard__nodata">
-                  <Icon
-                    style={{ fontSize: "20px" }}
-                    type="exclamation-circle"
-                    className="maindashboard__nodata-icon"
-                  />
-                  {translate("error.dashboard.notfound", {
-                    type: translate("label.dashboard.applications")
-                  })}
-                </Row>
-              )}
+              {!_.get(this.props, "submissions") &&
+                !_.get(this.props, "submissions.length") && (
+                  <Row className="maindashboard__nodata">
+                    <Icon
+                      style={{ fontSize: "20px" }}
+                      type="exclamation-circle"
+                      className="maindashboard__nodata-icon"
+                    />
+                    {translate("error.dashboard.notfound", {
+                      type: translate("label.dashboard.applications")
+                    })}
+                  </Row>
+                )}
               <Pagination
                 containerStyle={
                   submissionCount > 4

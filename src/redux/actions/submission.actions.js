@@ -244,7 +244,8 @@ export default {
           dispatch({
             type: SubmissionActionTypes.VALIDATE_SEQUENCE,
             data: res.data,
-            id
+            id,
+            validateSequence_flag: true
           });
         }
         ApiActions.success(dispatch);
@@ -342,7 +343,8 @@ export default {
         dispatch({
           text: data.text,
           type: SubmissionActionTypes.FIND_TEXT,
-          data: res.data
+          data: res.data,
+          find_flag: true
         });
         ApiActions.success(dispatch);
       } catch (err) {

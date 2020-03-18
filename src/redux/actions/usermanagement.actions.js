@@ -78,7 +78,8 @@ export default {
         const res = await UsermanagementApi.fetchUsers(data);
         dispatch({
           type: UsermanagementActionTypes.FETCH_USERS,
-          data: res.data
+          data: res.data,
+          usersFlag: true
         });
         ApiActions.success(dispatch);
       } catch (err) {

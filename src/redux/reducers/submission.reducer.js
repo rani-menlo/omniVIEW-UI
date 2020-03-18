@@ -1,6 +1,7 @@
 import _ from "lodash";
 import uuidv4 from "uuid/v4";
 import { SubmissionActionTypes } from "../actionTypes";
+import { ApiActions } from "../actions";
 
 const initialState = {
   sequences: {},
@@ -8,6 +9,7 @@ const initialState = {
   sequenceJson: {},
   lifeCycleJson: {},
   validations: {},
+  validationsSequence_flag: false,
   find: {
     searchResults: [],
     selected: "",
@@ -15,7 +17,8 @@ const initialState = {
     matchCase: false,
     matchWholeword: false,
     sortFile: "asc",
-    sortTitle: "asc"
+    sortTitle: "asc",
+    find_flag: false
   }
 };
 
@@ -56,7 +59,8 @@ export default (state = initialState, action) => {
         validations: {
           ...state.validations,
           [action.id]: action.data.data
-        }
+        },
+        validationsSequence_flag: action.validateSequence_flag
       };
     }
     case SubmissionActionTypes.FIND_TEXT: {
@@ -69,7 +73,8 @@ export default (state = initialState, action) => {
             ...obj,
             hash: uuidv4()
           })),
-          searchText: action.text
+          searchText: action.text,
+          find_flag: action.find_flag
         }
       };
     }
@@ -130,7 +135,8 @@ export default (state = initialState, action) => {
         find: {
           ...state.find,
           searchResults: [],
-          searchText: ""
+          searchText: "",
+          find_flag: false
         }
       };
     }

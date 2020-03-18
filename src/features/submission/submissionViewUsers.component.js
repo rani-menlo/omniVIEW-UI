@@ -69,7 +69,7 @@ class SubmissionViewUsers extends Component {
 
   render() {
     const { searchText } = this.state;
-    const { selectedUser, role } = this.props;
+    const { selectedUser, role, usersFlag } = this.props;
     return (
       <div className="submissionViewUsers">
         <div className="submissionViewUsers__filters">
@@ -138,7 +138,7 @@ class SubmissionViewUsers extends Component {
             </div>
           ))}
           {this.props.users != null &&
-            !_.get(this.props, "users") &&
+            usersFlag &&
             !_.get(this.props, "users.length") && (
               <Row className="maindashboard__nodata">
                 <Icon

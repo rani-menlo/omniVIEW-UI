@@ -1280,6 +1280,7 @@ class SubmissionView extends Component {
                       users={this.getFilteredUsers()}
                       selectedUser={selectedUser}
                       onUserSelected={this.viewPermissions}
+                      usersFlag={this.props.usersFlag}
                     />
                   )}
                 </div>
@@ -1609,7 +1610,8 @@ function mapStateToProps(state) {
     sequenceJson: getSequenceJson(state),
     selectedSubmission: state.Application.selectedSubmission,
     selectedCustomer: state.Customer.selectedCustomer,
-    users: state.Usermanagement.users
+    users: state.Usermanagement.users,
+    usersFlag: state.Usermanagement.usersFlag
   };
 }
 

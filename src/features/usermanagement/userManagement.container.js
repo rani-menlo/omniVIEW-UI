@@ -835,19 +835,18 @@ class UserManagementContainer extends Component {
                   </div>
                 );
               })}
-              {!_.get(this.props, "users") &&
-                !_.get(this.props, "users.length") && (
-                  <Row className="maindashboard__nodata">
-                    <Icon
-                      style={{ fontSize: "20px" }}
-                      type="exclamation-circle"
-                      className="maindashboard__nodata-icon"
-                    />
-                    {translate("error.dashboard.notfound", {
-                      type: translate("label.dashboard.users")
-                    })}
-                  </Row>
-                )}
+              {this.props.usersFlag && !_.get(this.props, "users.length") && (
+                <Row className="maindashboard__nodata">
+                  <Icon
+                    style={{ fontSize: "20px" }}
+                    type="exclamation-circle"
+                    className="maindashboard__nodata-icon"
+                  />
+                  {translate("error.dashboard.notfound", {
+                    type: translate("label.dashboard.users")
+                  })}
+                </Row>
+              )}
             </div>
           )}
           {viewBy === "lists" && (
@@ -989,19 +988,18 @@ class UserManagementContainer extends Component {
                   </Row>
                 ))}
               </div>
-              {!_.get(this.props, "users") &&
-                !_.get(this.props, "users.length") && (
-                  <Row className="maindashboard__nodata">
-                    <Icon
-                      style={{ fontSize: "20px" }}
-                      type="exclamation-circle"
-                      className="maindashboard__nodata-icon"
-                    />
-                    {translate("error.dashboard.notfound", {
-                      type: translate("label.dashboard.users")
-                    })}
-                  </Row>
-                )}
+              {this.props.usersFlag && !_.get(this.props, "users.length") && (
+                <Row className="maindashboard__nodata">
+                  <Icon
+                    style={{ fontSize: "20px" }}
+                    type="exclamation-circle"
+                    className="maindashboard__nodata-icon"
+                  />
+                  {translate("error.dashboard.notfound", {
+                    type: translate("label.dashboard.users")
+                  })}
+                </Row>
+              )}
               <Pagination
                 key={usersCount}
                 containerStyle={
@@ -1112,6 +1110,7 @@ function mapStateToProps(state) {
     selectedCustomer: state.Customer.selectedCustomer,
     user: state.Login.user,
     users: state.Usermanagement.users,
+    usersFlag: state.Usermanagement.usersFlag,
     usersCount: state.Usermanagement.usersCount
   };
 }

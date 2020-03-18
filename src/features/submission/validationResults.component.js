@@ -231,7 +231,7 @@ class ValidationResults extends Component {
                 </thead>
                 <tbody key={sort}>
                   {validationResults &&
-                    validationResults.length &&
+                    validationResults.length > 0 &&
                     _.map(validationResults, (validation, idx) => {
                       return (
                         <tr
@@ -281,7 +281,7 @@ class ValidationResults extends Component {
                         </tr>
                       );
                     })}
-                  {!_.get(this.props, "validations") &&
+                  {this.props.validationsSequence_flag &&
                     !_.get(this.props, "validations.length") && (
                       <tr className="no_validation_sequences">
                         No Errors Found
@@ -317,7 +317,8 @@ class ValidationResults extends Component {
 
 function mapStateToProps(state, props) {
   return {
-    validations: getValidationsBySequence(state, props)
+    validations: getValidationsBySequence(state, props),
+    validationsSequence_flag: state.Submission.validationsSequence_flag
   };
 }
 

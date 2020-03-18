@@ -8,6 +8,7 @@ const initialState = {
   cAdmins: [],
   usersOfFileOrSubmission: [],
   usersCount: 0,
+  usersFlag: false,
   departments: [],
   licences: [],
   allLicences: [],
@@ -45,7 +46,8 @@ export default (state = initialState, action) => {
         return {
           ...state,
           users: action.data.data,
-          usersCount: action.data.usercount
+          usersCount: action.data.usercount,
+          usersFlag: action.usersFlag
         };
       }
     }

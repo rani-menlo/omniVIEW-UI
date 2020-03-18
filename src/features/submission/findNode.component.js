@@ -33,7 +33,9 @@ class FindNode extends Component {
   };
 
   clearSearch = () => {
-    this.setState({ searchText: "" });
+    this.setState({ searchText: "" }, () => {
+      this.props.dispatch(SubmissionActions.clearSearchResults());
+    });
   };
 
   onCheckboxChange = type => e => {
@@ -235,9 +237,9 @@ class FindNode extends Component {
                   size="16px"
                   opacity={0.5}
                   text={
-                    searchText === null
+                    searchText === null || !searchText
                       ? translate("text.submission.findresults")
-                      : !searchResults.length
+                      : this.props.find_flag && !searchResults.length
                       ? translate("text.submission.nomatch")
                       : ""
                   }
@@ -320,7 +322,6 @@ class FindNode extends Component {
 }
 
 function mapStateToProps(state, props) {
-  console.log(state, "state in find noDe");
   return {
     selectedSequence: state.Submission.selectedSequence,
     selectedSubmission: state.Application.selectedSubmission,
@@ -330,7 +331,8 @@ function mapStateToProps(state, props) {
     sortFile: state.Submission.find.sortFile,
     sortTitle: state.Submission.find.sortTitle,
     matchCase: state.Submission.find.matchCase,
-    matchWholeword: state.Submission.find.matchWholeword
+    matchWholeword: state.Submission.find.matchWholeword,
+    find_flag: state.Submission.find.find_flag
   };
 }
 
