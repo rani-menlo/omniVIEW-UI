@@ -494,12 +494,20 @@ class SubmissionView extends Component {
   getSubmissionLabel = () => {
     const { selectedSequence, sequenceJson, lifeCycleJson } = this.props;
     const jsonData = selectedSequence ? sequenceJson : lifeCycleJson;
-    const label = _.get(
-      jsonData,
-      "[fda-regional:fda-regional][admin][application-set][application][application-information][application-number][$t]",
-      ""
-    );
-    return label;
+    const m1Json = selectedSequence
+    ? _.get(sequenceJson, "[fda-regional:fda-regional]", "")
+    : _.get(lifeCycleJson, "[fda-regional:fda-regional]", "");
+    const dtd_version = getDTDVersion(m1Json);
+    const productDescription = _.get(m1Json, "[admin][product-description]");
+    const label = dtd_version == "2.01" ? 
+      _.get(productDescription, "[application-number]", "")
+      : 
+      _.get(
+        jsonData,
+        "[fda-regional:fda-regional][admin][application-set][application][application-information][application-number][$t]",
+        ""
+      );
+      return label;
   };
 
   getSequenceLabel = () => {

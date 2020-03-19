@@ -79,7 +79,7 @@ class NodeProperties extends Component {
     }
 
     if (newWindow) {
-      newWindow.addEventListener("load", function() {
+      newWindow.addEventListener("load", function () {
         newWindow.document.title = title || "";
       });
     }
@@ -475,38 +475,102 @@ class NodeProperties extends Component {
     let previousSeqName = "";
     nextSeqName = nextSeq && nextSeq.name;
     nextSeqName =
-      nextSeqName &&
-      `${_.get(submission, "name")}\\${nextSeqName} (${_.get(
-        nextSeq,
-        "submission_type",
-        ""
-      )}-${_.get(nextSeq, "submission_sub_type", "")})`;
+      // nextSeqName &&
+      // `${_.get(submission, "name")}\\${nextSeqName} (${_.get(
+      //   nextSeq,
+      //   "submission_type",
+      //   ""
+      // )}-${_.get(nextSeq, "submission_sub_type", "")})`;
+      nextSeqName && (
+        _.get(
+          nextSeq,
+          "submission_sub_type",
+          ""
+        ) ? `${_.get(submission, "name")}\\${nextSeqName} (${_.get(
+          nextSeq,
+          "submission_type",
+          ""
+        )}-${_.get(nextSeq, "submission_sub_type", "")})`
+        :  getV2_2Date(m1Json) ?  `${_.get(submission, "name")}\\${nextSeqName} (${_.get(
+          nextSeq,
+          "submission_type",
+          ""
+        )}) ${getV2_2Date(
+          m1Json
+        )}` : `${_.get(submission, "name")}\\${nextSeqName} (${_.get(
+          nextSeq,
+          "submission_type",
+          ""
+        )})`
+      );
 
     previousSeqName = previousSeq && previousSeq.name;
     previousSeqName =
       previousSeqName &&
+      // `${_.get(submission, "name")}\\${previousSeqName} (${_.get(
+      //   previousSeq,
+      //   "submission_type",
+      //   ""
+      // )}-${_.get(previousSeq, "submission_sub_type", "")})`;
+
+      previousSeqName && (
+      _.get(previousSeq, "submission_sub_type", "") ? 
       `${_.get(submission, "name")}\\${previousSeqName} (${_.get(
         previousSeq,
         "submission_type",
         ""
-      )}-${_.get(previousSeq, "submission_sub_type", "")})`;
+      )}-${_.get(previousSeq, "submission_sub_type", "")})` : getV2_2Date(m1Json) ? 
+      `${_.get(submission, "name")}\\${previousSeqName} (${_.get(
+        previousSeq,
+        "submission_type",
+        ""
+      )}) ${getV2_2Date(
+        m1Json
+      )}` :  `${_.get(submission, "name")}\\${previousSeqName} (${_.get(
+        previousSeq,
+        "submission_type",
+        ""
+      )})`);
 
     const currentSeq =
-      getDTDVersion(m1Json) == "2.01"
-        ? `${_.get(submission, "name")}\\${this.getFirstSeq().name ||
-            ""} (${this.getFirstSeq().submission_type || ""}) ${getV2_2Date(
-            m1Json
-          )}`
-        : `${_.get(submission, "name")}\\${_.get(
-            selectedSequence,
-            "name",
-            ""
-          )} (${_.get(nextSeq || previousSeq, "submission_type", "")}-${_.get(
-            nextSeq || previousSeq,
-            "submission_sub_type",
-            ""
-          )})`;
+      // getDTDVersion(m1Json) == "2.01"
+      //   ? `${_.get(submission, "name")}\\${this.getFirstSeq().name ||
+      //   ""} (${this.getFirstSeq().submission_type || ""}) ${getV2_2Date(
+      //     m1Json
+      //   )}`
+      //   : `${_.get(submission, "name")}\\${_.get(
+      //     selectedSequence,
+      //     "name",
+      //     ""
+      //   )} (${_.get(nextSeq || previousSeq, "submission_type", "")}-${_.get(
+      //     nextSeq || previousSeq,
+      //     "submission_sub_type",
+      //     ""
+      //   )})`;
 
+        _.get(
+          nextSeq || previousSeq,
+          "submission_sub_type",
+          ""
+        ) ? `${_.get(submission, "name")}\\${_.get(
+          selectedSequence,
+          "name",
+          ""
+        )} (${_.get(nextSeq || previousSeq, "submission_type", "")}-${_.get(
+          nextSeq || previousSeq,
+          "submission_sub_type",
+          ""
+        )})` : getV2_2Date(m1Json) ? `${_.get(submission, "name")}\\${_.get(
+          selectedSequence,
+          "name",
+          ""
+        )} (${_.get(nextSeq || previousSeq, "submission_type", "")}) ${getV2_2Date(
+              m1Json
+            )}` : `${_.get(submission, "name")}\\${_.get(
+              selectedSequence,
+              "name",
+              ""
+            )} (${_.get(nextSeq || previousSeq, "submission_type", "")})`;
     /* const nextSeq = _.get(projectJson, "next_seq", "");
     const previousSeq = _.get(projectJson, "pre_seq", "");
     let nextSeqName = "";
@@ -571,10 +635,10 @@ class NodeProperties extends Component {
       getDTDVersion(m1Json) == "2.01"
         ? _.get(m1Json, "[admin][product-description][application-number]", "")
         : _.get(
-            m1Json,
-            "[admin][application-set][application][application-information][application-number][$t]",
-            ""
-          );
+          m1Json,
+          "[admin][application-set][application][application-information][application-number][$t]",
+          ""
+        );
     const companyName = _.get(
       m1Json,
       "[admin][applicant-info][company-name]",
@@ -586,22 +650,28 @@ class NodeProperties extends Component {
     const firstSeq =
       getDTDVersion(m1Json) == "2.01"
         ? `${_.get(submission, "name")}\\${this.getFirstSeq().name ||
-            ""} (${this.getFirstSeq().submission_type || ""}) ${getV2_2Date(
-            m1Json
-          )}`
+        ""} (${this.getFirstSeq().submission_type || ""}) ${getV2_2Date(
+          m1Json
+        )}`
         : `${_.get(submission, "name")}\\${this.getFirstSeq().name ||
-            ""} (${this.getFirstSeq().submission_type ||
-            ""}-${this.getFirstSeq().submission_sub_type || ""})`;
+        ""} (${this.getFirstSeq().submission_type ||
+        ""}-${this.getFirstSeq().submission_sub_type || ""})`;
 
     const lastSeq =
-      getDTDVersion(m1Json) == "2.01"
-        ? `${_.get(submission, "name")}\\${this.getFirstSeq().name ||
+      // getDTDVersion(m1Json) == "2.01"
+      //   ? `${_.get(submission, "name")}\\${this.getFirstSeq().name ||
+      //       ""} (${this.getFirstSeq().submission_type || ""}) ${getV2_2Date(
+      //       m1Json
+      //     )}`
+      //   :
+      this.getLastSeq()
+        .submission_sub_type ? `${_.get(submission, "name")}\\${this.getLastSeq().name ||
+        ""} (${this.getLastSeq().submission_type || ""}-${this.getLastSeq()
+          .submission_sub_type || ""})` : getV2_2Date(m1Json) ? `${_.get(submission, "name")}\\${this.getFirstSeq().name ||
             ""} (${this.getFirstSeq().submission_type || ""}) ${getV2_2Date(
-            m1Json
-          )}`
-        : `${_.get(submission, "name")}\\${this.getLastSeq().name ||
-            ""} (${this.getLastSeq().submission_type || ""}-${this.getLastSeq()
-            .submission_sub_type || ""})`;
+              m1Json
+            )}` : `${_.get(submission, "name")}\\${this.getFirstSeq().name ||
+              ""} (${this.getFirstSeq().submission_type || ""})`;
     return (
       <React.Fragment>
         <RowItems>
@@ -1053,97 +1123,97 @@ class NodeProperties extends Component {
         <RowItems>
           <div className="label">Product Name:</div>
           <div className="value">
-              {
-                Array.isArray(productNames) && (
-                  _.some(productNames, ["type", "established"])
+            {
+              Array.isArray(productNames) && (
+                _.some(productNames, ["type", "established"])
                   ? _.get(
-                      productDescription,
-                      `[prod-name][${productNames.findIndex(
-                        product => product.type === "established"
-                      )}][$t]`,
-                      ""
-                    ) 
-                  
+                    productDescription,
+                    `[prod-name][${productNames.findIndex(
+                      product => product.type === "established"
+                    )}][$t]`,
+                    ""
+                  )
+
                   : ""
-                )
-              }
-              {
-                !Array.isArray(productNames) && (
-                  _.get(productNames, "type") == "established" ? _.get(productNames, "[$t]") : ""
-                )
-              }
+              )
+            }
+            {
+              !Array.isArray(productNames) && (
+                _.get(productNames, "type") == "established" ? _.get(productNames, "[$t]") : ""
+              )
+            }
           </div>
         </RowItems>
         <RowItems>
           <div className="label">Proprietary Name:</div>
           <div className="value">
-              {
-                Array.isArray(productNames) && (
-                  _.some(productNames, ["type", "proprietary"])
+            {
+              Array.isArray(productNames) && (
+                _.some(productNames, ["type", "proprietary"])
                   ? _.get(
-                      productDescription,
-                      `[prod-name][${productNames.findIndex(
-                        product => product.type === "proprietary"
-                      )}][$t]`,
-                      ""
-                    ) 
-                  
+                    productDescription,
+                    `[prod-name][${productNames.findIndex(
+                      product => product.type === "proprietary"
+                    )}][$t]`,
+                    ""
+                  )
+
                   : ""
-                )
-              }
-              {
-                !Array.isArray(productNames) && (
-                  _.get(productNames, "type") == "proprietary" ? _.get(productNames, "[$t]") : ""
-                )
-              }
+              )
+            }
+            {
+              !Array.isArray(productNames) && (
+                _.get(productNames, "type") == "proprietary" ? _.get(productNames, "[$t]") : ""
+              )
+            }
           </div>
         </RowItems>
         <RowItems>
           <div className="label">Chemical Name:</div>
           <div className="value">
-              {
-                Array.isArray(productNames) && (
-                  _.some(productNames, ["type", "chemical"])
+            {
+              Array.isArray(productNames) && (
+                _.some(productNames, ["type", "chemical"])
                   ? _.get(
-                      productDescription,
-                      `[prod-name][${productNames.findIndex(
-                        product => product.type === "chemical"
-                      )}][$t]`,
-                      ""
-                    ) 
-                  
+                    productDescription,
+                    `[prod-name][${productNames.findIndex(
+                      product => product.type === "chemical"
+                    )}][$t]`,
+                    ""
+                  )
+
                   : ""
-                )
-              }
-              {
-                !Array.isArray(productNames) && (
-                  _.get(productNames, "type") == "chemical" ? _.get(productNames, "[$t]") : ""
-                )
-              }
+              )
+            }
+            {
+              !Array.isArray(productNames) && (
+                _.get(productNames, "type") == "chemical" ? _.get(productNames, "[$t]") : ""
+              )
+            }
           </div>
         </RowItems>
         <RowItems>
           <div className="label">Code Name:</div>
           <div className="value">
-              {
-                Array.isArray(productNames) && (
-                  _.some(productNames, ["type", "code"])
+            {
+              Array.isArray(productNames) && (
+                _.some(productNames, ["type", "code"])
                   ? _.get(
-                      productDescription,
-                      `[prod-name][${productNames.findIndex(
-                        product => product.type === "code"
-                      )}][$t]`,
-                      ""
-                    ) 
-                  
+                    productDescription,
+                    `[prod-name][${productNames.findIndex(
+                      product => product.type === "code"
+                    )}][$t]`,
+                    ""
+                  )
+
                   : ""
-                )
-              }
-              {
-                !Array.isArray(productNames) && (
-                  _.get(productNames, "type") == "code" ? _.get(productNames, "[$t]") : ""
-                )
-              }
+              )
+            }
+            {
+              !Array.isArray(productNames) && (
+                _.get(productNames, "type") == "code" ? _.get(productNames, "[$t]") : ""
+              )
+            }
           </div>
         </RowItems>
         <RowItems>
@@ -1231,7 +1301,7 @@ class NodeProperties extends Component {
     const { submission } = this.props;
     return `${_.get(submission, "name", "")}\\${lifeCycle.sequence} : ${
       lifeCycle.ID
-    }`;
+      }`;
   };
 
   getModifiedFile = lifeCycle => {
@@ -1375,7 +1445,7 @@ const RowItems = styled(Row)`
 function mapStateToProps(state) {
   const id = `${_.get(state.Customer.selectedCustomer, "id", "")}_${
     state.Application.selectedSubmission.id
-  }`;
+    }`;
   return {
     role: state.Login.role,
     selectedCustomer: state.Customer.selectedCustomer,
