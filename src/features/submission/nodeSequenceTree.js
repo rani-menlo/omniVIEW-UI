@@ -62,12 +62,14 @@ class NodeSequenceTree extends Component {
     const dtd_version = getDTDVersion(m1Json);
     const label =
       dtd_version == "2.01"
-        ? `${submissionLabel}\\${sequence.name} (${
+        ? sequence.submission_type ? `${submissionLabel}\\${sequence.name} (${
             sequence.submission_type
-          }) ${getV2_2Date(m1Json)}`
+          }) ${getV2_2Date(m1Json)}` : `${submissionLabel}\\${sequence.name}`
         : sequence.submission_sub_type
-        ? `${submissionLabel}\\${sequence.name} (${sequence.submission_type}-${sequence.submission_sub_type})`
-        : `${submissionLabel}\\${sequence.name} (${sequence.submission_type})`;
+        ? sequence.submission_type ? `${submissionLabel}\\${sequence.name} (${sequence.submission_type}-${sequence.submission_sub_type})`
+        : `${submissionLabel}\\${sequence.name}`
+        : sequence.submission_type ? `${submissionLabel}\\${sequence.name} (${sequence.submission_type})` :
+        `${submissionLabel}\\${sequence.name}`;
     return label;
   };
 

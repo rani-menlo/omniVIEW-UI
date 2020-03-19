@@ -525,7 +525,7 @@ class SubmissionView extends Component {
       ? _.get(sequenceJson, "[fda-regional:fda-regional]", "")
       : _.get(lifeCycleJson, "[fda-regional:fda-regional]", "");
     const dtd_version = getDTDVersion(m1Json);
-    let sequenceLabel =
+    let sequenceLabel = dtd_version ? 
       dtd_version == "2.01"
         ? `${_.get(selectedSubmission, "name", "")}\\${_.get(
             selectedSequence,
@@ -542,7 +542,11 @@ class SubmissionView extends Component {
             selectedSequence,
             "submission_sub_type",
             ""
-          )})`;
+          )})` : `${_.get(selectedSubmission, "name", "")}\\${_.get(
+            selectedSequence,
+            "name",
+            ""
+          )}`;
     return sequenceLabel;
   };
 
@@ -1607,6 +1611,7 @@ const FlexBox = styled.div`
 `;
 
 function mapStateToProps(state) {
+  console.log("selectedSubmission", state);
   return {
     loading: state.Api.loading,
     user: state.Login.user,
