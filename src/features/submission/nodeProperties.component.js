@@ -1053,57 +1053,97 @@ class NodeProperties extends Component {
         <RowItems>
           <div className="label">Product Name:</div>
           <div className="value">
-            {_.some(productNames, ["type", "established"])
-              ? _.get(
-                  productDescription,
-                  `[prod-name][${productNames.findIndex(
-                    product => product.type === "established"
-                  )}][$t]`,
-                  ""
+              {
+                Array.isArray(productNames) && (
+                  _.some(productNames, ["type", "established"])
+                  ? _.get(
+                      productDescription,
+                      `[prod-name][${productNames.findIndex(
+                        product => product.type === "established"
+                      )}][$t]`,
+                      ""
+                    ) 
+                  
+                  : ""
                 )
-              : ""}
+              }
+              {
+                !Array.isArray(productNames) && (
+                  _.get(productNames, "type") == "established" ? _.get(productNames, "[$t]") : ""
+                )
+              }
           </div>
         </RowItems>
         <RowItems>
           <div className="label">Proprietary Name:</div>
           <div className="value">
-            {_.some(productNames, ["type", "proprietary"])
-              ? _.get(
-                  productDescription,
-                  `[prod-name][${productNames.findIndex(
-                    product => product.type === "proprietary"
-                  )}][$t]`,
-                  ""
+              {
+                Array.isArray(productNames) && (
+                  _.some(productNames, ["type", "proprietary"])
+                  ? _.get(
+                      productDescription,
+                      `[prod-name][${productNames.findIndex(
+                        product => product.type === "proprietary"
+                      )}][$t]`,
+                      ""
+                    ) 
+                  
+                  : ""
                 )
-              : ""}
+              }
+              {
+                !Array.isArray(productNames) && (
+                  _.get(productNames, "type") == "proprietary" ? _.get(productNames, "[$t]") : ""
+                )
+              }
           </div>
         </RowItems>
         <RowItems>
           <div className="label">Chemical Name:</div>
           <div className="value">
-            {_.some(productNames, ["type", "chemical"])
-              ? _.get(
-                  productDescription,
-                  `[prod-name][${productNames.findIndex(
-                    product => product.type === "chemical"
-                  )}][$t]`,
-                  ""
+              {
+                Array.isArray(productNames) && (
+                  _.some(productNames, ["type", "chemical"])
+                  ? _.get(
+                      productDescription,
+                      `[prod-name][${productNames.findIndex(
+                        product => product.type === "chemical"
+                      )}][$t]`,
+                      ""
+                    ) 
+                  
+                  : ""
                 )
-              : ""}
+              }
+              {
+                !Array.isArray(productNames) && (
+                  _.get(productNames, "type") == "chemical" ? _.get(productNames, "[$t]") : ""
+                )
+              }
           </div>
         </RowItems>
         <RowItems>
           <div className="label">Code Name:</div>
           <div className="value">
-            {_.some(productNames, ["type", "code"])
-              ? _.get(
-                  productDescription,
-                  `[prod-name][${productNames.findIndex(
-                    product => product.type === "code"
-                  )}][$t]`,
-                  ""
+              {
+                Array.isArray(productNames) && (
+                  _.some(productNames, ["type", "code"])
+                  ? _.get(
+                      productDescription,
+                      `[prod-name][${productNames.findIndex(
+                        product => product.type === "code"
+                      )}][$t]`,
+                      ""
+                    ) 
+                  
+                  : ""
                 )
-              : ""}
+              }
+              {
+                !Array.isArray(productNames) && (
+                  _.get(productNames, "type") == "code" ? _.get(productNames, "[$t]") : ""
+                )
+              }
           </div>
         </RowItems>
         <RowItems>
