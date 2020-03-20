@@ -969,12 +969,22 @@ class ApplicationDashboard extends Component {
   //open delete sequences confirmation modal if user selects all the sequences
   //in the failure report window
   showDeleteSeqConfirmModal = type => {
+    let selectedSequences = [...this.state.selectedSequences];
+    const allUploadedSequences = [...this.state.allUploadedSequences];
+    let selectedFailedUploads = [...this.state.selectedFailedUploads];
+    const reportData = [...this.state.reportData];
+    let content_message = "";
+    if(type == "sucessfully_uploaded_sequences"){
+      content_message = selectedSequences.length === allUploadedSequences.length ? "You chose to delete all the Sequences that will remove the Application Card from the Dashboard page. Do you wish to continue?"
+      : "Are you sure you want to delete the selected Sequence(s)";
+    }else if(type == "failed_sequences"){
+      content_message = selectedFailedUploads.length == reportData.length ? "You chose to delete all the Sequences that will remove the Application Card from the Dashboard page. Do you wish to continue?"
+      : "Are you sure you want to delete the selected Sequence(s)";
+    }
     Modal.confirm({
       className: "omnimodal",
       title: translate("label.generic.delete"),
-      content:
-        "You chose to delete all the Sequences that will remove the Application Card from the Dashboard page. Do you wish to continue?",
-      okText: translate("label.generic.delete"),
+      content: content_message,
       cancelText: translate("label.button.cancel"),
       onOk: () => {
         this.deleteSequences(type);
@@ -983,27 +993,31 @@ class ApplicationDashboard extends Component {
     });
   };
 
+  
+
   //check if user selects all the sequences or not for the deletion
   getDeleteSequencesData = type => {
     //if user selects sequences from the successfully uploaded sequences modal
     if (type == "sucessfully_uploaded_sequences") {
-      let selectedSequences = [...this.state.selectedSequences];
-      const allUploadedSequences = [...this.state.allUploadedSequences];
-      if (selectedSequences.length == allUploadedSequences.length) {
-        this.showDeleteSeqConfirmModal("sucessfully_uploaded_sequences");
-      } else {
-        this.deleteSequences("sucessfully_uploaded_sequences");
-      }
+      // let selectedSequences = [...this.state.selectedSequences];
+      // const allUploadedSequences = [...this.state.allUploadedSequences];
+      // if (selectedSequences.length == allUploadedSequences.length) {
+      //   this.showDeleteSeqConfirmModal("sucessfully_uploaded_sequences");
+      // } else {
+      //   this.deleteSequences("sucessfully_uploaded_sequences");
+      // }
+      this.showDeleteSeqConfirmModal("sucessfully_uploaded_sequences");
       return;
     }
     //if user select sequences from the failure report modal
-    let selectedFailedUploads = [...this.state.selectedFailedUploads];
-    const reportData = [...this.state.reportData];
-    if (selectedFailedUploads.length == reportData.length) {
-      this.showDeleteSeqConfirmModal("failed_sequences");
-    } else {
-      this.deleteSequences("failed_sequences");
-    }
+    this.showDeleteSeqConfirmModal("failed_sequences");
+    // let selectedFailedUploads = [...this.state.selectedFailedUploads];
+    // const reportData = [...this.state.reportData];
+    // if (selectedFailedUploads.length == reportData.length) {
+    //   this.showDeleteSeqConfirmModal("failed_sequences");
+    // } else {
+    //   this.deleteSequences("failed_sequences");
+    // }
   };
 
   //showing delete error once submission or sequence get deleted successfully
