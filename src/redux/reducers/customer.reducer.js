@@ -8,6 +8,8 @@ const initialState = {
   selectedCustomer: null,
   subscriptionsInUse: [],
   licencesUnAssigned: [],
+  subscriptionsLoading: false,
+  licencesUnAssignedLoading: false,
   lookupLicences: {
     licences: [],
     types: []
@@ -40,20 +42,24 @@ export default (state = initialState, action) => {
     case CustomerActionTypes.SUBSCRIPTIONS_IN_USE: {
       return {
         ...state,
-        subscriptionsInUse: action.data.data
+        subscriptionsInUse: action.data.data,
+        subscriptionsLoading: true
       };
     }
     case CustomerActionTypes.LICENCES_UN_ASSIGNED: {
       return {
         ...state,
-        licencesUnAssigned: action.data
+        licencesUnAssigned: action.data,
+        licencesUnAssignedLoading: true
       };
     }
     case CustomerActionTypes.RESET_IN_USE_UN_ASSIGNED: {
       return {
         ...state,
         subscriptionsInUse: [],
-        licencesUnAssigned: []
+        licencesUnAssigned: [],
+        subscriptionsLoading: false,
+        licencesUnAssignedLoading: false
       };
     }
     case CustomerActionTypes.GET_LICENCE_LOOKUPS: {

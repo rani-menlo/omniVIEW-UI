@@ -369,8 +369,8 @@ class LicenceInUseUnAssigned extends Component {
             </div>
           </React.Fragment>
         )}
-        {type === "inuse" && !subscriptions.length && noLicences}
-        {type === "unassigned" && !licencesUnAssigned.length && noLicences}
+        {type === "inuse" && this.props.subscriptionsLoading && !_.get(this.props, "subscriptions.length") && noLicences}
+        {type === "unassigned" && this.props.licencesUnAssignedLoading && !_.get(this.props, "licencesUnAssigned.length") && noLicences}
         {error && (
           <p
             className="global__field__error-text"
@@ -396,7 +396,9 @@ function mapStateToProps(state) {
   return {
     loading: state.Api.loading,
     subscriptions: state.Customer.subscriptionsInUse,
-    licencesUnAssigned: state.Customer.licencesUnAssigned
+    licencesUnAssigned: state.Customer.licencesUnAssigned,
+    subscriptionsLoading: state.Customer.subscriptionsLoading,
+    licencesUnAssignedLoading: state.Customer.licencesUnAssignedLoading
   };
 }
 
