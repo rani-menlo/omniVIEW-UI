@@ -971,7 +971,7 @@ class UserManagementContainer extends Component {
                       width={this.getColumnWidth(TableColumnNames.EXP_DATE)}
                       className="maindashboard__list__item__row maindashboard__list__item-text"
                     >
-                      {getFormattedDate(_.get(usr, "expiryDate")) ||
+                      {usr.licenses.length > 0 ? getFormattedDate(_.find(usr.licenses, 'expired_date')) :
                         "__ /__ /____"}
                       <Dropdown
                         overlay={this.getMenu(usr)}
