@@ -13,7 +13,8 @@ import { getRoleName } from "../../utils";
 const initialFiltersState = {
   sortBy: "",
   roles: [],
-  departments: []
+  departments: [],
+  sort: false
 };
 let clonedFiltersState = _.cloneDeep(initialFiltersState);
 
@@ -89,7 +90,7 @@ class PopoverUsersFilter extends Component {
 
   onSortChange = sortBy => {
     this.setState({
-      filters: { ...this.state.filters, sortBy }
+      filters: { ...this.state.filters, sortBy, sort: true }
     });
   };
 
