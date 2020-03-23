@@ -88,7 +88,17 @@ class TreeNode extends Component {
         // consolidated folder may have subfolders which inturn has leaf array
         // leaf array items are based on selected view i.e. in current view only latest
         // files are shown and in lifecycle view all files are shown.
-        const consolidatedFolder = this.getConsolidatedStfFolders(stfFolders);
+        let consolidatedFolder = this.getConsolidatedStfFolders(stfFolders);
+        // sorting based on ID
+        const consolidatedFolderById = _.groupBy(_.values(consolidatedFolder), 'ID');
+        let ids = _.map(consolidatedFolder, value => value.ID);
+        ids = ids.sort(new Intl.Collator(undefined,{numeric:true, sensitivity:'base'}).compare);
+        consolidatedFolder = {};
+        _.map(ids, id => {
+          const obj = consolidatedFolderById[id][0];
+          consolidatedFolder[obj.title] = obj;
+        })
+        
         // remove the keys from the main object
         if (omitKeys.length) {
           content = _.omit(content, omitKeys);
@@ -308,6 +318,7 @@ class TreeNode extends Component {
       const subFoldr = {
         // lifeCycles: []
       };
+      array = this.setLatestFiles(array);
       _.map(array, (item, idx) => {
         // subFoldr.lifeCycles.push(item);
         if (idx === 0) {
@@ -415,7 +426,7 @@ class TreeNode extends Component {
           return;
         }
         //OMNG-650 - We are excluding 1816 validations related sequences in the structure
-        if (!leaf || _.get(leaf, "version", "").includes("STF")) {
+        if (_.get(leaf, "version", "").includes("STF")) {
           const index = array.indexOf(leaf);
           if (index > -1) {
             array.splice(index, 1);
@@ -429,11 +440,11 @@ class TreeNode extends Component {
           modifiedFile &&
           modifiedFile.substring(modifiedFile.lastIndexOf("#") + 1);
         //removing the files except appended files
-        if (leaf["operation"] != "append") {
+        // if (leaf["operation"] != "append") {
           if (modifiedFile === itemId) {
             _.remove(newArray, { ID: itemId });
           }
-        }
+        // }
       });
     });
     return newArray;
