@@ -686,6 +686,13 @@ class TreeNode extends Component {
       : this.setState({ fullyExpand: true, expand: true });
   };
 
+  fullyCollapse = () => {
+    const hash = _.get(this.state, "properties.hash");
+    hash
+      ? this.props.fullyExpanded()
+      : this.setState({ fullyExpand: false, expand: false });
+  }
+
   setCheckboxValue = checkboxValue => {
     this.setState({
       checkboxValue
@@ -718,13 +725,13 @@ class TreeNode extends Component {
     return (
       <Menu>
         {this.state.nodes.length && (
-          <Menu.Item onClick={this.fullyExpand}>
+          <Menu.Item onClick={!this.state.expand ? this.fullyExpand : this.fullyCollapse}>
             <div className="global__center-vert">
-              <img src="/images/plus-black.svg" style={style} />
+              <img src={!this.state.expand ? "/images/plus-black.svg" : "/images/minus-black.png"} style={style} />
               <Text
                 type="regular"
                 size="12px"
-                text={translate("label.node.fullyexpand")}
+                text={!this.state.expand ? translate("label.node.fullyexpand") : "Fully Collapse Item"}
               />
             </div>
           </Menu.Item>
