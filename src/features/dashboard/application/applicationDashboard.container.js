@@ -258,7 +258,8 @@ class ApplicationDashboard extends Component {
           _.get(data, "result", null),
           submission,
           _.get(data, "is_uploading"),
-          _.get(data, "is_submission")
+          _.get(data, "is_submission"),
+          _.get(data, "is_deleting")
         );
       }
       // else {
@@ -283,7 +284,7 @@ class ApplicationDashboard extends Component {
     }
   };
 
-  checkSequenceStatus = (data, submission, is_uploadingFlag, is_submission) => {
+  checkSequenceStatus = (data, submission, is_uploadingFlag, is_submission, is_deleting) => {
     const totalNoOfSeq = data.length;
     const inProgress = [];
     const failed = [];
@@ -313,6 +314,7 @@ class ApplicationDashboard extends Component {
     submission.sequence_success = success;
     submission.sequence_processing = processing;
     submission.is_submission = is_submission;
+    submission.is_deleting = is_deleting;
     if (!inProgress.length && processing.length) {
       submission.analyzing = true;
     }

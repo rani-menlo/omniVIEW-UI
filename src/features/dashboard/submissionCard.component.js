@@ -119,6 +119,7 @@ class SubmissionCard extends Component {
     const { crossRefs } = this.state;
     const uploading = _.get(submission, "is_uploading");
     const is_submission = _.get(submission, "is_submission");
+    const is_deleting = _.get(submission, "is_deleting");
     const LazyImageLoader = React.lazy(() =>
       import("../../uikit/components/image/imageLoader.component")
     );
@@ -127,7 +128,7 @@ class SubmissionCard extends Component {
         <div
           className="submissioncard"
           style={{
-            ...((uploading || submission.analyzing) && {
+            ...((uploading || submission.analyzing || is_deleting) && {
               cursor: "not-allowed"
             })
           }}
@@ -137,7 +138,7 @@ class SubmissionCard extends Component {
             <span
               className="submissioncard__heading-text global__cursor-pointer"
               style={{
-                ...((uploading || submission.analyzing) && {
+                ...((uploading || submission.analyzing || is_deleting) && {
                   cursor: "not-allowed"
                 })
               }}
@@ -145,7 +146,7 @@ class SubmissionCard extends Component {
             >
               {_.get(submission, "name")}
             </span>
-            {!uploading && !submission.analyzing && (
+            {!uploading && !submission.analyzing && !is_deleting && (
               <Dropdown
                 overlay={getMenu && getMenu()}
                 trigger={["click"]}
@@ -165,6 +166,7 @@ class SubmissionCard extends Component {
             style={{
               ...((uploading ||
                 submission.analyzing ||
+                is_deleting ||
                 (_.get(submission, "sequence_failed.length") &&
                   is_submission == 1) ||
                 // _.get(submission, "sequence_failed.length") ==
@@ -175,11 +177,25 @@ class SubmissionCard extends Component {
             }}
             onClick={onSelect && onSelect(submission)}
           >
-            {(uploading ||
+            {/* when delete sequences is inprogress displaying below block */}
+            {
+              is_deleting && (
+                <React.Fragment>
+                  <div style={{ padding: "10px" }}>
+                    <Text      
+                      type="medium"
+                      textStyle={{ marginTop: "30%", textAlign: "center" }}
+                      text="Delete Sequence(s) is in progress..."
+                    />
+                  </div>
+                </React.Fragment>
+              )
+            }
+            {((uploading ||
               submission.analyzing ||
               (_.get(submission, "sequence_failed.length") &&
-                is_submission == 1) ||
-              "") && (
+                is_submission == 1) || 
+              "") && !is_deleting) && (
               <React.Fragment>
                 <div style={{ padding: "10px" }}>
                   {/* Displaying uploaded sequences by total sequences */}
@@ -261,13 +277,13 @@ class SubmissionCard extends Component {
                   )}
               </React.Fragment>
             )}
-            {/* Sequence is uploaded successfully and able to access the application */}
+            {/* Sequence is uploaded successfully (or) process of deleting sequences is done and able to access the application */}
             {!uploading &&
               !submission.analyzing &&
               // !(
               //   submission.sequence_failed && submission.sequence_failed.length
               // ) &&
-              is_submission == 0 && (
+              is_submission == 0 && !is_deleting && (
                 <React.Fragment>
                   <div className="submissioncard__content__item">
                     <p className="submissioncard__content__item-label">
