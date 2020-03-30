@@ -56,10 +56,11 @@ class CustomerDashboard extends Component {
       this.onCustomerSelected({ ...user.customer })();
     }
     //To prevent browser back button from going back
-    window.history.pushState(null, document.title, window.location.href);
-    window.addEventListener("popstate", function(event) {
-      window.history.pushState(null, document.title, window.location.href);
-    });
+    // window.history.pushState(null, document.title, window.location.href);
+    // window.addEventListener("popstate", function(event) {
+    //   window.history.pushState(null, document.title, window.location.href);
+    // });
+
   }
 
   fetchCustomers = (sortBy = "company_name", orderBy = "ASC") => {
