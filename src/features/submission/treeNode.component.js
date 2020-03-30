@@ -318,7 +318,9 @@ class TreeNode extends Component {
       const subFoldr = {
         // lifeCycles: []
       };
-      array = this.setLatestFiles(array);
+      if (view === "current") {
+        array = this.setLatestFiles(array);
+      }
       _.map(array, (item, idx) => {
         // subFoldr.lifeCycles.push(item);
         if (idx === 0) {
@@ -687,10 +689,11 @@ class TreeNode extends Component {
   };
 
   fullyCollapse = () => {
-    const hash = _.get(this.state, "properties.hash");
-    hash
-      ? this.props.fullyExpanded()
-      : this.setState({ fullyExpand: false, expand: false });
+    // const hash = _.get(this.state, "properties.hash");
+    // hash
+    //   ? this.props.fullyExpanded()
+    //   : this.setState({ fullyExpand: false, expand: false });
+    this.setState({ fullyExpand: false, expand: false });
   }
 
   setCheckboxValue = checkboxValue => {
