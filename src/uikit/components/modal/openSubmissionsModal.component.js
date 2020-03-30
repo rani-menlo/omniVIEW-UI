@@ -1,12 +1,13 @@
 import React, { Component } from "react";
-import { connect } from "react-redux";
 import _ from "lodash";
 import PropTypes from "prop-types";
+
+import Text from "../text/text.component";
 import DraggableModal from "./draggableModal.component";
+import { connect } from "react-redux";
 import { isLoggedInOmniciaRole } from "../../../utils";
 import { bindActionCreators } from "redux";
 import { ApplicationActions, CustomerActions } from "../../../redux/actions";
-import Text from "../text/text.component";
 import { OmniButton } from "..";
 import { translate } from "../../../translations/translator";
 import { Tabs, Icon } from "antd";
@@ -14,12 +15,14 @@ import { Tabs, Icon } from "antd";
 const { TabPane } = Tabs;
 
 class OpenSubmissionsModal extends Component {
+
+  //props used in this component and its type
   static propTypes = {
     onClose: PropTypes.func,
     onItemSelected: PropTypes.func,
-    onOpenSubmission: PropTypes.func
+    onOpenSubmission: PropTypes.func,
   };
-
+  
   constructor(props) {
     super(props);
     this.state = {
@@ -72,9 +75,8 @@ class OpenSubmissionsModal extends Component {
       selectedSubmission: _.get(this.props, "selectedSubmission", ""),
       selectedCustomer: _.get(this.props, "selectedCustomer", "")
     });
-    if (isLoggedInOmniciaRole(this.props.role)) {
+    if (!isLoggedInOmniciaRole(this.props.role)) {
       //this.fetchCustomers();
-    } else {
       const { user } = this.props;
       this.onCustomerSelected({ ...user.customer })();
       this.fetchApplications();
@@ -117,11 +119,10 @@ class OpenSubmissionsModal extends Component {
   };
 
   render() {
-    const { visible, onClose, onOpenSubmission } = this.props;
+    const { onClose } = this.props;
     const {
       submissions,
       customers,
-      selectedCustomer,
       selectedSubmission,
       activeTab
     } = this.state;
@@ -154,13 +155,12 @@ class OpenSubmissionsModal extends Component {
                       {_.map(submissions, (submission, idx) => {
                         return (
                           <tr
-                            key={idx}
                             className={`global__cursor-pointer ${selectedSubmission.id ===
                               submission.id && "global__node-selected"}`}
                             onClick={this.onItemSelected(submission)}
                             key={submission.id}
                           >
-                            <td className="">
+                            <td>
                               <div
                                 style={{
                                   display: "flex",
@@ -202,11 +202,10 @@ class OpenSubmissionsModal extends Component {
                   <div className="open-submissions-modal__tabs__table__body">
                     <table>
                       <tbody>
-                        {customers && customers.length ? (
+                        {(_.get(customers, 'length') || "") && (
                           _.map(customers, (customer, idx) => {
                             return (
                               <tr
-                                key={idx}
                                 className={`global__cursor-pointer ${this.props
                                   .selectedCustomer.id === customer.id &&
                                   "global__node-selected"}`}
@@ -235,7 +234,8 @@ class OpenSubmissionsModal extends Component {
                               </tr>
                             );
                           })
-                        ) : (
+                        )}
+                        {!(_.get(customers.length) || "") && (
                           <tr className="no_validation_sequences">
                             No Customers Found
                           </tr>
@@ -277,9 +277,7 @@ function mapStateToProps(state) {
   return {
     role: state.Login.role,
     user: state.Login.user,
-    submissions: state.Application.submissions
-      ? state.Application.submissions
-      : "",
+    submissions: state.Application.submissions || '',
     customers: state.Customer.customers,
     selectedCustomer: state.Customer.selectedCustomer,
     selectedSubmission: state.Application.selectedSubmission
@@ -295,6 +293,7 @@ function mapDispatchToProps(dispatch) {
     )
   };
 }
+
 
 export default connect(
   mapStateToProps,
