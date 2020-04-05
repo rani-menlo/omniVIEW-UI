@@ -609,6 +609,9 @@ class TreeNode extends Component {
     const { label, view, mode, submission } = this.props;
     const { properties } = this.state;
     let name = label;
+    if(mode === "qc"){
+      name = _.get(properties, "key", label);
+    }
     if (label === "leaf" || mode === "standard") {
       name = _.get(properties, "title", label);
       if (label === "leaf" && view) {
@@ -617,6 +620,7 @@ class TreeNode extends Component {
         }]`;
       }
     }
+
 
     return name;
   };
