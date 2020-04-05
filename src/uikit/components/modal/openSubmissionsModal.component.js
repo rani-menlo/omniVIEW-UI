@@ -202,7 +202,7 @@ class OpenSubmissionsModal extends Component {
                   <div className="open-submissions-modal__tabs__table__body">
                     <table>
                       <tbody>
-                        {(_.get(customers, 'length') || "") && (
+                        {customers && customers.length ? (
                           _.map(customers, (customer, idx) => {
                             return (
                               <tr
@@ -234,8 +234,7 @@ class OpenSubmissionsModal extends Component {
                               </tr>
                             );
                           })
-                        )}
-                        {!(_.get(customers.length) || "") && (
+                        ) : (
                           <tr className="no_validation_sequences">
                             No Customers Found
                           </tr>
