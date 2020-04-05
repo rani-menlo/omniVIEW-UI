@@ -60,3 +60,13 @@
     margin-top: -3px;
   }
 }
+.omni-info-modal{
+  .ant-modal-confirm-body .ant-modal-confirm-content{
+    font-size: 13px;
+    font-weight: 600;
+    margin-top: 0px !important;
+  }
+  .ant-btn-primary{
+    font-size: 12px;
+  }
+}

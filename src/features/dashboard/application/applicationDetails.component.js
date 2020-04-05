@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { Modal } from "antd";
 import PropTypes from "prop-types";
 import _ from "lodash";
 import {
@@ -65,6 +66,17 @@ class ApplicationDetails extends Component {
       [field]: { ...this.state[field], value, error: "" }
     });
   };
+
+  onSubmit = () => {
+    Modal.info({
+      className: "omni-info-modal",
+      content: 'The Application Number and Application Type are fetched from the US Regional file of the highest numbered Sequence. The same Application Number and Type will be used for all the validations on this Submission after this step. ',
+      okText: translate("label.generic.ok"),
+      onOk: () => {
+        this.submit();
+      },
+    });
+  }
 
   submit = () => {
     const { submit } = this.props;
@@ -148,6 +160,7 @@ class ApplicationDetails extends Component {
           placeholder={translate("label.newapplication.submissioncenter")}
         />
         <SelectField
+          disabled
           key={_.get(applicationType, "value.key")}
           selectFieldClassName="newlicence__field-select"
           style={style}
@@ -159,6 +172,7 @@ class ApplicationDetails extends Component {
           placeholder={translate("label.newapplication.applicationtype")}
         />
         <NumericInput
+          disabled
           limit={999999}
           value={applicationNo.value}
           label={`${translate("label.newapplication.applicationnumber")}*`}
@@ -185,7 +199,7 @@ class ApplicationDetails extends Component {
           <OmniButton
             type="primary"
             label={translate("label.button.upload")}
-            onClick={this.submit}
+            onClick={this.onSubmit}
           />
         </div>
       </div>

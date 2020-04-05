@@ -15,7 +15,8 @@ const SelectField = ({
   style,
   selectFieldStyle,
   className,
-  selectFieldClassName
+  selectFieldClassName,
+  disabled
 }) => {
   return (
     <div style={style} className={className}>
@@ -25,6 +26,7 @@ const SelectField = ({
         defaultValue={selectedValue}
         onChange={onChange}
         className={selectFieldClassName}
+        disabled={disabled}
       >
         {_.map(options, option => (
           <Option key={option.key}>{option.value}</Option>
