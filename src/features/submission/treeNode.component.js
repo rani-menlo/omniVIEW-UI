@@ -147,6 +147,7 @@ class TreeNode extends Component {
           const stfFoldersByTitle = _.groupBy(stfFolders, "title");
           // all leaf items of each stfFolder is combined and then modifying the
           // stfFolders array based on latest files.
+          let newStfFolders = [];
           _.map(stfFoldersByTitle, array => {
             let foldrs = [];
             _.map(array, item => {
@@ -161,12 +162,16 @@ class TreeNode extends Component {
             const diff = _.difference(allSequences, latestSequences);
             // remove diff items from stfFolders
             _.map(diff, df => {
-              _.remove(stfFolders, { sequence: df });
+              // _.remove(stfFolders, { sequence: df });
+              _.remove(array, { sequence: df });
             });
+            newStfFolders = [...newStfFolders, ...array];
           });
           content = _.omit(content, omitKeys);
+          // sorting the folders based on ID
+          newStfFolders = _.sortBy(newStfFolders, "ID");
           // set the stfFolder to main object.
-          _.map(stfFolders, stfFolder => {
+          _.map(newStfFolders, stfFolder => {
             content[stfFolder["_omitKey"]] = stfFolder;
           });
         }
@@ -235,6 +240,9 @@ class TreeNode extends Component {
     const leafNodes = _.filter(nodes, { label: "leaf" });
     const stfNodes = _.difference(nodes, leafNodes);
     nodes = [].concat(stfNodes).concat(leafNodes);
+
+    //sorting leaf folders based on ID
+    nodes = _.sortBy(nodes, "value.ID");
 
     if (properties["_stfKey"] && mode === "standard") {
       nodes = this.sortByTitle(nodes);
@@ -428,12 +436,12 @@ class TreeNode extends Component {
           return;
         }
         //OMNG-650 - We are excluding 1816 validations related sequences in the structure
-        if (_.get(leaf, "version", "").includes("STF")) {
-          const index = array.indexOf(leaf);
-          if (index > -1) {
-            array.splice(index, 1);
-          }
-        }
+        // if (_.get(leaf, "version", "").includes("STF")) {
+        //   const index = array.indexOf(leaf);
+        //   if (index > -1) {
+        //     array.splice(index, 1);
+        //   }
+        // }
         //removed this piece of code inorder to display both new and appended files
         //in both current view and life cycle view - OMNG-568
         //Need to check for appended and latest files in Current view - Sprint-21
