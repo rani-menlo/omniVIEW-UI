@@ -862,7 +862,8 @@ class NodeProperties extends Component {
       sequence,
       view,
       projectJson,
-      formFile
+      formFile,
+      selectedSubmission
     } = this.props;
     const m1Properties = m1Json["m1-regional-properties"];
     const applicantInfo = _.get(m1Json, "[admin][applicant-info]");
@@ -949,6 +950,10 @@ class NodeProperties extends Component {
         <RowItems>
           <div className="label">Application Number:</div>
           <div className="value">{_.get(applicationNumber, "[$t]", "")}</div>
+        </RowItems>
+        <RowItems>
+          <div className="label">Submission Center:</div>
+          <div className="value">{_.get(selectedSubmission, "submission_center", "")}</div>
         </RowItems>
         <RowItems>
           <div className="label">Application Type:</div>
@@ -1064,7 +1069,7 @@ class NodeProperties extends Component {
 
   //displaying DTD version 2.2(2.01) M1 properties (Jira ticket OMNG-764, Sprint-23)
   getM1PropertiesFor2_2 = () => {
-    const { m1Json, properties } = this.props;
+    const { m1Json, properties, selectedSubmission } = this.props;
     const m1Properties = m1Json["m1-regional-properties"];
     const applicantInfo = _.get(m1Json, "[admin][applicant-info]");
     const productDescription = _.get(m1Json, "[admin][product-description]");
@@ -1119,6 +1124,10 @@ class NodeProperties extends Component {
           <div className="value">
             {_.get(productDescription, "[application-number]", "")}
           </div>
+        </RowItems>
+        <RowItems>
+          <div className="label">Submission Center:</div>
+          <div className="value">{_.get(selectedSubmission, "submission_center", "")}</div>
         </RowItems>
         <RowItems>
           <div className="label">Product Name:</div>
@@ -1279,11 +1288,10 @@ class NodeProperties extends Component {
                 {leafProperties["checksum-type"] || ""}
               </div>
             </RowItems>
-            {/* <RowItems>
+            <RowItems>
               <div className="label">Xlink Type:</div>
               <div className="value">{leafProperties["xlink:type"]}</div>
-            </RowItems> */}
-
+            </RowItems>
             <RowItems>
               <div className="label">Containing Folder:</div>
               <div className="value global__center-vert">
