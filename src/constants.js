@@ -145,6 +145,7 @@ const UPLOAD_FAILED = 1; // File Transfer Failed (i.e.TRANSFER_ERROR)
 const UPLOAD_SUCCESS = 2; //Uploaded done but scripts yet to run
 const ANALYZING = 3;
 const UPLOAD_PROCESSING = 3; //scripts running
+const MISMATCH_SEQUENCES = 4; //if there are any mismatch sequences i.e. if uploaded sequences belongs to another submission
 
 const VIEWER = {
   GOOGLE_VIEWER_MAX_SIZE: 22 * 1024 * 1024, // 22MB
@@ -200,6 +201,7 @@ export {
   UPLOAD_SUCCESS,
   ANALYZING,
   UPLOAD_PROCESSING,
+  MISMATCH_SEQUENCES,
   ROLES,
   ROLE_IDS,
   CHECKBOX,
