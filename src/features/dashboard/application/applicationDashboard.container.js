@@ -946,31 +946,30 @@ class ApplicationDashboard extends Component {
 
   //Export to PDF
   exportToPDF = () => {
-    console.log("tis.statetet", this.state)
-    // this.showLoading();
-    // const res = ApplicationApi.exportViewReportPDF({
-    //   submission_id: this.state.selectedSubmissionMenu.id
-    // })
-    //   .then(res => {
-    //     this.hideLoading();
-    //     const defaultFilename = "Report.pdf";
-    //     var data = new Blob([res.data]);
-    //     if (typeof window.navigator.msSaveBlob === "function") {
-    //       // If it is IE that support download blob directly.
-    //       window.navigator.msSaveBlob(data, defaultFilename);
-    //     } else {
-    //       var blob = data;
-    //       var link = document.createElement("a");
-    //       link.href = window.URL.createObjectURL(blob);
-    //       link.download = defaultFilename;
-    //       document.body.appendChild(link);
-    //       link.click(); // create an <a> element and simulate the click operation.
-    //     }
-    //   })
-    //   .catch(error => {
-    //     this.hideLoading();
-    //     console.log(error);
-    //   });
+    this.showLoading();
+    const res = ApplicationApi.exportViewReportPDF({
+      submission_id: this.state.selectedSubmissionMenu.id
+    })
+      .then(res => {
+        this.hideLoading();
+        const defaultFilename = "Report.pdf";
+        var data = new Blob([res.data]);
+        if (typeof window.navigator.msSaveBlob === "function") {
+          // If it is IE that support download blob directly.
+          window.navigator.msSaveBlob(data, defaultFilename);
+        } else {
+          var blob = data;
+          var link = document.createElement("a");
+          link.href = window.URL.createObjectURL(blob);
+          link.download = defaultFilename;
+          document.body.appendChild(link);
+          link.click(); // create an <a> element and simulate the click operation.
+        }
+      })
+      .catch(error => {
+        this.hideLoading();
+        console.log(error);
+      });
   };
 
   showLoading = () => {
@@ -1142,6 +1141,7 @@ class ApplicationDashboard extends Component {
       selectedSubmission
     } = this.props;
     //rows selections
+    console.log("selectedSubmissionMenu", selectedSubmissionMenu);
     const rowSelection = {
       selectedRowKeys,
       onChange: this.onRowSelected,
@@ -1592,7 +1592,7 @@ class ApplicationDashboard extends Component {
                 size="16px"
                 text={
                   _.get(selectedSubmissionMenu, "broken_x_ref", "") == 0
-                    ? "Failure Report"
+                    ? `Failure Report - ${selectedSubmissionMenu.name}`
                     : ""
                 }
               />
@@ -1644,7 +1644,7 @@ class ApplicationDashboard extends Component {
                   <Text
                     type="extra_bold"
                     size="16px"
-                    text="Failure Report"
+                    text={`Failure Report - ${selectedSubmissionMenu.name}`}
                     textStyle={{ display: "inline-block" }}
                   />
                 </div>
