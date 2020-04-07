@@ -12,7 +12,8 @@ import {
   UPLOAD_FAILED,
   UPLOAD_INPROGRES,
   UPLOAD_PROCESSING,
-  UPLOAD_SUCCESS
+  UPLOAD_SUCCESS,
+  MISMATCH_SEQUENCES
 } from "../../../constants";
 import {
   ApiActions,
@@ -90,7 +91,10 @@ class ApplicationDashboard extends Component {
       selectedFailedUploads: [],
       selectedSequences: [],
       allUploadedSequences: [],
+      selectedRowKeys: [],
       openDeleteSequencesConfirmModal: false,
+      disableRetry: true,
+      // disableDelete: true,
       TableColumns: [
         {
           name: TableColumnNames.CHECKBOX,
@@ -297,6 +301,7 @@ class ApplicationDashboard extends Component {
           break;
         case UPLOAD_FAILED:
         case SCRIPT_ERROR:
+        case MISMATCH_SEQUENCES:
           failed.push(seq);
           break;
         case UPLOAD_SUCCESS:
@@ -315,6 +320,7 @@ class ApplicationDashboard extends Component {
     submission.sequence_processing = processing;
     submission.is_submission = is_submission;
     submission.is_deleting = is_deleting;
+
     if (!inProgress.length && processing.length) {
       submission.analyzing = true;
     }
@@ -335,6 +341,7 @@ class ApplicationDashboard extends Component {
       submission.is_uploading = false;
       this.clearSubmissionInterval(submission.id);
     }
+
     this.updateSubmissions(submission);
   };
 
@@ -431,42 +438,42 @@ class ApplicationDashboard extends Component {
           ]}
         {(isLoggedInOmniciaAdmin(this.props.role) ||
           isLoggedInCustomerAdmin(this.props.role)) && (
-          <Menu.Item key="delete_sequences">
-            <div className="global__center-vert global__text-red">
-              <Icon
-                type="close-circle"
-                theme="outlined"
-                style={{ fontSize: "18px", marginRight: "4px" }}
-              />
-              <Text
-                type="regular"
-                size="12px"
-                text="Delete Sequences"
-                className="global__text-red"
-                textStyle={{ marginLeft: "2px" }}
-              />
-            </div>
-          </Menu.Item>
-        )}
+            <Menu.Item key="delete_sequences">
+              <div className="global__center-vert global__text-red">
+                <Icon
+                  type="close-circle"
+                  theme="outlined"
+                  style={{ fontSize: "18px", marginRight: "4px" }}
+                />
+                <Text
+                  type="regular"
+                  size="12px"
+                  text="Delete Sequences"
+                  className="global__text-red"
+                  textStyle={{ marginLeft: "2px" }}
+                />
+              </div>
+            </Menu.Item>
+          )}
         {(isLoggedInOmniciaAdmin(this.props.role) ||
           isLoggedInCustomerAdmin(this.props.role)) && (
-          <Menu.Item key="delete">
-            <div className="global__center-vert global__text-red">
-              <Icon
-                type="delete"
-                theme="filled"
-                style={{ fontSize: "20px", marginRight: "8px" }}
-              />
-              <Text
-                type="regular"
-                size="12px"
-                text="Delete Application"
-                className="global__text-red"
-                textStyle={{ marginLeft: "-4px" }}
-              />
-            </div>
-          </Menu.Item>
-        )}
+            <Menu.Item key="delete">
+              <div className="global__center-vert global__text-red">
+                <Icon
+                  type="delete"
+                  theme="filled"
+                  style={{ fontSize: "20px", marginRight: "8px" }}
+                />
+                <Text
+                  type="regular"
+                  size="12px"
+                  text="Delete Application"
+                  className="global__text-red"
+                  textStyle={{ marginLeft: "-4px" }}
+                />
+              </div>
+            </Menu.Item>
+          )}
       </Menu>
     );
   };
@@ -575,7 +582,7 @@ class ApplicationDashboard extends Component {
         "_blank",
         "height=0, width=0"
       );
-      newWindow.addEventListener("load", function() {
+      newWindow.addEventListener("load", function () {
         newWindow.document.title = submission.name;
       });
     } else if (key === "permissions") {
@@ -624,7 +631,7 @@ class ApplicationDashboard extends Component {
           )
         );
       },
-      onCancel: () => {}
+      onCancel: () => { }
     });
   };
 
@@ -914,11 +921,16 @@ class ApplicationDashboard extends Component {
     const { data } = res;
     const failures = _.filter(
       _.get(data, "result"),
-      seq => seq.status == UPLOAD_FAILED || seq.status == SCRIPT_ERROR
+      seq => seq.status == UPLOAD_FAILED || seq.status == SCRIPT_ERROR || seq.status == MISMATCH_SEQUENCES
     );
+    console.log("failures", failures);
+    // const failures = _.filter(
+    //   _.get(data, "result"),
+    //   seq => seq.status == UPLOAD_FAILED || seq.status == SCRIPT_ERROR
+    // );
     window.scrollTo(0, 0);
     this.setState({
-      reportData: failures,
+      reportData: _.map(failures, fail => ({key: fail, ...fail})),
       openFailuresModal: true,
       selectedSubmissionMenu: submission
     });
@@ -934,30 +946,31 @@ class ApplicationDashboard extends Component {
 
   //Export to PDF
   exportToPDF = () => {
-    this.showLoading();
-    const res = ApplicationApi.exportViewReportPDF({
-      submission_id: this.state.selectedSubmissionMenu.id
-    })
-      .then(res => {
-        this.hideLoading();
-        const defaultFilename = "Report.pdf";
-        var data = new Blob([res.data]);
-        if (typeof window.navigator.msSaveBlob === "function") {
-          // If it is IE that support download blob directly.
-          window.navigator.msSaveBlob(data, defaultFilename);
-        } else {
-          var blob = data;
-          var link = document.createElement("a");
-          link.href = window.URL.createObjectURL(blob);
-          link.download = defaultFilename;
-          document.body.appendChild(link);
-          link.click(); // create an <a> element and simulate the click operation.
-        }
-      })
-      .catch(error => {
-        this.hideLoading();
-        console.log(error);
-      });
+    console.log("tis.statetet", this.state)
+    // this.showLoading();
+    // const res = ApplicationApi.exportViewReportPDF({
+    //   submission_id: this.state.selectedSubmissionMenu.id
+    // })
+    //   .then(res => {
+    //     this.hideLoading();
+    //     const defaultFilename = "Report.pdf";
+    //     var data = new Blob([res.data]);
+    //     if (typeof window.navigator.msSaveBlob === "function") {
+    //       // If it is IE that support download blob directly.
+    //       window.navigator.msSaveBlob(data, defaultFilename);
+    //     } else {
+    //       var blob = data;
+    //       var link = document.createElement("a");
+    //       link.href = window.URL.createObjectURL(blob);
+    //       link.download = defaultFilename;
+    //       document.body.appendChild(link);
+    //       link.click(); // create an <a> element and simulate the click operation.
+    //     }
+    //   })
+    //   .catch(error => {
+    //     this.hideLoading();
+    //     console.log(error);
+    //   });
   };
 
   showLoading = () => {
@@ -976,12 +989,12 @@ class ApplicationDashboard extends Component {
     let selectedFailedUploads = [...this.state.selectedFailedUploads];
     const reportData = [...this.state.reportData];
     let content_message = "";
-    if(type == "sucessfully_uploaded_sequences"){
+    if (type == "sucessfully_uploaded_sequences") {
       content_message = selectedSequences.length === allUploadedSequences.length ? "You chose to delete all the Sequences that will remove the Application Card from the Dashboard page. Do you wish to continue?"
-      : "Are you sure you want to delete the selected Sequence(s)";
-    }else if(type == "failed_sequences"){
+        : "Are you sure you want to delete the selected Sequence(s)";
+    } else if (type == "failed_sequences") {
       content_message = selectedFailedUploads.length == reportData.length ? "You chose to delete all the Sequences that will remove the Application Card from the Dashboard page. Do you wish to continue?"
-      : "Are you sure you want to delete the selected Sequence(s)";
+        : "Are you sure you want to delete the selected Sequence(s)";
     }
     Modal.confirm({
       className: "omnimodal",
@@ -991,11 +1004,11 @@ class ApplicationDashboard extends Component {
       onOk: () => {
         this.deleteSequences(type);
       },
-      onCancel: () => {}
+      onCancel: () => { }
     });
   };
 
-  
+
 
   //check if user selects all the sequences or not for the deletion
   getDeleteSequencesData = type => {
@@ -1079,6 +1092,26 @@ class ApplicationDashboard extends Component {
     });
   };
 
+  //on selecting rows in failure report window
+  onRowSelected = (selectedRowKeys, selectedRows) => {
+    const disableRetry = _.some(selectedRows, ['status', 4]);
+    //const disableDelete = false;
+    const { user, role } = this.props;
+    if (user.is_secondary_contact || isAdmin(role.name)) {
+      this.setState({
+        selectedRowKeys,
+        selectedFailedUploads: selectedRows,
+        disableRetry,
+        //disableDelete: false
+      });
+    }
+  }
+
+  // onSelectChange = selectedRowKeys => {
+  //   console.log('selectedRowKeys changed: ', selectedRowKeys);
+  //   this.setState({ selectedRowKeys, disableDelete: false });
+  // };
+
   render() {
     const {
       viewBy,
@@ -1095,7 +1128,10 @@ class ApplicationDashboard extends Component {
       reportData,
       selectedFailedUploads,
       showSequencesModal,
-      selectedSubmissionMenu
+      selectedSubmissionMenu,
+      disableRetry,
+      selectedRowKeys,
+      //disableDelete
     } = this.state;
     const {
       loading,
@@ -1105,6 +1141,34 @@ class ApplicationDashboard extends Component {
       user,
       selectedSubmission
     } = this.props;
+    //rows selections
+    const rowSelection = {
+      selectedRowKeys,
+      onChange: this.onRowSelected,
+      hideDefaultSelections: true,
+      selections: [
+        {
+          text: 'Select Incorrect Sequences',
+          onSelect: changableRowKeys => {
+            let newSelectedRowKeys = [];
+            newSelectedRowKeys = changableRowKeys.filter((key, index) => {
+              return key.status == 4;
+            });
+            this.setState({ selectedRowKeys: newSelectedRowKeys, selectedFailedUploads: newSelectedRowKeys, disableRetry });
+          }, 
+        },
+        {
+          text: 'Select Failed Sequences',
+          onSelect: changableRowKeys => {
+            let newSelectedRowKeys = [];
+            newSelectedRowKeys = changableRowKeys.filter((key, index) => {
+              return key.status != 4;
+            });
+            this.setState({ selectedRowKeys: newSelectedRowKeys, selectedFailedUploads: newSelectedRowKeys, disableRetry: false });
+          },
+        }
+      ],
+    };
     if (!selectedCustomer) {
       return <Redirect to="/customers" />;
     }
@@ -1157,13 +1221,13 @@ class ApplicationDashboard extends Component {
                 </span>
                 {(isLoggedInOmniciaAdmin(this.props.role) ||
                   isLoggedInCustomerAdmin(this.props.role)) && (
-                  <div
-                    className="maindashboard__header__addEdit"
-                    onClick={this.openUserManagement}
-                  >
-                    {translate("label.usermgmt.title")}
-                  </div>
-                )}
+                    <div
+                      className="maindashboard__header__addEdit"
+                      onClick={this.openUserManagement}
+                    >
+                      {translate("label.usermgmt.title")}
+                    </div>
+                  )}
               </div>
               {isAdmin(role.slug) && submissions.length !== 0 && (
                 <OmniButton
@@ -1179,17 +1243,17 @@ class ApplicationDashboard extends Component {
             {(isLoggedInOmniciaAdmin(this.props.role) ||
               isLoggedInCustomerAdmin(this.props.role) ||
               user.is_secondary_contact) && (
-              <React.Fragment>
-                <OmniButton
-                  type="add"
-                  label={translate("label.button.add", {
-                    type: translate("label.dashboard.application")
-                  })}
-                  buttonStyle={{ height: "40px" }}
-                  onClick={this.addNewApplication}
-                />
-              </React.Fragment>
-            )}
+                <React.Fragment>
+                  <OmniButton
+                    type="add"
+                    label={translate("label.button.add", {
+                      type: translate("label.dashboard.application")
+                    })}
+                    buttonStyle={{ height: "40px" }}
+                    onClick={this.addNewApplication}
+                  />
+                </React.Fragment>
+              )}
           </div>
           {(isLoggedInOmniciaAdmin(role) || isLoggedInCustomerAdmin(role)) && (
             <div className="global__center-vert" style={{ marginTop: "10px" }}>
@@ -1236,18 +1300,18 @@ class ApplicationDashboard extends Component {
             <React.Fragment>
               {(isLoggedInOmniciaAdmin(this.props.role) ||
                 isLoggedInCustomerAdmin(this.props.role)) && (
-                <div
-                  className="global__center-vert"
-                  style={{ height: "40px", marginTop: "12px" }}
-                >
-                  <OmniButton
-                    type="primary"
-                    disabled={!assignPermissions}
-                    label={translate("label.dashboard.assignpermissions")}
-                    onClick={this.openPermissionsModal}
-                  />
-                </div>
-              )}
+                  <div
+                    className="global__center-vert"
+                    style={{ height: "40px", marginTop: "12px" }}
+                  >
+                    <OmniButton
+                      type="primary"
+                      disabled={!assignPermissions}
+                      label={translate("label.dashboard.assignpermissions")}
+                      onClick={this.openPermissionsModal}
+                    />
+                  </div>
+                )}
               <div className="maindashboard__list">
                 <TableHeader
                   columns={TableColumns}
@@ -1298,7 +1362,7 @@ class ApplicationDashboard extends Component {
                       {(() => {
                         if (
                           _.get(submission, "sequence_inProgress.length") ==
-                            0 &&
+                          0 &&
                           _.get(submission, "sequence_failed.length") != 0
                         ) {
                           return (
@@ -1555,10 +1619,10 @@ class ApplicationDashboard extends Component {
                   {_.get(selectedSubmissionMenu, "broken_x_ref", "") == 1
                     ? `A Sequence in the Application has a cross-reference to another Sequence that is not yet uploaded`
                     : `${_.get(
-                        selectedSubmissionMenu,
-                        "broken_x_ref",
-                        ""
-                      )} Sequences in the Application have the cross-references to other Sequences that are not yet uploaded`}
+                      selectedSubmissionMenu,
+                      "broken_x_ref",
+                      ""
+                    )} Sequences in the Application have the cross-references to other Sequences that are not yet uploaded`}
                 </p>
               </div>
             )}
@@ -1568,7 +1632,7 @@ class ApplicationDashboard extends Component {
                 _.get(selectedSubmissionMenu, "broken_x_ref") == 0
                   ? "no-crossrefs"
                   : "crossrefs"
-              }`}
+                }`}
             >
               {_.get(selectedSubmissionMenu, "broken_x_ref") != 0 && (
                 <div className="">
@@ -1591,18 +1655,11 @@ class ApplicationDashboard extends Component {
                     columns={this.uploadFailedColumns}
                     dataSource={reportData}
                     pagination={false}
-                    rowSelection={
-                      user.is_secondary_contact || isAdmin(role.name)
-                        ? {
-                            onChange: (selectedRowKeys, selectedRows) => {
-                              this.setState({
-                                selectedFailedUploads: selectedRows
-                              });
-                            }
-                          }
-                        : ""
-                    }
-                    //scroll={{ y: 200 }}
+                    // rowSelection={{
+                    //   onChange: this.onRowSelected
+                    // }}
+                    rowSelection={rowSelection}
+                  //scroll={{ y: 200 }}
                   />
                 </div>
               </div>
@@ -1620,14 +1677,14 @@ class ApplicationDashboard extends Component {
               secondary contact and admins*/}
                 {user.is_secondary_contact || isAdmin(role.name) ? (
                   <OmniButton
-                    disabled={!selectedFailedUploads.length}
+                    disabled={!selectedFailedUploads.length || disableRetry} 
                     label="Retry"
                     buttonStyle={{ width: "120px", margin: "10px 0 0 10px" }}
                     onClick={this.retryUpload}
                   />
                 ) : (
-                  ""
-                )}
+                    ""
+                  )}
                 <OmniButton
                   disabled={!selectedFailedUploads.length}
                   label="Delete"
