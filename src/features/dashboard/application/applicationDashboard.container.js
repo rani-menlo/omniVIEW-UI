@@ -1154,7 +1154,7 @@ class ApplicationDashboard extends Component {
             newSelectedRowKeys = changableRowKeys.filter((key, index) => {
               return key.status == 4;
             });
-            this.setState({ selectedRowKeys: newSelectedRowKeys, selectedFailedUploads: newSelectedRowKeys, disableRetry });
+            this.setState({ selectedRowKeys: newSelectedRowKeys, selectedFailedUploads: newSelectedRowKeys, disableRetry: true });
           }, 
         },
         {
