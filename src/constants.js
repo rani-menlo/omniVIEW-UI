@@ -160,13 +160,24 @@ These folder names should follow order as in the valid-values.xml.
 valid-values.xml follows ascending order but somehow below titles are pushed to top/bottom without any logic
 hence we are following the same by taking these values to push top/bottom after ascending order */
 const VALID_VALUES_XML_DATA = {
-  BOTTOM_LIST: [
-    "Complete Patient List",
-    "List of Patients Having Abnormal Lab Values",
-    "List of Patients Having Adverse Events",
-    "List of Patients Having Serious Adverse Events"
-  ],
-  TOP_LIST: ["Synopsis"]
+  // BOTTOM_LIST: [
+  //   "Complete Patient List",
+  //   "List of Patients Having Abnormal Lab Values",
+  //   "List of Patients Having Adverse Events",
+  //   "List of Patients Having Serious Adverse Events"
+  // ],
+  TOP_LIST: ["Pre Clinical Study Report", "Legacy Clinical Study Report", "Synopsis", "Study Report Body", "Protocol or Amendment",
+              "Sample Case Report Form", "IEC-IRB Consent Form List", "List Description Investigator Site", "Signatures Investigators",
+              "List Patients with Batches", "Randomisation Scheme", "Audit Certificates Report", "Statistical Methods Interim Analysis Plan",
+              "Inter-Laboratory Standardisation Methods Quality Assurance", "Publications Based on Study", "Publications Referenced in Report",
+              "Discontinued Patients", "Protocol Deviations", "Patients Excluded from Efficacy Analysis", "Demographic Data", 
+              "Compliance and Drug Concentration Data", "Individual Efficacy Response Data", "Adverse Event Listings", 
+              "Listing Individual Laboratory Measurements by Patient", "Case Report Forms", "Available On Request",
+              "Complete Patient List", "Serious Adverse Event Patient List", "Adverse Event Patient List", "Abnormal Lab Values Patient List",
+              "Data Tabulation Dataset Legacy", "Data Tabulation Dataset Sdtm", "Data Tabulation Dataset Send", "Data Tabulation Data Definition",
+              "Data Listing Dataset", "Data Listing Data Definition", "Analysis Dataset Adam", "Analysis Dataset Legacy", "Analysis Program",
+              "Analysis Data Definition", "Annotated Crf", "Ecg", "Image", "Subject Profiles", "Safety Report", "Antibacterial", "Special Pathogen",
+              "Antiviral", "Iss", "ise", "Pm Description"]
 };
 
 const CLOUDS = {

@@ -284,14 +284,14 @@ class TreeNode extends Component {
       topList = [];
     titles = titles.sort(collator.compare);
     // ordering based on valid-values.xml data (Refer comment in VALID_VALUES_XML_DATA_BOTTOM_LIST)
-    _.map(VALID_VALUES_XML_DATA.BOTTOM_LIST, item => {
-      const idx = _.findIndex(titles, title => {
-        const flag = title.includes(item);
-        flag && bottomList.push(title);
-        return flag;
-      });
-      idx >= 0 && titles.splice(idx, 1);
-    });
+    // _.map(VALID_VALUES_XML_DATA.BOTTOM_LIST, item => {
+    //   const idx = _.findIndex(titles, title => {
+    //     const flag = title.includes(item);
+    //     flag && bottomList.push(title);
+    //     return flag;
+    //   });
+    //   idx >= 0 && titles.splice(idx, 1);
+    // });
 
     _.map(VALID_VALUES_XML_DATA.TOP_LIST, item => {
       const idx = _.findIndex(titles, title => {
@@ -302,7 +302,8 @@ class TreeNode extends Component {
       idx >= 0 && titles.splice(idx, 1);
     });
 
-    titles = [...topList, ...titles, ...bottomList];
+    // titles = [...topList, ...titles, ...bottomList];
+    titles = [...topList, ...titles];
     return _.map(titles, title => nodesByTitle[title][0]);
   };
 
@@ -618,7 +619,10 @@ class TreeNode extends Component {
     const { properties } = this.state;
     let name = label;
     if(mode === "qc"){
-      name = _.get(properties, "key", label);
+      name = _.get(properties, "key", label) ? _.get(properties, "key", label) : _.get(properties, "title", label);
+      if(!view){
+        name = _.get(properties, "title", label);
+      }
     }
     if (label === "leaf" || mode === "standard") {
       name = _.get(properties, "title", label);
