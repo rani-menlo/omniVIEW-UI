@@ -174,10 +174,10 @@ const VALID_VALUES_XML_DATA = {
               "Compliance and Drug Concentration Data", "Individual Efficacy Response Data", "Adverse Event Listings", 
               "Listing Individual Laboratory Measurements by Patient", "Case Report Forms", "Available On Request",
               "Complete Patient List", "Serious Adverse Event Patient List", "Adverse Event Patient List", "Abnormal Lab Values Patient List",
-              "Data Tabulation Dataset Legacy", "Data Tabulation Dataset Sdtm", "Data Tabulation Dataset Send", "Data Tabulation Data Definition",
-              "Data Listing Dataset", "Data Listing Data Definition", "Analysis Dataset Adam", "Analysis Dataset Legacy", "Analysis Program",
-              "Analysis Data Definition", "Annotated Crf", "Ecg", "Image", "Subject Profiles", "Safety Report", "Antibacterial", "Special Pathogen",
-              "Antiviral", "Iss", "ise", "Pm Description"]
+              "Data Tabulation Dataset Legacy", "Data Tabulation Dataset SDTM", "Data Tabulation Dataset Send", "Data Tabulation Data Definition",
+              "Data Listing Dataset", "Data Listing Data Definition", "Analysis Dataset ADaM", "Analysis Dataset Legacy", "Analysis Program",
+              "Analysis Data Definition", "Annotated CRF", "Ecg", "Image", "Subject Profiles", "Safety Report", "Antibacterial", "Special Pathogen",
+              "Antiviral", "iss", "ise", "Pm Description"]
 };
 
 const CLOUDS = {
