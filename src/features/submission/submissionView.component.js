@@ -356,6 +356,9 @@ class SubmissionView extends Component {
   };
 
   onSequenceSelected = sequence => {
+    //we are retaining the mode and view after selecting the sequence
+    //fixed it on 10-April-2020
+    const {selectedMode} = this.state;
     Permissions.clear();
     this.treeNodesMap.clear();
     this.props.actions.setSelectedSequence(sequence);
@@ -367,6 +370,7 @@ class SubmissionView extends Component {
     );
     this.setState({
       treeExpand: false,
+      selectedMode,
       selectedView: "",
       nodeProperties: null,
       enableValidateSequence: this.state.proUser

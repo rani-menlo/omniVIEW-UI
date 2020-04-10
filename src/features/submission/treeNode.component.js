@@ -620,9 +620,6 @@ class TreeNode extends Component {
     let name = label;
     if(mode === "qc"){
       name = _.get(properties, "key", label) ? _.get(properties, "key", label) : _.get(properties, "title", label);
-      if(!view){
-        name = _.get(properties, "title", label);
-      }
     }
     if (label === "leaf" || mode === "standard") {
       name = _.get(properties, "title", label);
