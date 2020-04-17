@@ -517,11 +517,12 @@ class TreeNode extends Component {
   getLeafIcon = () => {
     let icon = (
       <Icon type="folder" theme="filled" className="global__file-folder" />
-    );
-    const { properties } = this.state;
-    const style = { width: "18px", height: "21px" };
-    const version = _.get(properties, "version", "");
-    const stfKey = _.get(properties, "_stfKey", "");
+      );
+      const { properties } = this.state;
+      const style = { width: "18px", height: "21px" };
+      const version = _.get(properties, "version", "");
+      const stfKey = _.get(properties, "_stfKey", "");
+      console.log(this.state, version, stfKey, "state");
     if (properties.title === "US Regional") {
       icon = (
         <img
@@ -541,7 +542,15 @@ class TreeNode extends Component {
       );
     }
     if (this.props.label === "leaf") {
-      if (properties.is_x_ref) {
+      if (version.includes("STF")) {
+        icon = (
+          <img
+            src="/images/file-stf.svg"
+            className="global__file-folder"
+            style={style}
+          />
+        );
+      }else if (properties.is_x_ref) {
         icon = (
           <img
             src="/images/file-cross-ref.svg"
