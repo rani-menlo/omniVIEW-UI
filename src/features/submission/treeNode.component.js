@@ -243,6 +243,7 @@ class TreeNode extends Component {
 
     //sorting leaf folders based on ID
     // nodes = _.sortBy(nodes, "value.ID");
+    //Ticket No:OMNG-844
     const nodesById = {};
     let nodeIds = _.map(nodes, node => {
       let id = _.get(node, 'value.ID', '');
@@ -552,7 +553,6 @@ class TreeNode extends Component {
     const style = { width: "18px", height: "21px" };
     const version = _.get(properties, "version", "");
     const stfKey = _.get(properties, "_stfKey", "");
-    console.log(this.state, version, stfKey, "state");
     if (properties.title === "US Regional") {
       icon = (
         <img
@@ -871,6 +871,7 @@ class TreeNode extends Component {
       properties
     } = this.state;
     const {
+      label,
       defaultPaddingLeft,
       selectedNodeId,
       onNodeSelected,
@@ -886,7 +887,10 @@ class TreeNode extends Component {
       selectInLifeCycle
     } = this.props;
     const paddingLeft = this.props.paddingLeft + defaultPaddingLeft;
-    console.log("testestest", nodes);
+    //Displaying nothing when no childs (Ticket No:OMNG-835)
+    if (!_.get(nodes, 'length') && label !== 'leaf') {
+      return null;
+    }
     return (
       <React.Fragment>
         <div
