@@ -92,13 +92,13 @@ class TreeNode extends Component {
         // sorting based on ID
         const consolidatedFolderById = _.groupBy(_.values(consolidatedFolder), 'ID');
         let ids = _.map(consolidatedFolder, value => value.ID);
-        ids = ids.sort(new Intl.Collator(undefined,{numeric:true, sensitivity:'base'}).compare);
+        ids = ids.sort(new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' }).compare);
         consolidatedFolder = {};
         _.map(ids, id => {
           const obj = consolidatedFolderById[id][0];
           consolidatedFolder[obj.title] = obj;
         })
-        
+
         // remove the keys from the main object
         if (omitKeys.length) {
           content = _.omit(content, omitKeys);
@@ -242,7 +242,24 @@ class TreeNode extends Component {
     nodes = [].concat(stfNodes).concat(leafNodes);
 
     //sorting leaf folders based on ID
-    nodes = _.sortBy(nodes, "value.ID");
+    // nodes = _.sortBy(nodes, "value.ID");
+    const nodesById = {};
+    let nodeIds = _.map(nodes, node => {
+      let id = _.get(node, 'value.ID', '');
+      if (id) {
+        id = `${id}_${_.get(node, 'value.folderID', '')}`;
+        nodesById[id] = node;
+      }
+      return id;
+    });
+    if (_.size(nodesById)) {
+      const collator = new Intl.Collator(undefined, {
+        numeric: true,
+        sensitivity: "base"
+      });
+      nodeIds = nodeIds.sort(collator.compare);
+      nodes = _.map(nodeIds, id => nodesById[id]);
+    }
 
     if (properties["_stfKey"] && mode === "standard") {
       nodes = this.sortByTitle(nodes);
@@ -254,6 +271,7 @@ class TreeNode extends Component {
         ? CHECKBOX.SELECTED
         : CHECKBOX.DESELECTED
     });
+    nodes = _.sortBy(nodes, "value.leaf.ID");
     this.nodeRefs = _.map(nodes, node => React.createRef());
   }
 
@@ -294,16 +312,28 @@ class TreeNode extends Component {
     // });
 
     _.map(VALID_VALUES_XML_DATA.TOP_LIST, item => {
-      const idx = _.findIndex(titles, title => {
+      // const idx = _.findIndex(titles, title => {
+      //   const flag = title.includes(item);
+      //   flag && topList.push(title);
+      //   return flag;
+      // });
+      // idx >= 0 && titles.splice(idx, 1);
+
+      // const clonedTitles = [...titles];
+      _.map(titles, (title, idx) => {
+        // if (!title) {
+        //   return;
+        // }
         const flag = title.includes(item);
-        flag && topList.push(title);
-        return flag;
+        if (flag) {
+          topList.push(title);
+        }
       });
-      idx >= 0 && titles.splice(idx, 1);
     });
 
+    const diff = _.difference(titles, topList);
     // titles = [...topList, ...titles, ...bottomList];
-    titles = [...topList, ...titles];
+    titles = [...topList, ...diff];
     return _.map(titles, title => nodesByTitle[title][0]);
   };
 
@@ -452,9 +482,9 @@ class TreeNode extends Component {
           modifiedFile.substring(modifiedFile.lastIndexOf("#") + 1);
         //removing the files except appended files
         // if (leaf["operation"] != "append") {
-          if (modifiedFile === itemId) {
-            _.remove(newArray, { ID: itemId });
-          }
+        if (modifiedFile === itemId) {
+          _.remove(newArray, { ID: itemId });
+        }
         // }
       });
     });
@@ -506,23 +536,23 @@ class TreeNode extends Component {
     return this.state.expand ? (
       <Icon type="caret-down" onClick={this.toggle} className="global__caret" />
     ) : (
-      <Icon
-        type="caret-right"
-        onClick={this.toggle}
-        className="global__caret"
-      />
-    );
+        <Icon
+          type="caret-right"
+          onClick={this.toggle}
+          className="global__caret"
+        />
+      );
   };
 
   getLeafIcon = () => {
     let icon = (
       <Icon type="folder" theme="filled" className="global__file-folder" />
-      );
-      const { properties } = this.state;
-      const style = { width: "18px", height: "21px" };
-      const version = _.get(properties, "version", "");
-      const stfKey = _.get(properties, "_stfKey", "");
-      console.log(this.state, version, stfKey, "state");
+    );
+    const { properties } = this.state;
+    const style = { width: "18px", height: "21px" };
+    const version = _.get(properties, "version", "");
+    const stfKey = _.get(properties, "_stfKey", "");
+    console.log(this.state, version, stfKey, "state");
     if (properties.title === "US Regional") {
       icon = (
         <img
@@ -550,7 +580,7 @@ class TreeNode extends Component {
             style={style}
           />
         );
-      }else if (properties.is_x_ref) {
+      } else if (properties.is_x_ref) {
         icon = (
           <img
             src="/images/file-cross-ref.svg"
@@ -627,7 +657,7 @@ class TreeNode extends Component {
     const { label, view, mode, submission } = this.props;
     const { properties } = this.state;
     let name = label;
-    if(mode === "qc"){
+    if (mode === "qc") {
       name = _.get(properties, "key", label) ? _.get(properties, "key", label) : _.get(properties, "title", label);
     }
     if (label === "leaf" || mode === "standard") {
@@ -635,7 +665,7 @@ class TreeNode extends Component {
       if (label === "leaf" && view) {
         name = `${name} [${_.get(submission, "name", "")}\\${
           properties.sequence
-        }]`;
+          }]`;
       }
     }
 
@@ -678,7 +708,7 @@ class TreeNode extends Component {
     }
 
     if (newWindow) {
-      newWindow.addEventListener("load", function() {
+      newWindow.addEventListener("load", function () {
         newWindow.document.title = _.get(properties, "title", "");
       });
     }
@@ -856,6 +886,7 @@ class TreeNode extends Component {
       selectInLifeCycle
     } = this.props;
     const paddingLeft = this.props.paddingLeft + defaultPaddingLeft;
+    console.log("testestest", nodes);
     return (
       <React.Fragment>
         <div
