@@ -1,5 +1,6 @@
 const SERVER_URL = location.origin;
 const PDF_ROUTER = "viewer/pdf";
+const OPENED_PDF_FILES = {};
 /**
  * @licstart The following is the entire license notice for the
  * Javascript code in this page
@@ -2732,7 +2733,14 @@ const PDF_ROUTER = "viewer/pdf";
             href.indexOf("http") >= 0 ||
             href.indexOf("https") >= 0
           ) {
-            window.open(orginal, "_blank");
+            if(!OPENED_PDF_FILES[orginal]) {
+              var popupWindow = window.open(orginal, "_blank");
+              OPENED_PDF_FILES[orginal] = popupWindow;
+              popupWindow.onbeforeunload = function() {
+                OPENED_PDF_FILES[orginal] = null;
+              }
+            }
+            OPENED_PDF_FILES[orginal].focus();
             evt.preventDefault();
           }
         }
