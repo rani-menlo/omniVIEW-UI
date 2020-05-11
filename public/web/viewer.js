@@ -5676,7 +5676,7 @@ const OPENED_PDF_FILES = {};
           kind: OptionKind.API
         },
         disableAutoFetch: {
-          value: false,
+          value: true,
           kind: OptionKind.API
         },
         disableCreateObjectURL: {
@@ -5693,7 +5693,7 @@ const OPENED_PDF_FILES = {};
           kind: OptionKind.API
         },
         disableStream: {
-          value: false,
+          value: true,
           kind: OptionKind.API
         },
         isEvalSupported: {
@@ -15568,8 +15568,8 @@ const OPENED_PDF_FILES = {};
             eventBusDispatchToDOM: false,
             pdfBugEnabled: false,
             disableRange: false,
-            disableStream: false,
-            disableAutoFetch: false,
+            disableStream: true,
+            disableAutoFetch: true,
             disableFontFace: false,
             textLayerMode: 1,
             useOnlyCssZoom: false,
