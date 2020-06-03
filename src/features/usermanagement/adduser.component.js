@@ -492,12 +492,12 @@ class AddUser extends Component {
               {translate("label.usermgmt.licensestatus")}:
               <span
                 className={`userManagement__group__users__user__info-text-${
-                  _.get(selectedUser, "license_status", 0)
+                  statusActive
                     ? "active"
                     : "inactive"
                 }`}
               >
-                {_.get(selectedUser, "license_status", 0)
+                {statusActive
                   ? ` ${translate("label.user.active")}`
                   : ` ${translate("label.user.inactive")}`}
               </span>
@@ -510,8 +510,8 @@ class AddUser extends Component {
             <React.Fragment>
               <p className="addUser-heading">
                 {`${translate("label.usermgmt.expires")}: ${
-                  _.get(selectedUser, "license_status")
-                    ? getFormattedDate(_.get(selectedUser, "expiryDate"))
+                  (statusActive)
+                    ? _.get(selectedUser, "licenses.length", 0) ? getFormattedDate(_.find(selectedUser.licenses, 'expired_date')) : "N/A"
                     : "N/A"
                 }`}
               </p>
