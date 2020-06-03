@@ -160,7 +160,7 @@ class ValidationResults extends Component {
   };
 
   render() {
-    const { onClose, label, sequence } = this.props;
+    const { onClose, label, sequence, dtdVersion } = this.props;
     const { validationResults, sort, selected } = this.state;
     return (
       <React.Fragment>
@@ -296,8 +296,8 @@ class ValidationResults extends Component {
               className={`validationResults__footer__viewreport ${!_.get(
                 validationResults,
                 "length"
-              ) && "global__disabled-box"}`}
-              onClick={_.get(validationResults, "length") && this.openReport}
+              ) || dtdVersion == '2.01' && "global__disabled-box"}`}
+              onClick={(_.get(validationResults, "length") && dtdVersion != '2.01') && this.openReport}
             >
               View Report
             </div>

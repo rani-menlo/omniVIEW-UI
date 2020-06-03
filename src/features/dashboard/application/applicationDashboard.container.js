@@ -1232,7 +1232,7 @@ class ApplicationDashboard extends Component {
               {isAdmin(role.slug) && submissions.length !== 0 && (
                 <OmniButton
                   type="add"
-                  image={<img src="/images/global-permissions.svg" />}
+                  image={<img src="/images/global-permission-white.svg" />}
                   label={translate("label.dashboard.assignglobalpermissions")}
                   className="maindashboard-assignpermissions"
                   buttonStyle={{ marginRight: "4px" }}
@@ -1262,7 +1262,7 @@ class ApplicationDashboard extends Component {
                 style={{ marginRight: "8px", opacity: 0.5 }}
               />
               <Text
-                className="global__cursor-pointer"
+                className="global__cursor-pointer maindashboard-licenses"
                 type="bold"
                 size="14px"
                 opacity={0.5}
@@ -1272,7 +1272,7 @@ class ApplicationDashboard extends Component {
               />
               <Text
                 type="regular"
-                className="global__cursor-pointer"
+                className="global__cursor-pointer maindashboard-licenses-number"
                 size="14px"
                 text={`${_.get(
                   selectedCustomer,
@@ -1284,7 +1284,7 @@ class ApplicationDashboard extends Component {
               />
               <Text
                 type="regular"
-                className="global__cursor-pointer"
+                className="global__cursor-pointer maindashboard-licenses-number"
                 size="14px"
                 text={`${_.get(selectedCustomer, "revoked_licenses", 0) +
                   _.get(

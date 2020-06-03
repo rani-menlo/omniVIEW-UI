@@ -305,11 +305,11 @@ class UserManagementContainer extends Component {
             {_.get(usr, "is_active", false) ? (
               <img src="/images/deactivate.svg" />
             ) : (
-              <Icon
-                type="check-circle"
-                style={{ fontSize: "20px", marginRight: "8px" }}
-              />
-            )}
+                <Icon
+                  type="check-circle"
+                  style={{ fontSize: "20px", marginRight: "8px" }}
+                />
+              )}
             <span>
               {_.get(usr, "is_active", false)
                 ? translate("label.usermgmt.deactivate")
@@ -416,8 +416,7 @@ class UserManagementContainer extends Component {
         );
       }
     }
-
-    this.fetchUsers(customer);
+    this.setState({ pageNo: 1 }, () => this.fetchUsers(customer));
   };
 
   onPageChange = pageNo => {
@@ -487,17 +486,17 @@ class UserManagementContainer extends Component {
     const users = {
       users: this.state.selectedUser
         ? [
-            {
-              userId: this.state.selectedUser.user_id,
-              is_active: Number(
-                !_.get(this.state.selectedUser, "is_active", false)
-              )
-            }
-          ]
+          {
+            userId: this.state.selectedUser.user_id,
+            is_active: Number(
+              !_.get(this.state.selectedUser, "is_active", false)
+            )
+          }
+        ]
         : _.map(this.state.checkedUsers, user => ({
-            userId: user.user_id,
-            is_active: this.state.deactivateAll ? 0 : 1
-          }))
+          userId: user.user_id,
+          is_active: this.state.deactivateAll ? 0 : 1
+        }))
     };
 
     this.props.dispatch(
@@ -776,7 +775,7 @@ class UserManagementContainer extends Component {
                   size="20px"
                   className="userManagement-subheader-title"
                   text={selectedCustomer.company_name}
-                  // onClick={this.goBack}
+                // onClick={this.goBack}
                 />
                 <img
                   className="global__cursor-pointer"
@@ -886,7 +885,7 @@ class UserManagementContainer extends Component {
                     this.state.markAllSecondary
                       ? translate("label.generic.tag")
                       : translate("label.generic.untag")
-                  } ${translate("label.user.seccontact")}`}
+                    } ${translate("label.user.seccontact")}`}
                   onClick={this.openSecondaryContact}
                 />
                 <OmniButton
@@ -954,10 +953,10 @@ class UserManagementContainer extends Component {
                           {translate("label.user.active")}
                         </span>
                       ) : (
-                        <span className="maindashboard__list__item-text-inactive">
-                          {translate("label.user.inactive")}
-                        </span>
-                      )}
+                          <span className="maindashboard__list__item-text-inactive">
+                            {translate("label.user.inactive")}
+                          </span>
+                        )}
                     </Column>
                     <Column
                       width={this.getColumnWidth(TableColumnNames.CONTACT)}
@@ -969,10 +968,18 @@ class UserManagementContainer extends Component {
                     </Column>
                     <Column
                       width={this.getColumnWidth(TableColumnNames.EXP_DATE)}
-                      className="maindashboard__list__item__row maindashboard__list__item-text"
+                      className="maindashboard__list__item-text"
                     >
-                      {usr.licenses.length > 0 ? getFormattedDate(_.find(usr.licenses, 'expired_date')) :
-                        "__ /__ /____"}
+                      <p >
+                        {usr.licenses.length > 0 ? getFormattedDate(_.find(usr.licenses, 'expired_date')) :
+                          "__ /__ /____"}
+                      </p>
+                      <p 
+                      style={{ fontWeight: "bold", fontSize: "12px" }}>
+                        {usr.licenses.length > 0 ? _.get(usr.licenses[0], 'type_name', '') : 'N/A'}
+                      </p>
+                    </Column>
+                    <Column>
                       <Dropdown
                         overlay={this.getMenu(usr)}
                         trigger={["click"]}
@@ -1030,15 +1037,15 @@ class UserManagementContainer extends Component {
             visible={this.state.showDeactivateModal}
             title={
               (!_.isNull(this.state.selectedUser)
-              ? _.get(this.state, "selectedUser.is_active")
-              : this.state.deactivateAll)
+                ? _.get(this.state, "selectedUser.is_active")
+                : this.state.deactivateAll)
                 ? `${translate("label.usermgmt.deactivateacc")}?`
                 : `${translate("label.usermgmt.activateacc")}?`
             }
             content={
               (!_.isNull(this.state.selectedUser)
-              ? _.get(this.state, "selectedUser.is_active")
-              : this.state.deactivateAll)
+                ? _.get(this.state, "selectedUser.is_active")
+                : this.state.deactivateAll)
                 ? translate("text.usermgmt.deactivatemsg")
                 : translate("text.usermgmt.activatemsg")
             }
@@ -1095,7 +1102,7 @@ const TableColumnNames = {
   EMAIl: translate("label.user.email"),
   CONTACT: translate("label.user.seccontact"),
   STATUS: translate("label.user.accstatus"),
-  EXP_DATE: translate("label.user.expdate")
+  EXP_DATE: translate("label.user.expdateLicenseType")
 };
 
 const Column = styled.div`
