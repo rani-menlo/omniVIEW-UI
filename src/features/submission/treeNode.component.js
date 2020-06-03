@@ -10,7 +10,7 @@ import {
   VALID_VALUES_XML_DATA_TOP_LIST,
   VALID_VALUES_XML_DATA
 } from "../../constants";
-import { isLoggedInCustomerAdmin, isLoggedInOmniciaAdmin } from "../../utils";
+import { isLoggedInCustomerAdmin, isLoggedInOmniciaAdmin, openFileInWindow } from "../../utils";
 import { translate } from "../../translations/translator";
 
 class TreeNode extends Component {
@@ -688,30 +688,7 @@ class TreeNode extends Component {
       return;
     }
     const fileHref = properties["xlink:href"];
-    let type = "";
-    if (fileHref) {
-      type = fileHref.substring(fileHref.lastIndexOf(".") + 1);
-    }
-    let newWindow = null;
-    if (type.includes("pdf") && properties.fileID) {
-      newWindow = window.open(
-        `${process.env.PUBLIC_URL}/viewer/pdf/${properties.fileID}`,
-        "_blank"
-      );
-    } else {
-      if (properties.fileID) {
-        newWindow = window.open(
-          `${process.env.PUBLIC_URL}/viewer/${type}/${properties.fileID}`,
-          "_blank"
-        );
-      }
-    }
-
-    if (newWindow) {
-      newWindow.addEventListener("load", function () {
-        newWindow.document.title = _.get(properties, "title", "");
-      });
-    }
+    openFileInWindow(fileHref, properties.fileID, _.get(properties, "title", ""))
   };
 
   toggle = () => {
@@ -949,14 +926,14 @@ class TreeNode extends Component {
               role={role}
               expand={this.props.expand || fullyExpand}
               paddingLeft={paddingLeft}
-              key={node.label + idx + mode}
-              label={node.label}
-              content={node.value}
+              key={node && node.label ? node.label : '' + idx + mode}
+              label={node && node.label}
+              content={node && node.value}
               selectedNodeId={selectedNodeId}
               onNodeSelected={onNodeSelected}
               mode={mode}
               view={view}
-              leafParent={node.leafParent}
+              leafParent={node && node.leafParent}
               submission={submission}
               viewPermissions={viewPermissions}
               editPermissions={editPermissions}
