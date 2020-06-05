@@ -153,10 +153,10 @@ const getDTD2_2_FormattedDate = (date, format) => {
 
 const openFileInWindow = (fileHref, fileID, title) => {
   let type = "";
+  let url = '';
   if (fileHref) {
     type = fileHref.substring(fileHref.lastIndexOf(".") + 1);
   }
-  let url = '';
   if (type.includes("pdf") && fileID) {
     url = `${process.env.PUBLIC_URL}/viewer/pdf/${fileID}`;
   } else {
