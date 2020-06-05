@@ -942,14 +942,16 @@ class TreeNode extends Component {
           </div>
         </div>
         {expand &&
-          _.map(nodes, (node, idx) => (
+          _.map(nodes, (node, idx) => {
+            const key = node && node.label ? node.label : '' + idx + mode;
+            return (
             <TreeNode
               ref={this.nodeRefs[idx]}
               parentNode={this}
               role={role}
               expand={this.props.expand || fullyExpand}
               paddingLeft={paddingLeft}
-              key={node && node.label ? node.label : '' + idx + mode}
+              key={key}
               label={node && node.label}
               content={node && node.value}
               selectedNodeId={selectedNodeId}
@@ -965,7 +967,7 @@ class TreeNode extends Component {
               onExpandNode={onExpandNode}
               selectInLifeCycle={selectInLifeCycle}
             />
-          ))}
+          )})}
       </React.Fragment>
     );
   }
