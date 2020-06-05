@@ -38,7 +38,7 @@ const OPENED_PDF_FILES = {};
     /******/ /******/ var module = (installedModules[moduleId] = {
       /******/ i: moduleId,
       /******/ l: false,
-      /******/ exports: {}
+      /******/ exports: {},
       /******/
     }); // Execute the module function
     /******/
@@ -64,7 +64,7 @@ const OPENED_PDF_FILES = {};
     /******/ if (!__webpack_require__.o(exports, name)) {
       /******/ Object.defineProperty(exports, name, {
         enumerable: true,
-        get: getter
+        get: getter,
       });
       /******/
     }
@@ -74,7 +74,7 @@ const OPENED_PDF_FILES = {};
   /******/ /******/ __webpack_require__.r = function(exports) {
     /******/ if (typeof Symbol !== "undefined" && Symbol.toStringTag) {
       /******/ Object.defineProperty(exports, Symbol.toStringTag, {
-        value: "Module"
+        value: "Module",
       });
       /******/
     }
@@ -99,7 +99,7 @@ const OPENED_PDF_FILES = {};
     /******/ __webpack_require__.r(ns);
     /******/ Object.defineProperty(ns, "default", {
       enumerable: true,
-      value: value
+      value: value,
     });
     /******/ if (mode & 2 && typeof value != "string")
       for (var key in value)
@@ -181,7 +181,7 @@ const OPENED_PDF_FILES = {};
             print: document.getElementById("print"),
             presentationModeButton: document.getElementById("presentationMode"),
             download: document.getElementById("download"),
-            viewBookmark: document.getElementById("viewBookmark")
+            viewBookmark: document.getElementById("viewBookmark"),
           },
           secondaryToolbar: {
             toolbar: document.getElementById("secondaryToolbar"),
@@ -212,7 +212,7 @@ const OPENED_PDF_FILES = {};
             spreadEvenButton: document.getElementById("spreadEven"),
             documentPropertiesButton: document.getElementById(
               "documentProperties"
-            )
+            ),
           },
           fullscreen: {
             contextFirstPage: document.getElementById("contextFirstPage"),
@@ -220,7 +220,7 @@ const OPENED_PDF_FILES = {};
             contextPageRotateCw: document.getElementById("contextPageRotateCw"),
             contextPageRotateCcw: document.getElementById(
               "contextPageRotateCcw"
-            )
+            ),
           },
           sidebar: {
             outerContainer: document.getElementById("outerContainer"),
@@ -231,11 +231,11 @@ const OPENED_PDF_FILES = {};
             attachmentsButton: document.getElementById("viewAttachments"),
             thumbnailView: document.getElementById("thumbnailView"),
             outlineView: document.getElementById("outlineView"),
-            attachmentsView: document.getElementById("attachmentsView")
+            attachmentsView: document.getElementById("attachmentsView"),
           },
           sidebarResizer: {
             outerContainer: document.getElementById("outerContainer"),
-            resizer: document.getElementById("sidebarResizer")
+            resizer: document.getElementById("sidebarResizer"),
           },
           findBar: {
             bar: document.getElementById("findbar"),
@@ -247,7 +247,7 @@ const OPENED_PDF_FILES = {};
             findMsg: document.getElementById("findMsg"),
             findResultsCount: document.getElementById("findResultsCount"),
             findPreviousButton: document.getElementById("findPrevious"),
-            findNextButton: document.getElementById("findNext")
+            findNextButton: document.getElementById("findNext"),
           },
           passwordOverlay: {
             overlayName: "passwordOverlay",
@@ -255,7 +255,7 @@ const OPENED_PDF_FILES = {};
             label: document.getElementById("passwordText"),
             input: document.getElementById("password"),
             submitButton: document.getElementById("passwordSubmit"),
-            cancelButton: document.getElementById("passwordCancel")
+            cancelButton: document.getElementById("passwordCancel"),
           },
           documentProperties: {
             overlayName: "documentPropertiesOverlay",
@@ -277,8 +277,8 @@ const OPENED_PDF_FILES = {};
               version: document.getElementById("versionField"),
               pageCount: document.getElementById("pageCountField"),
               pageSize: document.getElementById("pageSizeField"),
-              linearized: document.getElementById("linearizedField")
-            }
+              linearized: document.getElementById("linearizedField"),
+            },
           },
           errorWrapper: {
             container: document.getElementById("errorWrapper"),
@@ -286,11 +286,11 @@ const OPENED_PDF_FILES = {};
             closeButton: document.getElementById("errorClose"),
             errorMoreInfo: document.getElementById("errorMoreInfo"),
             moreInfoButton: document.getElementById("errorShowMore"),
-            lessInfoButton: document.getElementById("errorShowLess")
+            lessInfoButton: document.getElementById("errorShowLess"),
           },
           printContainer: document.getElementById("printContainer"),
           openFileInputName: "fileInput",
-          debuggerScriptPath: "./debugger.js"
+          debuggerScriptPath: "./debugger.js",
         };
       }
       function webViewerLoad() {
@@ -315,7 +315,7 @@ const OPENED_PDF_FILES = {};
       "use strict";
 
       Object.defineProperty(exports, "__esModule", {
-        value: true
+        value: true,
       });
       exports.PDFPrintServiceFactory = exports.DefaultExternalServices = exports.PDFViewerApplication = undefined;
 
@@ -467,8 +467,8 @@ const OPENED_PDF_FILES = {};
         supportsDocumentColors: true,
         supportedMouseWheelZoomModifierKeys: {
           ctrlKey: true,
-          metaKey: true
-        }
+          metaKey: true,
+        },
       };
       var PDFViewerApplication = {
         initialBookmark: document.location.hash.substring(1),
@@ -555,7 +555,7 @@ const OPENED_PDF_FILES = {};
 
                         this.l10n.translate(appContainer).then(function() {
                           _this.eventBus.dispatch("localized", {
-                            source: _this
+                            source: _this,
                           });
                         });
                         this.initialized = true;
@@ -591,7 +591,7 @@ const OPENED_PDF_FILES = {};
                           disableFontFace: true,
                           disableRange: true,
                           disableStream: true,
-                          textLayerMode: _ui_utils.TextLayerMode.DISABLE
+                          textLayerMode: _ui_utils.TextLayerMode.DISABLE,
                         };
                         _context2.prev = 1;
                         _context2.next = 4;
@@ -813,7 +813,7 @@ const OPENED_PDF_FILES = {};
                     switch ((_context4.prev = _context4.next)) {
                       case 0:
                         this.l10n = this.externalServices.createL10n({
-                          locale: _app_options.AppOptions.get("locale")
+                          locale: _app_options.AppOptions.get("locale"),
                         });
                         _context4.next = 3;
                         return this.l10n.getDirection();
@@ -882,7 +882,7 @@ const OPENED_PDF_FILES = {};
                           ),
                           externalLinkRel: _app_options.AppOptions.get(
                             "externalLinkRel"
-                          )
+                          ),
                         });
 
                         this.pdfLinkService = pdfLinkService;
@@ -890,7 +890,7 @@ const OPENED_PDF_FILES = {};
                           {
                             disableCreateObjectURL: _app_options.AppOptions.get(
                               "disableCreateObjectURL"
-                            )
+                            ),
                           }
                         );
 
@@ -898,7 +898,7 @@ const OPENED_PDF_FILES = {};
                         findController = new _pdf_find_controller.PDFFindController(
                           {
                             linkService: pdfLinkService,
-                            eventBus: eventBus
+                            eventBus: eventBus,
                           }
                         );
 
@@ -936,7 +936,7 @@ const OPENED_PDF_FILES = {};
                           ),
                           maxCanvasPixels: _app_options.AppOptions.get(
                             "maxCanvasPixels"
-                          )
+                          ),
                         });
                         pdfRenderingQueue.setViewer(this.pdfViewer);
                         pdfLinkService.setViewer(this.pdfViewer);
@@ -947,7 +947,7 @@ const OPENED_PDF_FILES = {};
                             container: thumbnailContainer,
                             renderingQueue: pdfRenderingQueue,
                             linkService: pdfLinkService,
-                            l10n: this.l10n
+                            l10n: this.l10n,
                           }
                         );
                         pdfRenderingQueue.setThumbnailViewer(
@@ -955,7 +955,7 @@ const OPENED_PDF_FILES = {};
                         );
                         this.pdfHistory = new _pdf_history.PDFHistory({
                           linkService: pdfLinkService,
-                          eventBus: eventBus
+                          eventBus: eventBus,
                         });
                         pdfLinkService.setHistory(this.pdfHistory);
                         this.findBar = new _pdf_find_bar.PDFFindBar(
@@ -975,7 +975,7 @@ const OPENED_PDF_FILES = {};
                             eventBus: eventBus,
                             cursorToolOnLoad: _app_options.AppOptions.get(
                               "cursorToolOnLoad"
-                            )
+                            ),
                           }
                         );
                         this.toolbar = new _toolbar.Toolbar(
@@ -995,7 +995,7 @@ const OPENED_PDF_FILES = {};
                               viewer: viewer,
                               pdfViewer: this.pdfViewer,
                               eventBus: eventBus,
-                              contextMenuItems: appConfig.fullscreen
+                              contextMenuItems: appConfig.fullscreen,
                             }
                           );
                         }
@@ -1008,14 +1008,14 @@ const OPENED_PDF_FILES = {};
                           {
                             container: appConfig.sidebar.outlineView,
                             eventBus: eventBus,
-                            linkService: pdfLinkService
+                            linkService: pdfLinkService,
                           }
                         );
                         this.pdfAttachmentViewer = new _pdf_attachment_viewer.PDFAttachmentViewer(
                           {
                             container: appConfig.sidebar.attachmentsView,
                             eventBus: eventBus,
-                            downloadManager: downloadManager
+                            downloadManager: downloadManager,
                           }
                         );
                         sidebarConfig = Object.create(appConfig.sidebar);
@@ -1269,7 +1269,7 @@ const OPENED_PDF_FILES = {};
                         );
                         console.log("****", token);
                         const header = {
-                          "x-auth-token": token
+                          "x-auth-token": token,
                         };
                         parameters.httpHeaders = header;
                         if (typeof file === "string") {
@@ -1424,10 +1424,10 @@ const OPENED_PDF_FILES = {};
               "error_version_info",
               {
                 version: _pdfjsLib.version || "?",
-                build: _pdfjsLib.build || "?"
+                build: _pdfjsLib.build || "?",
               },
               "PDF.js v{{version}} (build: {{build}})"
-            )
+            ),
           ];
           if (moreInfo) {
             moreInfoText.push(
@@ -1579,7 +1579,7 @@ const OPENED_PDF_FILES = {};
                 rotation: null,
                 sidebarView: _pdf_sidebar.SidebarView.NONE,
                 scrollMode: null,
-                spreadMode: null
+                spreadMode: null,
               })
               .catch(function() {});
             Promise.all([storePromise, pageModePromise])
@@ -1659,10 +1659,10 @@ const OPENED_PDF_FILES = {};
                                   rotation: rotation,
                                   sidebarView: sidebarView,
                                   scrollMode: scrollMode,
-                                  spreadMode: spreadMode
+                                  spreadMode: spreadMode,
                                 });
                                 _this5.eventBus.dispatch("documentinit", {
-                                  source: _this5
+                                  source: _this5,
                                 });
                                 if (!_this5.isViewerEmbedded) {
                                   pdfViewer.focus();
@@ -1675,7 +1675,7 @@ const OPENED_PDF_FILES = {};
                                       resolve,
                                       FORCE_PAGES_LOADED_TIMEOUT
                                     );
-                                  })
+                                  }),
                                 ]);
 
                               case 14:
@@ -2023,7 +2023,7 @@ const OPENED_PDF_FILES = {};
           _boundEvents.windowHashChange = function() {
             eventBus.dispatch("hashchange", {
               source: window,
-              hash: document.location.hash.substring(1)
+              hash: document.location.hash.substring(1),
             });
           };
           _boundEvents.windowBeforePrint = function() {
@@ -2120,14 +2120,14 @@ const OPENED_PDF_FILES = {};
           _boundEvents.windowHashChange = null;
           _boundEvents.windowBeforePrint = null;
           _boundEvents.windowAfterPrint = null;
-        }
+        },
       };
       var validateFileURL = void 0;
       {
         var HOSTED_VIEWER_ORIGINS = [
           "null",
           "http://mozilla.github.io",
-          "https://mozilla.github.io"
+          "https://mozilla.github.io",
         ];
         validateFileURL = function validateFileURL(file) {
           if (file === undefined) {
@@ -2157,7 +2157,7 @@ const OPENED_PDF_FILES = {};
               )
               .then(function(loadingErrorMessage) {
                 PDFViewerApplication.error(loadingErrorMessage, {
-                  message: message
+                  message: message,
                 });
               });
             throw ex;
@@ -2180,7 +2180,7 @@ const OPENED_PDF_FILES = {};
             PDFBug.init(
               {
                 OPS: _pdfjsLib.OPS,
-                createObjectURL: _pdfjsLib.createObjectURL
+                createObjectURL: _pdfjsLib.createObjectURL,
               },
               appConfig.mainContainer
             );
@@ -2224,7 +2224,7 @@ const OPENED_PDF_FILES = {};
           }
           PDFViewerApplication.eventBus.dispatch("fileinputchange", {
             source: this,
-            fileInput: evt.target
+            fileInput: evt.target,
           });
         });
         appConfig.mainContainer.addEventListener("dragover", function(evt) {
@@ -2239,7 +2239,7 @@ const OPENED_PDF_FILES = {};
           }
           PDFViewerApplication.eventBus.dispatch("fileinputchange", {
             source: this,
-            fileInput: evt.dataTransfer
+            fileInput: evt.dataTransfer,
           });
         });
         if (!PDFViewerApplication.supportsPrinting) {
@@ -2260,7 +2260,7 @@ const OPENED_PDF_FILES = {};
           function(evt) {
             if (evt.target === this) {
               PDFViewerApplication.eventBus.dispatch("resize", {
-                source: this
+                source: this,
               });
             }
           },
@@ -2402,7 +2402,7 @@ const OPENED_PDF_FILES = {};
               zoom: location.scale,
               scrollLeft: location.left,
               scrollTop: location.top,
-              rotation: location.rotation
+              rotation: location.rotation,
             })
             .catch(function() {});
         }
@@ -2477,7 +2477,7 @@ const OPENED_PDF_FILES = {};
             if (file.name) {
               _url = {
                 url: _url,
-                originalUrl: file.name
+                originalUrl: file.name,
               };
             }
             PDFViewerApplication.open(_url);
@@ -2582,7 +2582,7 @@ const OPENED_PDF_FILES = {};
           caseSensitive: evt.caseSensitive,
           entireWord: evt.entireWord,
           highlightAll: evt.highlightAll,
-          findPrevious: evt.findPrevious
+          findPrevious: evt.findPrevious,
         });
       }
       function webViewerFindFromUrlHash(evt) {
@@ -2592,7 +2592,7 @@ const OPENED_PDF_FILES = {};
           caseSensitive: false,
           entireWord: false,
           highlightAll: true,
-          findPrevious: false
+          findPrevious: false,
         });
       }
       function webViewerUpdateFindMatchesCount(_ref15) {
@@ -2615,7 +2615,7 @@ const OPENED_PDF_FILES = {};
           PDFViewerApplication.externalServices.updateFindControlState({
             result: state,
             findPrevious: previous,
-            matchesCount: matchesCount
+            matchesCount: matchesCount,
           });
         } else {
           PDFViewerApplication.findBar.updateUIState(
@@ -2722,7 +2722,6 @@ const OPENED_PDF_FILES = {};
 
         var orginal = `${SERVER_URL}/${PDF_ROUTER}?fileid=${fileId}&path=${hrefsublink}`;
         console.log("after---->", orginal);
-        
 
         if (evt.target.href) {
           var evthtml = evt.target.outerHTML;
@@ -2733,14 +2732,24 @@ const OPENED_PDF_FILES = {};
             href.indexOf("http") >= 0 ||
             href.indexOf("https") >= 0
           ) {
-            if(!OPENED_PDF_FILES[orginal]) {
+            var urlTokens = orginal.split("#");
+            var pdfUrl = urlTokens.length >=1 ? urlTokens[0] : urlTokens;
+            var hashUrl = urlTokens.length > 1 ? urlTokens[1] : "";
+            if (!OPENED_PDF_FILES[pdfUrl]) {
               var popupWindow = window.open(orginal, "_blank");
-              OPENED_PDF_FILES[orginal] = popupWindow;
+              OPENED_PDF_FILES[pdfUrl] = popupWindow;
               popupWindow.onbeforeunload = function() {
-                OPENED_PDF_FILES[orginal] = null;
-              }
+                OPENED_PDF_FILES[pdfUrl] = null;
+              };
+            } else {
+              var openedWindow = OPENED_PDF_FILES[pdfUrl];
+              openedWindow.focus();
+              var page = hashUrl.charAt(1);
+              page = Number(page) + 1;
+              openedWindow = openedWindow[1] || openedWindow[0];
+              openedWindow.PDFViewerApplication.toolbar.setPageNumber(page);
+              openedWindow.PDFViewerApplication.page = page;
             }
-            OPENED_PDF_FILES[orginal].focus();
             evt.preventDefault();
           }
         }
@@ -2791,7 +2800,7 @@ const OPENED_PDF_FILES = {};
                       caseSensitive: findState.caseSensitive,
                       entireWord: findState.entireWord,
                       highlightAll: findState.highlightAll,
-                      findPrevious: cmd === 5 || cmd === 12
+                      findPrevious: cmd === 5 || cmd === 12,
                     }
                   );
                 }
@@ -3043,8 +3052,8 @@ const OPENED_PDF_FILES = {};
           supportsPrinting: false,
           createPrintService: function createPrintService() {
             throw new Error("Not implemented: createPrintService");
-          }
-        }
+          },
+        },
       };
       exports.PDFViewerApplication = PDFViewerApplication;
       exports.DefaultExternalServices = DefaultExternalServices;
@@ -3138,12 +3147,12 @@ const OPENED_PDF_FILES = {};
             try {
               return {
                 type: "normal",
-                arg: fn.call(obj, arg)
+                arg: fn.call(obj, arg),
               };
             } catch (err) {
               return {
                 type: "throw",
-                arg: err
+                arg: err,
               };
             }
           }
@@ -3312,7 +3321,7 @@ const OPENED_PDF_FILES = {};
                   }
                   return {
                     value: record.arg,
-                    done: context.done
+                    done: context.done,
                   };
                 } else if (record.type === "throw") {
                   state = GenStateCompleted;
@@ -3450,7 +3459,7 @@ const OPENED_PDF_FILES = {};
           function doneResult() {
             return {
               value: undefined,
-              done: true
+              done: true,
             };
           }
           Context.prototype = {
@@ -3606,13 +3615,13 @@ const OPENED_PDF_FILES = {};
               this.delegate = {
                 iterator: values(iterable),
                 resultName: resultName,
-                nextLoc: nextLoc
+                nextLoc: nextLoc,
               };
               if (this.method === "next") {
                 this.arg = undefined;
               }
               return ContinueSentinel;
-            }
+            },
           };
         })(
           (function() {
@@ -3637,13 +3646,13 @@ const OPENED_PDF_FILES = {};
             enumerable: true,
             get: function get() {
               return module.l;
-            }
+            },
           });
           Object.defineProperty(module, "id", {
             enumerable: true,
             get: function get() {
               return module.i;
-            }
+            },
           });
           module.webpackPolyfill = 1;
         }
@@ -3657,7 +3666,7 @@ const OPENED_PDF_FILES = {};
       "use strict";
 
       Object.defineProperty(exports, "__esModule", {
-        value: true
+        value: true,
       });
       exports.moveToEndOfArray = exports.waitOnEventOrTimeout = exports.WaitOnType = exports.animationStarted = exports.normalizeWheelEventDelta = exports.binarySearchFirstItem = exports.watchScroll = exports.scrollIntoView = exports.getOutputScale = exports.approximateFraction = exports.getPageSizeInches = exports.roundToDivide = exports.getVisibleElements = exports.backtrackBeforeAllVisibleElements = exports.parseQueryString = exports.noContextMenuHandler = exports.getPDFFileNameFromURL = exports.ProgressBar = exports.EventBus = exports.NullL10n = exports.TextLayerMode = exports.RendererType = exports.PresentationModeState = exports.isPortraitOrientation = exports.isValidRotation = exports.VERTICAL_PADDING = exports.SCROLLBAR_PADDING = exports.MAX_AUTO_SCALE = exports.UNKNOWN_SCALE = exports.MAX_SCALE = exports.MIN_SCALE = exports.DEFAULT_SCALE = exports.DEFAULT_SCALE_VALUE = exports.CSS_UNITS = undefined;
 
@@ -3789,16 +3798,16 @@ const OPENED_PDF_FILES = {};
         UNKNOWN: 0,
         NORMAL: 1,
         CHANGING: 2,
-        FULLSCREEN: 3
+        FULLSCREEN: 3,
       };
       var RendererType = {
         CANVAS: "canvas",
-        SVG: "svg"
+        SVG: "svg",
       };
       var TextLayerMode = {
         DISABLE: 0,
         ENABLE: 1,
-        ENABLE_ENHANCE: 2
+        ENABLE_ENHANCE: 2,
       };
       function formatL10nValue(text, args) {
         if (!args) {
@@ -3926,7 +3935,7 @@ const OPENED_PDF_FILES = {};
           }
 
           return translate;
-        })()
+        })(),
       };
       function getOutputScale(ctx) {
         var devicePixelRatio = window.devicePixelRatio || 1;
@@ -3941,7 +3950,7 @@ const OPENED_PDF_FILES = {};
         return {
           sx: pixelRatio,
           sy: pixelRatio,
-          scaled: pixelRatio !== 1
+          scaled: pixelRatio !== 1,
         };
       }
       function scrollIntoView(element, spot) {
@@ -4014,7 +4023,7 @@ const OPENED_PDF_FILES = {};
           down: true,
           lastX: viewAreaElement.scrollLeft,
           lastY: viewAreaElement.scrollTop,
-          _eventHandler: debounceScroll
+          _eventHandler: debounceScroll,
         };
         var rAF = null;
         viewAreaElement.addEventListener("scroll", debounceScroll, true);
@@ -4109,7 +4118,7 @@ const OPENED_PDF_FILES = {};
         var height = ((y2 - y1) / 72) * userUnit;
         return {
           width: changeOrientation ? height : width,
-          height: changeOrientation ? width : height
+          height: changeOrientation ? width : height,
         };
       }
       function backtrackBeforeAllVisibleElements(index, views, top) {
@@ -4224,7 +4233,7 @@ const OPENED_PDF_FILES = {};
             x: currentWidth,
             y: currentHeight,
             view: view,
-            percent: percentVisible
+            percent: percentVisible,
           });
         }
         var first = visible[0];
@@ -4241,7 +4250,7 @@ const OPENED_PDF_FILES = {};
         return {
           first: first,
           last: last,
-          views: visible
+          views: visible,
         };
       }
       function noContextMenuHandler(evt) {
@@ -4317,7 +4326,7 @@ const OPENED_PDF_FILES = {};
       }
       var WaitOnType = {
         EVENT: "event",
-        TIMEOUT: "timeout"
+        TIMEOUT: "timeout",
       };
       function waitOnEventOrTimeout(_ref6) {
         var target = _ref6.target,
@@ -4385,7 +4394,7 @@ const OPENED_PDF_FILES = {};
                 this._listeners[eventName] = eventListeners;
               }
               eventListeners.push(listener);
-            }
+            },
           },
           {
             key: "off",
@@ -4399,7 +4408,7 @@ const OPENED_PDF_FILES = {};
                 return;
               }
               eventListeners.splice(i, 1);
-            }
+            },
           },
           {
             key: "dispatch",
@@ -4419,7 +4428,7 @@ const OPENED_PDF_FILES = {};
               if (this._dispatchToDOM) {
                 this._dispatchDOMEvent(eventName, args);
               }
-            }
+            },
           },
           {
             key: "_dispatchDOMEvent",
@@ -4449,8 +4458,8 @@ const OPENED_PDF_FILES = {};
               var event = document.createEvent("CustomEvent");
               event.initCustomEvent(eventName, true, true, details);
               document.dispatchEvent(event);
-            }
-          }
+            },
+          },
         ]);
 
         return EventBus;
@@ -4494,7 +4503,7 @@ const OPENED_PDF_FILES = {};
               this.div.classList.remove("indeterminate");
               var progressSize = (this.width * this._percent) / 100;
               this.div.style.width = progressSize + this.units;
-            }
+            },
           },
           {
             key: "setWidth",
@@ -4510,7 +4519,7 @@ const OPENED_PDF_FILES = {};
                   "width: calc(100% - " + scrollbarWidth + "px);"
                 );
               }
-            }
+            },
           },
           {
             key: "hide",
@@ -4521,7 +4530,7 @@ const OPENED_PDF_FILES = {};
               this.visible = false;
               this.bar.classList.add("hidden");
               document.body.classList.remove("loadingInProgress");
-            }
+            },
           },
           {
             key: "show",
@@ -4532,7 +4541,7 @@ const OPENED_PDF_FILES = {};
               this.visible = true;
               document.body.classList.add("loadingInProgress");
               this.bar.classList.remove("hidden");
-            }
+            },
           },
           {
             key: "percent",
@@ -4543,8 +4552,8 @@ const OPENED_PDF_FILES = {};
               this._indeterminate = isNaN(val);
               this._percent = clamp(val, 0, 100);
               this._updateBar();
-            }
-          }
+            },
+          },
         ]);
 
         return ProgressBar;
@@ -4622,7 +4631,7 @@ const OPENED_PDF_FILES = {};
       "use strict";
 
       Object.defineProperty(exports, "__esModule", {
-        value: true
+        value: true,
       });
       exports.PDFCursorTools = exports.CursorTool = undefined;
 
@@ -4654,7 +4663,7 @@ const OPENED_PDF_FILES = {};
       var CursorTool = {
         SELECT: 0,
         HAND: 1,
-        ZOOM: 2
+        ZOOM: 2,
       };
 
       var PDFCursorTools = (function() {
@@ -4676,7 +4685,7 @@ const OPENED_PDF_FILES = {};
           this.active = CursorTool.SELECT;
           this.activeBeforePresentationMode = null;
           this.handTool = new _grab_to_pan.GrabToPan({
-            element: this.container
+            element: this.container,
           });
           this._addEventListeners();
           Promise.resolve().then(function() {
@@ -4723,16 +4732,16 @@ const OPENED_PDF_FILES = {};
               }
               this.active = tool;
               this._dispatchEvent();
-            }
+            },
           },
           {
             key: "_dispatchEvent",
             value: function _dispatchEvent() {
               this.eventBus.dispatch("cursortoolchanged", {
                 source: this,
-                tool: this.active
+                tool: this.active,
               });
-            }
+            },
           },
           {
             key: "_addEventListeners",
@@ -4757,14 +4766,14 @@ const OPENED_PDF_FILES = {};
                   _this3.switchTool(previouslyActive);
                 }
               });
-            }
+            },
           },
           {
             key: "activeTool",
             get: function get() {
               return this.active;
-            }
-          }
+            },
+          },
         ]);
 
         return PDFCursorTools;
@@ -4780,7 +4789,7 @@ const OPENED_PDF_FILES = {};
       "use strict";
 
       Object.defineProperty(exports, "__esModule", {
-        value: true
+        value: true,
       });
       function GrabToPan(options) {
         this.element = options.element;
@@ -4876,7 +4885,7 @@ const OPENED_PDF_FILES = {};
             this.element.scrollTo({
               top: scrollTop,
               left: scrollLeft,
-              behavior: "instant"
+              behavior: "instant",
             });
           } else {
             this.element.scrollTop = scrollTop;
@@ -4895,7 +4904,7 @@ const OPENED_PDF_FILES = {};
           );
           this.document.removeEventListener("mouseup", this._endPan, true);
           this.overlay.remove();
-        }
+        },
       };
       var matchesSelector;
       ["webkitM", "mozM", "msM", "oM", "m"].some(function(prefix) {
@@ -4933,7 +4942,7 @@ const OPENED_PDF_FILES = {};
       "use strict";
 
       Object.defineProperty(exports, "__esModule", {
-        value: true
+        value: true,
       });
 
       var _createClass = (function() {
@@ -4964,7 +4973,7 @@ const OPENED_PDF_FILES = {};
         INITIAL: 0,
         RUNNING: 1,
         PAUSED: 2,
-        FINISHED: 3
+        FINISHED: 3,
       };
 
       var PDFRenderingQueue = (function() {
@@ -4985,19 +4994,19 @@ const OPENED_PDF_FILES = {};
             key: "setViewer",
             value: function setViewer(pdfViewer) {
               this.pdfViewer = pdfViewer;
-            }
+            },
           },
           {
             key: "setThumbnailViewer",
             value: function setThumbnailViewer(pdfThumbnailViewer) {
               this.pdfThumbnailViewer = pdfThumbnailViewer;
-            }
+            },
           },
           {
             key: "isHighestPriority",
             value: function isHighestPriority(view) {
               return this.highestPriorityPage === view.renderingId;
-            }
+            },
           },
           {
             key: "renderHighestPriority",
@@ -5023,7 +5032,7 @@ const OPENED_PDF_FILES = {};
                   CLEANUP_TIMEOUT
                 );
               }
-            }
+            },
           },
           {
             key: "getHighestPriority",
@@ -5057,13 +5066,13 @@ const OPENED_PDF_FILES = {};
                 }
               }
               return null;
-            }
+            },
           },
           {
             key: "isViewFinished",
             value: function isViewFinished(view) {
               return view.renderingState === RenderingStates.FINISHED;
-            }
+            },
           },
           {
             key: "renderView",
@@ -5089,8 +5098,8 @@ const OPENED_PDF_FILES = {};
                   break;
               }
               return true;
-            }
-          }
+            },
+          },
         ]);
 
         return PDFRenderingQueue;
@@ -5106,7 +5115,7 @@ const OPENED_PDF_FILES = {};
       "use strict";
 
       Object.defineProperty(exports, "__esModule", {
-        value: true
+        value: true,
       });
       exports.PDFSidebar = exports.SidebarView = undefined;
 
@@ -5142,7 +5151,7 @@ const OPENED_PDF_FILES = {};
         NONE: 0,
         THUMBS: 1,
         OUTLINE: 2,
-        ATTACHMENTS: 3
+        ATTACHMENTS: 3,
       };
 
       var PDFSidebar = (function() {
@@ -5184,7 +5193,7 @@ const OPENED_PDF_FILES = {};
               this.switchView(SidebarView.THUMBS);
               this.outlineButton.disabled = false;
               this.attachmentsButton.disabled = false;
-            }
+            },
           },
           {
             key: "setInitialView",
@@ -5207,7 +5216,7 @@ const OPENED_PDF_FILES = {};
               if (isViewPreserved) {
                 this._dispatchEvent();
               }
-            }
+            },
           },
           {
             key: "switchView",
@@ -5278,7 +5287,7 @@ const OPENED_PDF_FILES = {};
                 this._dispatchEvent();
               }
               this._hideUINotification(this.active);
-            }
+            },
           },
           {
             key: "open",
@@ -5296,7 +5305,7 @@ const OPENED_PDF_FILES = {};
               this._forceRendering();
               this._dispatchEvent();
               this._hideUINotification(this.active);
-            }
+            },
           },
           {
             key: "close",
@@ -5310,7 +5319,7 @@ const OPENED_PDF_FILES = {};
               this.outerContainer.classList.remove("sidebarOpen");
               this._forceRendering();
               this._dispatchEvent();
-            }
+            },
           },
           {
             key: "toggle",
@@ -5320,16 +5329,16 @@ const OPENED_PDF_FILES = {};
               } else {
                 this.open();
               }
-            }
+            },
           },
           {
             key: "_dispatchEvent",
             value: function _dispatchEvent() {
               this.eventBus.dispatch("sidebarviewchanged", {
                 source: this,
-                view: this.visibleView
+                view: this.visibleView,
               });
-            }
+            },
           },
           {
             key: "_forceRendering",
@@ -5340,7 +5349,7 @@ const OPENED_PDF_FILES = {};
                 this.pdfViewer.forceRendering();
                 this.pdfThumbnailViewer.forceRendering();
               }
-            }
+            },
           },
           {
             key: "_updateThumbnailViewer",
@@ -5365,7 +5374,7 @@ const OPENED_PDF_FILES = {};
               pdfThumbnailViewer.scrollThumbnailIntoView(
                 pdfViewer.currentPageNumber
               );
-            }
+            },
           },
           {
             key: "_showUINotification",
@@ -5397,7 +5406,7 @@ const OPENED_PDF_FILES = {};
                   this.attachmentsButton.classList.add(UI_NOTIFICATION_CLASS);
                   break;
               }
-            }
+            },
           },
           {
             key: "_hideUINotification",
@@ -5437,7 +5446,7 @@ const OPENED_PDF_FILES = {};
                 .then(function(msg) {
                   _this2.toggleButton.title = msg;
                 });
-            }
+            },
           },
           {
             key: "_addEventListeners",
@@ -5459,7 +5468,7 @@ const OPENED_PDF_FILES = {};
               });
               this.outlineButton.addEventListener("dblclick", function() {
                 _this3.eventBus.dispatch("toggleoutlinetree", {
-                  source: _this3
+                  source: _this3,
                 });
               });
               this.attachmentsButton.addEventListener("click", function() {
@@ -5499,32 +5508,32 @@ const OPENED_PDF_FILES = {};
                   _this3._updateThumbnailViewer();
                 }
               });
-            }
+            },
           },
           {
             key: "visibleView",
             get: function get() {
               return this.isOpen ? this.active : SidebarView.NONE;
-            }
+            },
           },
           {
             key: "isThumbnailViewVisible",
             get: function get() {
               return this.isOpen && this.active === SidebarView.THUMBS;
-            }
+            },
           },
           {
             key: "isOutlineViewVisible",
             get: function get() {
               return this.isOpen && this.active === SidebarView.OUTLINE;
-            }
+            },
           },
           {
             key: "isAttachmentsViewVisible",
             get: function get() {
               return this.isOpen && this.active === SidebarView.ATTACHMENTS;
-            }
-          }
+            },
+          },
         ]);
 
         return PDFSidebar;
@@ -5540,7 +5549,7 @@ const OPENED_PDF_FILES = {};
       "use strict";
 
       Object.defineProperty(exports, "__esModule", {
-        value: true
+        value: true,
       });
       exports.OptionKind = exports.AppOptions = undefined;
 
@@ -5574,162 +5583,162 @@ const OPENED_PDF_FILES = {};
       var OptionKind = {
         VIEWER: "viewer",
         API: "api",
-        WORKER: "worker"
+        WORKER: "worker",
       };
       var defaultOptions = {
         cursorToolOnLoad: {
           value: 0,
-          kind: OptionKind.VIEWER
+          kind: OptionKind.VIEWER,
         },
         defaultUrl: {
           value: "",
-          kind: OptionKind.VIEWER
+          kind: OptionKind.VIEWER,
         },
         defaultZoomValue: {
           value: "",
-          kind: OptionKind.VIEWER
+          kind: OptionKind.VIEWER,
         },
         disableHistory: {
           value: false,
-          kind: OptionKind.VIEWER
+          kind: OptionKind.VIEWER,
         },
         disablePageLabels: {
           value: false,
-          kind: OptionKind.VIEWER
+          kind: OptionKind.VIEWER,
         },
         disablePageMode: {
           value: false,
-          kind: OptionKind.VIEWER
+          kind: OptionKind.VIEWER,
         },
         enablePrintAutoRotate: {
           value: false,
-          kind: OptionKind.VIEWER
+          kind: OptionKind.VIEWER,
         },
         enableWebGL: {
           value: false,
-          kind: OptionKind.VIEWER
+          kind: OptionKind.VIEWER,
         },
         eventBusDispatchToDOM: {
           value: false,
-          kind: OptionKind.VIEWER
+          kind: OptionKind.VIEWER,
         },
         externalLinkRel: {
           value: "noopener noreferrer nofollow",
-          kind: OptionKind.VIEWER
+          kind: OptionKind.VIEWER,
         },
         externalLinkTarget: {
           value: 0,
-          kind: OptionKind.VIEWER
+          kind: OptionKind.VIEWER,
         },
         imageResourcesPath: {
           value: "./images/",
-          kind: OptionKind.VIEWER
+          kind: OptionKind.VIEWER,
         },
         maxCanvasPixels: {
           value:
             _viewer_compatibility.viewerCompatibilityParams.maxCanvasPixels ||
             16777216,
-          kind: OptionKind.VIEWER
+          kind: OptionKind.VIEWER,
         },
         pdfBugEnabled: {
           value: false,
-          kind: OptionKind.VIEWER
+          kind: OptionKind.VIEWER,
         },
         renderer: {
           value: "canvas",
-          kind: OptionKind.VIEWER
+          kind: OptionKind.VIEWER,
         },
         renderInteractiveForms: {
           value: false,
-          kind: OptionKind.VIEWER
+          kind: OptionKind.VIEWER,
         },
         showPreviousViewOnLoad: {
           value: true,
-          kind: OptionKind.VIEWER
+          kind: OptionKind.VIEWER,
         },
         sidebarViewOnLoad: {
           value: 0,
-          kind: OptionKind.VIEWER
+          kind: OptionKind.VIEWER,
         },
         scrollModeOnLoad: {
           value: 0,
-          kind: OptionKind.VIEWER
+          kind: OptionKind.VIEWER,
         },
         spreadModeOnLoad: {
           value: 0,
-          kind: OptionKind.VIEWER
+          kind: OptionKind.VIEWER,
         },
         textLayerMode: {
           value: 1,
-          kind: OptionKind.VIEWER
+          kind: OptionKind.VIEWER,
         },
         useOnlyCssZoom: {
           value: false,
-          kind: OptionKind.VIEWER
+          kind: OptionKind.VIEWER,
         },
         cMapPacked: {
           value: true,
-          kind: OptionKind.API
+          kind: OptionKind.API,
         },
         cMapUrl: {
           value: "../web/cmaps/",
-          kind: OptionKind.API
+          kind: OptionKind.API,
         },
         disableAutoFetch: {
           value: true,
-          kind: OptionKind.API
+          kind: OptionKind.API,
         },
         disableCreateObjectURL: {
           value:
             _pdfjsLib.apiCompatibilityParams.disableCreateObjectURL || false,
-          kind: OptionKind.API
+          kind: OptionKind.API,
         },
         disableFontFace: {
           value: false,
-          kind: OptionKind.API
+          kind: OptionKind.API,
         },
         disableRange: {
           value: false,
-          kind: OptionKind.API
+          kind: OptionKind.API,
         },
         disableStream: {
           value: true,
-          kind: OptionKind.API
+          kind: OptionKind.API,
         },
         isEvalSupported: {
           value: true,
-          kind: OptionKind.API
+          kind: OptionKind.API,
         },
         maxImageSize: {
           value: -1,
-          kind: OptionKind.API
+          kind: OptionKind.API,
         },
         pdfBug: {
           value: false,
-          kind: OptionKind.API
+          kind: OptionKind.API,
         },
         postMessageTransfers: {
           value: true,
-          kind: OptionKind.API
+          kind: OptionKind.API,
         },
         verbosity: {
           value: 1,
-          kind: OptionKind.API
+          kind: OptionKind.API,
         },
         workerPort: {
           value: null,
-          kind: OptionKind.WORKER
+          kind: OptionKind.WORKER,
         },
         workerSrc: {
           value: "../build/pdf.worker.js",
-          kind: OptionKind.WORKER
-        }
+          kind: OptionKind.WORKER,
+        },
       };
       {
         defaultOptions.locale = {
           value:
             typeof navigator !== "undefined" ? navigator.language : "en-US",
-          kind: OptionKind.VIEWER
+          kind: OptionKind.VIEWER,
         };
       }
       var userOptions = Object.create(null);
@@ -5753,7 +5762,7 @@ const OPENED_PDF_FILES = {};
               return defaultOption !== undefined
                 ? defaultOption.value
                 : undefined;
-            }
+            },
           },
           {
             key: "getAll",
@@ -5774,20 +5783,20 @@ const OPENED_PDF_FILES = {};
                   userOption !== undefined ? userOption : defaultOption.value;
               }
               return options;
-            }
+            },
           },
           {
             key: "set",
             value: function set(name, value) {
               userOptions[name] = value;
-            }
+            },
           },
           {
             key: "remove",
             value: function remove(name) {
               delete userOptions[name];
-            }
-          }
+            },
+          },
         ]);
 
         return AppOptions;
@@ -5823,7 +5832,7 @@ const OPENED_PDF_FILES = {};
       "use strict";
 
       Object.defineProperty(exports, "__esModule", {
-        value: true
+        value: true,
       });
       exports.getGlobalEventBus = exports.attachDOMEventsToEventBus = undefined;
 
@@ -5839,14 +5848,14 @@ const OPENED_PDF_FILES = {};
           var event = document.createEvent("CustomEvent");
           event.initCustomEvent("pagerendered", true, true, {
             pageNumber: evt.pageNumber,
-            cssTransform: evt.cssTransform
+            cssTransform: evt.cssTransform,
           });
           evt.source.div.dispatchEvent(event);
         });
         eventBus.on("textlayerrendered", function(evt) {
           var event = document.createEvent("CustomEvent");
           event.initCustomEvent("textlayerrendered", true, true, {
-            pageNumber: evt.pageNumber
+            pageNumber: evt.pageNumber,
           });
           evt.source.textLayerDiv.dispatchEvent(event);
         });
@@ -5864,7 +5873,7 @@ const OPENED_PDF_FILES = {};
         eventBus.on("pagesloaded", function(evt) {
           var event = document.createEvent("CustomEvent");
           event.initCustomEvent("pagesloaded", true, true, {
-            pagesCount: evt.pagesCount
+            pagesCount: evt.pagesCount,
           });
           evt.source.container.dispatchEvent(event);
         });
@@ -5891,21 +5900,21 @@ const OPENED_PDF_FILES = {};
             phraseSearch: evt.phraseSearch,
             caseSensitive: evt.caseSensitive,
             highlightAll: evt.highlightAll,
-            findPrevious: evt.findPrevious
+            findPrevious: evt.findPrevious,
           });
           window.dispatchEvent(event);
         });
         eventBus.on("attachmentsloaded", function(evt) {
           var event = document.createEvent("CustomEvent");
           event.initCustomEvent("attachmentsloaded", true, true, {
-            attachmentsCount: evt.attachmentsCount
+            attachmentsCount: evt.attachmentsCount,
           });
           evt.source.container.dispatchEvent(event);
         });
         eventBus.on("sidebarviewchanged", function(evt) {
           var event = document.createEvent("CustomEvent");
           event.initCustomEvent("sidebarviewchanged", true, true, {
-            view: evt.view
+            view: evt.view,
           });
           evt.source.outerContainer.dispatchEvent(event);
         });
@@ -5917,7 +5926,7 @@ const OPENED_PDF_FILES = {};
         eventBus.on("namedaction", function(evt) {
           var event = document.createEvent("CustomEvent");
           event.initCustomEvent("namedaction", true, true, {
-            action: evt.action
+            action: evt.action,
           });
           evt.source.pdfViewer.container.dispatchEvent(event);
         });
@@ -5925,14 +5934,14 @@ const OPENED_PDF_FILES = {};
           var event = document.createEvent("CustomEvent");
           event.initCustomEvent("presentationmodechanged", true, true, {
             active: evt.active,
-            switchInProgress: evt.switchInProgress
+            switchInProgress: evt.switchInProgress,
           });
           window.dispatchEvent(event);
         });
         eventBus.on("outlineloaded", function(evt) {
           var event = document.createEvent("CustomEvent");
           event.initCustomEvent("outlineloaded", true, true, {
-            outlineCount: evt.outlineCount
+            outlineCount: evt.outlineCount,
           });
           evt.source.container.dispatchEvent(event);
         });
@@ -5946,7 +5955,7 @@ const OPENED_PDF_FILES = {};
 
         if (!globalEventBus) {
           globalEventBus = new _ui_utils.EventBus({
-            dispatchToDOM: dispatchToDOM
+            dispatchToDOM: dispatchToDOM,
           });
           if (!dispatchToDOM) {
             attachDOMEventsToEventBus(globalEventBus);
@@ -5964,7 +5973,7 @@ const OPENED_PDF_FILES = {};
       "use strict";
 
       Object.defineProperty(exports, "__esModule", {
-        value: true
+        value: true,
       });
       exports.OverlayManager = undefined;
 
@@ -6091,7 +6100,7 @@ const OPENED_PDF_FILES = {};
                               element: element,
                               container: container,
                               callerCloseMethod: callerCloseMethod,
-                              canForceClose: canForceClose
+                              canForceClose: canForceClose,
                             };
 
                           case 8:
@@ -6111,7 +6120,7 @@ const OPENED_PDF_FILES = {};
               }
 
               return register;
-            })()
+            })(),
           },
           {
             key: "unregister",
@@ -6162,7 +6171,7 @@ const OPENED_PDF_FILES = {};
               }
 
               return unregister;
-            })()
+            })(),
           },
           {
             key: "open",
@@ -6241,7 +6250,7 @@ const OPENED_PDF_FILES = {};
               }
 
               return open;
-            })()
+            })(),
           },
           {
             key: "close",
@@ -6312,7 +6321,7 @@ const OPENED_PDF_FILES = {};
               }
 
               return close;
-            })()
+            })(),
           },
           {
             key: "_keyDown",
@@ -6321,7 +6330,7 @@ const OPENED_PDF_FILES = {};
                 this._closeThroughCaller();
                 evt.preventDefault();
               }
-            }
+            },
           },
           {
             key: "_closeThroughCaller",
@@ -6332,14 +6341,14 @@ const OPENED_PDF_FILES = {};
               if (this._active) {
                 this.close(this._active);
               }
-            }
+            },
           },
           {
             key: "active",
             get: function get() {
               return this._active;
-            }
-          }
+            },
+          },
         ]);
 
         return OverlayManager;
@@ -6354,7 +6363,7 @@ const OPENED_PDF_FILES = {};
       "use strict";
 
       Object.defineProperty(exports, "__esModule", {
-        value: true
+        value: true,
       });
       exports.PasswordPrompt = undefined;
 
@@ -6450,7 +6459,7 @@ const OPENED_PDF_FILES = {};
                   _this2.label.textContent = msg;
                 });
               });
-            }
+            },
           },
           {
             key: "close",
@@ -6460,7 +6469,7 @@ const OPENED_PDF_FILES = {};
               this.overlayManager.close(this.overlayName).then(function() {
                 _this3.input.value = "";
               });
-            }
+            },
           },
           {
             key: "verify",
@@ -6470,15 +6479,15 @@ const OPENED_PDF_FILES = {};
                 this.close();
                 return this.updateCallback(password);
               }
-            }
+            },
           },
           {
             key: "setUpdateCallback",
             value: function setUpdateCallback(updateCallback, reason) {
               this.updateCallback = updateCallback;
               this.reason = reason;
-            }
-          }
+            },
+          },
         ]);
 
         return PasswordPrompt;
@@ -6493,7 +6502,7 @@ const OPENED_PDF_FILES = {};
       "use strict";
 
       Object.defineProperty(exports, "__esModule", {
-        value: true
+        value: true,
       });
       exports.PDFAttachmentViewer = undefined;
 
@@ -6555,7 +6564,7 @@ const OPENED_PDF_FILES = {};
                 this._renderedCapability = (0,
                 _pdfjsLib.createPromiseCapability)();
               }
-            }
+            },
           },
           {
             key: "_dispatchEvent",
@@ -6563,9 +6572,9 @@ const OPENED_PDF_FILES = {};
               this._renderedCapability.resolve();
               this.eventBus.dispatch("attachmentsloaded", {
                 source: this,
-                attachmentsCount: attachmentsCount
+                attachmentsCount: attachmentsCount,
               });
-            }
+            },
           },
           {
             key: "_bindPdfLink",
@@ -6589,7 +6598,7 @@ const OPENED_PDF_FILES = {};
                 window.open(viewerUrl);
                 return false;
               };
-            }
+            },
           },
           {
             key: "_bindLink",
@@ -6600,7 +6609,7 @@ const OPENED_PDF_FILES = {};
                 _this.downloadManager.downloadData(content, filename, "");
                 return false;
               };
-            }
+            },
           },
           {
             key: "render",
@@ -6646,7 +6655,7 @@ const OPENED_PDF_FILES = {};
                 this.container.appendChild(div);
               }
               this._dispatchEvent(attachmentsCount);
-            }
+            },
           },
           {
             key: "_appendAttachment",
@@ -6670,15 +6679,15 @@ const OPENED_PDF_FILES = {};
                 }
                 attachments[id] = {
                   filename: filename,
-                  content: content
+                  content: content,
                 };
                 _this2.render({
                   attachments: attachments,
-                  keepRenderedCapability: true
+                  keepRenderedCapability: true,
                 });
               });
-            }
-          }
+            },
+          },
         ]);
 
         return PDFAttachmentViewer;
@@ -6693,7 +6702,7 @@ const OPENED_PDF_FILES = {};
       "use strict";
 
       Object.defineProperty(exports, "__esModule", {
-        value: true
+        value: true,
       });
       exports.PDFDocumentProperties = undefined;
 
@@ -6768,11 +6777,11 @@ const OPENED_PDF_FILES = {};
       var NON_METRIC_LOCALES = ["en-us", "en-lr", "my"];
       var US_PAGE_NAMES = {
         "8.5x11": "Letter",
-        "8.5x14": "Legal"
+        "8.5x14": "Legal",
       };
       var METRIC_PAGE_NAMES = {
         "297x420": "A3",
-        "210x297": "A4"
+        "210x297": "A4",
       };
       function getPageName(size, isPortrait, pageNames) {
         var width = isPortrait ? size.width : size.height;
@@ -6835,12 +6844,12 @@ const OPENED_PDF_FILES = {};
                   value: Object.freeze(data),
                   writable: false,
                   enumerable: true,
-                  configurable: true
+                  configurable: true,
                 });
               };
               Promise.all([
                 this.overlayManager.open(this.overlayName),
-                this._dataAvailableCapability.promise
+                this._dataAvailableCapability.promise,
               ]).then(function() {
                 var currentPageNumber = _this2._currentPageNumber;
                 var pagesRotation = _this2._pagesRotation;
@@ -6877,7 +6886,7 @@ const OPENED_PDF_FILES = {};
                             pagesRotation
                           );
                         }),
-                      _this2._parseLinearization(info.IsLinearized)
+                      _this2._parseLinearization(info.IsLinearized),
                     ]);
                   })
                   .then(function(_ref3) {
@@ -6907,7 +6916,7 @@ const OPENED_PDF_FILES = {};
                       pageSize: pageSize,
                       linearized: isLinearized,
                       _currentPageNumber: currentPageNumber,
-                      _pagesRotation: pagesRotation
+                      _pagesRotation: pagesRotation,
                     });
                     _this2._updateUI();
                     return _this2.pdfDocument.getDownloadInfo();
@@ -6931,13 +6940,13 @@ const OPENED_PDF_FILES = {};
                     _this2._updateUI();
                   });
               });
-            }
+            },
           },
           {
             key: "close",
             value: function close() {
               this.overlayManager.close(this.overlayName);
-            }
+            },
           },
           {
             key: "setDocument",
@@ -6957,7 +6966,7 @@ const OPENED_PDF_FILES = {};
               this.pdfDocument = pdfDocument;
               this.url = url;
               this._dataAvailableCapability.resolve();
-            }
+            },
           },
           {
             key: "setFileSize",
@@ -6965,7 +6974,7 @@ const OPENED_PDF_FILES = {};
               if (Number.isInteger(fileSize) && fileSize > 0) {
                 this.maybeFileSize = fileSize;
               }
-            }
+            },
           },
           {
             key: "_reset",
@@ -6978,7 +6987,7 @@ const OPENED_PDF_FILES = {};
               _pdfjsLib.createPromiseCapability)();
               this._currentPageNumber = 1;
               this._pagesRotation = 0;
-            }
+            },
           },
           {
             key: "_updateUI",
@@ -7002,7 +7011,7 @@ const OPENED_PDF_FILES = {};
                 this.fields[_id].textContent =
                   content || content === 0 ? content : DEFAULT_FIELD_CONTENT;
               }
-            }
+            },
           },
           {
             key: "_parseFileSize",
@@ -7020,7 +7029,7 @@ const OPENED_PDF_FILES = {};
                   "document_properties_kb",
                   {
                     size_kb: (+kb.toPrecision(3)).toLocaleString(),
-                    size_b: fileSize.toLocaleString()
+                    size_b: fileSize.toLocaleString(),
                   },
                   "{{size_kb}} KB ({{size_b}} bytes)"
                 );
@@ -7029,11 +7038,11 @@ const OPENED_PDF_FILES = {};
                 "document_properties_mb",
                 {
                   size_mb: (+(kb / 1024).toPrecision(3)).toLocaleString(),
-                  size_b: fileSize.toLocaleString()
+                  size_b: fileSize.toLocaleString(),
                 },
                 "{{size_mb}} MB ({{size_b}} bytes)"
               );
-            }
+            },
           },
           {
             key: "_parsePageSize",
@@ -7046,7 +7055,7 @@ const OPENED_PDF_FILES = {};
               if (pagesRotation % 180 !== 0) {
                 pageSizeInches = {
                   width: pageSizeInches.height,
-                  height: pageSizeInches.width
+                  height: pageSizeInches.width,
                 };
               }
               var isPortrait = (0, _ui_utils.isPortraitOrientation)(
@@ -7054,11 +7063,11 @@ const OPENED_PDF_FILES = {};
               );
               var sizeInches = {
                 width: Math.round(pageSizeInches.width * 100) / 100,
-                height: Math.round(pageSizeInches.height * 100) / 100
+                height: Math.round(pageSizeInches.height * 100) / 100,
               };
               var sizeMillimeters = {
                 width: Math.round(pageSizeInches.width * 25.4 * 10) / 10,
-                height: Math.round(pageSizeInches.height * 25.4 * 10) / 10
+                height: Math.round(pageSizeInches.height * 25.4 * 10) / 10,
               };
               var pageName = null;
               var name =
@@ -7073,11 +7082,11 @@ const OPENED_PDF_FILES = {};
               ) {
                 var exactMillimeters = {
                   width: pageSizeInches.width * 25.4,
-                  height: pageSizeInches.height * 25.4
+                  height: pageSizeInches.height * 25.4,
                 };
                 var intMillimeters = {
                   width: Math.round(sizeMillimeters.width),
-                  height: Math.round(sizeMillimeters.height)
+                  height: Math.round(sizeMillimeters.height),
                 };
                 if (
                   Math.abs(exactMillimeters.width - intMillimeters.width) <
@@ -7095,7 +7104,7 @@ const OPENED_PDF_FILES = {};
                       width:
                         Math.round((intMillimeters.width / 25.4) * 100) / 100,
                       height:
-                        Math.round((intMillimeters.height / 25.4) * 100) / 100
+                        Math.round((intMillimeters.height / 25.4) * 100) / 100,
                     };
                     sizeMillimeters = intMillimeters;
                   }
@@ -7122,7 +7131,7 @@ const OPENED_PDF_FILES = {};
                     (isPortrait ? "portrait" : "landscape"),
                   null,
                   isPortrait ? "portrait" : "landscape"
-                )
+                ),
               ]).then(function(_ref6) {
                 var _ref7 = _slicedToArray(_ref6, 4),
                   _ref7$ = _ref7[0],
@@ -7141,14 +7150,14 @@ const OPENED_PDF_FILES = {};
                     height: height.toLocaleString(),
                     unit: unit,
                     name: name,
-                    orientation: orientation
+                    orientation: orientation,
                   },
                   "{{width}} × {{height}} {{unit}} (" +
                     (name ? "{{name}}, " : "") +
                     "{{orientation}})"
                 );
               });
-            }
+            },
           },
           {
             key: "_parseDate",
@@ -7185,11 +7194,11 @@ const OPENED_PDF_FILES = {};
                 "document_properties_date_string",
                 {
                   date: dateString,
-                  time: timeString
+                  time: timeString,
                 },
                 "{{date}}, {{time}}"
               );
-            }
+            },
           },
           {
             key: "_parseLinearization",
@@ -7200,8 +7209,8 @@ const OPENED_PDF_FILES = {};
                 null,
                 isLinearized ? "Yes" : "No"
               );
-            }
-          }
+            },
+          },
         ]);
 
         return PDFDocumentProperties;
@@ -7216,7 +7225,7 @@ const OPENED_PDF_FILES = {};
       "use strict";
 
       Object.defineProperty(exports, "__esModule", {
-        value: true
+        value: true,
       });
       exports.PDFFindBar = undefined;
 
@@ -7318,7 +7327,7 @@ const OPENED_PDF_FILES = {};
             key: "reset",
             value: function reset() {
               this.updateUIState();
-            }
+            },
           },
           {
             key: "dispatchEvent",
@@ -7331,9 +7340,9 @@ const OPENED_PDF_FILES = {};
                 caseSensitive: this.caseSensitive.checked,
                 entireWord: this.entireWord.checked,
                 highlightAll: this.highlightAll.checked,
-                findPrevious: findPrev
+                findPrevious: findPrev,
               });
-            }
+            },
           },
           {
             key: "updateUIState",
@@ -7380,7 +7389,7 @@ const OPENED_PDF_FILES = {};
                 _this2._adjustWidth();
               });
               this.updateResultsCount(matchesCount);
-            }
+            },
           },
           {
             key: "updateResultsCount",
@@ -7413,7 +7422,7 @@ const OPENED_PDF_FILES = {};
                     "find_match_count",
                     {
                       current: current,
-                      total: total
+                      total: total,
                     },
                     "{{current}} of {{total}} match" + (total !== 1 ? "es" : "")
                   );
@@ -7426,7 +7435,7 @@ const OPENED_PDF_FILES = {};
                 );
                 _this3._adjustWidth();
               });
-            }
+            },
           },
           {
             key: "open",
@@ -7439,7 +7448,7 @@ const OPENED_PDF_FILES = {};
               this.findField.select();
               this.findField.focus();
               this._adjustWidth();
-            }
+            },
           },
           {
             key: "close",
@@ -7451,7 +7460,7 @@ const OPENED_PDF_FILES = {};
               this.toggleButton.classList.remove("toggled");
               this.bar.classList.add("hidden");
               this.eventBus.dispatch("findbarclose", { source: this });
-            }
+            },
           },
           {
             key: "toggle",
@@ -7461,7 +7470,7 @@ const OPENED_PDF_FILES = {};
               } else {
                 this.open();
               }
-            }
+            },
           },
           {
             key: "_adjustWidth",
@@ -7476,8 +7485,8 @@ const OPENED_PDF_FILES = {};
               if (findbarHeight > inputContainerHeight) {
                 this.bar.classList.add("wrapContainers");
               }
-            }
-          }
+            },
+          },
         ]);
 
         return PDFFindBar;
@@ -7492,7 +7501,7 @@ const OPENED_PDF_FILES = {};
       "use strict";
 
       Object.defineProperty(exports, "__esModule", {
-        value: true
+        value: true,
       });
       exports.PDFFindController = exports.FindState = undefined;
 
@@ -7529,7 +7538,7 @@ const OPENED_PDF_FILES = {};
         FOUND: 0,
         NOT_FOUND: 1,
         WRAPPED: 2,
-        PENDING: 3
+        PENDING: 3,
       };
       var FIND_TIMEOUT = 250;
       var CHARACTERS_TO_NORMALIZE = {
@@ -7543,7 +7552,7 @@ const OPENED_PDF_FILES = {};
         "\u201F": '"',
         "\xBC": "1/4",
         "\xBD": "1/2",
-        "\xBE": "3/4"
+        "\xBE": "3/4",
       };
 
       var PDFFindController = (function() {
@@ -7577,7 +7586,7 @@ const OPENED_PDF_FILES = {};
               }
               this._pdfDocument = pdfDocument;
               this._firstPageCapability.resolve();
-            }
+            },
           },
           {
             key: "executeCommand",
@@ -7611,7 +7620,7 @@ const OPENED_PDF_FILES = {};
                   _this._nextMatch();
                 }
               });
-            }
+            },
           },
           {
             key: "_reset",
@@ -7623,11 +7632,11 @@ const OPENED_PDF_FILES = {};
               this._state = null;
               this._selected = {
                 pageIdx: -1,
-                matchIdx: -1
+                matchIdx: -1,
               };
               this._offset = {
                 pageIdx: null,
-                matchIdx: null
+                matchIdx: null,
               };
               this._extractTextPromises = [];
               this._pageContents = [];
@@ -7640,7 +7649,7 @@ const OPENED_PDF_FILES = {};
               this._findTimeout = null;
               this._firstPageCapability = (0,
               _pdfjsLib.createPromiseCapability)();
-            }
+            },
           },
           {
             key: "_normalize",
@@ -7648,7 +7657,7 @@ const OPENED_PDF_FILES = {};
               return text.replace(this._normalizationRegex, function(ch) {
                 return CHARACTERS_TO_NORMALIZE[ch];
               });
-            }
+            },
           },
           {
             key: "_prepareMatches",
@@ -7700,7 +7709,7 @@ const OPENED_PDF_FILES = {};
                 matches.push(matchesWithLength[i].match);
                 matchesLength.push(matchesWithLength[i].matchLength);
               }
-            }
+            },
           },
           {
             key: "_isEntireWord",
@@ -7727,7 +7736,7 @@ const OPENED_PDF_FILES = {};
                 }
               }
               return true;
-            }
+            },
           },
           {
             key: "_calculatePhraseMatch",
@@ -7754,7 +7763,7 @@ const OPENED_PDF_FILES = {};
                 matches.push(matchIdx);
               }
               this._pageMatches[pageIndex] = matches;
-            }
+            },
           },
           {
             key: "_calculateWordMatch",
@@ -7787,7 +7796,7 @@ const OPENED_PDF_FILES = {};
                   matchesWithLength.push({
                     match: matchIdx,
                     matchLength: subqueryLen,
-                    skipped: false
+                    skipped: false,
                   });
                 }
               }
@@ -7801,7 +7810,7 @@ const OPENED_PDF_FILES = {};
                 this._pageMatches[pageIndex],
                 this._pageMatchesLength[pageIndex]
               );
-            }
+            },
           },
           {
             key: "_calculateMatch",
@@ -7845,7 +7854,7 @@ const OPENED_PDF_FILES = {};
                 this._matchesCountTotal += pageMatchesCount;
                 this._updateUIResultsCount();
               }
-            }
+            },
           },
           {
             key: "_extractText",
@@ -7866,7 +7875,7 @@ const OPENED_PDF_FILES = {};
                     .getPage(i + 1)
                     .then(function(pdfPage) {
                       return pdfPage.getTextContent({
-                        normalizeWhitespace: true
+                        normalizeWhitespace: true,
                       });
                     })
                     .then(
@@ -7894,7 +7903,7 @@ const OPENED_PDF_FILES = {};
               for (var i = 0, ii = this._linkService.pagesCount; i < ii; i++) {
                 _loop(i, ii);
               }
-            }
+            },
           },
           {
             key: "_updatePage",
@@ -7904,9 +7913,9 @@ const OPENED_PDF_FILES = {};
               }
               this._eventBus.dispatch("updatetextlayermatches", {
                 source: this,
-                pageIndex: index
+                pageIndex: index,
               });
-            }
+            },
           },
           {
             key: "_nextMatch",
@@ -7961,7 +7970,7 @@ const OPENED_PDF_FILES = {};
                 this._advanceOffsetPage(previous);
               }
               this._nextPageMatch();
-            }
+            },
           },
           {
             key: "_matchesReady",
@@ -7983,7 +7992,7 @@ const OPENED_PDF_FILES = {};
                 }
               }
               return false;
-            }
+            },
           },
           {
             key: "_nextPageMatch",
@@ -8000,7 +8009,7 @@ const OPENED_PDF_FILES = {};
                   break;
                 }
               } while (!this._matchesReady(matches));
-            }
+            },
           },
           {
             key: "_advanceOffsetPage",
@@ -8016,7 +8025,7 @@ const OPENED_PDF_FILES = {};
                 offset.pageIdx = previous ? numPages - 1 : 0;
                 offset.wrapped = true;
               }
-            }
+            },
           },
           {
             key: "_updateMatch",
@@ -8045,7 +8054,7 @@ const OPENED_PDF_FILES = {};
               if (this._selected.pageIdx !== -1) {
                 this._updatePage(this._selected.pageIdx);
               }
-            }
+            },
           },
           {
             key: "_onFindBarClose",
@@ -8068,10 +8077,10 @@ const OPENED_PDF_FILES = {};
                 _this4._highlightMatches = false;
                 _this4._eventBus.dispatch("updatetextlayermatches", {
                   source: _this4,
-                  pageIndex: -1
+                  pageIndex: -1,
                 });
               });
-            }
+            },
           },
           {
             key: "_requestMatchesCount",
@@ -8094,18 +8103,18 @@ const OPENED_PDF_FILES = {};
               }
               return {
                 current: current,
-                total: total
+                total: total,
               };
-            }
+            },
           },
           {
             key: "_updateUIResultsCount",
             value: function _updateUIResultsCount() {
               this._eventBus.dispatch("updatefindmatchescount", {
                 source: this,
-                matchesCount: this._requestMatchesCount()
+                matchesCount: this._requestMatchesCount(),
               });
-            }
+            },
           },
           {
             key: "_updateUIState",
@@ -8114,40 +8123,40 @@ const OPENED_PDF_FILES = {};
                 source: this,
                 state: state,
                 previous: previous,
-                matchesCount: this._requestMatchesCount()
+                matchesCount: this._requestMatchesCount(),
               });
-            }
+            },
           },
           {
             key: "highlightMatches",
             get: function get() {
               return this._highlightMatches;
-            }
+            },
           },
           {
             key: "pageMatches",
             get: function get() {
               return this._pageMatches;
-            }
+            },
           },
           {
             key: "pageMatchesLength",
             get: function get() {
               return this._pageMatchesLength;
-            }
+            },
           },
           {
             key: "selected",
             get: function get() {
               return this._selected;
-            }
+            },
           },
           {
             key: "state",
             get: function get() {
               return this._state;
-            }
-          }
+            },
+          },
         ]);
 
         return PDFFindController;
@@ -8163,7 +8172,7 @@ const OPENED_PDF_FILES = {};
       "use strict";
 
       Object.defineProperty(exports, "__esModule", {
-        value: true
+        value: true,
       });
       var CharacterType = {
         SPACE: 0,
@@ -8173,7 +8182,7 @@ const OPENED_PDF_FILES = {};
         KATAKANA_LETTER: 4,
         HIRAGANA_LETTER: 5,
         HALFWIDTH_KATAKANA_LETTER: 6,
-        THAI_LETTER: 7
+        THAI_LETTER: 7,
       };
       function isAlphabeticalScript(charCode) {
         return charCode < 0x2e80;
@@ -8257,7 +8266,7 @@ const OPENED_PDF_FILES = {};
       "use strict";
 
       Object.defineProperty(exports, "__esModule", {
-        value: true
+        value: true,
       });
       exports.isDestArraysEqual = exports.isDestHashesEqual = exports.PDFHistory = undefined;
 
@@ -8324,7 +8333,7 @@ const OPENED_PDF_FILES = {};
         return {
           hash: hash,
           page: page,
-          rotation: linkService.rotation
+          rotation: linkService.rotation,
         };
       }
 
@@ -8400,7 +8409,7 @@ const OPENED_PDF_FILES = {};
                   {
                     hash: hash,
                     page: page,
-                    rotation: rotation
+                    rotation: rotation,
                   },
                   true
                 );
@@ -8422,7 +8431,7 @@ const OPENED_PDF_FILES = {};
               } else if (destination.page) {
                 this.initialBookmark = "page=" + destination.page;
               }
-            }
+            },
           },
           {
             key: "push",
@@ -8471,7 +8480,7 @@ const OPENED_PDF_FILES = {};
                   dest: explicitDest,
                   hash: hash,
                   page: pageNumber,
-                  rotation: this.linkService.rotation
+                  rotation: this.linkService.rotation,
                 },
                 forceReplace
               );
@@ -8481,7 +8490,7 @@ const OPENED_PDF_FILES = {};
                   _this2._popStateInProgress = false;
                 });
               }
-            }
+            },
           },
           {
             key: "pushCurrentPosition",
@@ -8490,7 +8499,7 @@ const OPENED_PDF_FILES = {};
                 return;
               }
               this._tryPushCurrentPosition();
-            }
+            },
           },
           {
             key: "back",
@@ -8502,7 +8511,7 @@ const OPENED_PDF_FILES = {};
               if (this._isValidState(state) && state.uid > 0) {
                 window.history.back();
               }
-            }
+            },
           },
           {
             key: "forward",
@@ -8514,7 +8523,7 @@ const OPENED_PDF_FILES = {};
               if (this._isValidState(state) && state.uid < this._maxUid) {
                 window.history.forward();
               }
-            }
+            },
           },
           {
             key: "_pushOrReplaceState",
@@ -8528,7 +8537,7 @@ const OPENED_PDF_FILES = {};
               var newState = {
                 fingerprint: this.fingerprint,
                 uid: shouldReplace ? this._uid : this._uid + 1,
-                destination: destination
+                destination: destination,
               };
               this._updateInternalState(destination, newState.uid);
               if (shouldReplace) {
@@ -8537,7 +8546,7 @@ const OPENED_PDF_FILES = {};
                 this._maxUid = this._uid;
                 window.history.pushState(newState, "");
               }
-            }
+            },
           },
           {
             key: "_tryPushCurrentPosition",
@@ -8584,7 +8593,7 @@ const OPENED_PDF_FILES = {};
                 forceReplace = true;
               }
               this._pushOrReplaceState(position, forceReplace);
-            }
+            },
           },
           {
             key: "_isValidState",
@@ -8605,7 +8614,7 @@ const OPENED_PDF_FILES = {};
                 return false;
               }
               return true;
-            }
+            },
           },
           {
             key: "_updateInternalState",
@@ -8625,7 +8634,7 @@ const OPENED_PDF_FILES = {};
               this._destination = destination;
               this._uid = uid;
               this._numPositionUpdates = 0;
-            }
+            },
           },
           {
             key: "_updateViewarea",
@@ -8644,7 +8653,7 @@ const OPENED_PDF_FILES = {};
                   : location.pdfOpenParams.substring(1),
                 page: this.linkService.page,
                 first: location.pageNumber,
-                rotation: location.rotation
+                rotation: location.rotation,
               };
               if (this._popStateInProgress) {
                 return;
@@ -8665,7 +8674,7 @@ const OPENED_PDF_FILES = {};
                   _this3._updateViewareaTimeout = null;
                 }, UPDATE_VIEWAREA_TIMEOUT);
               }
-            }
+            },
           },
           {
             key: "_popState",
@@ -8689,7 +8698,7 @@ const OPENED_PDF_FILES = {};
                   {
                     hash: hash,
                     page: page,
-                    rotation: rotation
+                    rotation: rotation,
                   },
                   true
                 );
@@ -8704,7 +8713,7 @@ const OPENED_PDF_FILES = {};
                 (0, _ui_utils.waitOnEventOrTimeout)({
                   target: window,
                   name: "hashchange",
-                  delay: HASH_CHANGE_TIMEOUT
+                  delay: HASH_CHANGE_TIMEOUT,
                 }).then(function() {
                   _this4._blockHashChange--;
                 });
@@ -8727,7 +8736,7 @@ const OPENED_PDF_FILES = {};
               Promise.resolve().then(function() {
                 _this4._popStateInProgress = false;
               });
-            }
+            },
           },
           {
             key: "_bindEvents",
@@ -8747,7 +8756,7 @@ const OPENED_PDF_FILES = {};
               eventBus.on("updateviewarea", _boundEvents.updateViewarea);
               window.addEventListener("popstate", _boundEvents.popState);
               window.addEventListener("pagehide", _boundEvents.pageHide);
-            }
+            },
           },
           {
             key: "popStateInProgress",
@@ -8756,8 +8765,8 @@ const OPENED_PDF_FILES = {};
                 this.initialized &&
                 (this._popStateInProgress || this._blockHashChange > 0)
               );
-            }
-          }
+            },
+          },
         ]);
 
         return PDFHistory;
@@ -8834,7 +8843,7 @@ const OPENED_PDF_FILES = {};
       "use strict";
 
       Object.defineProperty(exports, "__esModule", {
-        value: true
+        value: true,
       });
       exports.SimpleLinkService = exports.PDFLinkService = undefined;
 
@@ -8919,19 +8928,19 @@ const OPENED_PDF_FILES = {};
               this.baseUrl = baseUrl;
               this.pdfDocument = pdfDocument;
               this._pagesRefCache = Object.create(null);
-            }
+            },
           },
           {
             key: "setViewer",
             value: function setViewer(pdfViewer) {
               this.pdfViewer = pdfViewer;
-            }
+            },
           },
           {
             key: "setHistory",
             value: function setHistory(pdfHistory) {
               this.pdfHistory = pdfHistory;
-            }
+            },
           },
           {
             key: "navigateTo",
@@ -8953,7 +8962,7 @@ const OPENED_PDF_FILES = {};
                         _this.cachePageRef(pageIndex + 1, destRef);
                         goToDestination({
                           namedDest: namedDest,
-                          explicitDest: explicitDest
+                          explicitDest: explicitDest,
                         });
                       })
                       .catch(function() {
@@ -8997,12 +9006,12 @@ const OPENED_PDF_FILES = {};
                   _this.pdfHistory.push({
                     namedDest: namedDest,
                     explicitDest: explicitDest,
-                    pageNumber: pageNumber
+                    pageNumber: pageNumber,
                   });
                 }
                 _this.pdfViewer.scrollPageIntoView({
                   pageNumber: pageNumber,
-                  destArray: explicitDest
+                  destArray: explicitDest,
                 });
               };
               new Promise(function(resolve, reject) {
@@ -9012,14 +9021,14 @@ const OPENED_PDF_FILES = {};
                     .then(function(destArray) {
                       resolve({
                         namedDest: dest,
-                        explicitDest: destArray
+                        explicitDest: destArray,
                       });
                     });
                   return;
                 }
                 resolve({
                   namedDest: "",
-                  explicitDest: dest
+                  explicitDest: dest,
                 });
               }).then(function(data) {
                 if (!Array.isArray(data.explicitDest)) {
@@ -9035,7 +9044,7 @@ const OPENED_PDF_FILES = {};
                 }
                 goToDestination(data);
               });
-            }
+            },
           },
           {
             key: "getDestinationHash",
@@ -9048,13 +9057,13 @@ const OPENED_PDF_FILES = {};
                 return this.getAnchorUrl("#" + escape(str));
               }
               return this.getAnchorUrl("");
-            }
+            },
           },
           {
             key: "getAnchorUrl",
             value: function getAnchorUrl(anchor) {
               return (this.baseUrl || "") + anchor;
-            }
+            },
           },
           {
             key: "setHash",
@@ -9067,7 +9076,7 @@ const OPENED_PDF_FILES = {};
                   this.eventBus.dispatch("findfromurlhash", {
                     source: this,
                     query: params["search"].replace(/"/g, ""),
-                    phraseSearch: params["phrase"] === "true"
+                    phraseSearch: params["phrase"] === "true",
                   });
                 }
                 if ("nameddest" in params) {
@@ -9087,7 +9096,7 @@ const OPENED_PDF_FILES = {};
                       { name: "XYZ" },
                       zoomArgs.length > 1 ? zoomArgs[1] | 0 : null,
                       zoomArgs.length > 2 ? zoomArgs[2] | 0 : null,
-                      zoomArgNumber ? zoomArgNumber / 100 : zoomArg
+                      zoomArgNumber ? zoomArgNumber / 100 : zoomArg,
                     ];
                   } else {
                     if (zoomArg === "Fit" || zoomArg === "FitB") {
@@ -9101,7 +9110,7 @@ const OPENED_PDF_FILES = {};
                       dest = [
                         null,
                         { name: zoomArg },
-                        zoomArgs.length > 1 ? zoomArgs[1] | 0 : null
+                        zoomArgs.length > 1 ? zoomArgs[1] | 0 : null,
                       ];
                     } else if (zoomArg === "FitR") {
                       if (zoomArgs.length !== 5) {
@@ -9115,7 +9124,7 @@ const OPENED_PDF_FILES = {};
                           zoomArgs[1] | 0,
                           zoomArgs[2] | 0,
                           zoomArgs[3] | 0,
-                          zoomArgs[4] | 0
+                          zoomArgs[4] | 0,
                         ];
                       }
                     } else {
@@ -9132,7 +9141,7 @@ const OPENED_PDF_FILES = {};
                   this.pdfViewer.scrollPageIntoView({
                     pageNumber: pageNumber || this.page,
                     destArray: dest,
-                    allowNegativeOffset: true
+                    allowNegativeOffset: true,
                   });
                 } else if (pageNumber) {
                   this.page = pageNumber;
@@ -9140,7 +9149,7 @@ const OPENED_PDF_FILES = {};
                 if ("pagemode" in params) {
                   this.eventBus.dispatch("pagemode", {
                     source: this,
-                    mode: params.pagemode
+                    mode: params.pagemode,
                   });
                 }
               } else {
@@ -9165,7 +9174,7 @@ const OPENED_PDF_FILES = {};
                     "a valid destination."
                 );
               }
-            }
+            },
           },
           {
             key: "executeNamedAction",
@@ -9202,9 +9211,9 @@ const OPENED_PDF_FILES = {};
               }
               this.eventBus.dispatch("namedaction", {
                 source: this,
-                action: action
+                action: action,
               });
-            }
+            },
           },
           {
             key: "cachePageRef",
@@ -9214,7 +9223,7 @@ const OPENED_PDF_FILES = {};
               }
               var refStr = pageRef.num + " " + pageRef.gen + " R";
               this._pagesRefCache[refStr] = pageNum;
-            }
+            },
           },
           {
             key: "_cachedPageNumber",
@@ -9223,13 +9232,13 @@ const OPENED_PDF_FILES = {};
               return (
                 (this._pagesRefCache && this._pagesRefCache[refStr]) || null
               );
-            }
+            },
           },
           {
             key: "pagesCount",
             get: function get() {
               return this.pdfDocument ? this.pdfDocument.numPages : 0;
-            }
+            },
           },
           {
             key: "page",
@@ -9238,7 +9247,7 @@ const OPENED_PDF_FILES = {};
             },
             set: function set(value) {
               this.pdfViewer.currentPageNumber = value;
-            }
+            },
           },
           {
             key: "rotation",
@@ -9247,8 +9256,8 @@ const OPENED_PDF_FILES = {};
             },
             set: function set(value) {
               this.pdfViewer.pagesRotation = value;
-            }
-          }
+            },
+          },
         ]);
 
         return PDFLinkService;
@@ -9330,52 +9339,52 @@ const OPENED_PDF_FILES = {};
         _createClass(SimpleLinkService, [
           {
             key: "navigateTo",
-            value: function navigateTo(dest) {}
+            value: function navigateTo(dest) {},
           },
           {
             key: "getDestinationHash",
             value: function getDestinationHash(dest) {
               return "#";
-            }
+            },
           },
           {
             key: "getAnchorUrl",
             value: function getAnchorUrl(hash) {
               return "#";
-            }
+            },
           },
           {
             key: "setHash",
-            value: function setHash(hash) {}
+            value: function setHash(hash) {},
           },
           {
             key: "executeNamedAction",
-            value: function executeNamedAction(action) {}
+            value: function executeNamedAction(action) {},
           },
           {
             key: "cachePageRef",
-            value: function cachePageRef(pageNum, pageRef) {}
+            value: function cachePageRef(pageNum, pageRef) {},
           },
           {
             key: "pagesCount",
             get: function get() {
               return 0;
-            }
+            },
           },
           {
             key: "page",
             get: function get() {
               return 0;
             },
-            set: function set(value) {}
+            set: function set(value) {},
           },
           {
             key: "rotation",
             get: function get() {
               return 0;
             },
-            set: function set(value) {}
-          }
+            set: function set(value) {},
+          },
         ]);
 
         return SimpleLinkService;
@@ -9391,7 +9400,7 @@ const OPENED_PDF_FILES = {};
       "use strict";
 
       Object.defineProperty(exports, "__esModule", {
-        value: true
+        value: true,
       });
       exports.PDFOutlineViewer = undefined;
 
@@ -9445,16 +9454,16 @@ const OPENED_PDF_FILES = {};
               this.lastToggleIsShow = true;
               this.container.textContent = "";
               this.container.classList.remove("outlineWithDeepNesting");
-            }
+            },
           },
           {
             key: "_dispatchEvent",
             value: function _dispatchEvent(outlineCount) {
               this.eventBus.dispatch("outlineloaded", {
                 source: this,
-                outlineCount: outlineCount
+                outlineCount: outlineCount,
               });
-            }
+            },
           },
           {
             key: "_bindLink",
@@ -9470,7 +9479,7 @@ const OPENED_PDF_FILES = {};
                   target: newWindow
                     ? _pdfjsLib.LinkTarget.BLANK
                     : linkService.externalLinkTarget,
-                  rel: linkService.externalLinkRel
+                  rel: linkService.externalLinkRel,
                 });
                 return;
               }
@@ -9481,7 +9490,7 @@ const OPENED_PDF_FILES = {};
                 }
                 return false;
               };
-            }
+            },
           },
           {
             key: "_setStyles",
@@ -9499,7 +9508,7 @@ const OPENED_PDF_FILES = {};
               if (styleStr) {
                 element.setAttribute("style", styleStr);
               }
-            }
+            },
           },
           {
             key: "_addToggleButton",
@@ -9519,7 +9528,7 @@ const OPENED_PDF_FILES = {};
                 }
               };
               div.insertBefore(toggler, div.firstChild);
-            }
+            },
           },
           {
             key: "_toggleOutlineItem",
@@ -9531,7 +9540,7 @@ const OPENED_PDF_FILES = {};
                   "outlineItemsHidden"
                 );
               }
-            }
+            },
           },
           {
             key: "toggleOutlineTree",
@@ -9540,7 +9549,7 @@ const OPENED_PDF_FILES = {};
                 return;
               }
               this._toggleOutlineItem(this.container, !this.lastToggleIsShow);
-            }
+            },
           },
           {
             key: "render",
@@ -9560,8 +9569,8 @@ const OPENED_PDF_FILES = {};
               var queue = [
                 {
                   parent: fragment,
-                  items: this.outline
-                }
+                  items: this.outline,
+                },
               ];
               var hasAnyNesting = false;
               while (queue.length > 0) {
@@ -9585,7 +9594,7 @@ const OPENED_PDF_FILES = {};
                     div.appendChild(itemsDiv);
                     queue.push({
                       parent: itemsDiv,
-                      items: item.items
+                      items: item.items,
                     });
                   }
                   levelData.parent.appendChild(div);
@@ -9597,8 +9606,8 @@ const OPENED_PDF_FILES = {};
               }
               this.container.appendChild(fragment);
               this._dispatchEvent(outlineCount);
-            }
-          }
+            },
+          },
         ]);
 
         return PDFOutlineViewer;
@@ -9613,7 +9622,7 @@ const OPENED_PDF_FILES = {};
       "use strict";
 
       Object.defineProperty(exports, "__esModule", {
-        value: true
+        value: true,
       });
       exports.PDFPresentationMode = undefined;
 
@@ -9739,10 +9748,10 @@ const OPENED_PDF_FILES = {};
               }
               this.args = {
                 page: this.pdfViewer.currentPageNumber,
-                previousScale: this.pdfViewer.currentScaleValue
+                previousScale: this.pdfViewer.currentScaleValue,
               };
               return true;
-            }
+            },
           },
           {
             key: "_mouseWheel",
@@ -9778,7 +9787,7 @@ const OPENED_PDF_FILES = {};
                   this.mouseScrollTimeStamp = currentTime;
                 }
               }
-            }
+            },
           },
           {
             key: "_goToPreviousPage",
@@ -9789,7 +9798,7 @@ const OPENED_PDF_FILES = {};
               }
               this.pdfViewer.currentPageNumber = page - 1;
               return true;
-            }
+            },
           },
           {
             key: "_goToNextPage",
@@ -9800,7 +9809,7 @@ const OPENED_PDF_FILES = {};
               }
               this.pdfViewer.currentPageNumber = page + 1;
               return true;
-            }
+            },
           },
           {
             key: "_notifyStateChange",
@@ -9808,9 +9817,9 @@ const OPENED_PDF_FILES = {};
               this.eventBus.dispatch("presentationmodechanged", {
                 source: this,
                 active: this.active,
-                switchInProgress: !!this.switchInProgress
+                switchInProgress: !!this.switchInProgress,
               });
-            }
+            },
           },
           {
             key: "_setSwitchInProgress",
@@ -9825,7 +9834,7 @@ const OPENED_PDF_FILES = {};
                 delete _this2.switchInProgress;
                 _this2._notifyStateChange();
               }, DELAY_BEFORE_RESETTING_SWITCH_IN_PROGRESS);
-            }
+            },
           },
           {
             key: "_resetSwitchInProgress",
@@ -9834,7 +9843,7 @@ const OPENED_PDF_FILES = {};
                 clearTimeout(this.switchInProgress);
                 delete this.switchInProgress;
               }
-            }
+            },
           },
           {
             key: "_enter",
@@ -9854,7 +9863,7 @@ const OPENED_PDF_FILES = {};
               this.contextMenuOpen = false;
               this.container.setAttribute("contextmenu", "viewerContextMenu");
               window.getSelection().removeAllRanges();
-            }
+            },
           },
           {
             key: "_exit",
@@ -9876,7 +9885,7 @@ const OPENED_PDF_FILES = {};
               this._resetMouseScrollState();
               this.container.removeAttribute("contextmenu");
               this.contextMenuOpen = false;
-            }
+            },
           },
           {
             key: "_mouseDown",
@@ -9899,13 +9908,13 @@ const OPENED_PDF_FILES = {};
                   }
                 }
               }
-            }
+            },
           },
           {
             key: "_contextMenu",
             value: function _contextMenu() {
               this.contextMenuOpen = true;
-            }
+            },
           },
           {
             key: "_showControls",
@@ -9921,7 +9930,7 @@ const OPENED_PDF_FILES = {};
                 _this5.container.classList.remove(CONTROLS_SELECTOR);
                 delete _this5.controlsTimeout;
               }, DELAY_BEFORE_HIDING_CONTROLS);
-            }
+            },
           },
           {
             key: "_hideControls",
@@ -9932,14 +9941,14 @@ const OPENED_PDF_FILES = {};
               clearTimeout(this.controlsTimeout);
               this.container.classList.remove(CONTROLS_SELECTOR);
               delete this.controlsTimeout;
-            }
+            },
           },
           {
             key: "_resetMouseScrollState",
             value: function _resetMouseScrollState() {
               this.mouseScrollTimeStamp = 0;
               this.mouseScrollDelta = 0;
-            }
+            },
           },
           {
             key: "_touchSwipe",
@@ -9957,7 +9966,7 @@ const OPENED_PDF_FILES = {};
                     startX: evt.touches[0].pageX,
                     startY: evt.touches[0].pageY,
                     endX: evt.touches[0].pageX,
-                    endY: evt.touches[0].pageY
+                    endY: evt.touches[0].pageY,
                   };
                   break;
                 case "touchmove":
@@ -9997,7 +10006,7 @@ const OPENED_PDF_FILES = {};
                   }
                   break;
               }
-            }
+            },
           },
           {
             key: "_addWindowListeners",
@@ -10021,7 +10030,7 @@ const OPENED_PDF_FILES = {};
               window.addEventListener("touchstart", this.touchSwipeBind);
               window.addEventListener("touchmove", this.touchSwipeBind);
               window.addEventListener("touchend", this.touchSwipeBind);
-            }
+            },
           },
           {
             key: "_removeWindowListeners",
@@ -10043,7 +10052,7 @@ const OPENED_PDF_FILES = {};
               delete this.resetMouseScrollStateBind;
               delete this.contextMenuBind;
               delete this.touchSwipeBind;
-            }
+            },
           },
           {
             key: "_fullscreenChange",
@@ -10053,7 +10062,7 @@ const OPENED_PDF_FILES = {};
               } else {
                 this._exit();
               }
-            }
+            },
           },
           {
             key: "_addFullscreenChangeListeners",
@@ -10075,7 +10084,7 @@ const OPENED_PDF_FILES = {};
                 "MSFullscreenChange",
                 this.fullscreenChangeBind
               );
-            }
+            },
           },
           {
             key: "_removeFullscreenChangeListeners",
@@ -10097,7 +10106,7 @@ const OPENED_PDF_FILES = {};
                 this.fullscreenChangeBind
               );
               delete this.fullscreenChangeBind;
-            }
+            },
           },
           {
             key: "isFullscreen",
@@ -10108,8 +10117,8 @@ const OPENED_PDF_FILES = {};
                 document.webkitIsFullScreen ||
                 document.msFullscreenElement
               );
-            }
-          }
+            },
+          },
         ]);
 
         return PDFPresentationMode;
@@ -10124,7 +10133,7 @@ const OPENED_PDF_FILES = {};
       "use strict";
 
       Object.defineProperty(exports, "__esModule", {
-        value: true
+        value: true,
       });
       exports.PDFSidebarResizer = undefined;
 
@@ -10226,7 +10235,7 @@ const OPENED_PDF_FILES = {};
               this._width = width;
               this.doc.style.setProperty(SIDEBAR_WIDTH_VAR, width + "px");
               return true;
-            }
+            },
           },
           {
             key: "_mouseMove",
@@ -10236,7 +10245,7 @@ const OPENED_PDF_FILES = {};
                 width = this.outerContainerWidth - width;
               }
               this._updateWidth(width);
-            }
+            },
           },
           {
             key: "_mouseUp",
@@ -10246,7 +10255,7 @@ const OPENED_PDF_FILES = {};
               var _boundEvents = this._boundEvents;
               window.removeEventListener("mousemove", _boundEvents.mouseMove);
               window.removeEventListener("mouseup", _boundEvents.mouseUp);
-            }
+            },
           },
           {
             key: "_addEventListeners",
@@ -10285,7 +10294,7 @@ const OPENED_PDF_FILES = {};
                         );
                         if (updated) {
                           _this2.eventBus.dispatch("resize", {
-                            source: _this2
+                            source: _this2,
                           });
                         }
                       });
@@ -10295,7 +10304,7 @@ const OPENED_PDF_FILES = {};
                   }
                 }
               });
-            }
+            },
           },
           {
             key: "outerContainerWidth",
@@ -10304,8 +10313,8 @@ const OPENED_PDF_FILES = {};
                 this._outerContainerWidth = this.outerContainer.clientWidth;
               }
               return this._outerContainerWidth;
-            }
-          }
+            },
+          },
         ]);
 
         return PDFSidebarResizer;
@@ -10320,7 +10329,7 @@ const OPENED_PDF_FILES = {};
       "use strict";
 
       Object.defineProperty(exports, "__esModule", {
-        value: true
+        value: true,
       });
       exports.PDFThumbnailViewer = undefined;
 
@@ -10380,13 +10389,13 @@ const OPENED_PDF_FILES = {};
             key: "_scrollUpdated",
             value: function _scrollUpdated() {
               this.renderingQueue.renderHighestPriority();
-            }
+            },
           },
           {
             key: "getThumbnail",
             value: function getThumbnail(index) {
               return this._thumbnails[index];
-            }
+            },
           },
           {
             key: "_getVisibleThumbs",
@@ -10395,7 +10404,7 @@ const OPENED_PDF_FILES = {};
                 this.container,
                 this._thumbnails
               );
-            }
+            },
           },
           {
             key: "scrollThumbnailIntoView",
@@ -10438,18 +10447,18 @@ const OPENED_PDF_FILES = {};
                 }
                 if (shouldScroll) {
                   (0, _ui_utils.scrollIntoView)(thumbnailView.div, {
-                    top: THUMBNAIL_SCROLL_MARGIN
+                    top: THUMBNAIL_SCROLL_MARGIN,
                   });
                 }
               }
               this._currentPageNumber = pageNumber;
-            }
+            },
           },
           {
             key: "cleanup",
             value: function cleanup() {
               _pdf_thumbnail_view.PDFThumbnailView.cleanup();
-            }
+            },
           },
           {
             key: "_resetView",
@@ -10460,7 +10469,7 @@ const OPENED_PDF_FILES = {};
               this._pagesRotation = 0;
               this._pagesRequests = [];
               this.container.textContent = "";
-            }
+            },
           },
           {
             key: "setDocument",
@@ -10488,7 +10497,7 @@ const OPENED_PDF_FILES = {};
                       linkService: _this.linkService,
                       renderingQueue: _this.renderingQueue,
                       disableCanvasToImageConversion: false,
-                      l10n: _this.l10n
+                      l10n: _this.l10n,
                     });
                     _this._thumbnails.push(thumbnail);
                   }
@@ -10502,7 +10511,7 @@ const OPENED_PDF_FILES = {};
                     reason
                   );
                 });
-            }
+            },
           },
           {
             key: "_cancelRendering",
@@ -10512,7 +10521,7 @@ const OPENED_PDF_FILES = {};
                   this._thumbnails[i].cancelRendering();
                 }
               }
-            }
+            },
           },
           {
             key: "setPageLabels",
@@ -10539,7 +10548,7 @@ const OPENED_PDF_FILES = {};
                 var label = this._pageLabels && this._pageLabels[i];
                 this._thumbnails[i].setPageLabel(label);
               }
-            }
+            },
           },
           {
             key: "_ensurePdfPageLoaded",
@@ -10566,7 +10575,7 @@ const OPENED_PDF_FILES = {};
                 });
               this._pagesRequests[pageNumber] = promise;
               return promise;
-            }
+            },
           },
           {
             key: "forceRendering",
@@ -10586,7 +10595,7 @@ const OPENED_PDF_FILES = {};
                 return true;
               }
               return false;
-            }
+            },
           },
           {
             key: "pagesRotation",
@@ -10607,8 +10616,8 @@ const OPENED_PDF_FILES = {};
               for (var i = 0, ii = this._thumbnails.length; i < ii; i++) {
                 this._thumbnails[i].update(rotation);
               }
-            }
-          }
+            },
+          },
         ]);
 
         return PDFThumbnailViewer;
@@ -10623,7 +10632,7 @@ const OPENED_PDF_FILES = {};
       "use strict";
 
       Object.defineProperty(exports, "__esModule", {
-        value: true
+        value: true,
       });
       exports.PDFThumbnailView = undefined;
 
@@ -10685,7 +10694,7 @@ const OPENED_PDF_FILES = {};
               tempCanvas.height = 0;
             }
             tempCanvasCache = null;
-          }
+          },
         };
       })();
 
@@ -10764,7 +10773,7 @@ const OPENED_PDF_FILES = {};
                 var totalRotation = (this.rotation + this.pdfPageRotate) % 360;
                 this.viewport = pdfPage.getViewport(1, totalRotation);
                 this.reset();
-              }
+              },
             },
             {
               key: "reset",
@@ -10793,7 +10802,7 @@ const OPENED_PDF_FILES = {};
                   this.image.removeAttribute("src");
                   delete this.image;
                 }
-              }
+              },
             },
             {
               key: "update",
@@ -10804,10 +10813,10 @@ const OPENED_PDF_FILES = {};
                 var totalRotation = (this.rotation + this.pdfPageRotate) % 360;
                 this.viewport = this.viewport.clone({
                   scale: 1,
-                  rotation: totalRotation
+                  rotation: totalRotation,
                 });
                 this.reset();
-              }
+              },
             },
             {
               key: "cancelRendering",
@@ -10819,7 +10828,7 @@ const OPENED_PDF_FILES = {};
                 this.renderingState =
                   _pdf_rendering_queue.RenderingStates.INITIAL;
                 this.resume = null;
-              }
+              },
             },
             {
               key: "_getPageDrawContext",
@@ -10842,7 +10851,7 @@ const OPENED_PDF_FILES = {};
                   ctx.scale(outputScale.sx, outputScale.sy);
                 }
                 return ctx;
-              }
+              },
             },
             {
               key: "_convertCanvasToImage",
@@ -10897,7 +10906,7 @@ const OPENED_PDF_FILES = {};
                 this.canvas.width = 0;
                 this.canvas.height = 0;
                 delete this.canvas;
-              }
+              },
             },
             {
               key: "draw",
@@ -10950,7 +10959,7 @@ const OPENED_PDF_FILES = {};
                 };
                 var renderContext = {
                   canvasContext: ctx,
-                  viewport: drawViewport
+                  viewport: drawViewport,
                 };
                 var renderTask = (this.renderTask = this.pdfPage.render(
                   renderContext
@@ -10965,7 +10974,7 @@ const OPENED_PDF_FILES = {};
                   }
                 );
                 return renderCapability.promise;
-              }
+              },
             },
             {
               key: "setImage",
@@ -11051,7 +11060,7 @@ const OPENED_PDF_FILES = {};
                   canvas.height
                 );
                 this._convertCanvasToImage();
-              }
+              },
             },
             {
               key: "setPageLabel",
@@ -11090,22 +11099,22 @@ const OPENED_PDF_FILES = {};
                       _this3.canvas.setAttribute("aria-label", ariaLabel);
                     }
                   });
-              }
+              },
             },
             {
               key: "pageId",
               get: function get() {
                 return this.pageLabel !== null ? this.pageLabel : this.id;
-              }
-            }
+              },
+            },
           ],
           [
             {
               key: "cleanup",
               value: function cleanup() {
                 TempImageFactory.destroyCanvas();
-              }
-            }
+              },
+            },
           ]
         );
 
@@ -11121,7 +11130,7 @@ const OPENED_PDF_FILES = {};
       "use strict";
 
       Object.defineProperty(exports, "__esModule", {
-        value: true
+        value: true,
       });
       exports.PDFViewer = undefined;
 
@@ -11177,8 +11186,8 @@ const OPENED_PDF_FILES = {};
             value: subClass,
             enumerable: false,
             writable: true,
-            configurable: true
-          }
+            configurable: true,
+          },
         });
         if (superClass)
           Object.setPrototypeOf
@@ -11223,12 +11232,12 @@ const OPENED_PDF_FILES = {};
                 ) {
                   pageSpot = {
                     left: 0,
-                    top: 0
+                    top: 0,
                   };
                 }
               }
               (0, _ui_utils.scrollIntoView)(pageDiv, pageSpot);
-            }
+            },
           },
           {
             key: "_getVisiblePages",
@@ -11245,15 +11254,15 @@ const OPENED_PDF_FILES = {};
               var visible = [
                 {
                   id: currentPage.id,
-                  view: currentPage
-                }
+                  view: currentPage,
+                },
               ];
               return {
                 first: currentPage,
                 last: currentPage,
-                views: visible
+                views: visible,
               };
-            }
+            },
           },
           {
             key: "update",
@@ -11287,9 +11296,9 @@ const OPENED_PDF_FILES = {};
               this._updateLocation(visible.first);
               this.eventBus.dispatch("updateviewarea", {
                 source: this,
-                location: this._location
+                location: this._location,
               });
-            }
+            },
           },
           {
             key: "_setDocumentViewerElement",
@@ -11299,7 +11308,7 @@ const OPENED_PDF_FILES = {};
                 "_setDocumentViewerElement",
                 this.viewer
               );
-            }
+            },
           },
           {
             key: "_isScrollModeHorizontal",
@@ -11307,8 +11316,8 @@ const OPENED_PDF_FILES = {};
               return this.isInPresentationMode
                 ? false
                 : this._scrollMode === _base_viewer.ScrollMode.HORIZONTAL;
-            }
-          }
+            },
+          },
         ]);
 
         return PDFViewer;
@@ -11323,7 +11332,7 @@ const OPENED_PDF_FILES = {};
       "use strict";
 
       Object.defineProperty(exports, "__esModule", {
-        value: true
+        value: true,
       });
       exports.SpreadMode = exports.ScrollMode = exports.BaseViewer = undefined;
 
@@ -11370,12 +11379,12 @@ const OPENED_PDF_FILES = {};
       var ScrollMode = {
         VERTICAL: 0,
         HORIZONTAL: 1,
-        WRAPPED: 2
+        WRAPPED: 2,
       };
       var SpreadMode = {
         NONE: 0,
         ODD: 1,
-        EVEN: 2
+        EVEN: 2,
       };
       function PDFPageViewBuffer(size) {
         var data = [];
@@ -11471,13 +11480,13 @@ const OPENED_PDF_FILES = {};
             key: "getPageView",
             value: function getPageView(index) {
               return this._pages[index];
-            }
+            },
           },
           {
             key: "_setCurrentPageNumber",
             value: function _setCurrentPageNumber(val) {
               //setting the previously visited page number
-              if(this._currentPageNumber != val) {
+              if (this._currentPageNumber != val) {
                 console.log("_setCurrentPageNumber", this._currentPageNumber);
                 PDFViewerApplication.previousVisitedPage = this._currentPageNumber;
               }
@@ -11504,7 +11513,7 @@ const OPENED_PDF_FILES = {};
               var arg = {
                 source: this,
                 pageNumber: val,
-                pageLabel: this._pageLabels && this._pageLabels[val - 1]
+                pageLabel: this._pageLabels && this._pageLabels[val - 1],
               };
               this._currentPageNumber = val;
               this.eventBus.dispatch("pagechanging", arg);
@@ -11512,7 +11521,7 @@ const OPENED_PDF_FILES = {};
               if (resetCurrentPageView) {
                 this._resetCurrentPageView();
               }
-            }
+            },
           },
           {
             key: "setDocument",
@@ -11537,7 +11546,7 @@ const OPENED_PDF_FILES = {};
                 _this2._pageViewsReady = true;
                 _this2.eventBus.dispatch("pagesloaded", {
                   source: _this2,
-                  pagesCount: pagesCount
+                  pagesCount: pagesCount,
                 });
               });
               var isOnePageRenderedResolved = false;
@@ -11588,7 +11597,7 @@ const OPENED_PDF_FILES = {};
                       enableWebGL: _this2.enableWebGL,
                       useOnlyCssZoom: _this2.useOnlyCssZoom,
                       maxCanvasPixels: _this2.maxCanvasPixels,
-                      l10n: _this2.l10n
+                      l10n: _this2.l10n,
                     });
                     bindOnAfterAndBeforeDraw(pageView);
                     _this2._pages.push(pageView);
@@ -11647,7 +11656,7 @@ const OPENED_PDF_FILES = {};
                 .catch(function(reason) {
                   console.error("Unable to initialize viewer", reason);
                 });
-            }
+            },
           },
           {
             key: "setPageLabels",
@@ -11675,7 +11684,7 @@ const OPENED_PDF_FILES = {};
                 var label = this._pageLabels && this._pageLabels[i];
                 pageView.setPageLabel(label);
               }
-            }
+            },
           },
           {
             key: "_resetView",
@@ -11694,7 +11703,7 @@ const OPENED_PDF_FILES = {};
               this._spreadMode = SpreadMode.NONE;
               this.viewer.textContent = "";
               this._updateScrollMode();
-            }
+            },
           },
           {
             key: "_scrollUpdate",
@@ -11703,7 +11712,7 @@ const OPENED_PDF_FILES = {};
                 return;
               }
               this.update();
-            }
+            },
           },
           {
             key: "_scrollIntoView",
@@ -11716,7 +11725,7 @@ const OPENED_PDF_FILES = {};
                   _ref$pageNumber === undefined ? null : _ref$pageNumber;
 
               throw new Error("Not implemented: _scrollIntoView");
-            }
+            },
           },
           {
             key: "_setScaleDispatchEvent",
@@ -11729,11 +11738,11 @@ const OPENED_PDF_FILES = {};
               var arg = {
                 source: this,
                 scale: newScale,
-                presetValue: preset ? newValue : undefined
+                presetValue: preset ? newValue : undefined,
               };
               this.eventBus.dispatch("scalechanging", arg);
               this.eventBus.dispatch("scalechange", arg);
-            }
+            },
           },
           {
             key: "_setScaleUpdatePages",
@@ -11773,20 +11782,20 @@ const OPENED_PDF_FILES = {};
                     { name: "XYZ" },
                     this._location.left,
                     this._location.top,
-                    null
+                    null,
                   ];
                 }
                 this.scrollPageIntoView({
                   pageNumber: page,
                   destArray: dest,
-                  allowNegativeOffset: true
+                  allowNegativeOffset: true,
                 });
               }
               this._setScaleDispatchEvent(newScale, newValue, preset);
               if (this.defaultRenderingQueue) {
                 this.update();
               }
-            }
+            },
           },
           {
             key: "_setScale",
@@ -11853,7 +11862,7 @@ const OPENED_PDF_FILES = {};
                 }
                 this._setScaleUpdatePages(scale, value, noScroll, true);
               }
-            }
+            },
           },
           {
             key: "_resetCurrentPageView",
@@ -11863,7 +11872,7 @@ const OPENED_PDF_FILES = {};
               }
               var pageView = this._pages[this._currentPageNumber - 1];
               this._scrollIntoView({ pageDiv: pageView.div });
-            }
+            },
           },
           {
             key: "scrollPageIntoView",
@@ -11970,13 +11979,13 @@ const OPENED_PDF_FILES = {};
               if (scale === "page-fit" && !dest[4]) {
                 this._scrollIntoView({
                   pageDiv: pageView.div,
-                  pageNumber: pageNumber
+                  pageNumber: pageNumber,
                 });
                 return;
               }
               var boundingRect = [
                 pageView.viewport.convertToViewportPoint(x, y),
-                pageView.viewport.convertToViewportPoint(x + width, y + height)
+                pageView.viewport.convertToViewportPoint(x + width, y + height),
               ];
               var left = Math.min(boundingRect[0][0], boundingRect[1][0]);
               var top = Math.min(boundingRect[0][1], boundingRect[1][1]);
@@ -11988,11 +11997,11 @@ const OPENED_PDF_FILES = {};
                 pageDiv: pageView.div,
                 pageSpot: {
                   left: left,
-                  top: top
+                  top: top,
                 },
-                pageNumber: pageNumber
+                pageNumber: pageNumber,
               });
-            }
+            },
           },
           {
             key: "_resizeBuffer",
@@ -12002,7 +12011,7 @@ const OPENED_PDF_FILES = {};
                 2 * numVisiblePages + 1
               );
               this._buffer.resize(suggestedCacheSize, visiblePages);
-            }
+            },
           },
           {
             key: "_updateLocation",
@@ -12031,33 +12040,33 @@ const OPENED_PDF_FILES = {};
                 top: intTop,
                 left: intLeft,
                 rotation: this._pagesRotation,
-                pdfOpenParams: pdfOpenParams
+                pdfOpenParams: pdfOpenParams,
               };
-            }
+            },
           },
           {
             key: "update",
             value: function update() {
               throw new Error("Not implemented: update");
-            }
+            },
           },
           {
             key: "containsElement",
             value: function containsElement(element) {
               return this.container.contains(element);
-            }
+            },
           },
           {
             key: "focus",
             value: function focus() {
               this.container.focus();
-            }
+            },
           },
           {
             key: "_getVisiblePages",
             value: function _getVisiblePages() {
               throw new Error("Not implemented: _getVisiblePages");
-            }
+            },
           },
           {
             key: "cleanup",
@@ -12071,7 +12080,7 @@ const OPENED_PDF_FILES = {};
                   this._pages[i].reset();
                 }
               }
-            }
+            },
           },
           {
             key: "_cancelRendering",
@@ -12081,7 +12090,7 @@ const OPENED_PDF_FILES = {};
                   this._pages[i].cancelRendering();
                 }
               }
-            }
+            },
           },
           {
             key: "_ensurePdfPageLoaded",
@@ -12110,7 +12119,7 @@ const OPENED_PDF_FILES = {};
                 });
               this._pagesRequests[pageNumber] = promise;
               return promise;
-            }
+            },
           },
           {
             key: "forceRendering",
@@ -12134,7 +12143,7 @@ const OPENED_PDF_FILES = {};
                 return true;
               }
               return false;
-            }
+            },
           },
           {
             key: "createTextLayerBuilder",
@@ -12158,9 +12167,9 @@ const OPENED_PDF_FILES = {};
                   : this.findController,
                 enhanceTextSelection: this.isInPresentationMode
                   ? false
-                  : enhanceTextSelection
+                  : enhanceTextSelection,
               });
-            }
+            },
           },
           {
             key: "createAnnotationLayerBuilder",
@@ -12185,9 +12194,9 @@ const OPENED_PDF_FILES = {};
                 renderInteractiveForms: renderInteractiveForms,
                 linkService: this.linkService,
                 downloadManager: this.downloadManager,
-                l10n: l10n
+                l10n: l10n,
               });
-            }
+            },
           },
           {
             key: "getPagesOverview",
@@ -12197,7 +12206,7 @@ const OPENED_PDF_FILES = {};
                 return {
                   width: viewport.width,
                   height: viewport.height,
-                  rotation: viewport.rotation
+                  rotation: viewport.rotation,
                 };
               });
               if (!this.enablePrintAutoRotate) {
@@ -12216,10 +12225,10 @@ const OPENED_PDF_FILES = {};
                 return {
                   width: size.height,
                   height: size.width,
-                  rotation: (size.rotation + 90) % 360
+                  rotation: (size.rotation + 90) % 360,
                 };
               });
-            }
+            },
           },
           {
             key: "_updateScrollMode",
@@ -12247,7 +12256,7 @@ const OPENED_PDF_FILES = {};
               }
               this.scrollPageIntoView({ pageNumber: pageNumber });
               this.update();
-            }
+            },
           },
           {
             key: "_updateSpreadMode",
@@ -12287,19 +12296,19 @@ const OPENED_PDF_FILES = {};
               }
               this.scrollPageIntoView({ pageNumber: pageNumber });
               this.update();
-            }
+            },
           },
           {
             key: "pagesCount",
             get: function get() {
               return this._pages.length;
-            }
+            },
           },
           {
             key: "pageViewsReady",
             get: function get() {
               return this._pageViewsReady;
-            }
+            },
           },
           {
             key: "currentPageNumber",
@@ -12314,7 +12323,7 @@ const OPENED_PDF_FILES = {};
                 return;
               }
               this._setCurrentPageNumber(val, true);
-            }
+            },
           },
           {
             key: "currentPageLabel",
@@ -12333,7 +12342,7 @@ const OPENED_PDF_FILES = {};
                 }
               }
               this.currentPageNumber = pageNumber;
-            }
+            },
           },
           {
             key: "currentScale",
@@ -12350,7 +12359,7 @@ const OPENED_PDF_FILES = {};
                 return;
               }
               this._setScale(val, false);
-            }
+            },
           },
           {
             key: "currentScaleValue",
@@ -12362,7 +12371,7 @@ const OPENED_PDF_FILES = {};
                 return;
               }
               this._setScale(val, false);
-            }
+            },
           },
           {
             key: "pagesRotation",
@@ -12391,24 +12400,24 @@ const OPENED_PDF_FILES = {};
               this.eventBus.dispatch("rotationchanging", {
                 source: this,
                 pagesRotation: rotation,
-                pageNumber: pageNumber
+                pageNumber: pageNumber,
               });
               if (this.defaultRenderingQueue) {
                 this.update();
               }
-            }
+            },
           },
           {
             key: "_setDocumentViewerElement",
             get: function get() {
               throw new Error("Not implemented: _setDocumentViewerElement");
-            }
+            },
           },
           {
             key: "_isScrollModeHorizontal",
             get: function get() {
               throw new Error("Not implemented: _isScrollModeHorizontal");
-            }
+            },
           },
           {
             key: "isInPresentationMode",
@@ -12417,7 +12426,7 @@ const OPENED_PDF_FILES = {};
                 this.presentationModeState ===
                 _ui_utils.PresentationModeState.FULLSCREEN
               );
-            }
+            },
           },
           {
             key: "isChangingPresentationMode",
@@ -12426,7 +12435,7 @@ const OPENED_PDF_FILES = {};
                 this.presentationModeState ===
                 _ui_utils.PresentationModeState.CHANGING
               );
-            }
+            },
           },
           {
             key: "isHorizontalScrollbarEnabled",
@@ -12434,7 +12443,7 @@ const OPENED_PDF_FILES = {};
               return this.isInPresentationMode
                 ? false
                 : this.container.scrollWidth > this.container.clientWidth;
-            }
+            },
           },
           {
             key: "isVerticalScrollbarEnabled",
@@ -12442,7 +12451,7 @@ const OPENED_PDF_FILES = {};
               return this.isInPresentationMode
                 ? false
                 : this.container.scrollHeight > this.container.clientHeight;
-            }
+            },
           },
           {
             key: "hasEqualPageSizes",
@@ -12458,7 +12467,7 @@ const OPENED_PDF_FILES = {};
                 }
               }
               return true;
-            }
+            },
           },
           {
             key: "scrollMode",
@@ -12478,10 +12487,10 @@ const OPENED_PDF_FILES = {};
               this._scrollMode = mode;
               this.eventBus.dispatch("scrollmodechanged", {
                 source: this,
-                mode: mode
+                mode: mode,
               });
               this._updateScrollMode(this._currentPageNumber);
-            }
+            },
           },
           {
             key: "spreadMode",
@@ -12501,11 +12510,11 @@ const OPENED_PDF_FILES = {};
               this._spreadMode = mode;
               this.eventBus.dispatch("spreadmodechanged", {
                 source: this,
-                mode: mode
+                mode: mode,
               });
               this._updateSpreadMode(this._currentPageNumber);
-            }
-          }
+            },
+          },
         ]);
 
         return BaseViewer;
@@ -12522,7 +12531,7 @@ const OPENED_PDF_FILES = {};
       "use strict";
 
       Object.defineProperty(exports, "__esModule", {
-        value: true
+        value: true,
       });
       exports.DefaultAnnotationLayerFactory = exports.AnnotationLayerBuilder = undefined;
 
@@ -12610,7 +12619,7 @@ const OPENED_PDF_FILES = {};
                     imageResourcesPath: _this.imageResourcesPath,
                     renderInteractiveForms: _this.renderInteractiveForms,
                     linkService: _this.linkService,
-                    downloadManager: _this.downloadManager
+                    downloadManager: _this.downloadManager,
                   };
                   if (_this.div) {
                     _pdfjsLib.AnnotationLayer.update(parameters);
@@ -12626,13 +12635,13 @@ const OPENED_PDF_FILES = {};
                     _this.l10n.translate(_this.div);
                   }
                 });
-            }
+            },
           },
           {
             key: "cancel",
             value: function cancel() {
               this._cancelled = true;
-            }
+            },
           },
           {
             key: "hide",
@@ -12641,8 +12650,8 @@ const OPENED_PDF_FILES = {};
                 return;
               }
               this.div.setAttribute("hidden", "true");
-            }
-          }
+            },
+          },
         ]);
 
         return AnnotationLayerBuilder;
@@ -12676,10 +12685,10 @@ const OPENED_PDF_FILES = {};
                 imageResourcesPath: imageResourcesPath,
                 renderInteractiveForms: renderInteractiveForms,
                 linkService: new _pdf_link_service.SimpleLinkService(),
-                l10n: l10n
+                l10n: l10n,
               });
-            }
-          }
+            },
+          },
         ]);
 
         return DefaultAnnotationLayerFactory;
@@ -12695,7 +12704,7 @@ const OPENED_PDF_FILES = {};
       "use strict";
 
       Object.defineProperty(exports, "__esModule", {
-        value: true
+        value: true,
       });
       exports.PDFPageView = undefined;
 
@@ -12798,7 +12807,7 @@ const OPENED_PDF_FILES = {};
               );
               this.stats = pdfPage.stats;
               this.reset();
-            }
+            },
           },
           {
             key: "destroy",
@@ -12807,7 +12816,7 @@ const OPENED_PDF_FILES = {};
               if (this.pdfPage) {
                 this.pdfPage.cleanup();
               }
-            }
+            },
           },
           {
             key: "_resetZoomLayer",
@@ -12828,7 +12837,7 @@ const OPENED_PDF_FILES = {};
                 this.zoomLayer.remove();
               }
               this.zoomLayer = null;
-            }
+            },
           },
           {
             key: "reset",
@@ -12887,7 +12896,7 @@ const OPENED_PDF_FILES = {};
               this.loadingIconDiv = document.createElement("div");
               this.loadingIconDiv.className = "loadingIcon";
               div.appendChild(this.loadingIconDiv);
-            }
+            },
           },
           {
             key: "update",
@@ -12899,14 +12908,14 @@ const OPENED_PDF_FILES = {};
               var totalRotation = (this.rotation + this.pdfPageRotate) % 360;
               this.viewport = this.viewport.clone({
                 scale: this.scale * _ui_utils.CSS_UNITS,
-                rotation: totalRotation
+                rotation: totalRotation,
               });
               if (this.svg) {
                 this.cssTransform(this.svg, true);
                 this.eventBus.dispatch("pagerendered", {
                   source: this,
                   pageNumber: this.id,
-                  cssTransform: true
+                  cssTransform: true,
                 });
                 return;
               }
@@ -12930,7 +12939,7 @@ const OPENED_PDF_FILES = {};
                   this.eventBus.dispatch("pagerendered", {
                     source: this,
                     pageNumber: this.id,
-                    cssTransform: true
+                    cssTransform: true,
                   });
                   return;
                 }
@@ -12943,7 +12952,7 @@ const OPENED_PDF_FILES = {};
                 this.cssTransform(this.zoomLayer.firstChild);
               }
               this.reset(true, true);
-            }
+            },
           },
           {
             key: "cancelRendering",
@@ -12975,10 +12984,10 @@ const OPENED_PDF_FILES = {};
                 this.eventBus.dispatch("pagecancelled", {
                   source: this,
                   pageNumber: this.id,
-                  renderingState: renderingState
+                  renderingState: renderingState,
                 });
               }
-            }
+            },
           },
           {
             key: "cssTransform",
@@ -13066,13 +13075,13 @@ const OPENED_PDF_FILES = {};
               if (redrawAnnotations && this.annotationLayer) {
                 this.annotationLayer.render(this.viewport, "display");
               }
-            }
+            },
           },
           {
             key: "getPagePoint",
             value: function getPagePoint(x, y) {
               return this.viewport.convertToPdfPoint(x, y);
-            }
+            },
           },
           {
             key: "draw",
@@ -13165,7 +13174,7 @@ const OPENED_PDF_FILES = {};
                 _this.eventBus.dispatch("pagerendered", {
                   source: _this,
                   pageNumber: _this.id,
-                  cssTransform: false
+                  cssTransform: false,
                 });
                 if (error) {
                   return Promise.reject(error);
@@ -13183,7 +13192,7 @@ const OPENED_PDF_FILES = {};
                   return finishPaintTask(null).then(function() {
                     if (textLayer) {
                       var readableStream = pdfPage.streamTextContent({
-                        normalizeWhitespace: true
+                        normalizeWhitespace: true,
                       });
                       textLayer.setTextContentStream(readableStream);
                       textLayer.render();
@@ -13211,7 +13220,7 @@ const OPENED_PDF_FILES = {};
                 this.onBeforeDraw();
               }
               return resultPromise;
-            }
+            },
           },
           {
             key: "paintOnCanvas",
@@ -13224,7 +13233,7 @@ const OPENED_PDF_FILES = {};
                 },
                 cancel: function cancel() {
                   renderTask.cancel();
-                }
+                },
               };
               var viewport = this.viewport;
               var canvas = document.createElement("canvas");
@@ -13245,7 +13254,7 @@ const OPENED_PDF_FILES = {};
               this.outputScale = outputScale;
               if (this.useOnlyCssZoom) {
                 var actualSizeViewport = viewport.clone({
-                  scale: _ui_utils.CSS_UNITS
+                  scale: _ui_utils.CSS_UNITS,
                 });
                 outputScale.sx *= actualSizeViewport.width / viewport.width;
                 outputScale.sy *= actualSizeViewport.height / viewport.height;
@@ -13288,7 +13297,7 @@ const OPENED_PDF_FILES = {};
                 transform: transform,
                 viewport: this.viewport,
                 enableWebGL: this.enableWebGL,
-                renderInteractiveForms: this.renderInteractiveForms
+                renderInteractiveForms: this.renderInteractiveForms,
               };
               var renderTask = this.pdfPage.render(renderContext);
               renderTask.onContinue = function(cont) {
@@ -13310,7 +13319,7 @@ const OPENED_PDF_FILES = {};
                 }
               );
               return result;
-            }
+            },
           },
           {
             key: "paintOnSvg",
@@ -13328,7 +13337,7 @@ const OPENED_PDF_FILES = {};
               };
               var pdfPage = this.pdfPage;
               var actualSizeViewport = this.viewport.clone({
-                scale: _ui_utils.CSS_UNITS
+                scale: _ui_utils.CSS_UNITS,
               });
               var promise = pdfPage.getOperatorList().then(function(opList) {
                 ensureNotCancelled();
@@ -13356,9 +13365,9 @@ const OPENED_PDF_FILES = {};
                 },
                 cancel: function cancel() {
                   cancelled = true;
-                }
+                },
               };
-            }
+            },
           },
           {
             key: "setPageLabel",
@@ -13369,20 +13378,20 @@ const OPENED_PDF_FILES = {};
               } else {
                 this.div.removeAttribute("data-page-label");
               }
-            }
+            },
           },
           {
             key: "width",
             get: function get() {
               return this.viewport.width;
-            }
+            },
           },
           {
             key: "height",
             get: function get() {
               return this.viewport.height;
-            }
-          }
+            },
+          },
         ]);
 
         return PDFPageView;
@@ -13397,7 +13406,7 @@ const OPENED_PDF_FILES = {};
       "use strict";
 
       Object.defineProperty(exports, "__esModule", {
-        value: true
+        value: true,
       });
       exports.DefaultTextLayerFactory = exports.TextLayerBuilder = undefined;
 
@@ -13483,9 +13492,9 @@ const OPENED_PDF_FILES = {};
               this.eventBus.dispatch("textlayerrendered", {
                 source: this,
                 pageNumber: this.pageNumber,
-                numTextDivs: this.textDivs.length
+                numTextDivs: this.textDivs.length,
               });
-            }
+            },
           },
           {
             key: "render",
@@ -13514,7 +13523,7 @@ const OPENED_PDF_FILES = {};
                 textDivs: this.textDivs,
                 textContentItemsStr: this.textContentItemsStr,
                 timeout: timeout,
-                enhanceTextSelection: this.enhanceTextSelection
+                enhanceTextSelection: this.enhanceTextSelection,
               });
               this.textLayerRenderTask.promise.then(
                 function() {
@@ -13524,7 +13533,7 @@ const OPENED_PDF_FILES = {};
                 },
                 function(reason) {}
               );
-            }
+            },
           },
           {
             key: "cancel",
@@ -13533,21 +13542,21 @@ const OPENED_PDF_FILES = {};
                 this.textLayerRenderTask.cancel();
                 this.textLayerRenderTask = null;
               }
-            }
+            },
           },
           {
             key: "setTextContentStream",
             value: function setTextContentStream(readableStream) {
               this.cancel();
               this.textContentStream = readableStream;
-            }
+            },
           },
           {
             key: "setTextContent",
             value: function setTextContent(textContent) {
               this.cancel();
               this.textContent = textContent;
-            }
+            },
           },
           {
             key: "convertMatches",
@@ -13579,8 +13588,8 @@ const OPENED_PDF_FILES = {};
                 var match = {
                   begin: {
                     divIdx: i,
-                    offset: matchIdx - iIndex
-                  }
+                    offset: matchIdx - iIndex,
+                  },
                 };
                 if (matchesLength) {
                   matchIdx += matchesLength[m];
@@ -13596,12 +13605,12 @@ const OPENED_PDF_FILES = {};
                 }
                 match.end = {
                   divIdx: i,
-                  offset: matchIdx - iIndex
+                  offset: matchIdx - iIndex,
                 };
                 ret.push(match);
               }
               return ret;
-            }
+            },
           },
           {
             key: "renderMatches",
@@ -13627,7 +13636,7 @@ const OPENED_PDF_FILES = {};
                   : this.findController.state.highlightAll;
               var infinity = {
                 divIdx: -1,
-                offset: undefined
+                offset: undefined,
               };
               function beginText(begin, className) {
                 var divIdx = begin.divIdx;
@@ -13676,7 +13685,7 @@ const OPENED_PDF_FILES = {};
                   ) {
                     var spot = {
                       top: MATCH_SCROLL_OFFSET_TOP,
-                      left: MATCH_SCROLL_OFFSET_LEFT
+                      left: MATCH_SCROLL_OFFSET_LEFT,
                     };
                     (0, _ui_utils.scrollIntoView)(
                       textDivs[begin.divIdx],
@@ -13730,7 +13739,7 @@ const OPENED_PDF_FILES = {};
                   infinity.offset
                 );
               }
-            }
+            },
           },
           {
             key: "updateMatches",
@@ -13772,7 +13781,7 @@ const OPENED_PDF_FILES = {};
                 pageMatchesLength
               );
               this.renderMatches(this.matches);
-            }
+            },
           },
           {
             key: "_bindEvents",
@@ -13809,7 +13818,7 @@ const OPENED_PDF_FILES = {};
                 "updatetextlayermatches",
                 _boundEvents.updateTextLayerMatches
               );
-            }
+            },
           },
           {
             key: "_bindMouse",
@@ -13864,8 +13873,8 @@ const OPENED_PDF_FILES = {};
                 end.style.top = "";
                 end.classList.remove("active");
               });
-            }
-          }
+            },
+          },
         ]);
 
         return TextLayerBuilder;
@@ -13893,10 +13902,10 @@ const OPENED_PDF_FILES = {};
                 textLayerDiv: textLayerDiv,
                 pageIndex: pageIndex,
                 viewport: viewport,
-                enhanceTextSelection: enhanceTextSelection
+                enhanceTextSelection: enhanceTextSelection,
               });
-            }
-          }
+            },
+          },
         ]);
 
         return DefaultTextLayerFactory;
@@ -13912,7 +13921,7 @@ const OPENED_PDF_FILES = {};
       "use strict";
 
       Object.defineProperty(exports, "__esModule", {
-        value: true
+        value: true,
       });
       exports.SecondaryToolbar = undefined;
 
@@ -13960,107 +13969,107 @@ const OPENED_PDF_FILES = {};
             {
               element: options.presentationModeButton,
               eventName: "presentationmode",
-              close: true
+              close: true,
             },
             {
               element: options.openFileButton,
               eventName: "openfile",
-              close: true
+              close: true,
             },
             {
               element: options.printButton,
               eventName: "print",
-              close: true
+              close: true,
             },
             {
               element: options.downloadButton,
               eventName: "download",
-              close: true
+              close: true,
             },
             {
               element: options.viewBookmarkButton,
               eventName: null,
-              close: true
+              close: true,
             },
             {
               element: options.firstPageButton,
               eventName: "firstpage",
-              close: true
+              close: true,
             },
             {
               element: options.lastPageButton,
               eventName: "lastpage",
-              close: true
+              close: true,
             },
             {
               element: options.pageRotateCwButton,
               eventName: "rotatecw",
-              close: false
+              close: false,
             },
             {
               element: options.pageRotateCcwButton,
               eventName: "rotateccw",
-              close: false
+              close: false,
             },
             {
               element: options.cursorSelectToolButton,
               eventName: "switchcursortool",
               eventDetails: { tool: _pdf_cursor_tools.CursorTool.SELECT },
-              close: true
+              close: true,
             },
             {
               element: options.cursorHandToolButton,
               eventName: "switchcursortool",
               eventDetails: { tool: _pdf_cursor_tools.CursorTool.HAND },
-              close: true
+              close: true,
             },
             {
               element: options.scrollVerticalButton,
               eventName: "switchscrollmode",
               eventDetails: { mode: _base_viewer.ScrollMode.VERTICAL },
-              close: true
+              close: true,
             },
             {
               element: options.scrollHorizontalButton,
               eventName: "switchscrollmode",
               eventDetails: { mode: _base_viewer.ScrollMode.HORIZONTAL },
-              close: true
+              close: true,
             },
             {
               element: options.scrollWrappedButton,
               eventName: "switchscrollmode",
               eventDetails: { mode: _base_viewer.ScrollMode.WRAPPED },
-              close: true
+              close: true,
             },
             {
               element: options.spreadNoneButton,
               eventName: "switchspreadmode",
               eventDetails: { mode: _base_viewer.SpreadMode.NONE },
-              close: true
+              close: true,
             },
             {
               element: options.spreadOddButton,
               eventName: "switchspreadmode",
               eventDetails: { mode: _base_viewer.SpreadMode.ODD },
-              close: true
+              close: true,
             },
             {
               element: options.spreadEvenButton,
               eventName: "switchspreadmode",
               eventDetails: { mode: _base_viewer.SpreadMode.EVEN },
-              close: true
+              close: true,
             },
             {
               element: options.documentPropertiesButton,
               eventName: "documentproperties",
-              close: true
-            }
+              close: true,
+            },
           ];
           this.items = {
             firstPage: options.firstPageButton,
             lastPage: options.lastPageButton,
             pageRotateCw: options.pageRotateCwButton,
-            pageRotateCcw: options.pageRotateCcwButton
+            pageRotateCcw: options.pageRotateCcwButton,
           };
           this.mainContainer = mainContainer;
           this.eventBus = eventBus;
@@ -14096,14 +14105,14 @@ const OPENED_PDF_FILES = {};
             value: function setPageNumber(pageNumber) {
               this.pageNumber = pageNumber;
               this._updateUIState();
-            }
+            },
           },
           {
             key: "setPagesCount",
             value: function setPagesCount(pagesCount) {
               this.pagesCount = pagesCount;
               this._updateUIState();
-            }
+            },
           },
           {
             key: "reset",
@@ -14112,7 +14121,7 @@ const OPENED_PDF_FILES = {};
               this.pagesCount = 0;
               this._updateUIState();
               this.eventBus.dispatch("secondarytoolbarreset", { source: this });
-            }
+            },
           },
           {
             key: "_updateUIState",
@@ -14121,7 +14130,7 @@ const OPENED_PDF_FILES = {};
               this.items.lastPage.disabled = this.pageNumber >= this.pagesCount;
               this.items.pageRotateCw.disabled = this.pagesCount === 0;
               this.items.pageRotateCcw.disabled = this.pagesCount === 0;
-            }
+            },
           },
           {
             key: "_bindClickListeners",
@@ -14157,7 +14166,7 @@ const OPENED_PDF_FILES = {};
               for (var button in this.buttons) {
                 _loop(button);
               }
-            }
+            },
           },
           {
             key: "_bindCursorToolsListener",
@@ -14174,7 +14183,7 @@ const OPENED_PDF_FILES = {};
                     break;
                 }
               });
-            }
+            },
           },
           {
             key: "_bindScrollModeListener",
@@ -14208,7 +14217,7 @@ const OPENED_PDF_FILES = {};
                   scrollModeChanged({ mode: _base_viewer.ScrollMode.VERTICAL });
                 }
               });
-            }
+            },
           },
           {
             key: "_bindSpreadModeListener",
@@ -14237,7 +14246,7 @@ const OPENED_PDF_FILES = {};
                   spreadModeChanged({ mode: _base_viewer.SpreadMode.NONE });
                 }
               });
-            }
+            },
           },
           {
             key: "open",
@@ -14249,7 +14258,7 @@ const OPENED_PDF_FILES = {};
               this._setMaxHeight();
               this.toggleButton.classList.add("toggled");
               this.toolbar.classList.remove("hidden");
-            }
+            },
           },
           {
             key: "close",
@@ -14260,7 +14269,7 @@ const OPENED_PDF_FILES = {};
               this.opened = false;
               this.toolbar.classList.add("hidden");
               this.toggleButton.classList.remove("toggled");
-            }
+            },
           },
           {
             key: "toggle",
@@ -14270,7 +14279,7 @@ const OPENED_PDF_FILES = {};
               } else {
                 this.open();
               }
-            }
+            },
           },
           {
             key: "_setMaxHeight",
@@ -14289,14 +14298,14 @@ const OPENED_PDF_FILES = {};
                   "px;"
               );
               this.previousContainerHeight = this.containerHeight;
-            }
+            },
           },
           {
             key: "isOpen",
             get: function get() {
               return this.opened;
-            }
-          }
+            },
+          },
         ]);
 
         return SecondaryToolbar;
@@ -14311,7 +14320,7 @@ const OPENED_PDF_FILES = {};
       "use strict";
 
       Object.defineProperty(exports, "__esModule", {
-        value: true
+        value: true,
       });
       exports.PDFSinglePageViewer = undefined;
 
@@ -14388,8 +14397,8 @@ const OPENED_PDF_FILES = {};
             value: subClass,
             enumerable: false,
             writable: true,
-            configurable: true
-          }
+            configurable: true,
+          },
         });
         if (superClass)
           Object.setPrototypeOf
@@ -14429,7 +14438,7 @@ const OPENED_PDF_FILES = {};
               ).call(this);
               this._previousPageNumber = 1;
               this._shadowViewer = document.createDocumentFragment();
-            }
+            },
           },
           {
             key: "_ensurePageViewVisible",
@@ -14460,7 +14469,7 @@ const OPENED_PDF_FILES = {};
                   );
               }
               this._previousPageNumber = this._currentPageNumber;
-            }
+            },
           },
           {
             key: "_scrollUpdate",
@@ -14474,7 +14483,7 @@ const OPENED_PDF_FILES = {};
                 "_scrollUpdate",
                 this
               ).call(this);
-            }
+            },
           },
           {
             key: "_scrollIntoView",
@@ -14508,7 +14517,7 @@ const OPENED_PDF_FILES = {};
                   _this2.update();
                 }
               }, 0);
-            }
+            },
           },
           {
             key: "_getVisiblePages",
@@ -14522,14 +14531,14 @@ const OPENED_PDF_FILES = {};
                 id: pageView.id,
                 x: element.offsetLeft + element.clientLeft,
                 y: element.offsetTop + element.clientTop,
-                view: pageView
+                view: pageView,
               };
               return {
                 first: view,
                 last: view,
-                views: [view]
+                views: [view],
               };
-            }
+            },
           },
           {
             key: "update",
@@ -14545,17 +14554,17 @@ const OPENED_PDF_FILES = {};
               this._updateLocation(visible.first);
               this.eventBus.dispatch("updateviewarea", {
                 source: this,
-                location: this._location
+                location: this._location,
               });
-            }
+            },
           },
           {
             key: "_updateScrollMode",
-            value: function _updateScrollMode() {}
+            value: function _updateScrollMode() {},
           },
           {
             key: "_updateSpreadMode",
-            value: function _updateSpreadMode() {}
+            value: function _updateSpreadMode() {},
           },
           {
             key: "_setDocumentViewerElement",
@@ -14565,7 +14574,7 @@ const OPENED_PDF_FILES = {};
                 "_setDocumentViewerElement",
                 this._shadowViewer
               );
-            }
+            },
           },
           {
             key: "_isScrollModeHorizontal",
@@ -14575,8 +14584,8 @@ const OPENED_PDF_FILES = {};
                 "_isScrollModeHorizontal",
                 false
               );
-            }
-          }
+            },
+          },
         ]);
 
         return PDFSinglePageViewer;
@@ -14591,7 +14600,7 @@ const OPENED_PDF_FILES = {};
       "use strict";
 
       Object.defineProperty(exports, "__esModule", {
-        value: true
+        value: true,
       });
       exports.Toolbar = undefined;
 
@@ -14650,7 +14659,7 @@ const OPENED_PDF_FILES = {};
               this.pageNumber = pageNumber;
               this.pageLabel = pageLabel;
               this._updateUIState(false);
-            }
+            },
           },
           {
             key: "setPagesCount",
@@ -14658,7 +14667,7 @@ const OPENED_PDF_FILES = {};
               this.pagesCount = pagesCount;
               this.hasPageLabels = hasPageLabels;
               this._updateUIState(true);
-            }
+            },
           },
           {
             key: "setPageScale",
@@ -14666,7 +14675,7 @@ const OPENED_PDF_FILES = {};
               this.pageScaleValue = (pageScaleValue || pageScale).toString();
               this.pageScale = pageScale;
               this._updateUIState(false);
-            }
+            },
           },
           {
             key: "reset",
@@ -14678,7 +14687,7 @@ const OPENED_PDF_FILES = {};
               this.pageScaleValue = _ui_utils.DEFAULT_SCALE_VALUE;
               this.pageScale = _ui_utils.DEFAULT_SCALE;
               this._updateUIState(true);
-            }
+            },
           },
           {
             key: "_bindListeners",
@@ -14686,7 +14695,7 @@ const OPENED_PDF_FILES = {};
               var _this = this;
 
               var eventBus = this.eventBus,
-              items = this.items;
+                items = this.items;
               var self = this;
               items.previous.addEventListener("click", function() {
                 eventBus.dispatch("previouspage", { source: self });
@@ -14709,7 +14718,7 @@ const OPENED_PDF_FILES = {};
               items.pageNumber.addEventListener("change", function() {
                 eventBus.dispatch("pagenumberchanged", {
                   source: self,
-                  value: this.value
+                  value: this.value,
                 });
               });
               items.scaleSelect.addEventListener("change", function() {
@@ -14718,7 +14727,7 @@ const OPENED_PDF_FILES = {};
                 }
                 eventBus.dispatch("scalechanged", {
                   source: self,
-                  value: this.value
+                  value: this.value,
                 });
               });
               items.presentationModeButton.addEventListener(
@@ -14740,7 +14749,7 @@ const OPENED_PDF_FILES = {};
               eventBus.on("localized", function() {
                 _this._localized();
               });
-            }
+            },
           },
           {
             key: "_localized",
@@ -14748,7 +14757,7 @@ const OPENED_PDF_FILES = {};
               this._wasLocalized = true;
               this._adjustScaleWidth();
               this._updateUIState(true);
-            }
+            },
           },
           {
             key: "_updateUIState",
@@ -14791,7 +14800,7 @@ const OPENED_PDF_FILES = {};
                     "page_of_pages",
                     {
                       pageNumber: pageNumber,
-                      pagesCount: pagesCount
+                      pagesCount: pagesCount,
                     },
                     "({{pageNumber}} of {{pagesCount}})"
                   )
@@ -14825,7 +14834,7 @@ const OPENED_PDF_FILES = {};
                     items.customScaleOption.selected = true;
                   }
                 });
-            }
+            },
           },
           {
             key: "updateLoadingIndicatorState",
@@ -14840,7 +14849,7 @@ const OPENED_PDF_FILES = {};
                 PAGE_NUMBER_LOADING_INDICATOR,
                 loading
               );
-            }
+            },
           },
           {
             key: "_adjustScaleWidth",
@@ -14870,8 +14879,8 @@ const OPENED_PDF_FILES = {};
                   );
                 }
               });
-            }
-          }
+            },
+          },
         ]);
 
         return Toolbar;
@@ -14886,7 +14895,7 @@ const OPENED_PDF_FILES = {};
       "use strict";
 
       Object.defineProperty(exports, "__esModule", {
-        value: true
+        value: true,
       });
       exports.ViewHistory = undefined;
 
@@ -15027,7 +15036,7 @@ const OPENED_PDF_FILES = {};
               }
 
               return _writeToStorage;
-            })()
+            })(),
           },
           {
             key: "_readFromStorage",
@@ -15061,7 +15070,7 @@ const OPENED_PDF_FILES = {};
               }
 
               return _readFromStorage;
-            })()
+            })(),
           },
           {
             key: "set",
@@ -15103,7 +15112,7 @@ const OPENED_PDF_FILES = {};
               }
 
               return set;
-            })()
+            })(),
           },
           {
             key: "setMultiple",
@@ -15147,7 +15156,7 @@ const OPENED_PDF_FILES = {};
               }
 
               return setMultiple;
-            })()
+            })(),
           },
           {
             key: "get",
@@ -15190,7 +15199,7 @@ const OPENED_PDF_FILES = {};
               }
 
               return get;
-            })()
+            })(),
           },
           {
             key: "getMultiple",
@@ -15236,8 +15245,8 @@ const OPENED_PDF_FILES = {};
               }
 
               return getMultiple;
-            })()
-          }
+            })(),
+          },
         ]);
 
         return ViewHistory;
@@ -15252,7 +15261,7 @@ const OPENED_PDF_FILES = {};
       "use strict";
 
       Object.defineProperty(exports, "__esModule", {
-        value: true
+        value: true,
       });
       exports.GenericCom = undefined;
 
@@ -15348,8 +15357,8 @@ const OPENED_PDF_FILES = {};
             value: subClass,
             enumerable: false,
             writable: true,
-            configurable: true
-          }
+            configurable: true,
+          },
         });
         if (superClass)
           Object.setPrototypeOf
@@ -15409,7 +15418,7 @@ const OPENED_PDF_FILES = {};
               }
 
               return _writeToStorage;
-            })()
+            })(),
           },
           {
             key: "_readFromStorage",
@@ -15447,8 +15456,8 @@ const OPENED_PDF_FILES = {};
               }
 
               return _readFromStorage;
-            })()
-          }
+            })(),
+          },
         ]);
 
         return GenericPreferences;
@@ -15477,7 +15486,7 @@ const OPENED_PDF_FILES = {};
       "use strict";
 
       Object.defineProperty(exports, "__esModule", {
-        value: true
+        value: true,
       });
       exports.BasePreferences = undefined;
 
@@ -15580,7 +15589,7 @@ const OPENED_PDF_FILES = {};
             disablePageMode: false,
             disablePageLabels: false,
             scrollModeOnLoad: 0,
-            spreadModeOnLoad: 0
+            spreadModeOnLoad: 0,
           });
         }
         return defaultPreferences;
@@ -15602,7 +15611,7 @@ const OPENED_PDF_FILES = {};
                 value: Object.freeze(defaults),
                 writable: false,
                 enumerable: true,
-                configurable: false
+                configurable: false,
               });
               _this.prefs = Object.assign(Object.create(null), defaults);
               return _this._readFromStorage(defaults);
@@ -15662,7 +15671,7 @@ const OPENED_PDF_FILES = {};
               }
 
               return _writeToStorage;
-            })()
+            })(),
           },
           {
             key: "_readFromStorage",
@@ -15697,7 +15706,7 @@ const OPENED_PDF_FILES = {};
               }
 
               return _readFromStorage;
-            })()
+            })(),
           },
           {
             key: "reset",
@@ -15739,7 +15748,7 @@ const OPENED_PDF_FILES = {};
               }
 
               return reset;
-            })()
+            })(),
           },
           {
             key: "set",
@@ -15864,7 +15873,7 @@ const OPENED_PDF_FILES = {};
               }
 
               return set;
-            })()
+            })(),
           },
           {
             key: "get",
@@ -15924,7 +15933,7 @@ const OPENED_PDF_FILES = {};
               }
 
               return get;
-            })()
+            })(),
           },
           {
             key: "getAll",
@@ -15966,8 +15975,8 @@ const OPENED_PDF_FILES = {};
               }
 
               return getAll;
-            })()
-          }
+            })(),
+          },
         ]);
 
         return BasePreferences;
@@ -15982,7 +15991,7 @@ const OPENED_PDF_FILES = {};
       "use strict";
 
       Object.defineProperty(exports, "__esModule", {
-        value: true
+        value: true,
       });
       exports.DownloadManager = undefined;
 
@@ -16054,7 +16063,7 @@ const OPENED_PDF_FILES = {};
                 return;
               }
               _download(url + "#pdfjs.action=download", filename);
-            }
+            },
           },
           {
             key: "downloadData",
@@ -16071,7 +16080,7 @@ const OPENED_PDF_FILES = {};
                 this.disableCreateObjectURL
               );
               _download(blobUrl, filename);
-            }
+            },
           },
           {
             key: "download",
@@ -16088,8 +16097,8 @@ const OPENED_PDF_FILES = {};
               }
               var blobUrl = _pdfjsLib.URL.createObjectURL(blob);
               _download(blobUrl, filename);
-            }
-          }
+            },
+          },
         ]);
 
         return DownloadManager;
@@ -16104,7 +16113,7 @@ const OPENED_PDF_FILES = {};
       "use strict";
 
       Object.defineProperty(exports, "__esModule", {
-        value: true
+        value: true,
       });
       exports.GenericL10n = undefined;
 
@@ -16224,7 +16233,7 @@ const OPENED_PDF_FILES = {};
               }
 
               return getLanguage;
-            })()
+            })(),
           },
           {
             key: "getDirection",
@@ -16264,7 +16273,7 @@ const OPENED_PDF_FILES = {};
               }
 
               return getDirection;
-            })()
+            })(),
           },
           {
             key: "get",
@@ -16308,7 +16317,7 @@ const OPENED_PDF_FILES = {};
               }
 
               return get;
-            })()
+            })(),
           },
           {
             key: "translate",
@@ -16350,8 +16359,8 @@ const OPENED_PDF_FILES = {};
               }
 
               return translate;
-            })()
-          }
+            })(),
+          },
         ]);
 
         return GenericL10n;
@@ -16399,7 +16408,7 @@ const OPENED_PDF_FILES = {};
           }
           return {
             id: l10nId,
-            args: args
+            args: args,
           };
         }
         function fireL10nReadyEvent(lang) {
@@ -16781,7 +16790,7 @@ const OPENED_PDF_FILES = {};
             xog: 3,
             yo: 0,
             zh: 0,
-            zu: 3
+            zu: 3,
           };
           function isIn(n, list) {
             return list.indexOf(n) !== -1;
@@ -16944,7 +16953,7 @@ const OPENED_PDF_FILES = {};
               if (isIn(n, [2, 12])) return "two";
               if (isIn(n, [1, 11])) return "one";
               return "other";
-            }
+            },
           };
           var index = locales2rules[lang.replace(/-.*$/, "")];
           if (!(index in pluralRules)) {
@@ -17145,7 +17154,7 @@ const OPENED_PDF_FILES = {};
                 callback();
               });
             }
-          }
+          },
         };
       })(window, document);
 
@@ -17156,7 +17165,7 @@ const OPENED_PDF_FILES = {};
       "use strict";
 
       Object.defineProperty(exports, "__esModule", {
-        value: true
+        value: true,
       });
       exports.PDFPrintService = undefined;
 
@@ -17188,14 +17197,14 @@ const OPENED_PDF_FILES = {};
               canvasContext: ctx,
               transform: [PRINT_UNITS, 0, 0, PRINT_UNITS, 0, 0],
               viewport: pdfPage.getViewport(1, size.rotation),
-              intent: "print"
+              intent: "print",
             };
             return pdfPage.render(renderContext).promise;
           })
           .then(function() {
             return {
               width: width,
-              height: height
+              height: height,
             };
           });
       }
@@ -17331,7 +17340,7 @@ const OPENED_PDF_FILES = {};
           if (!this.active) {
             throw new Error("This print request was cancelled or completed.");
           }
-        }
+        },
       };
       var print = window.print;
       window.print = function print() {
@@ -17423,9 +17432,9 @@ const OPENED_PDF_FILES = {};
         true
       );
       //preventing the right click on pdf
-      window.addEventListener('contextmenu', event => {
-        event.preventDefault()
-      })
+      window.addEventListener("contextmenu", (event) => {
+        event.preventDefault();
+      });
       if (hasAttachEvent) {
         document.attachEvent("onkeydown", function(event) {
           event = event || window.event;
@@ -17481,12 +17490,12 @@ const OPENED_PDF_FILES = {};
             l10n
           );
           return activeService;
-        }
+        },
       };
       exports.PDFPrintService = PDFPrintService;
 
       /***/
-    }
+    },
     /******/
   ]
 );

@@ -12,7 +12,8 @@ import {
   getOrderedSequences,
   getDTD2_2_FormattedDate,
   getDTDVersion,
-  getV2_2Date
+  getV2_2Date,
+  openFileInWindow
 } from "../../utils";
 import { Text } from "../../uikit/components";
 import { Icon } from "antd";
@@ -62,27 +63,7 @@ class NodeProperties extends Component {
   };
 
   loadFile = (fileHref, fileID, title) => {
-    const type = fileHref.substring(fileHref.lastIndexOf(".") + 1);
-    let newWindow = null;
-    if (type.includes("pdf") && fileID) {
-      newWindow = window.open(
-        `${process.env.PUBLIC_URL}/viewer/pdf/${fileID}`,
-        "_blank"
-      );
-    } else {
-      if (fileID) {
-        newWindow = window.open(
-          `${process.env.PUBLIC_URL}/viewer/${type}/${fileID}`,
-          "_blank"
-        );
-      }
-    }
-
-    if (newWindow) {
-      newWindow.addEventListener("load", function () {
-        newWindow.document.title = title || "";
-      });
-    }
+    openFileInWindow(fileHref, fileID, title);
   };
 
   openFile = () => {

@@ -1054,6 +1054,10 @@ class SubmissionView extends Component {
       sequencesPaneWidth,
       propertiesWidth
     } = this.state;
+    let m1Json = selectedSequence
+    ? _.get(sequenceJson, "[fda-regional:fda-regional]", "")
+    : _.get(lifeCycleJson, "[fda-regional:fda-regional]", "");
+    let dtd_version = getDTDVersion(m1Json);
     if (!selectedSubmission) {
       return <Redirect to="/applications" />;
     }
@@ -1552,6 +1556,7 @@ class SubmissionView extends Component {
               label={_.get(selectedSubmission, "name", "")}
               onClose={this.closeValidationModal}
               onItemSelected={this.onValidationResultItemClick}
+              dtdVersion={dtd_version}
             />
           </DraggableModal>
           <DraggableModal
