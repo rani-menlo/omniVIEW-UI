@@ -9,7 +9,7 @@ import {
   PhoneField,
   OmniButton,
   CircularLocalImageFile,
-  ImageLoader
+  ImageLoader,
 } from "../../uikit/components";
 import Header from "../header/header.component";
 import { translate } from "../../translations/translator";
@@ -24,62 +24,52 @@ class CreateProfile extends Component {
     this.state = {
       editProfile: false,
       showChangePassword: false,
-      username: {
-        value: "",
-        error: ""
-      },
       password: {
         value: "",
-        error: ""
+        error: "",
       },
       oldPassword: {
         value: "",
-        error: ""
+        error: "",
       },
       confirmPwd: {
         value: "",
-        error: ""
+        error: "",
       },
       fname: {
         value: "",
-        error: ""
+        error: "",
       },
       lname: {
         value: "",
-        error: ""
+        error: "",
       },
       email: {
         value: "",
-        error: ""
+        error: "",
       },
       phone: {
         value: "",
-        error: ""
+        error: "",
       },
       selectedFile: null,
-      existingProfileImageChanged: false
+      existingProfileImageChanged: false,
     };
     this.uploadContainer = React.createRef();
   }
 
-  clearUsernameError = () => {
-    this.props.dispatch(LoginActions.setUsernameExistsError(""));
-  };
-
   componentDidMount() {
-    this.clearUsernameError();
     const { history } = this.props;
     const state = this.populateState();
     this.setState({
       ...state,
-      editProfile: history.location.pathname.includes("/edit")
+      editProfile: history.location.pathname.includes("/edit"),
     });
   }
 
   populateState = () => {
     const { user } = this.props;
     const state = { ...this.state };
-    state.username.value = isNaN(user.user_name) ? user.user_name : "";
     state.fname.value = user.first_name;
     state.lname.value = user.last_name;
     state.email.value = user.email;
@@ -90,47 +80,29 @@ class CreateProfile extends Component {
     return state;
   };
 
-  onInputChange = field => e => {
-    this.clearUsernameError();
+  onInputChange = (field) => (e) => {
     const { value } = e.target;
-    this.setState(
-      {
-        [field]: { ...this.state[field], value, error: "" }
-      },
-      () => {
-        if (field == "username") {
-          this.changeUsername();
-        }
-      }
-    );
+    this.setState({
+      [field]: { ...this.state[field], value, error: "" },
+    });
   };
 
-  onPhoneChange = value => {
+  onPhoneChange = (value) => {
     this.setState({ phone: { ...this.state.phone, value, error: "" } });
   };
 
   goBack = () => {
-    this.clearUsernameError();
     this.props.history.push("/customers");
   };
 
   save = () => {
     const state = { ...this.state };
     let error = false;
-    if (this.props.usernameExists) {
-      return;
-    }
-    if (!state.username.value) {
-      error = true;
-      state.username.error = translate("error.form.required", {
-        type: translate("label.form.username")
-      });
-    }
     if (!state.editProfile) {
       if (!state.password.value) {
         error = true;
         state.password.error = translate("error.form.required", {
-          type: translate("label.form.password")
+          type: translate("label.form.password"),
         });
       }
       if (state.password.value) {
@@ -139,7 +111,7 @@ class CreateProfile extends Component {
           if (!state.confirmPwd.value) {
             error = true;
             state.confirmPwd.error = translate("error.form.required", {
-              type: translate("label.form.password")
+              type: translate("label.form.password"),
             });
           }
           if (state.password.value !== state.confirmPwd.value) {
@@ -163,7 +135,7 @@ class CreateProfile extends Component {
           state.oldPassword.error = translate("error.form.required", {
             type: `${translate("label.generic.current")} ${translate(
               "label.form.password"
-            )}`
+            )}`,
           });
         }
         if (!state.password.value) {
@@ -171,7 +143,7 @@ class CreateProfile extends Component {
           state.password.error = translate("error.form.required", {
             type: `${translate("label.generic.new")} ${translate(
               "label.form.password"
-            )}`
+            )}`,
           });
         }
         if (state.password.value) {
@@ -182,7 +154,7 @@ class CreateProfile extends Component {
               state.confirmPwd.error = translate("error.form.required", {
                 type: `${translate("label.generic.new")} ${translate(
                   "label.form.password"
-                )} ${translate("label.generic.again")}`
+                )} ${translate("label.generic.again")}`,
               });
             }
             if (state.password.value !== state.confirmPwd.value) {
@@ -199,13 +171,13 @@ class CreateProfile extends Component {
     if (!state.fname.value) {
       error = true;
       state.fname.error = translate("error.form.required", {
-        type: translate("label.form.fname")
+        type: translate("label.form.fname"),
       });
     }
     if (!state.lname.value) {
       error = true;
       state.lname.error = translate("error.form.required", {
-        type: translate("label.form.lname")
+        type: translate("label.form.lname"),
       });
     }
     if (state.email.value) {
@@ -213,13 +185,13 @@ class CreateProfile extends Component {
       if (!valid) {
         error = true;
         state.email.error = translate("error.form.invalid", {
-          type: translate("label.form.email")
+          type: translate("label.form.email"),
         });
       }
     } else {
       error = true;
       state.email.error = translate("error.form.required", {
-        type: translate("label.form.email")
+        type: translate("label.form.email"),
       });
     }
     if (state.phone.value) {
@@ -227,13 +199,13 @@ class CreateProfile extends Component {
       if (!valid) {
         error = true;
         state.phone.error = translate("error.form.invalid", {
-          type: translate("label.form.phone")
+          type: translate("label.form.phone"),
         });
       }
     } else {
       error = true;
       state.phone.error = translate("error.form.required", {
-        type: translate("label.form.phone")
+        type: translate("label.form.phone"),
       });
     }
 
@@ -243,7 +215,6 @@ class CreateProfile extends Component {
     }
 
     const reqObject = new FormData();
-    reqObject.append("user_name", state.username.value);
     reqObject.append("firstname", state.fname.value);
     reqObject.append("lastname", state.lname.value);
     reqObject.append("emailaddress", state.email.value);
@@ -278,12 +249,12 @@ class CreateProfile extends Component {
     this.setState({ showChangePassword: true });
   };
 
-  onFileSelected = info => {
+  onFileSelected = (info) => {
     const { file, target } = info;
     if (target) {
       this.setState({
         selectedFile: target.files[0],
-        existingProfileImageChanged: this.props.user.profile ? true : false
+        existingProfileImageChanged: this.props.user.profile ? true : false,
       });
       return;
     }
@@ -295,7 +266,7 @@ class CreateProfile extends Component {
   deletePhoto = () => {
     this.setState({
       selectedFile: null,
-      existingProfileImageChanged: this.props.user.profile ? true : false
+      existingProfileImageChanged: this.props.user.profile ? true : false,
     });
   };
 
@@ -303,35 +274,9 @@ class CreateProfile extends Component {
     this.uploadContainer.current.click();
   };
 
-  changeUsername = _.debounce(() => {
-    let { username } = this.state;
-    let { user } = this.props;
-    // Not triggering the api call if the logged in person enters
-    // his username without any change
-    if (this.state.username.value) {
-      if (
-        !user.first_login &&
-        _.isEqual(user.user_name.toLowerCase(), username.value.toLowerCase())
-      ) {
-        return;
-      }
-      this.props.dispatch(
-        LoginActions.checkForUsername(
-          { userName: this.state.username.value },
-          () => {
-            username.value = this.state.username.value;
-            username.error = "";
-            this.setState({ username });
-          }
-        )
-      );
-    }
-  }, DEBOUNCE_TIME);
-
   render() {
     const {
       editProfile,
-      username,
       oldPassword,
       password,
       confirmPwd,
@@ -339,9 +284,9 @@ class CreateProfile extends Component {
       lname,
       email,
       phone,
-      showChangePassword
+      showChangePassword,
     } = this.state;
-    const { user, usernameExists } = this.props;
+    const { user } = this.props;
     return (
       <React.Fragment>
         <Loader loading={this.props.loading} />
@@ -371,9 +316,7 @@ class CreateProfile extends Component {
             <Text
               type="regular"
               size="16px"
-              text={`${translate("label.form.username")} ${translate(
-                "label.generic.and"
-              )} ${translate("label.form.password")}`}
+              text={`${translate("label.form.password")}`}
             />
             <Text
               type="regular"
@@ -383,26 +326,11 @@ class CreateProfile extends Component {
                 "text.form.pwdreq"
               )}`}
             />
-            <div
-              className="createProfile__fields"
-              style={{ marginTop: "12px" }}
-            >
-              <InputField
-                className="createProfile__fields-field"
-                style={{ marginRight: "14px" }}
-                label={`${translate("label.form.username")}*`}
-                value={username.value}
-                placeholder={translate("label.form.username")}
-                error={username.error || usernameExists}
-                onChange={this.onInputChange("username")}
-                //onBlur={this.onUsernameBlur}
-              />
-            </div>
             {editProfile && !showChangePassword && (
               <OmniButton
                 type="primary"
                 label="Change Password"
-                buttonStyle={{ marginBottom: "20px" }}
+                buttonStyle={{ marginBottom: "20px", marginTop: "10px" }}
                 onClick={this.showPasswordFields}
               />
             )}
@@ -484,7 +412,7 @@ class CreateProfile extends Component {
               type="regular"
               size="16px"
               text={translate("label.user.details", {
-                type: translate("label.dashboard.user")
+                type: translate("label.dashboard.user"),
               })}
             />
             <div className="createProfile__fields">
@@ -640,14 +568,16 @@ function mapStateToProps(state) {
   return {
     loading: state.Api.loading,
     user: state.Login.user,
-    usernameExists: state.Login.usernameExists
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    dispatch
+    dispatch,
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(CreateProfile);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(CreateProfile);
