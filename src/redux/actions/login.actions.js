@@ -31,7 +31,7 @@ export default {
         });
         if (!res.data.error) {
           Toast.success("Profile Updated!");
-          history.push("/customers");
+          history.push("/customer-accounts");
         }
         ApiActions.success(dispatch);
       } catch (err) {

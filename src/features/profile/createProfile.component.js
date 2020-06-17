@@ -111,7 +111,7 @@ class CreateProfile extends Component {
 
   goBack = () => {
     this.clearUsernameError();
-    this.props.history.push("/customers");
+    this.props.history.push("/customer-accounts");
   };
 
   save = () => {

@@ -29,7 +29,7 @@ class PrivateRoute extends Component {
               (props.match.path == "/verify/:mode" ||
                 props.match.path == "/auth")
             ) {
-              return <Redirect to="/customers" />;
+              return <Redirect to="/customer-accounts" />;
             }
             return <Component {...props} />;
           }

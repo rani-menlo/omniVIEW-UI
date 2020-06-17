@@ -6,7 +6,7 @@ import { Toast } from "../../uikit/components";
 
 export default {
   fetchCustomersByList: (pageNo, itemsPerPage, sortBy, order, search) => {
-    return async dispatch => {
+    return async (dispatch) => {
       ApiActions.request(dispatch);
       try {
         const res = await CustomerApi.fetchCustomersByList(
@@ -18,7 +18,7 @@ export default {
         );
         dispatch({
           type: CustomerActionTypes.FETCH_CUSTOMERS,
-          data: res.data
+          data: res.data,
         });
         ApiActions.success(dispatch);
       } catch (err) {
@@ -27,14 +27,30 @@ export default {
       }
     };
   },
-  fetchCustomers: search => {
-    return async dispatch => {
+  fetchCustomers: (search) => {
+    return async (dispatch) => {
       ApiActions.request(dispatch);
       try {
         const res = await CustomerApi.fetchCustomers(search);
         dispatch({
           type: CustomerActionTypes.FETCH_CUSTOMERS,
-          data: res.data
+          data: res.data,
+        });
+        ApiActions.success(dispatch);
+      } catch (err) {
+        console.log(err);
+        ApiActions.failure(dispatch);
+      }
+    };
+  },
+  fetchCustomerAccounts: () => {
+    return async (dispatch) => {
+      ApiActions.request(dispatch);
+      try {
+        const res = await CustomerApi.fetchCustomerAccounts();
+        dispatch({
+          type: CustomerActionTypes.FETCH_CUSTOMER_ACCOUNTS,
+          data: res.data,
         });
         ApiActions.success(dispatch);
       } catch (err) {
@@ -44,7 +60,7 @@ export default {
     };
   },
   addCustomer: (customer, callback) => {
-    return async dispatch => {
+    return async (dispatch) => {
       ApiActions.request(dispatch);
       try {
         const res = await CustomerApi.addCustomer(customer);
@@ -54,7 +70,7 @@ export default {
         } else {
           dispatch({
             type: CustomerActionTypes.ADD_CUSTOMER,
-            data: res.data
+            data: res.data,
           });
           callback && callback();
           ApiActions.success(dispatch);
@@ -65,7 +81,7 @@ export default {
     };
   },
   editCustomer: (customer, callback) => {
-    return async dispatch => {
+    return async (dispatch) => {
       ApiActions.request(dispatch);
       try {
         const res = await CustomerApi.editCustomer(customer);
@@ -75,7 +91,7 @@ export default {
         } else {
           dispatch({
             type: CustomerActionTypes.EDIT_CUSTOMER,
-            data: res.data
+            data: res.data,
           });
           callback && callback();
           ApiActions.success(dispatch);
@@ -86,23 +102,23 @@ export default {
     };
   },
   setSelectedCustomer: (customer, cb) => {
-    return dispatch => {
+    return (dispatch) => {
       dispatch({
         type: CustomerActionTypes.SET_SELECTED_CUSTOMER,
-        customer
+        customer,
       });
       cb && cb();
     };
   },
   activateDeactivateCustomer: (customer, search) => {
-    return async dispatch => {
+    return async (dispatch) => {
       ApiActions.request(dispatch);
       try {
         await CustomerApi.activateDeactivateCustomer(customer);
         const res = await CustomerApi.fetchCustomers(search);
         dispatch({
           type: CustomerActionTypes.FETCH_CUSTOMERS,
-          data: res.data
+          data: res.data,
         });
         !res.data.error && Toast.success("Customer Status Updated!");
         ApiActions.success(dispatch);
@@ -111,14 +127,14 @@ export default {
       }
     };
   },
-  getSubscriptionsInUse: customerId => {
-    return async dispatch => {
+  getSubscriptionsInUse: (customerId) => {
+    return async (dispatch) => {
       ApiActions.request(dispatch);
       try {
         const res = await CustomerApi.getSubscriptionsInUse(customerId);
         dispatch({
           type: CustomerActionTypes.SUBSCRIPTIONS_IN_USE,
-          data: res.data
+          data: res.data,
         });
         ApiActions.success(dispatch);
       } catch (err) {
@@ -126,15 +142,15 @@ export default {
       }
     };
   },
-  getAvailableLicences: customerId => {
-    return async dispatch => {
+  getAvailableLicences: (customerId) => {
+    return async (dispatch) => {
       ApiActions.request(dispatch);
       try {
         const res = await UsermanagementApi.fetchAvailableLicences(customerId);
         let licences = _.get(res, "data.licences", {});
         dispatch({
           type: CustomerActionTypes.LICENCES_UN_ASSIGNED,
-          data: licences
+          data: licences,
         });
         ApiActions.success(dispatch);
       } catch (err) {
@@ -153,7 +169,7 @@ export default {
         }
         dispatch({
           type: CustomerActionTypes.GET_LICENCE_LOOKUPS,
-          data: lookups
+          data: lookups,
         });
         ApiActions.success(dispatch);
       } catch (err) {
@@ -162,7 +178,7 @@ export default {
     };
   },
   addNewLicences: (data, callback) => {
-    return async dispatch => {
+    return async (dispatch) => {
       ApiActions.request(dispatch);
       try {
         const res = await CustomerApi.addNewLicences(data);
@@ -175,7 +191,7 @@ export default {
   },
   resetLicencesInUseAndUnAssigned: () => {
     return {
-      type: CustomerActionTypes.RESET_IN_USE_UN_ASSIGNED
+      type: CustomerActionTypes.RESET_IN_USE_UN_ASSIGNED,
     };
-  }
+  },
 };

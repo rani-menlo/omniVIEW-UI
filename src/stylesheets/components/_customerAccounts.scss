@@ -1,0 +1,19 @@
+.customer-accounts {
+  border: 1px solid $spanish-grey;
+  max-height: 400px;
+  overflow-y: auto;
+  margin-top: 50px;
+  padding: 12px;
+  border-radius: 4px;
+  h3 {
+    color: $clear-chill;
+    text-align: center;
+  }
+  span.ant-radio + * {
+    padding-right: 15px !important;
+    padding-left: 15px !important;
+    word-break: break-all;
+    white-space: normal;
+    display: inline-flex;
+  }
+}

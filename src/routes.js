@@ -22,6 +22,7 @@ import SubscriptionsPage from "./features/license/subscriptionsPage.component";
 import RequestLicense from "./features/license/requestLicence.component";
 import AddNewApplication from "./features/dashboard/application/addNewApplication.container";
 import RemoteDetails from "./features/dashboard/application/remoteDetails.component";
+import CustomerAccounts from './features/customerAccounts/customerAccounts.component';
 
 const Routes = () => {
   return (
@@ -50,6 +51,10 @@ const Routes = () => {
             />
             <PrivateRoute path="/auth" component={LoginAuth1} />
             <PrivateRoute path="/verify/:mode" component={AuthenticationCode} />
+            <PrivateRoute
+              path="/customer-accounts"
+              component={CustomerAccounts}
+            />
             <PrivateRoute
               path="/customers"
               component={CustomerDashboardContainer}

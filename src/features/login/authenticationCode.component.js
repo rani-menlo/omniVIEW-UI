@@ -39,7 +39,7 @@ class AuthenticationCode extends Component {
       this.props.history.push("/profile");
       return;
     }
-    this.props.history.push("/customers");
+    this.props.history.push("/customer-accounts");
   };
 
   resendOtp = () => {
