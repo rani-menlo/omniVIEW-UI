@@ -17,7 +17,7 @@ class ValidationResults extends Component {
     this.state = {
       sort: "asc",
       validationResults: [],
-      selected: ""
+      selected: "",
     };
   }
 
@@ -25,13 +25,13 @@ class ValidationResults extends Component {
     onClose: PropTypes.func,
     sequence: PropTypes.object,
     label: PropTypes.string,
-    onItemSelected: PropTypes.func
+    onItemSelected: PropTypes.func,
   };
 
   componentDidMount() {
     const { sequence } = this.props;
     sequence &&
-      this.props.actions.validateSequence(sequence.id, err => {
+      this.props.actions.validateSequence(sequence.id, (err) => {
         Toast.error("Internal server error. Please try again later.");
         this.props.onClose();
       });
@@ -45,7 +45,7 @@ class ValidationResults extends Component {
     return _.size(newState) ? { ...newState } : null;
   }
 
-  getAlertIcon = severity => {
+  getAlertIcon = (severity) => {
     if (severity === "Low") {
       return "/images/alert-low.svg";
     } else if (severity === "Medium") {
@@ -55,7 +55,7 @@ class ValidationResults extends Component {
     }
   };
 
-  sortColumn = key => () => {
+  sortColumn = (key) => () => {
     const { validationResults } = this.state;
     const sortBy = this.state.sort === "asc" ? "desc" : "asc";
     /* if (key === "severity") {
@@ -77,7 +77,7 @@ class ValidationResults extends Component {
     const data = _.orderBy(validationResults, key, sortBy);
     this.setState({
       sort: sortBy,
-      validationResults: data
+      validationResults: data,
     });
   };
 
@@ -87,7 +87,7 @@ class ValidationResults extends Component {
     onItemSelected && onItemSelected(item);
   };
 
-  getValidationGroupIcon = validation => {
+  getValidationGroupIcon = (validation) => {
     const { group, isFile, isFolder, isSTF } = validation;
     let img = (
       <Icon type="folder" theme="filled" className="global__file-folder" />
@@ -151,7 +151,7 @@ class ValidationResults extends Component {
   openReport = () => {
     const authToken = localStorage.getItem("omniview_user_token");
     const {
-      sequence: { id }
+      sequence: { id },
     } = this.props;
     let url = URI.VALIDATION_REPORT.replace("{sequenceId}", id);
     url = url.replace("{authToken}", authToken);
@@ -160,7 +160,7 @@ class ValidationResults extends Component {
   };
 
   render() {
-    const { onClose, label, sequence } = this.props;
+    const { onClose, label, sequence, dtdVersion } = this.props;
     const { validationResults, sort, selected } = this.state;
     return (
       <React.Fragment>
@@ -249,7 +249,7 @@ class ValidationResults extends Component {
                               </span>
                               <span
                                 style={{
-                                  wordBreak: "break-word"
+                                  wordBreak: "break-word",
                                 }}
                               >
                                 {_.get(validation, "displayName", "") ||
@@ -270,7 +270,7 @@ class ValidationResults extends Component {
                           <td className="col-description">
                             <span
                               style={{
-                                wordBreak: "break-word"
+                                wordBreak: "break-word",
                               }}
                             >
                               {`${
@@ -318,14 +318,17 @@ class ValidationResults extends Component {
 function mapStateToProps(state, props) {
   return {
     validations: getValidationsBySequence(state, props),
-    validationsSequence_flag: state.Submission.validationsSequence_flag
+    validationsSequence_flag: state.Submission.validationsSequence_flag,
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ ...SubmissionActions }, dispatch)
+    actions: bindActionCreators({ ...SubmissionActions }, dispatch),
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ValidationResults);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(ValidationResults);

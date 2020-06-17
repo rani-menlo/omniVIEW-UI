@@ -205,6 +205,7 @@
   "label.user.email": "Email",
   "label.user.status": "Status",
   "label.user.expdate": "Exp. Date",
+  "label.user.expdateLicenseType": "Exp. Date/License Type",
   "label.user.contact": "Contact",
   "label.user.seccontact": "Secondary Contact",
   "label.user.areyousuremarkseccontact": "Are you sure you want to tag selected users as Secondary Contacts?",

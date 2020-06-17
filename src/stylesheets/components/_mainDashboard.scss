@@ -4,13 +4,19 @@
     color: $sky-of-margritte;
     cursor: pointer;
   }
+  &-licenses {
+    border-bottom: 2px solid $sky-of-margritte;
+  }
+  &-licenses-number{
+    color: $sky-of-margritte !important;
+  }
   &-assignpermissions {
     display: inline-flex !important;
-    border: solid 1px $platinum-granite;
-    background: $white !important;
     height: 40px;
+    margin-top: -4px;
     > .omniButton-add-text {
-      @include text-medium(14px);
+      @include text-bold(16px);
+      color: $white !important;
     }
     &_visible {
       display: initial;
