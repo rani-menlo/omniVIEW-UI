@@ -12,12 +12,16 @@ import { translate } from "../../translations/translator";
 class AuthenticationCode extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      otp: ''
+    }
   }
   onInputCode = e => {
     const { verified, error } = this.props;
     error && this.props.actions.resetOtpError();
     verified && this.props.actions.resetOtp();
     const otp = e.target.value;
+    this.setState({ otp })
     if (/\s/.test(otp)) {
       this.props.actions.setOtpError(translate("error.authcode.invalid"));
       return;
@@ -44,10 +48,13 @@ class AuthenticationCode extends Component {
 
   resendOtp = () => {
     const { mode } = this.props.match.params;
+    this.props.actions.resetOtpError();
+    this.props.actions.resetOtp();
     const data = {
       isEmail: mode === "email"
     };
     this.props.actions.sendOtp(data);
+    this.setState({ otp: '' })
   };
 
   goBack = () => {
@@ -66,6 +73,7 @@ class AuthenticationCode extends Component {
 
   render() {
     const { verified, verifying, loading, error } = this.props;
+    const { otp } = this.state;
     return (
       <React.Fragment>
         <Loader loading={loading} />
@@ -87,6 +95,7 @@ class AuthenticationCode extends Component {
               className={`authenticationCode-form-input ${error &&
                 "authenticationCode-errorbox"}`}
               onChange={this.onInputCode}
+              value={otp}
             />
             <div className="authenticationCode-form__icons">
               {verifying && <Spin />}
@@ -116,7 +125,7 @@ class AuthenticationCode extends Component {
               type="primary"
               className={`common_authbuttons-btn common_authbuttons-btn-send authenticationCode-login-${
                 verified ? "enable" : "disable"
-              }`}
+                }`}
               onClick={this.openDashboard}
             >
               {translate("text.login.title")}
