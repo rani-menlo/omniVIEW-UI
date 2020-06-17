@@ -17,13 +17,13 @@ import {
   Pagination,
   Text,
   Toast,
-  OmniCheckbox
+  OmniCheckbox,
 } from "../../uikit/components";
 import { DEBOUNCE_TIME, ROLES, ROLE_IDS } from "../../constants";
 import {
   UsermanagementActions,
   CustomerActions,
-  ApiActions
+  ApiActions,
 } from "../../redux/actions";
 import { Avatar, Dropdown, Menu, Icon, Popover, Modal } from "antd";
 import { translate } from "../../translations/translator";
@@ -32,7 +32,7 @@ import {
   getFormattedDate,
   isLoggedInOmniciaRole,
   isLoggedInOmniciaAdmin,
-  isLoggedInCustomerAdmin
+  isLoggedInCustomerAdmin,
 } from "../../utils";
 import PopoverUsersFilter from "./popoverUsersFilter";
 import UserCard from "./userCard.component";
@@ -47,12 +47,12 @@ class UserManagementContainer extends Component {
   static getDerivedStateFromProps(props, state) {
     if (_.get(props, "users.length") && !_.get(state, "users.length")) {
       return {
-        users: _.map(props.users, user => {
+        users: _.map(props.users, (user) => {
           if (user.is_secondary_contact === null) {
             user.is_secondary_contact = false;
           }
           return user;
-        })
+        }),
       };
     }
     return null;
@@ -85,62 +85,62 @@ class UserManagementContainer extends Component {
           checked: false,
           sort: false,
           width: "4%",
-          onCheckboxChange: this.checkAll
+          onCheckboxChange: this.checkAll,
         },
         {
           name: TableColumnNames.NAME,
           key: "first_name",
           checkbox: false,
           sort: true,
-          width: "20%"
+          width: "20%",
         },
         {
           name: TableColumnNames.USER_ROLE,
           key: "role_name",
           checkbox: false,
           sort: true,
-          width: "11%"
+          width: "11%",
         },
         {
           name: TableColumnNames.DEPARTMENT,
           key: "department_name",
           checkbox: false,
           sort: true,
-          width: "17%"
+          width: "17%",
         },
         {
           name: TableColumnNames.EMAIl,
           key: "email",
           checkbox: false,
           sort: true,
-          width: "22%"
+          width: "22%",
         },
         {
           name: TableColumnNames.STATUS,
           key: "is_active",
           checkbox: false,
           sort: true,
-          width: "8%"
+          width: "8%",
         },
         {
           name: TableColumnNames.CONTACT,
           key: "is_secondary_contact",
           checkbox: false,
-          width: "8%"
+          width: "8%",
         },
         {
           name: TableColumnNames.EXP_DATE,
           key: "expired_date",
           checkbox: false,
           // sort: true,
-          width: "10%"
-        }
-      ]
+          width: "10%",
+        },
+      ],
     };
     this.searchUsers = _.debounce(this.searchUsers, DEBOUNCE_TIME);
   }
 
-  checkAll = e => {
+  checkAll = (e) => {
     const checked = _.get(e, "target.checked", false);
     if (!this.state.users.length) {
       e.preventDefault();
@@ -148,9 +148,9 @@ class UserManagementContainer extends Component {
     }
     let checkedUsers = [];
     let users = this.state.users.slice(0, this.state.itemsPerPage);
-    users = _.map(users, submission => ({
+    users = _.map(users, (submission) => ({
       ...submission,
-      checked
+      checked,
     }));
     if (checked) {
       checkedUsers = [...users];
@@ -162,7 +162,7 @@ class UserManagementContainer extends Component {
     const allRnotActive = _.every(checkedUsers, ["is_active", false]);
     const allRnotSecondary = _.every(checkedUsers, [
       "is_secondary_contact",
-      false
+      false,
     ]);
     this.setState({
       users,
@@ -170,11 +170,11 @@ class UserManagementContainer extends Component {
       showGlobalButtons: checkedUsers.length !== 0,
       checkedUsers,
       deactivateAll: !allRnotActive,
-      markAllSecondary: allRnotSecondary
+      markAllSecondary: allRnotSecondary,
     });
   };
 
-  onCheckboxChange = user => e => {
+  onCheckboxChange = (user) => (e) => {
     const checked = e.target.checked;
     const users = this.state.users.slice(0, this.state.itemsPerPage);
     user.checked = checked;
@@ -193,7 +193,7 @@ class UserManagementContainer extends Component {
     const allRnotActive = _.every(checkedUsers, ["is_active", false]);
     const allRnotSecondary = _.every(checkedUsers, [
       "is_secondary_contact",
-      false
+      false,
     ]);
     this.setState({
       users,
@@ -201,15 +201,15 @@ class UserManagementContainer extends Component {
       showGlobalButtons,
       checkedUsers,
       deactivateAll: !allRnotActive,
-      markAllSecondary: allRnotSecondary
+      markAllSecondary: allRnotSecondary,
     });
   };
 
-  openAccessControlModal = user => () => {
+  openAccessControlModal = (user) => () => {
     this.setState({ showAccessControlModal: true, selectedUser: user });
   };
 
-  removeUser = usr => () => {
+  removeUser = (usr) => () => {
     Modal.confirm({
       className: "omnimodal",
       title: translate("label.generic.delete"),
@@ -221,7 +221,7 @@ class UserManagementContainer extends Component {
       },
       onCancel: () => {
         // this.setState({ selectedUser: null }, this.deleteUser);
-      }
+      },
     });
   };
 
@@ -243,7 +243,7 @@ class UserManagementContainer extends Component {
     );
   };
 
-  resendInvitation = usr => () => {
+  resendInvitation = (usr) => () => {
     this.props.dispatch(
       UsermanagementActions.resendInvitationMail(
         { userId: usr.user_id },
@@ -254,7 +254,7 @@ class UserManagementContainer extends Component {
     );
   };
 
-  getMenu = usr => () => {
+  getMenu = (usr) => () => {
     return (
       <Menu className="maindashboard__list__item-dropdown-menu">
         <Menu.Item
@@ -299,17 +299,17 @@ class UserManagementContainer extends Component {
         >
           <p
             style={{
-              color: _.get(usr, "is_active", false) ? "red" : "#00d592"
+              color: _.get(usr, "is_active", false) ? "red" : "#00d592",
             }}
           >
             {_.get(usr, "is_active", false) ? (
               <img src="/images/deactivate.svg" />
             ) : (
-                <Icon
-                  type="check-circle"
-                  style={{ fontSize: "20px", marginRight: "8px" }}
-                />
-              )}
+              <Icon
+                type="check-circle"
+                style={{ fontSize: "20px", marginRight: "8px" }}
+              />
+            )}
             <span>
               {_.get(usr, "is_active", false)
                 ? translate("label.usermgmt.deactivate")
@@ -355,7 +355,7 @@ class UserManagementContainer extends Component {
     );
   };
 
-  changeView = type => {
+  changeView = (type) => {
     // this.selectedFilters = {};
     this.setState({ viewBy: type }, () => this.fetchUsers());
   };
@@ -381,7 +381,7 @@ class UserManagementContainer extends Component {
                 page: pageNo,
                 limit: itemsPerPage,
                 includeLoggedInUser: true,
-                ...this.selectedFilters
+                ...this.selectedFilters,
               })
             );
           } else {
@@ -391,7 +391,7 @@ class UserManagementContainer extends Component {
                 search: searchText,
                 includeLoggedInUser: true,
                 isList: false, //backend team needs this flag for sorting the list based on the lastest updated user
-                ...this.selectedFilters
+                ...this.selectedFilters,
               })
             );
           }
@@ -400,7 +400,7 @@ class UserManagementContainer extends Component {
     );
   };
 
-  onCustomerSelected = customer => {
+  onCustomerSelected = (customer) => {
     this.props.dispatch(CustomerActions.setSelectedCustomer(customer));
     const omniciaRoles = _.map(ROLES.OMNICIA, "id");
     const customerRoles = _.map(ROLES.CUSTOMER, "id");
@@ -411,7 +411,7 @@ class UserManagementContainer extends Component {
     if (this.selectedFilters.roles) {
       const diff = _.difference(this.selectedFilters.roles, roles);
       if (diff.length) {
-        this.selectedFilters.roles = _.map(this.selectedFilters.roles, role =>
+        this.selectedFilters.roles = _.map(this.selectedFilters.roles, (role) =>
           role < 4 ? role + 3 : role - 3
         );
       }
@@ -419,11 +419,11 @@ class UserManagementContainer extends Component {
     this.setState({ pageNo: 1 }, () => this.fetchUsers(customer));
   };
 
-  onPageChange = pageNo => {
+  onPageChange = (pageNo) => {
     this.setState({ pageNo }, () => this.fetchUsers());
   };
 
-  onPageSizeChange = itemsPerPage => {
+  onPageSizeChange = (itemsPerPage) => {
     this.setState({ itemsPerPage, pageNo: 1 }, () => this.fetchUsers());
   };
 
@@ -432,7 +432,7 @@ class UserManagementContainer extends Component {
     this.selectedFilters = {
       ...this.selectedFilters,
       sortBy: [sortBy],
-      order: orderBy
+      order: orderBy,
     };
     if (viewBy === "lists") {
       let filterObj = { ...this.selectedFilters };
@@ -442,7 +442,7 @@ class UserManagementContainer extends Component {
     this.fetchUsers();
   };
 
-  handleSearch = e => {
+  handleSearch = (e) => {
     const searchText = e.target.value;
     this.setState({ searchText });
     if (searchText === "" || _.size(searchText) >= 3) {
@@ -468,7 +468,7 @@ class UserManagementContainer extends Component {
     this.props.history.goBack();
   };
 
-  editUser = usr => () => {
+  editUser = (usr) => () => {
     this.props.dispatch(UsermanagementActions.setSelectedUser(usr));
     this.props.history.push("/usermanagement/edit");
   };
@@ -486,17 +486,17 @@ class UserManagementContainer extends Component {
     const users = {
       users: this.state.selectedUser
         ? [
-          {
-            userId: this.state.selectedUser.user_id,
-            is_active: Number(
-              !_.get(this.state.selectedUser, "is_active", false)
-            )
-          }
-        ]
-        : _.map(this.state.checkedUsers, user => ({
-          userId: user.user_id,
-          is_active: this.state.deactivateAll ? 0 : 1
-        }))
+            {
+              userId: this.state.selectedUser.user_id,
+              is_active: Number(
+                !_.get(this.state.selectedUser, "is_active", false)
+              ),
+            },
+          ]
+        : _.map(this.state.checkedUsers, (user) => ({
+            userId: user.user_id,
+            is_active: this.state.deactivateAll ? 0 : 1,
+          })),
     };
 
     this.props.dispatch(
@@ -518,7 +518,7 @@ class UserManagementContainer extends Component {
     this.closeUserCard();
   };
 
-  openActivateDeactivateModal = usr => () => {
+  openActivateDeactivateModal = (usr) => () => {
     this.setState({ showDeactivateModal: true, selectedUser: usr });
   };
 
@@ -531,11 +531,11 @@ class UserManagementContainer extends Component {
     this.openActivateDeactivateModal(this.state.selectedUser)();
   };
 
-  onFiltersUpdate = filters => {
+  onFiltersUpdate = (filters) => {
     this.selectedFilters = {
       ...this.selectedFilters,
       ...filters,
-      sortBy: filters.sortBy && [filters.sortBy]
+      sortBy: filters.sortBy && [filters.sortBy],
     };
 
     // if filters applied in the middle of the pagination
@@ -548,7 +548,7 @@ class UserManagementContainer extends Component {
     this.fetchUsers();
   };
 
-  openUserCard = usr => () => {
+  openUserCard = (usr) => () => {
     this.setState({ selectedUser: usr, showUserCard: true });
   };
 
@@ -556,34 +556,34 @@ class UserManagementContainer extends Component {
     this.setState({ showUserCard: false });
   };
 
-  showLicenceUnAssignedModal = user => () => {
+  showLicenceUnAssignedModal = (user) => () => {
     this.setState({
       selectedUser: user,
       showLicenceUnAssignedModal: true,
-      showUserCard: false
+      showUserCard: false,
     });
   };
 
   goBackToUnAssignedModal = () => {
     this.setState({
       showAssignLicenceToUser: false,
-      showLicenceUnAssignedModal: true
+      showLicenceUnAssignedModal: true,
     });
   };
 
   closeLicenseUnAssignedModal = () => {
     this.setState({
       showLicenceUnAssignedModal: false,
-      showLicenceUnAssignedModalError: ""
+      showLicenceUnAssignedModalError: "",
     });
   };
 
-  onAssignLicenseClick = license => {
+  onAssignLicenseClick = (license) => {
     if (license.licences.length < this.state.selectedUser.length) {
       this.setState({
         showLicenceUnAssignedModalError: translate(
           "error.licence.maxuserselected"
-        )
+        ),
       });
       return;
     }
@@ -591,13 +591,13 @@ class UserManagementContainer extends Component {
       showLicenceUnAssignedModal: false,
       showLicenceUnAssignedModalError: "",
       showAssignLicenceToUser: true,
-      assigningLicence: license
+      assigningLicence: license,
     });
   };
 
   closeAssignLicenceToUserModal = () => {
     this.setState({
-      showAssignLicenceToUser: false
+      showAssignLicenceToUser: false,
     });
   };
 
@@ -612,7 +612,7 @@ class UserManagementContainer extends Component {
           ...(_.includes(licence.slug, "view")
             ? { omni_view_license: licence.id }
             : { omni_file_license: licence.id }),
-          user_id: user.user_id
+          user_id: user.user_id,
         };
       });
     } else {
@@ -622,15 +622,15 @@ class UserManagementContainer extends Component {
           ...(_.includes(licence.slug, "view")
             ? { omni_view_license: licence.id }
             : { omni_file_license: licence.id }),
-          user_id: selectedUser.user_id
-        }
+          user_id: selectedUser.user_id,
+        },
       ];
       toastMsg = "License has been assigned.";
     }
     this.props.dispatch(
       UsermanagementActions.assignLicense(
         {
-          licenses
+          licenses,
         },
         async () => {
           Toast.success(toastMsg);
@@ -648,12 +648,12 @@ class UserManagementContainer extends Component {
     );
     this.setState({
       showAssignLicenceToUser: false,
-      showLicenceUnAssignedModal: false
+      showLicenceUnAssignedModal: false,
     });
   };
 
-  getColumnWidth = _.memoize(name => {
-    const col = _.find(this.state.TableColumns, col => col.name === name);
+  getColumnWidth = _.memoize((name) => {
+    const col = _.find(this.state.TableColumns, (col) => col.name === name);
     return _.get(col, "width");
   });
 
@@ -669,14 +669,14 @@ class UserManagementContainer extends Component {
         cancelText: translate("label.button.cancel"),
         onOk: () => {
           this.updateSecondaryContact();
-        }
+        },
       });
   };
 
   updateSecondaryContact = () => {
-    const users = _.map(this.state.checkedUsers, user => ({
+    const users = _.map(this.state.checkedUsers, (user) => ({
       userId: user.user_id,
-      is_secondary_contact: this.state.markAllSecondary ? 1 : 0
+      is_secondary_contact: this.state.markAllSecondary ? 1 : 0,
     }));
 
     this.props.dispatch(
@@ -697,7 +697,7 @@ class UserManagementContainer extends Component {
     }
     const allRdeactivated = _.every(this.state.checkedUsers, [
       "is_active",
-      false
+      false,
     ]);
     return allRdeactivated;
   };
@@ -712,7 +712,7 @@ class UserManagementContainer extends Component {
       showLicenceUnAssignedModalError,
       showAssignLicenceToUser,
       assigningLicence,
-      showAccessControlModal
+      showAccessControlModal,
     } = this.state;
     const { loading, selectedCustomer, usersCount } = this.props;
     if (!selectedCustomer) {
@@ -733,7 +733,7 @@ class UserManagementContainer extends Component {
       _(mergedRoles)
         .keys()
         .sort()
-        .each(key => {
+        .each((key) => {
           users[key] = mergedRoles[key];
         });
     }
@@ -775,7 +775,7 @@ class UserManagementContainer extends Component {
                   size="20px"
                   className="userManagement-subheader-title"
                   text={selectedCustomer.company_name}
-                // onClick={this.goBack}
+                  // onClick={this.goBack}
                 />
                 <img
                   className="global__cursor-pointer"
@@ -788,7 +788,7 @@ class UserManagementContainer extends Component {
           <div style={{ marginLeft: "auto" }}>
             <SearchBox
               placeholder={translate("text.header.search", {
-                type: translate("label.dashboard.users")
+                type: translate("label.dashboard.users"),
               })}
               searchText={searchText}
               clearSearch={this.clearSearch}
@@ -802,7 +802,7 @@ class UserManagementContainer extends Component {
             <OmniButton
               type="add"
               label={translate("label.button.add", {
-                type: translate("label.dashboard.user")
+                type: translate("label.dashboard.user"),
               })}
               className="userManagement__header-addButton"
               onClick={this.openAdduser}
@@ -817,7 +817,7 @@ class UserManagementContainer extends Component {
                       {getRoleName(key, true)}
                     </p>
                     <div className="userManagement__group__users">
-                      {_.map(user, usr => (
+                      {_.map(user, (usr) => (
                         <UserCard
                           menu={this.getMenu}
                           key={usr.user_id}
@@ -842,7 +842,7 @@ class UserManagementContainer extends Component {
                     className="maindashboard__nodata-icon"
                   />
                   {translate("error.dashboard.notfound", {
-                    type: translate("label.dashboard.users")
+                    type: translate("label.dashboard.users"),
                   })}
                 </Row>
               )}
@@ -856,7 +856,7 @@ class UserManagementContainer extends Component {
                   disabled={!this.state.showGlobalButtons}
                   label={translate("label.usermgmt.assignlicence")}
                   buttonStyle={{
-                    marginRight: "8px"
+                    marginRight: "8px",
                   }}
                   onClick={this.showLicenceUnAssignedModal(
                     this.state.checkedUsers
@@ -866,7 +866,7 @@ class UserManagementContainer extends Component {
                   type="primary"
                   disabled={!this.state.showGlobalButtons}
                   buttonStyle={{
-                    marginRight: "8px"
+                    marginRight: "8px",
                   }}
                   label={
                     this.state.deactivateAll
@@ -879,13 +879,13 @@ class UserManagementContainer extends Component {
                   type="primary"
                   disabled={!this.state.showGlobalButtons}
                   buttonStyle={{
-                    marginRight: "8px"
+                    marginRight: "8px",
                   }}
                   label={`${
                     this.state.markAllSecondary
                       ? translate("label.generic.tag")
                       : translate("label.generic.untag")
-                    } ${translate("label.user.seccontact")}`}
+                  } ${translate("label.user.seccontact")}`}
                   onClick={this.openSecondaryContact}
                 />
                 <OmniButton
@@ -900,100 +900,108 @@ class UserManagementContainer extends Component {
                   columns={this.state.TableColumns}
                   sortColumn={this.sortColumn}
                 />
-                {_.map(users, usr => (
-                  <Row
-                    key={usr.id}
-                    className="maindashboard__list__item"
-                    style={{ justifyContent: "normal", cursor: "default" }}
-                  >
-                    <Column
-                      width={this.getColumnWidth(TableColumnNames.CHECKBOX)}
+                {_.map(users, (usr) => {
+                  const typeName =
+                    usr.licenses.length > 0
+                      ? _.get(usr.licenses[0], "type_name", "")
+                      : "N/A";
+                  return (
+                    <Row
+                      key={usr.id}
+                      className="maindashboard__list__item"
+                      style={{ justifyContent: "normal", cursor: "default" }}
                     >
-                      <OmniCheckbox
-                        checked={usr.checked}
-                        onCheckboxChange={this.onCheckboxChange(usr)}
-                      />
-                    </Column>
-                    <Column
-                      width={this.getColumnWidth(TableColumnNames.NAME)}
-                      className="maindashboard__list__item-text-bold global__cursor-pointer"
-                      onClick={this.openUserCard(usr)}
-                    >
-                      {`${_.get(usr, "first_name", "")} ${_.get(
-                        usr,
-                        "last_name",
-                        ""
-                      )}`}
-                    </Column>
-                    <Column
-                      width={this.getColumnWidth(TableColumnNames.USER_ROLE)}
-                      className="maindashboard__list__item-text"
-                    >
-                      {getRoleName(_.get(usr, "role_name", ""))}
-                    </Column>
-                    <Column
-                      width={this.getColumnWidth(TableColumnNames.DEPARTMENT)}
-                      className="maindashboard__list__item-text"
-                    >
-                      {_.get(usr, "department_name", "")}
-                    </Column>
-                    <Column
-                      width={this.getColumnWidth(TableColumnNames.EMAIl)}
-                      className="maindashboard__list__item-text"
-                    >
-                      {_.get(usr, "email", "")}
-                    </Column>
-                    <Column
-                      width={this.getColumnWidth(TableColumnNames.STATUS)}
-                      className="maindashboard__list__item-text"
-                      style={{ paddingLeft: "5px" }}
-                    >
-                      {_.get(usr, "is_active", false) ? (
-                        <span className="maindashboard__list__item-text-active">
-                          {translate("label.user.active")}
-                        </span>
-                      ) : (
+                      <Column
+                        width={this.getColumnWidth(TableColumnNames.CHECKBOX)}
+                      >
+                        <OmniCheckbox
+                          checked={usr.checked}
+                          onCheckboxChange={this.onCheckboxChange(usr)}
+                        />
+                      </Column>
+                      <Column
+                        width={this.getColumnWidth(TableColumnNames.NAME)}
+                        className="maindashboard__list__item-text-bold global__cursor-pointer"
+                        onClick={this.openUserCard(usr)}
+                      >
+                        {`${_.get(usr, "first_name", "")} ${_.get(
+                          usr,
+                          "last_name",
+                          ""
+                        )}`}
+                      </Column>
+                      <Column
+                        width={this.getColumnWidth(TableColumnNames.USER_ROLE)}
+                        className="maindashboard__list__item-text"
+                      >
+                        {getRoleName(_.get(usr, "role_name", ""))}
+                      </Column>
+                      <Column
+                        width={this.getColumnWidth(TableColumnNames.DEPARTMENT)}
+                        className="maindashboard__list__item-text"
+                      >
+                        {_.get(usr, "department_name", "")}
+                      </Column>
+                      <Column
+                        width={this.getColumnWidth(TableColumnNames.EMAIl)}
+                        className="maindashboard__list__item-text"
+                      >
+                        {_.get(usr, "email", "")}
+                      </Column>
+                      <Column
+                        width={this.getColumnWidth(TableColumnNames.STATUS)}
+                        className="maindashboard__list__item-text"
+                        style={{ paddingLeft: "5px" }}
+                      >
+                        {_.get(usr, "is_active", false) ? (
+                          <span className="maindashboard__list__item-text-active">
+                            {translate("label.user.active")}
+                          </span>
+                        ) : (
                           <span className="maindashboard__list__item-text-inactive">
                             {translate("label.user.inactive")}
                           </span>
                         )}
-                    </Column>
-                    <Column
-                      width={this.getColumnWidth(TableColumnNames.CONTACT)}
-                      className="maindashboard__list__item-text"
-                    >
-                      {_.get(usr, "is_secondary_contact")
-                        ? translate("label.generic.yes")
-                        : translate("label.generic.no")}
-                    </Column>
-                    <Column
-                      width={this.getColumnWidth(TableColumnNames.EXP_DATE)}
-                      className="maindashboard__list__item-text"
-                    >
-                      <p >
-                        {usr.licenses.length > 0 ? getFormattedDate(_.find(usr.licenses, 'expired_date')) :
-                          "__ /__ /____"}
-                      </p>
-                      <p 
-                      style={{ fontWeight: "bold", fontSize: "12px" }}>
-                        {usr.licenses.length > 0 ? _.get(usr.licenses[0], 'type_name', '') : 'N/A'}
-                      </p>
-                    </Column>
-                    <Column>
-                      <Dropdown
-                        overlay={this.getMenu(usr)}
-                        trigger={["click"]}
-                        overlayClassName="maindashboard__list__item-dropdown"
+                      </Column>
+                      <Column
+                        width={this.getColumnWidth(TableColumnNames.CONTACT)}
+                        className="maindashboard__list__item-text"
                       >
-                        <img
-                          className="global__cursor-pointer"
-                          src="/images/overflow-black.svg"
-                          style={{ width: "18px", height: "18px" }}
-                        />
-                      </Dropdown>
-                    </Column>
-                  </Row>
-                ))}
+                        {_.get(usr, "is_secondary_contact")
+                          ? translate("label.generic.yes")
+                          : translate("label.generic.no")}
+                      </Column>
+                      <Column
+                        width={this.getColumnWidth(TableColumnNames.EXP_DATE)}
+                        className="maindashboard__list__item-text"
+                      >
+                        <p>
+                          {usr.licenses.length > 0
+                            ? getFormattedDate(
+                                _.find(usr.licenses, "expired_date")
+                              )
+                            : "__ /__ /____"}
+                        </p>
+                        <p style={{ fontWeight: "bold", fontSize: "12px" }}>
+                          {typeName}
+                        </p>
+                      </Column>
+                      <Column>
+                        <Dropdown
+                          overlay={this.getMenu(usr)}
+                          trigger={["click"]}
+                          overlayClassName="maindashboard__list__item-dropdown"
+                        >
+                          <img
+                            className="global__cursor-pointer"
+                            src="/images/overflow-black.svg"
+                            style={{ width: "18px", height: "18px" }}
+                          />
+                        </Dropdown>
+                      </Column>
+                    </Row>
+                  );
+                })}
               </div>
               {this.props.usersFlag && !_.get(this.props, "users.length") && (
                 <Row className="maindashboard__nodata">
@@ -1003,7 +1011,7 @@ class UserManagementContainer extends Component {
                     className="maindashboard__nodata-icon"
                   />
                   {translate("error.dashboard.notfound", {
-                    type: translate("label.dashboard.users")
+                    type: translate("label.dashboard.users"),
                   })}
                 </Row>
               )}
@@ -1018,7 +1026,7 @@ class UserManagementContainer extends Component {
                     top: range[0],
                     bottom: range[1],
                     total,
-                    type: translate("label.dashboard.users")
+                    type: translate("label.dashboard.users"),
                   })
                 }
                 pageSize={itemsPerPage}
@@ -1037,15 +1045,15 @@ class UserManagementContainer extends Component {
             visible={this.state.showDeactivateModal}
             title={
               (!_.isNull(this.state.selectedUser)
-                ? _.get(this.state, "selectedUser.is_active")
-                : this.state.deactivateAll)
+              ? _.get(this.state, "selectedUser.is_active")
+              : this.state.deactivateAll)
                 ? `${translate("label.usermgmt.deactivateacc")}?`
                 : `${translate("label.usermgmt.activateacc")}?`
             }
             content={
               (!_.isNull(this.state.selectedUser)
-                ? _.get(this.state, "selectedUser.is_active")
-                : this.state.deactivateAll)
+              ? _.get(this.state, "selectedUser.is_active")
+              : this.state.deactivateAll)
                 ? translate("text.usermgmt.deactivatemsg")
                 : translate("text.usermgmt.activatemsg")
             }
@@ -1102,11 +1110,11 @@ const TableColumnNames = {
   EMAIl: translate("label.user.email"),
   CONTACT: translate("label.user.seccontact"),
   STATUS: translate("label.user.accstatus"),
-  EXP_DATE: translate("label.user.expdateLicenseType")
+  EXP_DATE: translate("label.user.expdateLicenseType"),
 };
 
 const Column = styled.div`
-  width: ${props => props.width};
+  width: ${(props) => props.width};
   padding-left: 0px;
 `;
 
@@ -1118,13 +1126,13 @@ function mapStateToProps(state) {
     user: state.Login.user,
     users: state.Usermanagement.users,
     usersFlag: state.Usermanagement.usersFlag,
-    usersCount: state.Usermanagement.usersCount
+    usersCount: state.Usermanagement.usersCount,
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    dispatch
+    dispatch,
   };
 }
 
