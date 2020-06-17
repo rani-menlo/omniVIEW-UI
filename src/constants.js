@@ -158,6 +158,8 @@ const VIEWER = {
   OFFICE_VIEWER_MAX_SIZE: 10 * 1024 * 1024, // 10MB
 };
 
+const OPENED_WINDOWS = {};
+
 const IMAGE_SUPPORT_TYPES = ".JPG, .JPEG, .PNG";
 
 /* This data hardcoded from valid-values.xml file which we got from legacy application.

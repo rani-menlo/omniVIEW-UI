@@ -9,6 +9,7 @@ import { LoginActions } from "../../redux/actions";
 import Loader from "../../uikit/components/loader";
 import Footer from "../../uikit/components/footer/footer.component";
 import { translate } from "../../translations/translator";
+import { isEmail } from "../../utils";
 
 const FormItem = Form.Item;
 
@@ -16,18 +17,18 @@ class Login extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      username: {
+      email: {
         value: "",
-        error: ""
+        error: "",
       },
       password: {
         value: "",
-        error: ""
-      }
+        error: "",
+      },
     };
   }
   static propTypes = {
-    form: PropTypes.object
+    form: PropTypes.object,
   };
 
   componentDidMount() {
@@ -48,55 +49,65 @@ class Login extends Component {
     this.props.actions.resetLoginError();
   };
 
-  handleSubmit = e => {
+  handleSubmit = (e) => {
     e.preventDefault();
     // this.props.actions.resetLoginError();
-    let { username, password } = this.state;
-    if (!username.value) {
+    let { email, password } = this.state;
+    let email_valid = isEmail(email.value);
+    if (!email.value) {
       this.setState({
-        username: {
-          ...username,
+        email: {
+          ...email,
           error: translate("error.form.required", {
-            type: translate("label.form.username")
-          })
-        }
+            type: translate("label.form.email"),
+          }),
+        },
       });
     } else if (!password.value) {
       this.setState({
         password: {
           ...password,
           error: translate("error.form.required", {
-            type: translate("label.form.password")
-          })
-        }
+            type: translate("label.form.password"),
+          }),
+        },
+      });
+    } else if (!email_valid) {
+      this.setState({
+        email: {
+          ...email,
+          error: translate("error.form.invalid", {
+            type: translate("label.form.email"),
+          }),
+        },
       });
     } else {
       this.props.actions.login({
-        username: username.value,
-        password: password.value
+        username: email.value,
+        password: password.value,
       });
     }
   };
 
-  onUsernameChange = e => {
+  onEmailChange = (e) => {
     this.props.error && this.props.actions.resetLoginError();
     const text = e.target.value;
     let error = "";
     if (/\s/.test(text)) {
       error = translate("error.form.invalid", {
-        type: translate("label.form.username")
+        type: translate("label.form.email"),
       });
     }
     this.setState({
-      username: { ...this.state.username, value: text, error }
+      email: { ...this.state.email, value: text, error },
     });
   };
 
-  onPasswordChange = e => {
+  onPasswordChange = (e) => {
     this.props.error && this.props.actions.resetLoginError();
     const text = e.target.value;
     this.setState({
-      password: { ...this.state.password, value: text, error: "" }
+      password: { ...this.state.password, value: text, error: "" },
     });
   };
 
@@ -106,7 +117,7 @@ class Login extends Component {
 
   render() {
     const { loading, error } = this.props;
-    const { username, password } = this.state;
+    const { email, password } = this.state;
     return (
       <React.Fragment>
         <Loader loading={loading} />
@@ -118,20 +129,18 @@ class Login extends Component {
             {error && <p className="login-error">{error}</p>}
             <Form onSubmit={this.handleSubmit} autoComplete="new-password">
               <p className="global__field-label">
-                {translate("label.form.username")}
+                {translate("label.form.email")}
               </p>
               <FormItem>
                 <Input
                   autoComplete="off"
-                  placeholder={translate("label.form.username")}
-                  onChange={this.onUsernameChange}
-                  value={username.value}
-                  className={username.error && "login-errorbox"}
+                  placeholder={translate("label.form.email")}
+                  onChange={this.onEmailChange}
+                  value={email.value}
+                  className={email.error && "login-errorbox"}
                 />
               </FormItem>
-              {username.error && (
-                <p className="login-fieldError">{username.error}</p>
-              )}
+              {email.error && <p className="login-fieldError">{email.error}</p>}
               <div className="login__pwdsection" onClick={this.forgotPwd}>
                 <span className="global__field-label">
                   {translate("label.form.password")}
@@ -176,13 +185,13 @@ class Login extends Component {
 function mapStateToProps(state) {
   return {
     loading: state.Api.loading,
-    error: state.Login.login.error || state.Login.login.logoutMsg
+    error: state.Login.login.error || state.Login.login.logoutMsg,
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ ...LoginActions }, dispatch)
+    actions: bindActionCreators({ ...LoginActions }, dispatch),
   };
 }
 

@@ -72,9 +72,11 @@ class ApplicationDetails extends Component {
       className: "omni-info-modal",
       content: 'The Application Number and Application Type are fetched from the US Regional file of the highest numbered Sequence. The same Application Number and Type will be used for all the validations on this Submission after this step. ',
       okText: translate("label.generic.ok"),
+      okButtonProps:{ className: 'omniButton-primary' },
       onOk: () => {
         this.submit();
       },
+   
     });
   }
 
