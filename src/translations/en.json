@@ -182,7 +182,7 @@
   "label.profile.edit": "Edit Your Profile",
   "text.profile.addmsg": "Complete the form below to create a profile. Fields with an * are mandatory.",
   "text.profile.editmsg": "Make edits to your user profile below",
-  "text.profile.uniqueuserpwd": "Create a unique username and password.",
+  "text.profile.uniqueuserpwd": "Create a password.",
 
   "text.user.editmsg": "Make edits to this {type} profile below. Fields with an * are mandatory.",
   "text.user.addmsg": "Complete the form below to add a new {type}. Fields with an * are mandatory.",
