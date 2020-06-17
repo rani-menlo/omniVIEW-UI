@@ -125,10 +125,18 @@ class AssignPermissions extends Component {
       role.id == -1
         ? users
         : _.filter(
-            users,
-            usr =>
-              (_.get(usr, "roles[0].id") || _.get(usr, "role_id")) === role.id
-          );
+          users,
+          usr => {
+            if (role.name === 'Administrators') {
+              return _.get(usr, "roles[0].slug", "").includes("admin")
+            } else if (role.name === 'Publishers') {
+              return _.get(usr, "roles[0].slug", "").includes("publisher")
+            }
+            return _.get(usr, "roles[0].slug", "").includes("author")
+          }
+
+          // (_.get(usr, "roles[0].id") || _.get(usr, "role_id")) === role.id
+        );
     users = _.orderBy(users, ["first_name"], [this.state.order]);
     if (users.length) {
       this.setState({ users, selectedRole: role, noUsersError: false });
@@ -228,7 +236,7 @@ class AssignPermissions extends Component {
             <img
               src={`/images/${
                 assignGlobalPermissions ? "global-permissions" : "assign"
-              }.svg`}
+                }.svg`}
               style={{ marginRight: "8px" }}
             />
             <Text
@@ -254,8 +262,8 @@ class AssignPermissions extends Component {
               assignGlobalPermissions
                 ? translate("text.permissions.global")
                 : fileLevelAccessObj
-                ? translate("text.permissions.filelevel")
-                : translate("text.permissions.individual")
+                  ? translate("text.permissions.filelevel")
+                  : translate("text.permissions.individual")
             }
           />
           <div className="assign-permissions-modal__columns">
@@ -280,12 +288,12 @@ class AssignPermissions extends Component {
                           className="global__file-folder"
                         />
                       ) : (
-                        <img
-                          src="/images/file-new.svg"
-                          className="global__file-folder"
-                          style={{ width: "18px", height: "21px" }}
-                        />
-                      )}
+                          <img
+                            src="/images/file-new.svg"
+                            className="global__file-folder"
+                            style={{ width: "18px", height: "21px" }}
+                          />
+                        )}
                       <Text
                         type="medium"
                         size="14px"
@@ -293,16 +301,16 @@ class AssignPermissions extends Component {
                       />
                     </div>
                   ) : (
-                    _.map(submissions, submission => (
-                      <Text
-                        key={submission.id}
-                        type="medium"
-                        size="14px"
-                        text={submission.name}
-                        className="assign-permissions-modal__columns-content-item"
-                      />
-                    ))
-                  )}
+                      _.map(submissions, submission => (
+                        <Text
+                          key={submission.id}
+                          type="medium"
+                          size="14px"
+                          text={submission.name}
+                          className="assign-permissions-modal__columns-content-item"
+                        />
+                      ))
+                    )}
                 </div>
               </div>
             )}
@@ -375,7 +383,7 @@ class AssignPermissions extends Component {
                             text={_.capitalize(
                               getRoleNameByRoleId(
                                 _.get(user, "roles[0].id") ||
-                                  _.get(user, "role_id")
+                                _.get(user, "role_id")
                               )
                             )}
                           />
@@ -399,7 +407,7 @@ class AssignPermissions extends Component {
                         <PermissionCheckbox
                           disabled={isAdmin(
                             _.get(user, "roles[0].slug") ||
-                              _.get(user, "role_name")
+                            _.get(user, "role_name")
                           )}
                           value={+user.checked}
                           onChange={this.onCheckboxChange(user)}
@@ -407,7 +415,7 @@ class AssignPermissions extends Component {
                       </div>
                     );
                   })}
-                {!_.get(this.props, "users") &&
+                {_.get(this.props, "users") &&
                   !_.get(this.props, "users.length") && (
                     <Row className="maindashboard__nodata">
                       <Text
