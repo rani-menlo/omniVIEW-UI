@@ -57,7 +57,7 @@ export default {
       }
     };
   },
-  createOrUpdateProfile: (data, history) => {
+  createOrUpdateProfile: (data, history, cb) => {
     return async (dispatch) => {
       ApiActions.request(dispatch);
       try {
@@ -67,10 +67,11 @@ export default {
           data: res.data,
         });
         if (!res.data.error) {
-          Toast.success("Profile Updated!");
-          history.push("/customer-accounts");
+          // Toast.success("Profile Updated!");
+          // history.push("/customer-accounts");
         }
         ApiActions.success(dispatch);
+        cb && cb();
       } catch (err) {
         ApiActions.failure(dispatch);
       }
@@ -116,7 +117,7 @@ export default {
           type: LoginActionTypes.VERIFY_OTP,
         });
         const res = await LoginApi.verifyOtp(data);
-        
+
         dispatch({
           type: LoginActionTypes.VERIFIED_OTP,
           data: res.data,

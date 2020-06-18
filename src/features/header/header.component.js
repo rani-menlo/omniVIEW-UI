@@ -5,6 +5,7 @@ import ProfileMenu from "./profileMenu.component";
 import { PropTypes } from "prop-types";
 import { translate } from "../../translations/translator";
 import { withRouter } from "react-router-dom";
+import { isLoggedInOmniciaRole } from "../../utils";
 
 class Header extends Component {
   constructor(props) {
@@ -15,7 +16,18 @@ class Header extends Component {
   componentDidMount() {}
 
   goToMain = (history, disabled) => () => {
-    !disabled && history.push("/customer-accounts");
+    const { customerAccounts } = this.props;
+    if (!disabled) {
+      if (customerAccounts && customerAccounts.length > 1) {
+        history.push("/customer-accounts");
+      } else {
+        if (isLoggedInOmniciaRole(customerAccounts[0].role)) {
+          history.push("/customers");
+          return;
+        }
+        history.push("/applications");
+      }
+    }
   };
 
   signOut = () => {
@@ -53,11 +65,19 @@ class Header extends Component {
 
 function mapDispatchToProps(dispatch) {
   return {
-    dispatch
+    dispatch,
+  };
+}
+
+function mapStateToProps(state) {
+  return {
+    customerAccounts: state.Login.customerAccounts,
   };
 }
 
 export default withRouter(
-  connect(mapDispatchToProps)(Header)
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(Header)
 );
-

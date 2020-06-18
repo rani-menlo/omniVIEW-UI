@@ -8,6 +8,8 @@ const initialState = {
   role: null,
   customerAccounts: [],
   customerProfileAccounts: [],
+  invalid_license: false,
+  profileUpdated: false,
   login: {
     loggedIn: false,
     error: "",
@@ -23,6 +25,7 @@ const initialState = {
   },
   forgotPwdError: "",
   usernameExists: "",
+  customer: "",
 };
 
 export default (state = initialState, action) => {
@@ -121,8 +124,20 @@ export default (state = initialState, action) => {
       };
     }
     case LoginActionTypes.SWITCH_ACCOUNT: {
+      const { error, message, data, invalid_license } = action.data;
+      if (!invalid_license && error) {
+        return {
+          ...state,
+        };
+      }
+      !invalid_license &&
+        localStorage.setItem("omniview_user_token", _.get(data, "token", ""));
       return {
         ...state,
+        invalid_license,
+        user: _.get(action.data.data.userData.userObject, "user_profile", ""),
+        role: _.get(action.data.data.userData.userObject, "role", ""),
+        customer: _.get(action.data.data.userData.userObject, "customer", ""),
       };
     }
     case LoginActionTypes.AUTHENTICATED: {
@@ -197,6 +212,7 @@ export default (state = initialState, action) => {
       }
       return {
         ...state,
+        profileUpdated: true,
         user: { ...state.user, ...action.data.data },
       };
     }

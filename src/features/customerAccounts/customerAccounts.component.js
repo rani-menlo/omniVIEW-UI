@@ -41,6 +41,10 @@ class CustomerAccounts extends Component {
     let postObj = { customerId: selectedCustomer.customerId };
     this.props.dispatch(
       LoginActions.switchCustomerAccounts(postObj, () => {
+        if (this.props.invalid_license) {
+          this.props.history.push("/requestlicense");
+          return;
+        }
         if (isLoggedInOmniciaRole(selectedCustomer.role)) {
           this.props.history.push("/customers");
           return;
@@ -105,6 +109,7 @@ function mapStateToProps(state) {
     role: state.Login.role,
     user: state.Login.user,
     customerProfileAccounts: state.Login.customerProfileAccounts,
+    invalid_license: state.Login.invalid_license,
   };
 }
 

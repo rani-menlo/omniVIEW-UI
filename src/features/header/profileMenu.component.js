@@ -20,7 +20,7 @@ class ProfileMenu extends Component {
 
   manageUsers = () => {
     this.props.dispatch(
-      CustomerActions.setSelectedCustomer(this.props.user.customer)
+      CustomerActions.setSelectedCustomer(this.props.customer)
     );
     if (this.props.location.pathname === "/usermanagement") {
       this.props.history.push("/usermanagement/parent");
@@ -118,16 +118,20 @@ class ProfileMenu extends Component {
 function mapStateToProps(state) {
   return {
     user: state.Login.user,
-    role: state.Login.role
+    role: state.Login.role,
+    customer: state.Login.role,
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    dispatch
+    dispatch,
   };
 }
 
 export default withRouter(
-  connect(mapStateToProps, mapDispatchToProps)(ProfileMenu)
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(ProfileMenu)
 );

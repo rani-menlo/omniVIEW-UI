@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import _ from "lodash";
+import { isLoggedInOmniciaRole } from "../../utils";
+import { bindActionCreators } from "redux";
 import {
   Loader,
   ContentLayout,
@@ -10,6 +12,7 @@ import {
   OmniButton,
   CircularLocalImageFile,
   ImageLoader,
+  Toast,
 } from "../../uikit/components";
 import Header from "../header/header.component";
 import { translate } from "../../translations/translator";
@@ -68,11 +71,11 @@ class CreateProfile extends Component {
   }
 
   populateState = () => {
-    const { user } = this.props;
+    const { user, email } = this.props;
     const state = { ...this.state };
     state.fname.value = user.first_name;
     state.lname.value = user.last_name;
-    state.email.value = user.email;
+    state.email.value = email;
     state.phone.value = user.phone;
     if (user.profile) {
       state.selectedFile = user.profile;
@@ -92,8 +95,15 @@ class CreateProfile extends Component {
   };
 
   goBack = () => {
-    this.clearUsernameError();
-    this.props.history.push("/customer-accounts");
+    if (this.props.customerAccounts && this.props.customerAccounts.length > 1) {
+      this.props.history.push("/customer-accounts");
+    } else {
+      if (isLoggedInOmniciaRole(this.props.customerAccounts[0].role)) {
+        this.props.history.push("/customers");
+        return;
+      }
+      this.props.history.push("/applications");
+    }
   };
 
   save = () => {
@@ -242,7 +252,22 @@ class CreateProfile extends Component {
     }
 
     this.props.dispatch(
-      LoginActions.createOrUpdateProfile(reqObject, this.props.history)
+      LoginActions.createOrUpdateProfile(reqObject, this.props.history),
+      () => {
+        console.log("testt");
+        this.props.profileUpdated && this.goBack();
+      }
+    );
+
+    this.props.actions.createOrUpdateProfile(
+      reqObject,
+      this.props.history,
+      () => {
+        if (this.props.profileUpdated) {
+          Toast.success("Profile Updated!");
+          this.goBack();
+        }
+      }
     );
   };
 
@@ -569,12 +594,16 @@ function mapStateToProps(state) {
   return {
     loading: state.Api.loading,
     user: state.Login.user,
+    email: state.Login.email,
+    customerAccounts: state.Login.customerAccounts,
+    profileUpdated: state.Login.profileUpdated,
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
     dispatch,
+    actions: bindActionCreators({ ...LoginActions }, dispatch),
   };
 }
 

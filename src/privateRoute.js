@@ -3,6 +3,8 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { Redirect, Route } from "react-router-dom";
 import { isLoggedInOmniciaRole } from "./utils";
+import { bindActionCreators } from "redux";
+import { LoginActions, CustomerActions } from "./redux/actions";
 
 class PrivateRoute extends Component {
   render() {
@@ -34,10 +36,20 @@ class PrivateRoute extends Component {
               if (customerAccounts && customerAccounts.length > 1) {
                 return <Redirect to="/customer-accounts" />;
               } else {
-                if (isLoggedInOmniciaRole(customerAccounts[0].role)) {
-                  return <Redirect to="/customers" />;
-                }
-                return <Redirect to="/applications" />;
+                let obj = {
+                  customerId: _.get(customerAccounts[0].customer, "id"),
+                };
+                this.props.actions.switchCustomerAccounts(obj, () => {
+                  if (isLoggedInOmniciaRole(customerAccounts[0].role)) {
+                    return <Redirect to="/customers" />;
+                  }
+                  this.props.dispatch(
+                    CustomerActions.setSelectedCustomer(
+                      customerAccounts[0].customer
+                    )
+                  );
+                  return <Redirect to="/applications" />;
+                });
               }
             }
             return <Component {...props} />;
@@ -65,7 +77,14 @@ function mapStateToProps(state) {
   };
 }
 
+function mapDispatchToProps(dispatch) {
+  return {
+    dispatch,
+    actions: bindActionCreators({ ...LoginActions }, dispatch),
+  };
+}
+
 export default connect(
   mapStateToProps,
-  null
+  mapDispatchToProps
 )(PrivateRoute);
