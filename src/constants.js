@@ -4,8 +4,6 @@ const path = "/api/v1/";
 
 const SERVER_URL = process.env.REACT_APP_SERVER_URL;
 
-const OPENED_WINDOWS = {};
-
 const ROLE_IDS = {
   OMNICIA: {
     administrator: 1,
@@ -71,6 +69,7 @@ const URI = {
   GET_LICENCE_LOOKUP_INFO: `${path}customer/licenceLookupInfo`,
   ADD_NEW_LICENCES: `${path}customer/addLicences`,
   GET_USER_PROFILES: `${path}customer/getUserProfiles`,
+  SWITCH_CUSTOMER: `${path}customer/switchCustomer`,
 
   // Submission
   GET_APPLICATIONS: `${path}submission/getSubmissions`,

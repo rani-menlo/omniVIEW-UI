@@ -1,12 +1,13 @@
 import React, { Component } from "react";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
-import { CustomerActions } from "../../redux/actions";
+import { CustomerActions, LoginActions } from "../../redux/actions";
 import Header from "../header/header.component";
 import { Loader, OmniButton } from "../../uikit/components";
 import { Row, Col, Radio } from "antd";
 import { translate } from "../../translations/translator";
 import { get, map } from "lodash";
+import { isLoggedInOmniciaRole } from "../../utils";
 
 const RadioGroup = Radio.Group;
 
@@ -19,17 +20,12 @@ class CustomerAccounts extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      customerAccountsList: [
-        { id: 1, name: "Acme" },
-        { id: 2, name: "FDA" },
-        { id: 3, name: "Biorx" },
-      ],
       selectedCustomer: "",
     };
   }
 
   getCustomerAccounts = () => {
-    this.props.actions.fetchCustomerAccounts();
+    this.props.dispatch(LoginActions.fetchCustomerAccounts());
   };
 
   componentDidMount() {
@@ -41,15 +37,26 @@ class CustomerAccounts extends Component {
   };
 
   openCustApplications = () => {
-    const { selectCustomer } = this.state;
-    // this.props.actions.setSelectedCustomer(selectCustomer);
-    this.props.history.push("/applications");
+    const { selectedCustomer } = this.state;
+    let postObj = { customerId: selectedCustomer.customerId };
+    this.props.dispatch(
+      LoginActions.switchCustomerAccounts(postObj, () => {
+        if (isLoggedInOmniciaRole(selectedCustomer.role)) {
+          this.props.history.push("/customers");
+          return;
+        }
+        this.props.dispatch(
+          CustomerActions.setSelectedCustomer(selectedCustomer.customer)
+        );
+        this.props.history.push("/applications");
+      })
+    );
   };
 
   render() {
-    const { customerAccounts, loading } = this.props;
-    const { customerAccountsList, selectedCustomer } = this.state;
-    console.log("customerAccounts", customerAccounts);
+    const { customerProfileAccounts, loading } = this.props;
+    const { selectedCustomer } = this.state;
+    console.log("customerAccounts", customerProfileAccounts);
     return (
       <React.Fragment>
         <Loader loading={loading} />
@@ -58,20 +65,20 @@ class CustomerAccounts extends Component {
           <Col xs={12} md={12} lg={6} xl={6}>
             <div className="customer-accounts">
               <h3>{translate("text.customer.viewCustomer")}</h3>
-              {get(customerAccountsList, "length") && (
+              {get(customerProfileAccounts, "length", "") && (
                 <Row align="middle" justify="center" type="flex" className="">
                   <RadioGroup
                     value={selectedCustomer}
                     onChange={this.selectCustomer}
                   >
-                    {map(customerAccountsList, (customer) => (
+                    {map(customerProfileAccounts, (profile) => (
                       <Radio
-                        key={customer.id}
+                        key={profile.customerId}
                         style={radioStyle}
                         className="global__radio"
-                        value={customer}
+                        value={profile}
                       >
-                        {customer.name}
+                        {get(profile, "companyName", "N/A")}
                       </Radio>
                     ))}
                   </RadioGroup>
@@ -97,14 +104,14 @@ function mapStateToProps(state) {
     loading: state.Api.loading,
     role: state.Login.role,
     user: state.Login.user,
-    customerAccounts: state.Customer.customerAccounts,
+    customerProfileAccounts: state.Login.customerProfileAccounts,
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ ...CustomerActions }, dispatch),
     dispatch,
+    actions: bindActionCreators({ ...CustomerActions }, dispatch),
   };
 }
 

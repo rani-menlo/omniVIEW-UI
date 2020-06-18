@@ -43,22 +43,6 @@ export default {
       }
     };
   },
-  fetchCustomerAccounts: () => {
-    return async (dispatch) => {
-      ApiActions.request(dispatch);
-      try {
-        const res = await CustomerApi.fetchCustomerAccounts();
-        dispatch({
-          type: CustomerActionTypes.FETCH_CUSTOMER_ACCOUNTS,
-          data: res.data,
-        });
-        ApiActions.success(dispatch);
-      } catch (err) {
-        console.log(err);
-        ApiActions.failure(dispatch);
-      }
-    };
-  },
   addCustomer: (customer, callback) => {
     return async (dispatch) => {
       ApiActions.request(dispatch);

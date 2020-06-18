@@ -6,10 +6,12 @@ import { Toast } from "../../uikit/components";
 const initialState = {
   user: null,
   role: null,
+  customerAccounts: [],
+  customerProfileAccounts: [],
   login: {
     loggedIn: false,
     error: "",
-    logoutMsg: ""
+    logoutMsg: "",
   },
   otp: {
     error: "",
@@ -17,10 +19,10 @@ const initialState = {
     otpReceived: false,
     verified: false,
     verifying: false,
-    authorized: false
+    authorized: false,
   },
   forgotPwdError: "",
-  usernameExists: ""
+  usernameExists: "",
 };
 
 export default (state = initialState, action) => {
@@ -34,8 +36,8 @@ export default (state = initialState, action) => {
           login: {
             ...state.login,
             error: message,
-            logoutMsg: ""
-          }
+            logoutMsg: "",
+          },
         };
       }
       return {
@@ -44,15 +46,15 @@ export default (state = initialState, action) => {
           ...state.login,
           error: "",
           logoutMsg: "",
-          loggedIn: true
+          loggedIn: true,
         },
         userId: data.userId,
         name: data.name,
         email: data.email,
         "omniview-pro": _.find(
           data.licenses,
-          licence => licence.type_slug === "omniview-pro"
-        )
+          (licence) => licence.type_slug === "omniview-pro"
+        ),
       };
     }
     case LoginActionTypes.SEND_OTP: {
@@ -60,8 +62,8 @@ export default (state = initialState, action) => {
         ...state,
         otp: {
           ...state.otp,
-          otpReceived: true
-        }
+          otpReceived: true,
+        },
       };
     }
     case LoginActionTypes.VERIFY_OTP: {
@@ -69,8 +71,8 @@ export default (state = initialState, action) => {
         ...state,
         otp: {
           ...state.otp,
-          verifying: true
-        }
+          verifying: true,
+        },
       };
     }
     case LoginActionTypes.VERIFIED_OTP: {
@@ -78,25 +80,49 @@ export default (state = initialState, action) => {
       if (!invalid_license && error) {
         return {
           ...state,
+          customerAccounts: [],
           otp: {
             ...state.otp,
             error: message,
-            verifying: false
-          }
+            verifying: false,
+          },
         };
       }
       !invalid_license &&
         localStorage.setItem("omniview_user_token", _.get(data, "token", ""));
+      let customerAccounts = _.get(data.customerProfiles, "userProfiles", []);
+      let user = "",
+        role = "";
+      if (customerAccounts.length == 1) {
+        user = _.get(customerAccounts[0], "userData", "");
+        role = _.get(customerAccounts[0], "role", "");
+      }
       return {
         ...state,
-        user: _.get(data, "userData", ""),
-        role: _.get(data, "role", ""),
+        user: user,
+        role: role,
+        customerAccounts: customerAccounts,
         otp: {
           ...state.otp,
           invalid_license,
           verifying: false,
-          verified: true
-        }
+          verified: true,
+        },
+      };
+    }
+    case LoginActionTypes.FETCH_CUSTOMER_ACCOUNTS: {
+      return {
+        ...state,
+        customerProfileAccounts: _.get(
+          action.data.data,
+          "customer_user_profiles",
+          []
+        ),
+      };
+    }
+    case LoginActionTypes.SWITCH_ACCOUNT: {
+      return {
+        ...state,
       };
     }
     case LoginActionTypes.AUTHENTICATED: {
@@ -104,8 +130,8 @@ export default (state = initialState, action) => {
         ...state,
         otp: {
           ...state.otp,
-          authorized: true
-        }
+          authorized: true,
+        },
       };
     }
     case LoginActionTypes.SET_LOGGED_STATUS: {
@@ -113,8 +139,8 @@ export default (state = initialState, action) => {
         ...state,
         login: {
           ...state.login,
-          loggedIn: action.status
-        }
+          loggedIn: action.status,
+        },
       };
     }
     case LoginActionTypes.RESET_LOGIN_ERROR: {
@@ -123,8 +149,8 @@ export default (state = initialState, action) => {
         login: {
           ...state.login,
           error: "",
-          logoutMsg: ""
-        }
+          logoutMsg: "",
+        },
       };
     }
     case LoginActionTypes.SET_OTP_STATUS: {
@@ -132,8 +158,8 @@ export default (state = initialState, action) => {
         ...state,
         otp: {
           ...state.otp,
-          otpReceived: action.status
-        }
+          otpReceived: action.status,
+        },
       };
     }
     case LoginActionTypes.RESET_OTP: {
@@ -142,8 +168,8 @@ export default (state = initialState, action) => {
         otp: {
           ...state.otp,
           verified: false,
-          verifying: false
-        }
+          verifying: false,
+        },
       };
     }
     case LoginActionTypes.SET_OTP_ERROR: {
@@ -151,8 +177,8 @@ export default (state = initialState, action) => {
         ...state,
         otp: {
           ...state.otp,
-          error: action.error
-        }
+          error: action.error,
+        },
       };
     }
     case LoginActionTypes.RESET_OTP_ERROR: {
@@ -160,8 +186,8 @@ export default (state = initialState, action) => {
         ...state,
         otp: {
           ...state.otp,
-          error: ""
-        }
+          error: "",
+        },
       };
     }
     case LoginActionTypes.CREATE_UPDATE_PROFILE: {
@@ -171,7 +197,7 @@ export default (state = initialState, action) => {
       }
       return {
         ...state,
-        user: { ...state.user, ...action.data.data }
+        user: { ...state.user, ...action.data.data },
       };
     }
     case LoginActionTypes.CHECK_USERNAME: {
@@ -184,19 +210,19 @@ export default (state = initialState, action) => {
       }
       return {
         ...state,
-        usernameExists: error
+        usernameExists: error,
       };
     }
     case LoginActionTypes.FORGOT_PWD_ERROR: {
       return {
         ...state,
-        forgotPwdError: action.error
+        forgotPwdError: action.error,
       };
     }
     case LoginActionTypes.USERNAME_EXISTS_ERROR: {
       return {
         ...state,
-        usernameExists: ""
+        usernameExists: "",
       };
     }
     default:

@@ -20,7 +20,6 @@ export default {
       },
     });
   },
-  fetchCustomerAccounts: () => api.get(URI.GET_USER_PROFILES),
   fetchCustomersByUserId: (data) => {
     return api.post(URI.GET_ACCESSED_CUSTOMERS, data);
   },

@@ -10,15 +10,25 @@ const App = () => <Routes />;
 //disabling browser back button
 // window.history.pushState(null, null, null);
 window.onpopstate = function(event) {
-    console.log("onpopstate", event.state, !event.state, event, `${SERVER_URL}/verify/email`);
-    let url = window.location.href == `${SERVER_URL}/verify/email` ? true : false;
-    let token = localStorage.getItem("omniview_user_token") ? true : false;
-    if (url && token) {
-      event.preventDefault();
-      window.history.pushState(event.state, document.title, `${SERVER_URL}/customers`);
-      return;
-    }
-}
+  console.log(
+    "onpopstate",
+    event.state,
+    !event.state,
+    event,
+    `${SERVER_URL}/verify/email`
+  );
+  let url = window.location.href == `${SERVER_URL}/verify/email` ? true : false;
+  let token = localStorage.getItem("omniview_user_token") ? true : false;
+  if (url && token) {
+    event.preventDefault();
+    window.history.pushState(
+      event.state,
+      document.title,
+      `${SERVER_URL}/customers`
+    );
+    return;
+  }
+};
 
 ReactDOM.render(<App />, document.getElementById("root"));
 

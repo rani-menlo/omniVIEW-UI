@@ -2,7 +2,6 @@ import { CustomerActionTypes } from "../actionTypes";
 import _ from "lodash";
 
 const initialState = {
-  customerAccounts: [],
   customers: [],
   customerCount: 0,
   getCustomers_flag: false,
@@ -25,12 +24,6 @@ export default (state = initialState, action) => {
         customers: action.data.data,
         customerCount: action.data.customerCount,
         getCustomers_flag: true,
-      };
-    }
-    case CustomerActionTypes.FETCH_CUSTOMER_ACCOUNTS: {
-      return {
-        ...state,
-        customerAccounts: action.data.data,
       };
     }
     case CustomerActionTypes.ADD_CUSTOMER: {
