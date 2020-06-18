@@ -6,10 +6,10 @@ import { Text } from "../../uikit/components";
 
 class PopoverCustomers extends Component {
   static propTypes = {
-    onCustomerSelected: PropTypes.func
+    onCustomerSelected: PropTypes.func,
   };
 
-  onCustomerSelected = customer => () => {
+  onCustomerSelected = (customer) => () => {
     const { selectedCustomer } = this.props;
     if (customer.id === selectedCustomer.id) {
       return;
@@ -18,17 +18,13 @@ class PopoverCustomers extends Component {
   };
 
   render() {
-    const {
-      customers,
-      user: { customer },
-      selectedCustomer
-    } = this.props;
-    const sortedCustomers = _.sortBy(customers, cust => {
+    const { customers, customer, selectedCustomer } = this.props;
+    const sortedCustomers = _.sortBy(customers, (cust) => {
       return cust.id === customer.id ? 0 : 1;
     });
     return (
       <div className="popoverCustomers">
-        {_.map(sortedCustomers, customer => (
+        {_.map(sortedCustomers, (customer) => (
           <Text
             className={`popoverCustomers-text ${selectedCustomer.id ===
               customer.id && "popoverCustomers-text-selected"}`}
@@ -48,13 +44,14 @@ function mapStateToProps(state) {
   return {
     customers: state.Customer.customers,
     selectedCustomer: state.Customer.selectedCustomer,
-    user: state.Login.user
+    user: state.Login.user,
+    customer: state.Login.customer,
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    dispatch
+    dispatch,
   };
 }
 
