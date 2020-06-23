@@ -312,11 +312,11 @@ class CreateProfile extends Component {
       phone,
       showChangePassword,
     } = this.state;
-    const { user } = this.props;
+    const { user, first_login } = this.props;
     return (
       <React.Fragment>
         <Loader loading={this.props.loading} />
-        <Header style={{ marginBottom: "0px" }} disabled={user.first_login} />
+        <Header style={{ marginBottom: "0px" }} disabled={first_login} />
         <ContentLayout className="createProfile">
           <div style={{ marginBottom: "15px" }}>
             <Text
@@ -562,13 +562,13 @@ class CreateProfile extends Component {
               </div>
             )}
             <div className="createProfile__buttons">
-              {!user.first_login && (
+              {!first_login && (
                 <OmniButton
                   className="createProfile__buttons-btn"
                   type="secondary"
                   label={translate("label.button.cancel")}
                   onClick={this.goBack}
-                  disabled={user.first_login}
+                  disabled={first_login}
                 />
               )}
               <OmniButton
@@ -579,7 +579,7 @@ class CreateProfile extends Component {
                     ? translate("label.button.savechanges")
                     : translate("label.button.savesubmit")
                 }
-                buttonStyle={!user.first_login && { marginLeft: "16px" }}
+                buttonStyle={!first_login && { marginLeft: "16px" }}
                 onClick={this.save}
               />
             </div>
@@ -597,6 +597,7 @@ function mapStateToProps(state) {
     email: state.Login.email,
     customerAccounts: state.Login.customerAccounts,
     profileUpdated: state.Login.profileUpdated,
+    first_login: state.Login.first_login,
   };
 }
 

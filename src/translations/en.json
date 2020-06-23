@@ -67,6 +67,7 @@
   "label.pagination.back": "Back",
   "label.pagination.next": "Next",
   "text.header.search": "Search {type}...",
+  "text.header.switchcustomers": "Switch Customer(s)",
 
   "label.form.fname": "First Name",
   "label.form.lname": "Last Name",

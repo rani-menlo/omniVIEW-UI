@@ -14,6 +14,7 @@ const responseInterceptor = error => {
       LoginActions.logOut(_.get(error, "response.data.message", ""))
     );
   }
+  return Promise.reject(error);
 };
 
 export { responseInterceptor };

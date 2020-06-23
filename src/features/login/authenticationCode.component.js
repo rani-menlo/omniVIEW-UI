@@ -33,14 +33,14 @@ class AuthenticationCode extends Component {
   };
 
   openDashboard = () => {
-    const { user, invalid_license, customerAccounts } = this.props;
+    const { user, invalid_license, customerAccounts, first_login } = this.props;
     if (invalid_license) {
       this.props.history.push("/requestlicense");
       return;
     }
     this.props.actions.authenticated();
 
-    if (user.first_login) {
+    if (first_login) {
       this.props.history.push("/profile");
       return;
     }
@@ -161,6 +161,7 @@ function mapStateToProps(state) {
     user: state.Login.user,
     verified: state.Login.otp.verified,
     verifying: state.Login.otp.verifying,
+    first_login: state.Login.first_login,
     invalid_license: state.Login.otp.invalid_license,
     error: state.Login.otp.error,
     customerAccounts: state.Login.customerAccounts,

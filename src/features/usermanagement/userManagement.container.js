@@ -319,7 +319,7 @@ class UserManagementContainer extends Component {
         </Menu.Item>
         {(isLoggedInOmniciaAdmin(this.props.role) ||
           isLoggedInCustomerAdmin(this.props.role)) &&
-          usr.first_login && (
+          this.props.first_login && (
             <Menu.Item
               className="maindashboard__list__item-dropdown-menu-item"
               onClick={this.resendInvitation(usr)}
@@ -1127,6 +1127,7 @@ function mapStateToProps(state) {
     users: state.Usermanagement.users,
     usersFlag: state.Usermanagement.usersFlag,
     usersCount: state.Usermanagement.usersCount,
+    first_login: state.Login.first_login,
   };
 }
 

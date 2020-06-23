@@ -9,6 +9,7 @@ const initialState = {
   customerAccounts: [],
   customerProfileAccounts: [],
   invalid_license: false,
+  first_login: false,
   profileUpdated: false,
   login: {
     loggedIn: false,
@@ -79,7 +80,13 @@ export default (state = initialState, action) => {
       };
     }
     case LoginActionTypes.VERIFIED_OTP: {
-      const { error, message, data, invalid_license } = action.data;
+      const {
+        error,
+        message,
+        data,
+        invalid_license,
+        first_login,
+      } = action.data;
       if (!invalid_license && error) {
         return {
           ...state,
@@ -105,6 +112,7 @@ export default (state = initialState, action) => {
         user: user,
         role: role,
         customerAccounts: customerAccounts,
+        first_login: data.first_login,
         otp: {
           ...state.otp,
           invalid_license,
@@ -125,19 +133,26 @@ export default (state = initialState, action) => {
     }
     case LoginActionTypes.SWITCH_ACCOUNT: {
       const { error, message, data, invalid_license } = action.data;
+      if (invalid_license) {
+        return {
+          ...state,
+          invalid_license,
+        };
+      }
       if (!invalid_license && error) {
         return {
           ...state,
         };
       }
-      !invalid_license &&
-        localStorage.setItem("omniview_user_token", _.get(data, "token", ""));
+      // !invalid_license &&
+      //   localStorage.setItem("omniview_user_token", _.get(data, "token", ""));
       return {
         ...state,
         invalid_license,
-        user: _.get(action.data.data.userData.userObject, "user_profile", ""),
-        role: _.get(action.data.data.userData.userObject, "role", ""),
-        customer: _.get(action.data.data.userData.userObject, "customer", ""),
+        first_login: data.first_login,
+        user: _.get(data.userData.userObject, "user_profile", ""),
+        role: _.get(data.userData.userObject, "role", ""),
+        customer: _.get(data.userData.userObject, "customer", ""),
       };
     }
     case LoginActionTypes.AUTHENTICATED: {

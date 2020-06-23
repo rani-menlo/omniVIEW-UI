@@ -33,18 +33,28 @@ class CustomerAccounts extends Component {
   }
 
   selectCustomer = (e) => {
+    let { value } = e.target;
     this.setState({ selectedCustomer: e.target.value });
   };
 
   openCustApplications = () => {
     const { selectedCustomer } = this.state;
-    let postObj = { customerId: selectedCustomer.customerId };
+    this.props.dispatch(CustomerActions.setSelectedCustomer(selectedCustomer));
+    let postObj = { customerId: selectedCustomer.id };
     this.props.dispatch(
       LoginActions.switchCustomerAccounts(postObj, () => {
         if (this.props.invalid_license) {
           this.props.history.push("/requestlicense");
           return;
         }
+
+        // this.props.actions.authenticated();
+
+        if (this.props.first_login) {
+          this.props.history.push("/profile");
+          return;
+        }
+
         if (isLoggedInOmniciaRole(selectedCustomer.role)) {
           this.props.history.push("/customers");
           return;
@@ -69,7 +79,7 @@ class CustomerAccounts extends Component {
           <Col xs={12} md={12} lg={6} xl={6}>
             <div className="customer-accounts">
               <h3>{translate("text.customer.viewCustomer")}</h3>
-              {get(customerProfileAccounts, "length", "") && (
+              {get(customerProfileAccounts, "length") && (
                 <Row align="middle" justify="center" type="flex" className="">
                   <RadioGroup
                     value={selectedCustomer}
@@ -80,7 +90,7 @@ class CustomerAccounts extends Component {
                         key={profile.customerId}
                         style={radioStyle}
                         className="global__radio"
-                        value={profile}
+                        value={profile.customer}
                       >
                         {get(profile, "companyName", "N/A")}
                       </Radio>
@@ -108,6 +118,8 @@ function mapStateToProps(state) {
     loading: state.Api.loading,
     role: state.Login.role,
     user: state.Login.user,
+    first_login: state.Login.first_login,
+    customer: state.Login.customer,
     customerProfileAccounts: state.Login.customerProfileAccounts,
     invalid_license: state.Login.invalid_license,
   };

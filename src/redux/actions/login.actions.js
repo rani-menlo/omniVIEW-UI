@@ -41,10 +41,12 @@ export default {
       ApiActions.request(dispatch);
       try {
         const res = await LoginApi.switchAccountByCustomerUserId(customerId);
-        localStorage.setItem(
-          "omniview_user_token",
-          _.get(res.data.data, "token", "")
-        );
+        if(!_.get(res, 'data.invalid_license')){
+          localStorage.setItem(
+            "omniview_user_token",
+            _.get(res.data.data, "token", "")
+          );
+        }
         dispatch({
           type: LoginActionTypes.SWITCH_ACCOUNT,
           data: res.data,

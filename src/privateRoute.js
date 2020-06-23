@@ -9,7 +9,7 @@ import { LoginActions, CustomerActions } from "./redux/actions";
 class PrivateRoute extends Component {
   render() {
     const isLoggedIn = this.props.login.loggedIn;
-    const first_login = _.get(this.props, "user.first_login", false);
+    const first_login = _.get(this.props, "first_login", false);
     const authorized = _.get(this.props, "otp.authorized", false);
     const { component: Component, customerAccounts, ...rest } = this.props;
 
@@ -73,6 +73,7 @@ function mapStateToProps(state) {
     login: state.Login.login,
     otp: state.Login.otp,
     user: state.Login.user,
+    first_login: state.Login.first_login,
     customerAccounts: state.Login.customerAccounts,
   };
 }
