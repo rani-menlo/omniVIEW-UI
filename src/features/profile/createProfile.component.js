@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import _ from "lodash";
+import { isLoggedInOmniciaRole } from "../../utils";
+import { bindActionCreators } from "redux";
 import {
   Loader,
   ContentLayout,
@@ -10,6 +12,7 @@ import {
   OmniButton,
   CircularLocalImageFile,
   ImageLoader,
+  Toast,
 } from "../../uikit/components";
 import Header from "../header/header.component";
 import { translate } from "../../translations/translator";
@@ -68,11 +71,11 @@ class CreateProfile extends Component {
   }
 
   populateState = () => {
-    const { user } = this.props;
+    const { user, email } = this.props;
     const state = { ...this.state };
     state.fname.value = user.first_name;
     state.lname.value = user.last_name;
-    state.email.value = user.email;
+    state.email.value = email;
     state.phone.value = user.phone;
     if (user.profile) {
       state.selectedFile = user.profile;
@@ -92,7 +95,15 @@ class CreateProfile extends Component {
   };
 
   goBack = () => {
-    this.props.history.push("/customers");
+    if (this.props.customerAccounts && this.props.customerAccounts.length > 1) {
+      this.props.history.push("/customer-accounts");
+    } else {
+      if (isLoggedInOmniciaRole(this.props.customerAccounts[0].role)) {
+        this.props.history.push("/customers");
+        return;
+      }
+      this.props.history.push("/applications");
+    }
   };
 
   save = () => {
@@ -241,7 +252,22 @@ class CreateProfile extends Component {
     }
 
     this.props.dispatch(
-      LoginActions.createOrUpdateProfile(reqObject, this.props.history)
+      LoginActions.createOrUpdateProfile(reqObject, this.props.history),
+      () => {
+        console.log("testt");
+        this.props.profileUpdated && this.goBack();
+      }
+    );
+
+    this.props.actions.createOrUpdateProfile(
+      reqObject,
+      this.props.history,
+      () => {
+        if (this.props.profileUpdated) {
+          Toast.success("Profile Updated!");
+          this.goBack();
+        }
+      }
     );
   };
 
@@ -286,11 +312,11 @@ class CreateProfile extends Component {
       phone,
       showChangePassword,
     } = this.state;
-    const { user } = this.props;
+    const { user, first_login } = this.props;
     return (
       <React.Fragment>
         <Loader loading={this.props.loading} />
-        <Header style={{ marginBottom: "0px" }} disabled={user.first_login} />
+        <Header style={{ marginBottom: "0px" }} disabled={first_login} />
         <ContentLayout className="createProfile">
           <div style={{ marginBottom: "15px" }}>
             <Text
@@ -536,13 +562,13 @@ class CreateProfile extends Component {
               </div>
             )}
             <div className="createProfile__buttons">
-              {!user.first_login && (
+              {!first_login && (
                 <OmniButton
                   className="createProfile__buttons-btn"
                   type="secondary"
                   label={translate("label.button.cancel")}
                   onClick={this.goBack}
-                  disabled={user.first_login}
+                  disabled={first_login}
                 />
               )}
               <OmniButton
@@ -553,7 +579,7 @@ class CreateProfile extends Component {
                     ? translate("label.button.savechanges")
                     : translate("label.button.savesubmit")
                 }
-                buttonStyle={!user.first_login && { marginLeft: "16px" }}
+                buttonStyle={!first_login && { marginLeft: "16px" }}
                 onClick={this.save}
               />
             </div>
@@ -568,12 +594,17 @@ function mapStateToProps(state) {
   return {
     loading: state.Api.loading,
     user: state.Login.user,
+    email: state.Login.email,
+    customerAccounts: state.Login.customerAccounts,
+    profileUpdated: state.Login.profileUpdated,
+    first_login: state.Login.first_login,
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
     dispatch,
+    actions: bindActionCreators({ ...LoginActions }, dispatch),
   };
 }
 

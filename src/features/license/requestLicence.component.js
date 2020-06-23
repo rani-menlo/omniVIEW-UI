@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { Loader, Text, Row, OmniButton, Toast } from "../../uikit/components";
-import { LoginActions, ApiActions } from "../../redux/actions";
+import { LoginActions, ApiActions, CustomerActions, } from "../../redux/actions";
 import { translate } from "../../translations/translator";
 import AuthLayout from "../login/authLayout.component";
 import { UsermanagementApi } from "../../redux/api";
@@ -9,19 +9,32 @@ import { UsermanagementApi } from "../../redux/api";
 class RequestLicense extends Component {
   requestLicense = async () => {
     this.props.dispatch(ApiActions.requestOnDemand());
-    const res = await UsermanagementApi.requestLicense();
+    const res = await UsermanagementApi.requestLicense({
+      customerId: this.props.selectedCustomer.id,
+    });
     if (!res.data.error) {
       Toast.success(res.data.message);
       this.props.dispatch(ApiActions.successOnDemand());
       this.cancel();
     } else {
       Toast.error(res.data.message);
+      this.props.dispatch(ApiActions.successOnDemand());
+      this.cancel();
     }
   };
 
   cancel = () => {
-    this.props.dispatch(LoginActions.logOut());
-    this.props.history.push("/");
+    if (this.props.customerAccounts.length > 1) {
+      setTimeout(() => {
+        this.props.history.push("/customer-accounts");
+        this.props.dispatch(
+          CustomerActions.setSelectedCustomer(null)
+        );
+      }, 1500)
+    } else {
+      this.props.dispatch(LoginActions.logOut());
+      this.props.history.push("/");
+    }
   };
 
   render() {
@@ -60,13 +73,15 @@ class RequestLicense extends Component {
 
 function mapStateToProps(state) {
   return {
-    loading: state.Api.loading
+    loading: state.Api.loading,
+    selectedCustomer: state.Customer.selectedCustomer,
+    customerAccounts: state.Login.customerAccounts,
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    dispatch
+    dispatch,
   };
 }
 

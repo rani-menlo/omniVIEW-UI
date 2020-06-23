@@ -13,10 +13,16 @@
   &-logo {
     width: 176px;
     height: 36px;
-    cursor: pointer;
   }
   &-username {
     margin: 0px 10px;
     @include text-normal(16px);
+  }
+  &-signout {
+    cursor: pointer;
+    span {
+      padding: 0 8px;
+      font-weight: bold;
+    }
   }
 }

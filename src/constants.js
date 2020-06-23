@@ -8,39 +8,42 @@ const ROLE_IDS = {
   OMNICIA: {
     administrator: 1,
     author: 3,
-    publisher: 2
+    publisher: 2,
   },
   CUSTOMER: {
     administrator: 4,
     author: 6,
-    publisher: 5
-  }
+    publisher: 5,
+  },
 };
 
 const ROLES = {
   OMNICIA: [
     {
       name: translate("label.role.administrator"),
-      id: ROLE_IDS.OMNICIA.administrator
+      id: ROLE_IDS.OMNICIA.administrator,
     },
     { name: translate("label.role.author"), id: ROLE_IDS.OMNICIA.author },
-    { name: translate("label.role.publisher"), id: ROLE_IDS.OMNICIA.publisher }
+    { name: translate("label.role.publisher"), id: ROLE_IDS.OMNICIA.publisher },
   ],
   CUSTOMER: [
     {
       name: translate("label.role.administrator"),
-      id: ROLE_IDS.CUSTOMER.administrator
+      id: ROLE_IDS.CUSTOMER.administrator,
     },
     { name: translate("label.role.author"), id: ROLE_IDS.CUSTOMER.author },
-    { name: translate("label.role.publisher"), id: ROLE_IDS.CUSTOMER.publisher }
-  ]
+    {
+      name: translate("label.role.publisher"),
+      id: ROLE_IDS.CUSTOMER.publisher,
+    },
+  ],
 };
 
 const CHECKBOX = {
   SELECTED: 1,
   DESELECTED: 0,
   SELECTED_PARTIALLY: -1,
-  RESET_DEFAULT: 100
+  RESET_DEFAULT: 100,
 };
 
 const URI = {
@@ -65,6 +68,8 @@ const URI = {
   GET_SUBSCRIPTIONS_IN_USE: `${path}customer/getSubscriptionsInUse`,
   GET_LICENCE_LOOKUP_INFO: `${path}customer/licenceLookupInfo`,
   ADD_NEW_LICENCES: `${path}customer/addLicences`,
+  GET_USER_PROFILES: `${path}customer/getUserProfiles`,
+  SWITCH_CUSTOMER: `${path}customer/switchCustomer`,
 
   // Submission
   GET_APPLICATIONS: `${path}submission/getSubmissions`,
@@ -133,7 +138,7 @@ const URI = {
   SAVE_SEQUENCE_DETAILS: `${path}upload/saveSequenceDetails`,
   MONITOR_STATUS: `${path}upload/monitorStatus`,
   RETRY_UPLOADS: `${path}upload/retrySequence`,
-  GENERATEPDF: `${path}upload/generateErrorReport`
+  GENERATEPDF: `${path}upload/generateErrorReport`,
 };
 
 const DATE_FORMAT = "MM/DD/YYYY";
@@ -149,7 +154,7 @@ const MISMATCH_SEQUENCES = 4; //if there are any mismatch sequences i.e. if uplo
 
 const VIEWER = {
   GOOGLE_VIEWER_MAX_SIZE: 22 * 1024 * 1024, // 22MB
-  OFFICE_VIEWER_MAX_SIZE: 10 * 1024 * 1024 // 10MB
+  OFFICE_VIEWER_MAX_SIZE: 10 * 1024 * 1024, // 10MB
 };
 
 const OPENED_WINDOWS = {};
@@ -168,24 +173,65 @@ const VALID_VALUES_XML_DATA = {
   //   "List of Patients Having Adverse Events",
   //   "List of Patients Having Serious Adverse Events"
   // ],
-  TOP_LIST: ["Pre Clinical Study Report", "Legacy Clinical Study Report", "Synopsis", "Study Report Body", "Protocol or Amendment",
-              "Sample Case Report Form", "IEC-IRB Consent Form List", "List Description Investigator Site", "Signatures Investigators",
-              "List Patients with Batches", "Randomisation Scheme", "Audit Certificates Report", "Statistical Methods Interim Analysis Plan",
-              "Inter-Laboratory Standardisation Methods Quality Assurance", "Publications Based on Study", "Publications Referenced in Report",
-              "Discontinued Patients", "Protocol Deviations", "Patients Excluded from Efficacy Analysis", "Demographic Data", 
-              "Compliance and Drug Concentration Data", "Individual Efficacy Response Data", "Adverse Event Listings", 
-              "Listing Individual Laboratory Measurements by Patient", "Case Report Forms", "Available On Request",
-              "Complete Patient List", "Serious Adverse Event Patient List", "Adverse Event Patient List", "Abnormal Lab Values Patient List",
-              "Data Tabulation Dataset Legacy", "Data Tabulation Dataset SDTM", "Data Tabulation Dataset Send", "Data Tabulation Data Definition",
-              "Data Listing Dataset", "Data Listing Data Definition", "Analysis Dataset ADaM", "Analysis Dataset Legacy", "Analysis Program",
-              "Analysis Data Definition", "Annotated CRF", "Ecg", "Image", "Subject Profiles", "Safety Report", "Antibacterial", "Special Pathogen",
-              "Antiviral", "iss", "ise", "Pm Description"]
+  TOP_LIST: [
+    "Pre Clinical Study Report",
+    "Legacy Clinical Study Report",
+    "Synopsis",
+    "Study Report Body",
+    "Protocol or Amendment",
+    "Sample Case Report Form",
+    "IEC-IRB Consent Form List",
+    "List Description Investigator Site",
+    "Signatures Investigators",
+    "List Patients with Batches",
+    "Randomisation Scheme",
+    "Audit Certificates Report",
+    "Statistical Methods Interim Analysis Plan",
+    "Inter-Laboratory Standardisation Methods Quality Assurance",
+    "Publications Based on Study",
+    "Publications Referenced in Report",
+    "Discontinued Patients",
+    "Protocol Deviations",
+    "Patients Excluded from Efficacy Analysis",
+    "Demographic Data",
+    "Compliance and Drug Concentration Data",
+    "Individual Efficacy Response Data",
+    "Adverse Event Listings",
+    "Listing Individual Laboratory Measurements by Patient",
+    "Case Report Forms",
+    "Available On Request",
+    "Complete Patient List",
+    "Serious Adverse Event Patient List",
+    "Adverse Event Patient List",
+    "Abnormal Lab Values Patient List",
+    "Data Tabulation Dataset Legacy",
+    "Data Tabulation Dataset SDTM",
+    "Data Tabulation Dataset Send",
+    "Data Tabulation Data Definition",
+    "Data Listing Dataset",
+    "Data Listing Data Definition",
+    "Analysis Dataset ADaM",
+    "Analysis Dataset Legacy",
+    "Analysis Program",
+    "Analysis Data Definition",
+    "Annotated CRF",
+    "Ecg",
+    "Image",
+    "Subject Profiles",
+    "Safety Report",
+    "Antibacterial",
+    "Special Pathogen",
+    "Antiviral",
+    "iss",
+    "ise",
+    "Pm Description",
+  ],
 };
 
 const CLOUDS = {
   ftp: {
     name: "FTP",
-    disabled: false
+    disabled: false,
   },
   // afs: {
   //   name: "AFS",
@@ -193,12 +239,12 @@ const CLOUDS = {
   // },
   oneDrive: {
     name: "ONE DRIVE",
-    disabled: true
+    disabled: true,
   },
   box: {
     name: "BOX",
-    disabled: true
-  }
+    disabled: true,
+  },
 };
 
 export {
@@ -221,5 +267,5 @@ export {
   IMAGE_SUPPORT_TYPES,
   VALID_VALUES_XML_DATA,
   CLOUDS,
-  OPENED_WINDOWS
+  OPENED_WINDOWS,
 };

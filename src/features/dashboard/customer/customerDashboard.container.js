@@ -20,7 +20,7 @@ import {
   SubHeader,
   ContentLayout,
   DeactivateModal,
-  Toast
+  Toast,
 } from "../../../uikit/components";
 import { DEBOUNCE_TIME } from "../../../constants";
 import { translate } from "../../../translations/translator";
@@ -43,7 +43,7 @@ class CustomerDashboard extends Component {
       showUsersModal: false,
       showAssignLicenceToUser: false,
       assigningLicence: null,
-      selectedUsers: null
+      selectedUsers: null,
     };
     this.searchCustomers = _.debounce(this.searchCustomers, DEBOUNCE_TIME);
   }
@@ -52,15 +52,14 @@ class CustomerDashboard extends Component {
     if (isLoggedInOmniciaRole(this.props.role)) {
       this.fetchCustomers();
     } else {
-      const { user } = this.props;
-      this.onCustomerSelected({ ...user.customer })();
+      const { customer } = this.props;
+      this.onCustomerSelected({ ...customer })();
     }
     //To prevent browser back button from going back
     // window.history.pushState(null, document.title, window.location.href);
     // window.addEventListener("popstate", function(event) {
     //   window.history.pushState(null, document.title, window.location.href);
     // });
-
   }
 
   fetchCustomers = (sortBy = "company_name", orderBy = "ASC") => {
@@ -78,48 +77,48 @@ class CustomerDashboard extends Component {
     }
   };
 
-  changeView = type => {
+  changeView = (type) => {
     this.setState({ viewBy: type }, () => this.fetchCustomers());
   };
 
-  onCustomerSelected = customer => () => {
+  onCustomerSelected = (customer) => () => {
     this.props.actions.setSelectedCustomer(customer);
     this.props.history.push("/applications");
   };
 
-  subscriptionsInUse = customer => event => {
+  subscriptionsInUse = (customer) => (event) => {
     event.stopPropagation();
     isLoggedInOmniciaAdmin(this.props.role) &&
       this.setState({
         selectedCustomer: customer,
         showSubscriptionsInUse: true,
-        showLicenceUnAssigned: false
+        showLicenceUnAssigned: false,
       });
   };
 
-  subscriptionsUnAssigned = customer => event => {
+  subscriptionsUnAssigned = (customer) => (event) => {
     event.stopPropagation();
     isLoggedInOmniciaAdmin(this.props.role) &&
       this.setState({
         selectedCustomer: customer,
         showLicenceUnAssigned: true,
-        showSubscriptionsInUse: false
+        showSubscriptionsInUse: false,
       });
   };
 
   closeSubscriptionsModal = () => {
     this.setState({
       showSubscriptionsInUse: false,
-      showLicenceUnAssigned: false
+      showLicenceUnAssigned: false,
     });
   };
 
-  editCustomer = customer => () => {
+  editCustomer = (customer) => () => {
     this.props.actions.setSelectedCustomer(customer);
     this.props.history.push("/usermanagement/customer/edit");
   };
 
-  getMenu = customer => () => {
+  getMenu = (customer) => () => {
     return (
       <Menu className="maindashboard__list__item-dropdown-menu">
         <Menu.Item
@@ -148,7 +147,7 @@ class CustomerDashboard extends Component {
         >
           <p
             style={{
-              color: _.get(customer, "is_active", false) ? "red" : "#00d592"
+              color: _.get(customer, "is_active", false) ? "red" : "#00d592",
             }}
           >
             <img src="/images/deactivate.svg" />
@@ -163,11 +162,11 @@ class CustomerDashboard extends Component {
     );
   };
 
-  onPageChange = pageNo => {
+  onPageChange = (pageNo) => {
     this.setState({ pageNo }, () => this.fetchCustomers());
   };
 
-  onPageSizeChange = itemsPerPage => {
+  onPageSizeChange = (itemsPerPage) => {
     this.setState({ itemsPerPage }, () => this.fetchCustomers());
   };
 
@@ -175,7 +174,7 @@ class CustomerDashboard extends Component {
     this.fetchCustomers(sortBy, orderBy);
   };
 
-  handleSearch = e => {
+  handleSearch = (e) => {
     const searchText = e.target.value;
     this.setState({ searchText });
     if (searchText === "" || _.size(searchText) >= 3) {
@@ -202,11 +201,11 @@ class CustomerDashboard extends Component {
   };
 
   openOadminUserManagement = () => {
-    const { user } = this.props;
-    this.openUserMgmt(user.customer)();
+    const { customer } = this.props;
+    this.openUserMgmt(customer)();
   };
 
-  openUserMgmt = customer => () => {
+  openUserMgmt = (customer) => () => {
     this.props.actions.setSelectedCustomer(customer);
     this.props.history.push("/usermanagement");
   };
@@ -221,7 +220,7 @@ class CustomerDashboard extends Component {
       CustomerActions.activateDeactivateCustomer(
         {
           customerId: selectedCustomer.id,
-          is_active: +!_.get(selectedCustomer, "is_active", false)
+          is_active: +!_.get(selectedCustomer, "is_active", false),
         },
         _.size(searchText) >= 3 ? searchText : ""
       )
@@ -229,11 +228,11 @@ class CustomerDashboard extends Component {
     this.closeActivateDeactivateModal();
   };
 
-  openActivateDeactivateModal = customer => () => {
+  openActivateDeactivateModal = (customer) => () => {
     this.setState({ showDeactivateModal: true, selectedCustomer: customer });
   };
 
-  openUsersModal = license => {
+  openUsersModal = (license) => {
     this.props.dispatch(
       CustomerActions.setSelectedCustomer(this.state.selectedCustomer)
     );
@@ -241,14 +240,14 @@ class CustomerDashboard extends Component {
       showLicenceUnAssigned: false,
       showAssignLicenceToUser: false,
       showUsersModal: true,
-      assigningLicence: license
+      assigningLicence: license,
     });
   };
 
   goBackToUsersModal = () => {
     this.setState({
       showAssignLicenceToUser: false,
-      showUsersModal: true
+      showUsersModal: true,
     });
   };
 
@@ -256,22 +255,22 @@ class CustomerDashboard extends Component {
     this.setState({
       selectedUsers: null,
       showUsersModal: false,
-      assigningLicence: null
+      assigningLicence: null,
     });
   };
 
   closeAssignLicenceToUserModal = () => {
     this.setState({
       selectedUsers: null,
-      showAssignLicenceToUser: false
+      showAssignLicenceToUser: false,
     });
   };
 
-  onUserSelect = users => {
+  onUserSelect = (users) => {
     this.setState({
       showAssignLicenceToUser: true,
       showUsersModal: false,
-      selectedUsers: users
+      selectedUsers: users,
     });
   };
 
@@ -283,13 +282,13 @@ class CustomerDashboard extends Component {
         ...(_.includes(licence.slug, "view")
           ? { omni_view_license: licence.id }
           : { omni_file_license: licence.id }),
-        user_id: user.user_id
+        user_id: user.user_id,
       };
     });
     this.props.dispatch(
       UsermanagementActions.assignLicense(
         {
-          licenses
+          licenses,
         },
         () => {
           /* Toast.success(
@@ -306,7 +305,7 @@ class CustomerDashboard extends Component {
     );
     this.setState({
       selectedUsers: null,
-      showAssignLicenceToUser: false
+      showAssignLicenceToUser: false,
     });
   };
 
@@ -316,7 +315,7 @@ class CustomerDashboard extends Component {
       searchText,
       showSubscriptionsInUse,
       showLicenceUnAssigned,
-      showUsersModal
+      showUsersModal,
     } = this.state;
     const { customers, loading, customerCount, role } = this.props;
     return (
@@ -334,7 +333,7 @@ class CustomerDashboard extends Component {
           <div style={{ marginLeft: "auto" }}>
             <SearchBox
               placeholder={translate("text.header.search", {
-                type: translate("label.dashboard.customers")
+                type: translate("label.dashboard.customers"),
               })}
               searchText={searchText}
               clearSearch={this.clearSearch}
@@ -361,7 +360,7 @@ class CustomerDashboard extends Component {
               <OmniButton
                 type="add"
                 label={translate("label.button.add", {
-                  type: translate("label.dashboard.customer")
+                  type: translate("label.dashboard.customer"),
                 })}
                 onClick={this.addCustomer}
                 // className="global__disabled-box"
@@ -375,12 +374,12 @@ class CustomerDashboard extends Component {
                   columns={TableColumns}
                   sortColumn={this.sortColumn}
                 />
-                {_.map(customers, customer => (
+                {_.map(customers, (customer) => (
                   <Row
                     key={customer.id}
                     className="maindashboard__list__item"
                     style={{
-                      opacity: _.get(customer, "is_active", false) ? 1 : 0.5
+                      opacity: _.get(customer, "is_active", false) ? 1 : 0.5,
                     }}
                   >
                     <Column
@@ -464,7 +463,7 @@ class CustomerDashboard extends Component {
                     className="maindashboard__nodata-icon"
                   />
                   {translate("error.dashboard.notfound", {
-                    type: translate("label.dashboard.customers")
+                    type: translate("label.dashboard.customers"),
                   })}
                 </Row>
               )}
@@ -478,7 +477,7 @@ class CustomerDashboard extends Component {
                     top: range[0],
                     bottom: range[1],
                     total,
-                    type: translate("label.dashboard.customers")
+                    type: translate("label.dashboard.customers"),
                   })
                 }
                 pageSize={this.state.itemsPerPage}
@@ -491,7 +490,7 @@ class CustomerDashboard extends Component {
           {viewBy === "cards" && (
             <React.Fragment>
               <div className="maindashboard__cards">
-                {_.map(customers, customer => (
+                {_.map(customers, (customer) => (
                   <CustomerCard
                     role={role}
                     key={customer.id}
@@ -513,7 +512,7 @@ class CustomerDashboard extends Component {
                       className="maindashboard__nodata-icon"
                     />
                     {translate("error.dashboard.notfound", {
-                      type: translate("label.dashboard.customers")
+                      type: translate("label.dashboard.customers"),
                     })}
                   </Row>
                 )}
@@ -573,7 +572,7 @@ const TableColumnNames = {
   APPLICATIONS: translate("label.dashboard.applications"),
   STORAGE: translate("label.dashboard.storage"),
   COMPANY_ADMIN: translate("label.dashboard.companyadmin"),
-  SUBSCRIPTION: translate("label.dashboard.subscription")
+  SUBSCRIPTION: translate("label.dashboard.subscription"),
 };
 
 const TableColumns = [
@@ -582,50 +581,50 @@ const TableColumns = [
     key: "company_name",
     checkbox: false,
     sort: true,
-    width: "25%"
+    width: "25%",
   },
   {
     name: TableColumnNames.USERS,
     key: "number_of_users",
     checkbox: false,
     sort: true,
-    width: "8%"
+    width: "8%",
   },
   {
     name: TableColumnNames.APPLICATIONS,
     key: "number_of_submissions",
     checkbox: false,
     sort: true,
-    width: "12%"
+    width: "12%",
   },
   {
     name: TableColumnNames.STORAGE,
     key: "max_space",
     checkbox: false,
     sort: true,
-    width: "13%"
+    width: "13%",
   },
   {
     name: TableColumnNames.COMPANY_ADMIN,
     key: "admin_name",
     checkbox: false,
     sort: true,
-    width: "20%"
+    width: "20%",
   },
   {
     name: TableColumnNames.SUBSCRIPTION,
     checkbox: false,
-    width: "22%"
-  }
+    width: "22%",
+  },
 ];
 
-const getColumnWidth = _.memoize(name => {
-  const col = _.find(TableColumns, col => col.name === name);
+const getColumnWidth = _.memoize((name) => {
+  const col = _.find(TableColumns, (col) => col.name === name);
   return _.get(col, "width");
 });
 
 const Column = styled.div`
-  width: ${props => props.width};
+  width: ${(props) => props.width};
 `;
 
 function mapStateToProps(state) {
@@ -633,17 +632,21 @@ function mapStateToProps(state) {
     loading: state.Api.loading,
     role: state.Login.role,
     user: state.Login.user,
+    customer: state.Login.customer,
     customers: state.Customer.customers,
     customerCount: state.Customer.customerCount,
-    getCustomers_flag: state.Customer.getCustomers_flag
+    getCustomers_flag: state.Customer.getCustomers_flag,
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
     actions: bindActionCreators({ ...CustomerActions }, dispatch),
-    dispatch
+    dispatch,
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(CustomerDashboard);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(CustomerDashboard);

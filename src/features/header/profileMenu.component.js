@@ -14,13 +14,17 @@ class ProfileMenu extends Component {
     this.props.history.push("/");
   };
 
+  switchAccounts = () => {
+    this.props.history.push("/customer-accounts");
+  };
+
   editProfile = () => {
     this.props.history.push("/profile/edit");
   };
 
   manageUsers = () => {
     this.props.dispatch(
-      CustomerActions.setSelectedCustomer(this.props.user.customer)
+      CustomerActions.setSelectedCustomer(this.props.customer)
     );
     if (this.props.location.pathname === "/usermanagement") {
       this.props.history.push("/usermanagement/parent");
@@ -35,7 +39,7 @@ class ProfileMenu extends Component {
         <Menu.Item
           className="maindashboard__list__item-dropdown-menu-item"
           onClick={this.editProfile}
-          disabled={this.props.user.first_login}
+          disabled={this.props.first_login}
         >
           <p>
             <img src="/images/edit.svg" />
@@ -44,12 +48,26 @@ class ProfileMenu extends Component {
             )}`}</span>
           </p>
         </Menu.Item>
+        {this.props.customerAccounts && this.props.customerAccounts.length > 1 && (
+          <Menu.Item
+            className="maindashboard__list__item-dropdown-menu-item"
+            onClick={this.switchAccounts}
+          >
+            <p>
+              <img
+                src="/images/switch-customers.jpeg"
+                style={{ width: "20px", marginRight: "6px" }}
+              />
+              <span>{translate("text.header.switchcustomers")}</span>
+            </p>
+          </Menu.Item>
+        )}
         {(isLoggedInOmniciaAdmin(this.props.role) ||
           isLoggedInCustomerAdmin(this.props.role)) && (
           <Menu.Item
             className="maindashboard__list__item-dropdown-menu-item"
             onClick={this.manageUsers}
-            disabled={this.props.user.first_login}
+            disabled={this.props.first_login}
           >
             <p>
               <img src="/images/user-management.svg" />
@@ -80,7 +98,7 @@ class ProfileMenu extends Component {
   };
 
   render() {
-    const { user } = this.props;
+    const { user, customerAccounts } = this.props;
     if (!user) {
       return null;
     }
@@ -118,16 +136,24 @@ class ProfileMenu extends Component {
 function mapStateToProps(state) {
   return {
     user: state.Login.user,
-    role: state.Login.role
+    role: state.Login.role,
+    customer: state.Login.role,
+    first_login: state.Login.first_login,
+    selectedCustomer: state.Customer.selectedCustomer,
+    customerAccounts: state.Login.customerAccounts,
+    customer: state.Login.customer,
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    dispatch
+    dispatch,
   };
 }
 
 export default withRouter(
-  connect(mapStateToProps, mapDispatchToProps)(ProfileMenu)
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(ProfileMenu)
 );

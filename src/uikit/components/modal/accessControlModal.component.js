@@ -17,7 +17,7 @@ class AccessControl extends Component {
   propTypes = {
     visible: PropTypes.bool,
     user: PropTypes.object,
-    closeModal: PropTypes.func
+    closeModal: PropTypes.func,
   };
 
   constructor(props) {
@@ -29,18 +29,18 @@ class AccessControl extends Component {
       applications: "",
       checkAllApplications: false,
       checkAllCustomers: false,
-      data: {}
+      data: {},
     };
   }
 
   async componentDidMount() {
     this.props.dispatch(ApiActions.requestOnDemand());
     const res = await CustomerApi.fetchCustomersByUserId({
-      userId: this.props.user.user_id
+      userId: this.props.user.user_id || this.props.user.userId,
     });
     if (!res.data.error) {
       let customers = res.data.data;
-      customers = _.map(customers, customer => {
+      customers = _.map(customers, (customer) => {
         customer.checked = customer.hasAccess;
         return customer;
       });
@@ -54,7 +54,7 @@ class AccessControl extends Component {
     order = order === "asc" ? "desc" : "asc";
     customers = _.orderBy(
       customers,
-      customer => {
+      (customer) => {
         return _.toLower(customer.company_name);
       },
       [order]
@@ -62,7 +62,7 @@ class AccessControl extends Component {
     this.setState({ order, customers });
   };
 
-  onCustomerCheck = customer => e => {
+  onCustomerCheck = (customer) => (e) => {
     const checked = e.target.checked;
     customer.checked = checked;
     let { data, checkAllApplications, customers } = this.state;
@@ -74,7 +74,7 @@ class AccessControl extends Component {
       if (!applications.length) {
         applications = null;
       } else {
-        applications = _.map(applications, application => {
+        applications = _.map(applications, (application) => {
           application.checked = customer.checked;
           application.mutated = true;
           return application;
@@ -92,11 +92,11 @@ class AccessControl extends Component {
       applications,
       data,
       checkAllApplications,
-      checkAllCustomers
+      checkAllCustomers,
     });
   };
 
-  onCustomerSelected = customer => async e => {
+  onCustomerSelected = (customer) => async (e) => {
     if (e.target.type === "checkbox") {
       return;
     }
@@ -106,14 +106,14 @@ class AccessControl extends Component {
       this.props.dispatch(ApiActions.requestOnDemand());
       const res = await ApplicationApi.fetchAccessedApplications({
         customerId: customer.id,
-        userId: this.props.user.user_id
+        userId: this.props.user.user_id || this.props.userId,
       });
       if (!res.data.error) {
         applications = res.data.data;
       }
       this.props.dispatch(ApiActions.successOnDemand());
     }
-    applications = _.map(applications, application => {
+    applications = _.map(applications, (application) => {
       // ignore if already application has checked property
       if (!_.has(application, "checked")) {
         application.checked = customer.checked || application.hasAccess;
@@ -130,11 +130,11 @@ class AccessControl extends Component {
       data: { ...this.state.data, [customer.id]: applications },
       applications,
       selectedCustomer: customer,
-      checkAllApplications: allChecked
+      checkAllApplications: allChecked,
     });
   };
 
-  onApplicationCheck = application => e => {
+  onApplicationCheck = (application) => (e) => {
     const checked = e.target.checked;
     const { data, selectedCustomer, customers } = this.state;
     const applications = [...this.state.applications];
@@ -150,14 +150,14 @@ class AccessControl extends Component {
       checkAllApplications,
       checkAllCustomers,
       selectedCustomer,
-      data
+      data,
     });
   };
 
-  checkAllApplications = e => {
+  checkAllApplications = (e) => {
     const checked = e.target.checked;
     const { data, selectedCustomer, customers } = this.state;
-    const applications = _.map(this.state.applications, application => {
+    const applications = _.map(this.state.applications, (application) => {
       application.checked = checked;
       application.mutated = true;
       return application;
@@ -172,14 +172,14 @@ class AccessControl extends Component {
       checkAllApplications: checked,
       checkAllCustomers,
       selectedCustomer,
-      data
+      data,
     });
   };
 
-  checkAllCustomers = e => {
+  checkAllCustomers = (e) => {
     const checked = e.target.checked;
     let { data, customers, selectedCustomer } = this.state;
-    customers = _.map(customers, customer => {
+    customers = _.map(customers, (customer) => {
       customer.checked = checked;
       let applications = data[customer.id];
       if (!applications) {
@@ -189,7 +189,7 @@ class AccessControl extends Component {
         if (!applications.length) {
           applications = null;
         } else {
-          applications = _.map(applications, application => {
+          applications = _.map(applications, (application) => {
             application.checked = checked;
             application.mutated = true;
             return application;
@@ -205,7 +205,7 @@ class AccessControl extends Component {
       checkAllCustomers: checked,
       checkAllApplications: checked,
       applications,
-      data
+      data,
     });
   };
 
@@ -224,33 +224,33 @@ class AccessControl extends Component {
         const checkedSubmissions = _.filter(submissions, {
           mutated: true,
           checked: true,
-          hasAccess: false
+          hasAccess: false,
         });
         const uncheckedSubmissions = _.filter(submissions, {
           mutated: true,
           checked: false,
-          hasAccess: true
+          hasAccess: true,
         });
         if (checkedSubmissions.length) {
           granted.push({
             customerId,
             submissions: _.map(checkedSubmissions, "id"),
-            hasAllAccess: false
+            hasAllAccess: false,
           });
         }
         if (uncheckedSubmissions.length) {
           revoked.push({
             customerId,
             submissions: _.map(uncheckedSubmissions, "id"),
-            hasAllAccess: false
+            hasAllAccess: false,
           });
         }
       }
     });
     const obj = {
-      userId: this.props.user.user_id,
+      userId: this.props.user.user_id || this.props.user.userId,
       granted,
-      revoked
+      revoked,
     };
     console.log(obj);
     const res = await submissionApi.updateOmniciaUserPermissions(obj);
@@ -268,7 +268,7 @@ class AccessControl extends Component {
       applications,
       selectedCustomer,
       checkAllApplications,
-      checkAllCustomers
+      checkAllCustomers,
     } = this.state;
     return (
       <Modal
@@ -364,7 +364,7 @@ class AccessControl extends Component {
               className="assign-permissions-modal__columns-content"
               style={{ marginTop: "12px" }}
             >
-              {_.map(customers, customer => (
+              {_.map(customers, (customer) => (
                 <div
                   className={`assign-permissions-modal__columns-content-item global__center-vert global__cursor-pointer ${selectedCustomer.id ===
                     customer.id && "global__node-selected"}`}
@@ -372,8 +372,8 @@ class AccessControl extends Component {
                     justifyContent: "space-between",
                     ...(!customer.submissionCount && {
                       cursor: "not-allowed",
-                      opacity: 0.25
-                    })
+                      opacity: 0.25,
+                    }),
                   }}
                   onClick={
                     customer.submissionCount &&
@@ -430,7 +430,7 @@ class AccessControl extends Component {
               )}
             </div>
             <div className="assign-permissions-modal__columns-content">
-              {_.map(applications, application => (
+              {_.map(applications, (application) => (
                 <div
                   className="assign-permissions-modal__columns-content-item global__center-vert"
                   style={{ justifyContent: "space-between" }}
@@ -453,7 +453,7 @@ class AccessControl extends Component {
                   textStyle={{
                     marginTop: "30%",
                     padding: "0px 20px",
-                    textAlign: "center"
+                    textAlign: "center",
                   }}
                   opacity={0.25}
                   type="regular"
@@ -485,7 +485,7 @@ class AccessControl extends Component {
 
 function mapStateToProps(state) {
   return {
-    loading: state.Api.loading
+    loading: state.Api.loading,
   };
 }
 

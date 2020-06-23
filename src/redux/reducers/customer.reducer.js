@@ -12,8 +12,8 @@ const initialState = {
   licencesUnAssignedLoading: false,
   lookupLicences: {
     licences: [],
-    types: []
-  }
+    types: [],
+  },
 };
 
 export default (state = initialState, action) => {
@@ -23,34 +23,34 @@ export default (state = initialState, action) => {
         ...state,
         customers: action.data.data,
         customerCount: action.data.customerCount,
-        getCustomers_flag: true
+        getCustomers_flag: true,
       };
     }
     case CustomerActionTypes.ADD_CUSTOMER: {
       return {
         ...state,
         customers: state.customers.push(action.data.data.customer),
-        selectedCustomer: action.data.data.customer
+        selectedCustomer: action.data.data.customer,
       };
     }
     case CustomerActionTypes.SET_SELECTED_CUSTOMER: {
       return {
         ...state,
-        selectedCustomer: action.customer
+        selectedCustomer: action.customer,
       };
     }
     case CustomerActionTypes.SUBSCRIPTIONS_IN_USE: {
       return {
         ...state,
         subscriptionsInUse: action.data.data,
-        subscriptionsLoading: true
+        subscriptionsLoading: true,
       };
     }
     case CustomerActionTypes.LICENCES_UN_ASSIGNED: {
       return {
         ...state,
         licencesUnAssigned: action.data,
-        licencesUnAssignedLoading: true
+        licencesUnAssignedLoading: true,
       };
     }
     case CustomerActionTypes.RESET_IN_USE_UN_ASSIGNED: {
@@ -59,7 +59,7 @@ export default (state = initialState, action) => {
         subscriptionsInUse: [],
         licencesUnAssigned: [],
         subscriptionsLoading: false,
-        licencesUnAssignedLoading: false
+        licencesUnAssignedLoading: false,
       };
     }
     case CustomerActionTypes.GET_LICENCE_LOOKUPS: {
@@ -68,21 +68,21 @@ export default (state = initialState, action) => {
         lookupLicences: {
           licences: _.map(
             action.data.subscription_licences || action.data.licences,
-            licence => ({
+            (licence) => ({
               key: licence.id,
               value: licence.name,
-              ...licence
+              ...licence,
             })
           ),
           types: _.map(
             action.data.subscription_types || action.data.types,
-            type => ({
+            (type) => ({
               key: type.id,
               value: type.name,
-              ...type
+              ...type,
             })
-          )
-        }
+          ),
+        },
       };
     }
     default:
