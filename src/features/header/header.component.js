@@ -16,17 +16,13 @@ class Header extends Component {
   componentDidMount() {}
 
   goToMain = (history, disabled) => () => {
-    const { customerAccounts } = this.props;
+    const { customerAccounts, role } = this.props;
     if (!disabled) {
-      if (customerAccounts && customerAccounts.length > 1) {
-        history.push("/customer-accounts");
-      } else {
-        if (isLoggedInOmniciaRole(customerAccounts[0].role)) {
-          history.push("/customers");
-          return;
-        }
-        history.push("/applications");
+      if (isLoggedInOmniciaRole(role)) {
+        history.push("/customers");
+        return;
       }
+      history.push("/applications");
     }
   };
 
@@ -72,6 +68,7 @@ function mapDispatchToProps(dispatch) {
 function mapStateToProps(state) {
   return {
     customerAccounts: state.Login.customerAccounts,
+    role: state.Login.role,
   };
 }
 

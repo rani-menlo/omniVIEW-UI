@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { Loader, Text, Row, OmniButton, Toast } from "../../uikit/components";
-import { LoginActions, ApiActions, CustomerActions, } from "../../redux/actions";
+import { LoginActions, ApiActions, CustomerActions } from "../../redux/actions";
 import { translate } from "../../translations/translator";
 import AuthLayout from "../login/authLayout.component";
 import { UsermanagementApi } from "../../redux/api";
@@ -25,12 +25,8 @@ class RequestLicense extends Component {
 
   cancel = () => {
     if (this.props.customerAccounts.length > 1) {
-      setTimeout(() => {
-        this.props.history.push("/customer-accounts");
-        this.props.dispatch(
-          CustomerActions.setSelectedCustomer(null)
-        );
-      }, 1500)
+      this.props.dispatch(CustomerActions.setSelectedCustomer(null));
+      this.props.history.push("/customer-accounts");
     } else {
       this.props.dispatch(LoginActions.logOut());
       this.props.history.push("/");

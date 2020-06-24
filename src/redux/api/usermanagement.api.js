@@ -11,6 +11,8 @@ export default {
   assignLicense: (data) => api.post(URI.ASSIGN_LICENSE, data),
   revokeLicense: (data) => api.post(URI.REVOKE_LICENSE, data),
   requestLicense: (postObj) => api.post(URI.REQUEST_LICENSE, postObj),
+  request_email_change: (postObj) =>
+    api.post(URI.REQUEST_TO_CHANGE_EMAIL, postObj),
   addUser: (user) => api.post(URI.ADD_USER, user),
   updateUser: (user) => api.post(URI.UPDATE_USER, user),
   activateDeactivateUser: (user) => api.post(URI.ACTIVATE_DEACTIVATE, user),

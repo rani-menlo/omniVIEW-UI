@@ -17,9 +17,10 @@ import {
 import Header from "../header/header.component";
 import { translate } from "../../translations/translator";
 import { isEmail, isPhone, isValidPwd } from "../../utils";
-import { LoginActions } from "../../redux/actions";
-import { Upload, Avatar, Checkbox } from "antd";
+import { LoginActions, ApiActions, CustomerActions } from "../../redux/actions";
+import { Upload, Avatar, Checkbox, Modal } from "antd";
 import { IMAGE_SUPPORT_TYPES, DEBOUNCE_TIME } from "../../constants";
+import { UsermanagementApi } from "../../redux/api";
 
 class CreateProfile extends Component {
   constructor(props) {
@@ -27,6 +28,7 @@ class CreateProfile extends Component {
     this.state = {
       editProfile: false,
       showChangePassword: false,
+      openEmailModal: false,
       password: {
         value: "",
         error: "",
@@ -52,6 +54,10 @@ class CreateProfile extends Component {
         error: "",
       },
       phone: {
+        value: "",
+        error: "",
+      },
+      newEmail: {
         value: "",
         error: "",
       },
@@ -90,20 +96,55 @@ class CreateProfile extends Component {
     });
   };
 
+  //chane email addresses for other non-omnicia users
+  changeEmailAddress = async () => {
+    const state = { ...this.state };
+    let error = false;
+    if (state.newEmail.value) {
+      const valid = isEmail(state.newEmail.value);
+      if (!valid) {
+        error = true;
+        state.newEmail.error = translate("error.form.invalid", {
+          type: translate("label.form.email"),
+        });
+      }
+    } else {
+      error = true;
+      state.newEmail.error = translate("error.form.required", {
+        type: translate("label.form.email"),
+      });
+    }
+    if (error) {
+      this.setState(state);
+      return;
+    }
+    this.props.dispatch(ApiActions.requestOnDemand());
+    const res = await UsermanagementApi.request_email_change({
+      email: state.newEmail.value,
+    });
+    if (!res.data.error) {
+      Toast.success(res.data.message);
+      state.newEmail.value = "";
+      state.newEmail.error = "";
+      this.setState(state);
+      this.props.dispatch(ApiActions.successOnDemand());
+      this.closeEmailModal();
+    } else {
+      Toast.error(res.data.message);
+      this.props.dispatch(ApiActions.successOnDemand());
+    }
+  };
+
   onPhoneChange = (value) => {
     this.setState({ phone: { ...this.state.phone, value, error: "" } });
   };
 
   goBack = () => {
-    if (this.props.customerAccounts && this.props.customerAccounts.length > 1) {
-      this.props.history.push("/customer-accounts");
-    } else {
-      if (isLoggedInOmniciaRole(this.props.customerAccounts[0].role)) {
-        this.props.history.push("/customers");
-        return;
-      }
-      this.props.history.push("/applications");
+    if (isLoggedInOmniciaRole(this.props.role)) {
+      this.props.history.push("/customers");
+      return;
     }
+    this.props.history.push("/applications");
   };
 
   save = () => {
@@ -275,6 +316,16 @@ class CreateProfile extends Component {
     this.setState({ showChangePassword: true });
   };
 
+  openemailModal = () => {
+    this.setState({ openEmailModal: true });
+  };
+
+  closeEmailModal = () => {
+    this.setState({
+      openEmailModal: false,
+    });
+  };
+
   onFileSelected = (info) => {
     const { file, target } = info;
     if (target) {
@@ -304,21 +355,31 @@ class CreateProfile extends Component {
     const {
       editProfile,
       oldPassword,
+      openEmailModal,
       password,
       confirmPwd,
       fname,
       lname,
       email,
+      newEmail,
       phone,
       showChangePassword,
     } = this.state;
-    const { user, first_login } = this.props;
+    const { user, first_login, customer, role } = this.props;
     return (
       <React.Fragment>
         <Loader loading={this.props.loading} />
         <Header style={{ marginBottom: "0px" }} disabled={first_login} />
         <ContentLayout className="createProfile">
           <div style={{ marginBottom: "15px" }}>
+            {!isLoggedInOmniciaRole(role) && editProfile && !first_login && (
+              <Text
+                type="extra_bold"
+                size="24px"
+                text={customer.company_name}
+                textStyle={{ color: "#1890ff", textAlign: "center" }}
+              />
+            )}
             <Text
               type="extra_bold"
               size="24px"
@@ -460,24 +521,58 @@ class CreateProfile extends Component {
                 onChange={this.onInputChange("lname")}
               />
             </div>
-            <div className="createProfile__fields">
-              <InputField
-                className="createProfile__fields-field"
-                style={{ marginRight: "14px" }}
-                label={`${translate("label.form.email")}*`}
-                value={email.value}
-                placeholder={translate("placeholder.form.email")}
-                error={email.error}
-                onChange={this.onInputChange("email")}
-              />
-              <PhoneField
-                className="createProfile__fields-field"
-                error={phone.error}
-                label={`${translate("label.form.phone")}*`}
-                value={phone.value}
-                onChange={this.onPhoneChange}
-              />
-            </div>
+            {!isLoggedInOmniciaRole(role) && editProfile && !first_login ? (
+              <>
+                <div className="createProfile__fields">
+                  <InputField
+                    className="createProfile__fields-field"
+                    style={{ marginRight: "14px" }}
+                    label={`${translate("label.form.email")}*`}
+                    value={email.value}
+                    placeholder={translate("placeholder.form.email")}
+                    error={email.error}
+                    onChange={this.onInputChange("email")}
+                    disabled
+                  />
+                  <OmniButton
+                    className="createProfile__fields-field"
+                    type="primary"
+                    label="Change Email Address"
+                    buttonStyle={{ marginBottom: "20px", marginTop: "23px" }}
+                    onClick={this.openemailModal}
+                  />
+                </div>
+                <div className="createProfile__fields">
+                  <PhoneField
+                    className="createProfile__fields-field"
+                    error={phone.error}
+                    label={`${translate("label.form.phone")}*`}
+                    value={phone.value}
+                    style={{ marginBottom: "20px" }}
+                    onChange={this.onPhoneChange}
+                  />
+                </div>
+              </>
+            ) : (
+              <div className="createProfile__fields">
+                <InputField
+                  className="createProfile__fields-field"
+                  style={{ marginRight: "14px" }}
+                  label={`${translate("label.form.email")}*`}
+                  value={email.value}
+                  placeholder={translate("placeholder.form.email")}
+                  error={email.error}
+                  onChange={this.onInputChange("email")}
+                />
+                <PhoneField
+                  className="createProfile__fields-field"
+                  error={phone.error}
+                  label={`${translate("label.form.phone")}*`}
+                  value={phone.value}
+                  onChange={this.onPhoneChange}
+                />
+              </div>
+            )}
             <Checkbox
               key={0}
               style={{ marginBottom: "24px" }}
@@ -585,6 +680,54 @@ class CreateProfile extends Component {
             </div>
           </div>
         </ContentLayout>
+        <Modal
+          destroyOnClose
+          visible={openEmailModal}
+          closable={false}
+          footer={null}
+          width="25%"
+          centered
+        >
+          <div className="email-change-modal">
+            <div className="email-change-modal__header">
+              <Text
+                type="extra_bold"
+                size="14px"
+                text="Change Email Adress"
+                textStyle={{ color: "#1890ff" }}
+              />
+              <img
+                src="/images/close.svg"
+                className="email-change-modal__header-close"
+                onClick={this.closeEmailModal}
+              />
+            </div>
+            <div className="email-change-modal__fields">
+              <InputField
+                className="email-change-modal__fields-field"
+                label={`${translate("label.form.email")}*`}
+                value={newEmail.value}
+                placeholder={translate("placeholder.form.email")}
+                error={newEmail.error}
+                onChange={this.onInputChange("newEmail")}
+              />
+            </div>
+            <div>
+              <OmniButton
+                type="secondary"
+                label={translate("label.button.cancel")}
+                onClick={this.closeEmailModal}
+                buttonStyle={{ width: "120px", marginRight: "12px" }}
+              />
+              <OmniButton
+                type="primary"
+                label={translate("label.button.submit")}
+                onClick={this.changeEmailAddress}
+                buttonStyle={{ width: "120px", float: "right" }}
+              />
+            </div>
+          </div>
+        </Modal>
       </React.Fragment>
     );
   }
@@ -594,10 +737,12 @@ function mapStateToProps(state) {
   return {
     loading: state.Api.loading,
     user: state.Login.user,
+    role: state.Login.role,
     email: state.Login.email,
     customerAccounts: state.Login.customerAccounts,
     profileUpdated: state.Login.profileUpdated,
     first_login: state.Login.first_login,
+    customer: state.Login.customer,
   };
 }
 

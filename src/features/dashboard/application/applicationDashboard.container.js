@@ -13,14 +13,14 @@ import {
   UPLOAD_INPROGRES,
   UPLOAD_PROCESSING,
   UPLOAD_SUCCESS,
-  MISMATCH_SEQUENCES
+  MISMATCH_SEQUENCES,
 } from "../../../constants";
 import {
   ApiActions,
   ApplicationActions,
   SubmissionActions,
   CustomerActions,
-  UsermanagementActions
+  UsermanagementActions,
 } from "../../../redux/actions";
 import submissionActions from "../../../redux/actions/submission.actions";
 import usermanagementActions from "../../../redux/actions/usermanagement.actions";
@@ -41,7 +41,7 @@ import {
   SubHeader,
   TableHeader,
   Text,
-  Toast
+  Toast,
 } from "../../../uikit/components";
 import SequencesModal from "../../../uikit/components/modal/sequencesModal.component";
 import {
@@ -49,7 +49,7 @@ import {
   isAdmin,
   isLoggedInCustomerAdmin,
   isLoggedInOmniciaAdmin,
-  isLoggedInOmniciaRole
+  isLoggedInOmniciaRole,
 } from "../../../utils";
 import Header from "../../header/header.component";
 import AssignLicence from "../../license/assignLicence.component";
@@ -102,21 +102,21 @@ class ApplicationDashboard extends Component {
           checked: false,
           sort: false,
           width: "5%",
-          onCheckboxChange: this.checkAll
+          onCheckboxChange: this.checkAll,
         },
         {
           name: TableColumnNames.APPLICATION_NAME,
           key: "name",
           checkbox: false,
           sort: true,
-          width: "15%"
+          width: "15%",
         },
         {
           name: TableColumnNames.SEQUENCES,
           key: "sequence_count",
           checkbox: false,
           sort: true,
-          width: "10%"
+          width: "10%",
         },
         {
           name: TableColumnNames.ADDEDBY,
@@ -124,28 +124,28 @@ class ApplicationDashboard extends Component {
           checkbox: false,
           sort: true,
           width: "26%",
-          style: { paddingLeft: "15px" }
+          style: { paddingLeft: "15px" },
         },
         {
           name: TableColumnNames.ADDEDON,
           key: "created_at",
           checkbox: false,
           sort: true,
-          width: "14%"
+          width: "14%",
         },
         {
           name: TableColumnNames.LAST_UPDATED,
           key: "updated_at",
           checkbox: false,
           sort: true,
-          width: "17%"
+          width: "17%",
         },
         {
           name: TableColumnNames.USERS,
           checkbox: false,
-          width: "14%"
-        }
-      ]
+          width: "14%",
+        },
+      ],
     };
     this.searchApplications = _.debounce(
       this.searchApplications,
@@ -156,28 +156,30 @@ class ApplicationDashboard extends Component {
         title: "Sequence #",
         dataIndex: "pipeline_name",
         key: "id",
-        render: text => <Text type="regular" size="14px" text={text || 1001} />,
-        width: 110
+        render: (text) => (
+          <Text type="regular" size="14px" text={text || 1001} />
+        ),
+        width: 110,
       },
 
       {
         title: "Error Description",
         dataIndex: "error_message",
         key: "error",
-        render: text => (
+        render: (text) => (
           <Text
             type="regular"
             size="14px"
             text={text}
             textStyle={{ wordWrap: "break-word", wordBreak: "break-word" }}
           />
-        )
-      }
+        ),
+      },
     ];
   }
 
-  getColumnWidth = _.memoize(name => {
-    const col = _.find(this.state.TableColumns, col => col.name === name);
+  getColumnWidth = _.memoize((name) => {
+    const col = _.find(this.state.TableColumns, (col) => col.name === name);
     return _.get(col, "width");
   });
 
@@ -197,10 +199,10 @@ class ApplicationDashboard extends Component {
         }
       }); */
       return {
-        submissions: _.map(props.submissions, sub => ({
+        submissions: _.map(props.submissions, (sub) => ({
           ...sub,
-          ref: React.createRef()
-        }))
+          ref: React.createRef(),
+        })),
       };
     }
     return null;
@@ -210,7 +212,7 @@ class ApplicationDashboard extends Component {
     this.fetchApplications();
     if (!isLoggedInOmniciaRole(this.props.role)) {
       const res = await CustomerApi.getCustomerById(
-        this.props.selectedCustomer.id
+        this.props.customer.id || this.props.selectedCustomer.id
       );
       this.props.dispatch(CustomerActions.setSelectedCustomer(res.data.data));
     }
@@ -225,7 +227,7 @@ class ApplicationDashboard extends Component {
     if (!this.state.submissions.length) {
       return;
     }
-    _.map(this.state.submissions, submission => {
+    _.map(this.state.submissions, (submission) => {
       if (submission.is_uploading && !this.intervals.get(submission.id)) {
         this.startPolling(submission);
         const interval = setInterval(() => {
@@ -250,9 +252,9 @@ class ApplicationDashboard extends Component {
     }
   };
 
-  startPolling = async submission => {
+  startPolling = async (submission) => {
     const res = await ApplicationApi.monitorStatus({
-      submission_id: submission.id
+      submission_id: submission.id,
     });
     if (res) {
       const { data } = res;
@@ -280,7 +282,7 @@ class ApplicationDashboard extends Component {
   };
 
   //clearInterval
-  clearSubmissionInterval = submissionId => {
+  clearSubmissionInterval = (submissionId) => {
     const interval = this.intervals.get(submissionId);
     if (interval) {
       clearInterval(interval);
@@ -288,13 +290,19 @@ class ApplicationDashboard extends Component {
     }
   };
 
-  checkSequenceStatus = (data, submission, is_uploadingFlag, is_submission, is_deleting) => {
+  checkSequenceStatus = (
+    data,
+    submission,
+    is_uploadingFlag,
+    is_submission,
+    is_deleting
+  ) => {
     const totalNoOfSeq = data.length;
     const inProgress = [];
     const failed = [];
     const success = [];
     const processing = [];
-    _.map(data, seq => {
+    _.map(data, (seq) => {
       switch (seq.status) {
         case UPLOAD_INPROGRES:
           inProgress.push(seq);
@@ -345,13 +353,13 @@ class ApplicationDashboard extends Component {
     this.updateSubmissions(submission);
   };
 
-  onMenuClick = submission => ({ key }) => {
+  onMenuClick = (submission) => ({ key }) => {
     this.onMenuItemClick(key, submission);
   };
 
-  getMenu = submission => () => {
+  getMenu = (submission) => () => {
     const style = {
-      marginRight: "8px"
+      marginRight: "8px",
     };
     return (
       <Menu onClick={this.onMenuClick(submission)}>
@@ -434,46 +442,46 @@ class ApplicationDashboard extends Component {
                   textStyle={{ marginLeft: "1px" }}
                 />
               </div>
-            </Menu.Item>
+            </Menu.Item>,
           ]}
         {(isLoggedInOmniciaAdmin(this.props.role) ||
           isLoggedInCustomerAdmin(this.props.role)) && (
-            <Menu.Item key="delete_sequences">
-              <div className="global__center-vert global__text-red">
-                <Icon
-                  type="close-circle"
-                  theme="outlined"
-                  style={{ fontSize: "18px", marginRight: "4px" }}
-                />
-                <Text
-                  type="regular"
-                  size="12px"
-                  text="Delete Sequences"
-                  className="global__text-red"
-                  textStyle={{ marginLeft: "2px" }}
-                />
-              </div>
-            </Menu.Item>
-          )}
+          <Menu.Item key="delete_sequences">
+            <div className="global__center-vert global__text-red">
+              <Icon
+                type="close-circle"
+                theme="outlined"
+                style={{ fontSize: "18px", marginRight: "4px" }}
+              />
+              <Text
+                type="regular"
+                size="12px"
+                text="Delete Sequences"
+                className="global__text-red"
+                textStyle={{ marginLeft: "2px" }}
+              />
+            </div>
+          </Menu.Item>
+        )}
         {(isLoggedInOmniciaAdmin(this.props.role) ||
           isLoggedInCustomerAdmin(this.props.role)) && (
-            <Menu.Item key="delete">
-              <div className="global__center-vert global__text-red">
-                <Icon
-                  type="delete"
-                  theme="filled"
-                  style={{ fontSize: "20px", marginRight: "8px" }}
-                />
-                <Text
-                  type="regular"
-                  size="12px"
-                  text="Delete Application"
-                  className="global__text-red"
-                  textStyle={{ marginLeft: "-4px" }}
-                />
-              </div>
-            </Menu.Item>
-          )}
+          <Menu.Item key="delete">
+            <div className="global__center-vert global__text-red">
+              <Icon
+                type="delete"
+                theme="filled"
+                style={{ fontSize: "20px", marginRight: "8px" }}
+              />
+              <Text
+                type="regular"
+                size="12px"
+                text="Delete Application"
+                className="global__text-red"
+                textStyle={{ marginLeft: "-4px" }}
+              />
+            </div>
+          </Menu.Item>
+        )}
       </Menu>
     );
   };
@@ -502,7 +510,7 @@ class ApplicationDashboard extends Component {
     }
   };
 
-  changeView = type => {
+  changeView = (type) => {
     const TableColumns = [...this.state.TableColumns];
     TableColumns[0].checked = false;
     this.setState(
@@ -510,7 +518,7 @@ class ApplicationDashboard extends Component {
         viewBy: type,
         assignGlobalPermissions: false,
         assignPermissions: false,
-        TableColumns
+        TableColumns,
       },
       () => {
         this.clearAllIntervals();
@@ -519,7 +527,7 @@ class ApplicationDashboard extends Component {
     );
   };
 
-  onSubmissionSelected = submission => () => {
+  onSubmissionSelected = (submission) => () => {
     if (
       _.get(submission, "is_uploading") ||
       _.get(submission, "analyzing") ||
@@ -541,11 +549,11 @@ class ApplicationDashboard extends Component {
     this.props.history.push("/");
   };
 
-  onPageChange = pageNo => {
+  onPageChange = (pageNo) => {
     this.setState({ pageNo }, () => this.fetchApplications());
   };
 
-  onPageSizeChange = itemsPerPage => {
+  onPageSizeChange = (itemsPerPage) => {
     this.setState({ itemsPerPage }, () => this.fetchApplications());
   };
 
@@ -553,7 +561,7 @@ class ApplicationDashboard extends Component {
     this.fetchApplications(sortBy, orderBy);
   };
 
-  handleSearch = e => {
+  handleSearch = (e) => {
     const searchText = e.target.value;
     this.setState({ searchText });
     if (searchText === "" || _.size(searchText) >= 3) {
@@ -582,7 +590,7 @@ class ApplicationDashboard extends Component {
         "_blank",
         "height=0, width=0"
       );
-      newWindow.addEventListener("load", function () {
+      newWindow.addEventListener("load", function() {
         newWindow.document.title = submission.name;
       });
     } else if (key === "permissions") {
@@ -593,7 +601,7 @@ class ApplicationDashboard extends Component {
     } else if (key === "edit") {
       this.props.actions.setSelectedSubmission(submission);
       this.setState({
-        showPropertiesModal: true
+        showPropertiesModal: true,
       });
     } else if (key === "sequence") {
       this.props.actions.setSelectedSubmission(submission);
@@ -606,12 +614,12 @@ class ApplicationDashboard extends Component {
     }
   };
 
-  removeSubmission = submission => {
+  removeSubmission = (submission) => {
     Modal.confirm({
       className: "omnimodal",
       title: translate("label.generic.delete"),
       content: translate("label.user.areyousuredeletesubmission", {
-        name: submission.name
+        name: submission.name,
       }),
       okText: translate("label.generic.delete"),
       cancelText: translate("label.button.cancel"),
@@ -620,7 +628,7 @@ class ApplicationDashboard extends Component {
           ApplicationActions.deleteSubmission(
             {
               submission_id: submission.id,
-              customer_id: this.props.selectedCustomer.id
+              customer_id: this.props.selectedCustomer.id,
             },
             () => {
               Toast.success("Application has been deleted!");
@@ -631,11 +639,11 @@ class ApplicationDashboard extends Component {
           )
         );
       },
-      onCancel: () => { }
+      onCancel: () => {},
     });
   };
 
-  checkAll = e => {
+  checkAll = (e) => {
     const checked = _.get(e, "target.checked", false);
     if (!this.state.submissions.length) {
       e.preventDefault();
@@ -643,9 +651,9 @@ class ApplicationDashboard extends Component {
     }
     let checkedSubmissions = [];
     let submissions = this.state.submissions.slice(0, this.state.itemsPerPage);
-    submissions = _.map(submissions, submission => ({
+    submissions = _.map(submissions, (submission) => ({
       ...submission,
-      checked
+      checked,
     }));
     if (checked) {
       checkedSubmissions = [...submissions];
@@ -659,11 +667,11 @@ class ApplicationDashboard extends Component {
       TableColumns,
       // assignGlobalPermissions: checked,
       assignPermissions: checkedSubmissions.length !== 0,
-      checkedSubmissions
+      checkedSubmissions,
     });
   };
 
-  onCheckboxChange = submission => e => {
+  onCheckboxChange = (submission) => (e) => {
     const checked = e.target.checked;
     const submissions = this.state.submissions.slice(
       0,
@@ -690,7 +698,7 @@ class ApplicationDashboard extends Component {
       TableColumns,
       // assignGlobalPermissions,
       assignPermissions,
-      checkedSubmissions
+      checkedSubmissions,
     });
   };
 
@@ -700,7 +708,7 @@ class ApplicationDashboard extends Component {
   };
 
   //get all sucessfully uploaded sequences for a particular submission
-  getUploadedSequences = submission => {
+  getUploadedSequences = (submission) => {
     const { user } = this.props;
     if (submission) {
       // fetch sequences
@@ -712,23 +720,23 @@ class ApplicationDashboard extends Component {
   };
 
   //Upon sequences modal on click of delete sequences menu item
-  openSequencesModal = submission => {
+  openSequencesModal = (submission) => {
     this.getUploadedSequences(submission);
     this.setState({
       showSequencesModal: true,
-      selectedSubmissionMenu: submission
+      selectedSubmissionMenu: submission,
     });
   };
   //closing sequences modal
   closeSequencesModal = () => {
     this.state.selectedSubmissionMenu.ref.current.scrollIntoView({
-      behavior: "smooth"
+      behavior: "smooth",
     });
     this.setState({
       showSequencesModal: false,
       selectedSubmissionMenu: "",
       selectedSequences: [],
-      allUploadedSequences: []
+      allUploadedSequences: [],
     });
   };
 
@@ -737,7 +745,7 @@ class ApplicationDashboard extends Component {
     this.setState({
       showPermissionsModal: true,
       assignGlobalPermissions: true,
-      checkedSubmissions: this.state.submissions
+      checkedSubmissions: this.state.submissions,
     });
   };
 
@@ -745,44 +753,44 @@ class ApplicationDashboard extends Component {
     this.state.viewBy === "lists" && this.checkAll();
     this.setState({
       showPermissionsModal: false,
-      assignGlobalPermissions: false
+      assignGlobalPermissions: false,
     });
   };
 
   subscriptionsInUse = () => {
     this.setState({
       showSubscriptionsInUse: true,
-      showLicenceUnAssigned: false
+      showLicenceUnAssigned: false,
     });
   };
 
   subscriptionsUnAssigned = () => {
     this.setState({
       showLicenceUnAssigned: true,
-      showSubscriptionsInUse: false
+      showSubscriptionsInUse: false,
     });
   };
 
   closeSubscriptionsModal = () => {
     this.setState({
       showSubscriptionsInUse: false,
-      showLicenceUnAssigned: false
+      showLicenceUnAssigned: false,
     });
   };
 
-  openUsersModal = license => {
+  openUsersModal = (license) => {
     this.setState({
       showLicenceUnAssigned: false,
       showAssignLicenceToUser: false,
       showUsersModal: true,
-      assigningLicence: license
+      assigningLicence: license,
     });
   };
 
   goBackToUsersModal = () => {
     this.setState({
       showAssignLicenceToUser: false,
-      showUsersModal: true
+      showUsersModal: true,
     });
   };
 
@@ -790,22 +798,22 @@ class ApplicationDashboard extends Component {
     this.setState({
       selectedUsers: null,
       showUsersModal: false,
-      assigningLicence: null
+      assigningLicence: null,
     });
   };
 
   closeAssignLicenceToUserModal = () => {
     this.setState({
       selectedUsers: null,
-      showAssignLicenceToUser: false
+      showAssignLicenceToUser: false,
     });
   };
 
-  onUserSelect = users => {
+  onUserSelect = (users) => {
     this.setState({
       showAssignLicenceToUser: true,
       showUsersModal: false,
-      selectedUsers: users
+      selectedUsers: users,
     });
   };
 
@@ -817,13 +825,13 @@ class ApplicationDashboard extends Component {
         ...(_.includes(licence.slug, "view")
           ? { omni_view_license: licence.id }
           : { omni_file_license: licence.id }),
-        user_id: user.user_id
+        user_id: user.user_id,
       };
     });
     this.props.dispatch(
       UsermanagementActions.assignLicense(
         {
-          licenses
+          licenses,
         },
         async () => {
           /* Toast.success(
@@ -836,7 +844,7 @@ class ApplicationDashboard extends Component {
           Toast.success("License has been assigned.");
           this.props.dispatch(ApiActions.requestOnDemand());
           const res = await CustomerApi.getCustomerById(
-            this.props.selectedCustomer.id
+            this.props.customer.id || this.props.selectedCustomer.id
           );
           this.props.dispatch(
             CustomerActions.setSelectedCustomer(res.data.data)
@@ -847,7 +855,7 @@ class ApplicationDashboard extends Component {
     );
     this.setState({
       selectedUsers: null,
-      showAssignLicenceToUser: false
+      showAssignLicenceToUser: false,
     });
   };
 
@@ -863,12 +871,12 @@ class ApplicationDashboard extends Component {
     this.setState({ showPropertiesModal: false });
   };
 
-  updateSubmissionCenter = slug => {
+  updateSubmissionCenter = (slug) => {
     this.props.dispatch(
       ApplicationActions.updateSubmissionCenter(
         {
           submission_id: this.props.selectedSubmission.id,
-          center_slug: slug
+          center_slug: slug,
         },
         () => {
           this.fetchApplications();
@@ -882,21 +890,21 @@ class ApplicationDashboard extends Component {
     this.props.history.push("/applications/add");
   };
 
-  updateSubmissions = submission => {
+  updateSubmissions = (submission) => {
     const { submissions } = this.state;
-    let submissionIdx = submissions.findIndex(x => x.id === submission.id);
+    let submissionIdx = submissions.findIndex((x) => x.id === submission.id);
     submissions[submissionIdx] = submission;
     this.setState({
-      submissions
+      submissions,
     });
   };
 
-  updateUploadProgress = submission => {
+  updateUploadProgress = (submission) => {
     const { submissions } = this.state;
-    let submissionIdx = submissions.findIndex(x => x.id === submission.id);
+    let submissionIdx = submissions.findIndex((x) => x.id === submission.id);
     submissions[submissionIdx] = submission;
     this.setState({
-      submissions
+      submissions,
     });
   };
 
@@ -912,16 +920,19 @@ class ApplicationDashboard extends Component {
     );
   };
 
-  openFailures = submission => async e => {
+  openFailures = (submission) => async (e) => {
     e.stopPropagation();
     this.props.dispatch(ApiActions.requestOnDemand());
     const res = await ApplicationApi.monitorStatus({
-      submission_id: submission.id
+      submission_id: submission.id,
     });
     const { data } = res;
     const failures = _.filter(
       _.get(data, "result"),
-      seq => seq.status == UPLOAD_FAILED || seq.status == SCRIPT_ERROR || seq.status == MISMATCH_SEQUENCES
+      (seq) =>
+        seq.status == UPLOAD_FAILED ||
+        seq.status == SCRIPT_ERROR ||
+        seq.status == MISMATCH_SEQUENCES
     );
     console.log("failures", failures);
     // const failures = _.filter(
@@ -930,16 +941,16 @@ class ApplicationDashboard extends Component {
     // );
     window.scrollTo(0, 0);
     this.setState({
-      reportData: _.map(failures, fail => ({key: fail, ...fail})),
+      reportData: _.map(failures, (fail) => ({ key: fail, ...fail })),
       openFailuresModal: true,
-      selectedSubmissionMenu: submission
+      selectedSubmissionMenu: submission,
     });
     this.props.dispatch(ApiActions.successOnDemand());
   };
 
   closeFailuresModal = () => {
     this.state.selectedSubmissionMenu.ref.current.scrollIntoView({
-      behavior: "smooth"
+      behavior: "smooth",
     });
     this.setState({ openFailuresModal: false, selectedFailedUploads: [] });
   };
@@ -948,9 +959,9 @@ class ApplicationDashboard extends Component {
   exportToPDF = () => {
     this.showLoading();
     const res = ApplicationApi.exportViewReportPDF({
-      submission_id: this.state.selectedSubmissionMenu.id
+      submission_id: this.state.selectedSubmissionMenu.id,
     })
-      .then(res => {
+      .then((res) => {
         this.hideLoading();
         const defaultFilename = "Report.pdf";
         var data = new Blob([res.data]);
@@ -966,7 +977,7 @@ class ApplicationDashboard extends Component {
           link.click(); // create an <a> element and simulate the click operation.
         }
       })
-      .catch(error => {
+      .catch((error) => {
         this.hideLoading();
         console.log(error);
       });
@@ -982,18 +993,22 @@ class ApplicationDashboard extends Component {
 
   //open delete sequences confirmation modal if user selects all the sequences
   //in the failure report window
-  showDeleteSeqConfirmModal = type => {
+  showDeleteSeqConfirmModal = (type) => {
     let selectedSequences = [...this.state.selectedSequences];
     const allUploadedSequences = [...this.state.allUploadedSequences];
     let selectedFailedUploads = [...this.state.selectedFailedUploads];
     const reportData = [...this.state.reportData];
     let content_message = "";
     if (type == "sucessfully_uploaded_sequences") {
-      content_message = selectedSequences.length === allUploadedSequences.length ? "You chose to delete all the Sequences that will remove the Application Card from the Dashboard page. Do you wish to continue?"
-        : "Are you sure you want to delete the selected Sequence(s)";
+      content_message =
+        selectedSequences.length === allUploadedSequences.length
+          ? "You chose to delete all the Sequences that will remove the Application Card from the Dashboard page. Do you wish to continue?"
+          : "Are you sure you want to delete the selected Sequence(s)";
     } else if (type == "failed_sequences") {
-      content_message = selectedFailedUploads.length == reportData.length ? "You chose to delete all the Sequences that will remove the Application Card from the Dashboard page. Do you wish to continue?"
-        : "Are you sure you want to delete the selected Sequence(s)";
+      content_message =
+        selectedFailedUploads.length == reportData.length
+          ? "You chose to delete all the Sequences that will remove the Application Card from the Dashboard page. Do you wish to continue?"
+          : "Are you sure you want to delete the selected Sequence(s)";
     }
     Modal.confirm({
       className: "omnimodal",
@@ -1003,14 +1018,12 @@ class ApplicationDashboard extends Component {
       onOk: () => {
         this.deleteSequences(type);
       },
-      onCancel: () => { }
+      onCancel: () => {},
     });
   };
 
-
-
   //check if user selects all the sequences or not for the deletion
-  getDeleteSequencesData = type => {
+  getDeleteSequencesData = (type) => {
     //if user selects sequences from the successfully uploaded sequences modal
     if (type == "sucessfully_uploaded_sequences") {
       // let selectedSequences = [...this.state.selectedSequences];
@@ -1052,7 +1065,7 @@ class ApplicationDashboard extends Component {
   };
 
   //delete sequences
-  deleteSequences = async type => {
+  deleteSequences = async (type) => {
     this.showLoading();
     const reportData = [...this.state.reportData];
     let selectedFailedUploads = [...this.state.selectedFailedUploads];
@@ -1060,12 +1073,12 @@ class ApplicationDashboard extends Component {
     let selectedSequences = [...this.state.selectedSequences];
     let sequences =
       type == "failed_sequences"
-        ? selectedFailedUploads.flatMap(i => i.pipeline_name)
-        : selectedSequences.flatMap(i => i.name);
+        ? selectedFailedUploads.flatMap((i) => i.pipeline_name)
+        : selectedSequences.flatMap((i) => i.name);
     const res = await ApplicationApi.deleteSequences({
       customer_id: this.props.selectedCustomer.id,
       submission_id: this.state.selectedSubmissionMenu.id,
-      sequences: sequences
+      sequences: sequences,
     });
     this.hideLoading();
     if (!res.data.error) {
@@ -1093,7 +1106,7 @@ class ApplicationDashboard extends Component {
 
   //on selecting rows in failure report window
   onRowSelected = (selectedRowKeys, selectedRows) => {
-    const disableRetry = _.some(selectedRows, ['status', 4]);
+    const disableRetry = _.some(selectedRows, ["status", 4]);
     //const disableDelete = false;
     const { user, role } = this.props;
     if (user.is_secondary_contact || isAdmin(role.name)) {
@@ -1104,7 +1117,7 @@ class ApplicationDashboard extends Component {
         //disableDelete: false
       });
     }
-  }
+  };
 
   // onSelectChange = selectedRowKeys => {
   //   console.log('selectedRowKeys changed: ', selectedRowKeys);
@@ -1138,7 +1151,7 @@ class ApplicationDashboard extends Component {
       submissionCount,
       role,
       user,
-      selectedSubmission
+      selectedSubmission,
     } = this.props;
     //rows selections
     console.log("selectedSubmissionMenu", selectedSubmissionMenu);
@@ -1148,25 +1161,33 @@ class ApplicationDashboard extends Component {
       hideDefaultSelections: true,
       selections: [
         {
-          text: 'Select Incorrect Sequences',
-          onSelect: changableRowKeys => {
+          text: "Select Incorrect Sequences",
+          onSelect: (changableRowKeys) => {
             let newSelectedRowKeys = [];
             newSelectedRowKeys = changableRowKeys.filter((key, index) => {
               return key.status == 4;
             });
-            this.setState({ selectedRowKeys: newSelectedRowKeys, selectedFailedUploads: newSelectedRowKeys, disableRetry: true });
-          }, 
+            this.setState({
+              selectedRowKeys: newSelectedRowKeys,
+              selectedFailedUploads: newSelectedRowKeys,
+              disableRetry: true,
+            });
+          },
         },
         {
-          text: 'Select Failed Sequences',
-          onSelect: changableRowKeys => {
+          text: "Select Failed Sequences",
+          onSelect: (changableRowKeys) => {
             let newSelectedRowKeys = [];
             newSelectedRowKeys = changableRowKeys.filter((key, index) => {
               return key.status != 4;
             });
-            this.setState({ selectedRowKeys: newSelectedRowKeys, selectedFailedUploads: newSelectedRowKeys, disableRetry: false });
+            this.setState({
+              selectedRowKeys: newSelectedRowKeys,
+              selectedFailedUploads: newSelectedRowKeys,
+              disableRetry: false,
+            });
           },
-        }
+        },
       ],
     };
     if (!selectedCustomer) {
@@ -1187,7 +1208,7 @@ class ApplicationDashboard extends Component {
           <div style={{ marginLeft: "auto" }}>
             <SearchBox
               placeholder={translate("text.header.search", {
-                type: translate("label.dashboard.applications")
+                type: translate("label.dashboard.applications"),
               })}
               searchText={searchText}
               clearSearch={this.clearSearch}
@@ -1221,13 +1242,13 @@ class ApplicationDashboard extends Component {
                 </span>
                 {(isLoggedInOmniciaAdmin(this.props.role) ||
                   isLoggedInCustomerAdmin(this.props.role)) && (
-                    <div
-                      className="maindashboard__header__addEdit"
-                      onClick={this.openUserManagement}
-                    >
-                      {translate("label.usermgmt.title")}
-                    </div>
-                  )}
+                  <div
+                    className="maindashboard__header__addEdit"
+                    onClick={this.openUserManagement}
+                  >
+                    {translate("label.usermgmt.title")}
+                  </div>
+                )}
               </div>
               {isAdmin(role.slug) && submissions.length !== 0 && (
                 <OmniButton
@@ -1243,17 +1264,17 @@ class ApplicationDashboard extends Component {
             {(isLoggedInOmniciaAdmin(this.props.role) ||
               isLoggedInCustomerAdmin(this.props.role) ||
               user.is_secondary_contact) && (
-                <React.Fragment>
-                  <OmniButton
-                    type="add"
-                    label={translate("label.button.add", {
-                      type: translate("label.dashboard.application")
-                    })}
-                    buttonStyle={{ height: "40px" }}
-                    onClick={this.addNewApplication}
-                  />
-                </React.Fragment>
-              )}
+              <React.Fragment>
+                <OmniButton
+                  type="add"
+                  label={translate("label.button.add", {
+                    type: translate("label.dashboard.application"),
+                  })}
+                  buttonStyle={{ height: "40px" }}
+                  onClick={this.addNewApplication}
+                />
+              </React.Fragment>
+            )}
           </div>
           {(isLoggedInOmniciaAdmin(role) || isLoggedInCustomerAdmin(role)) && (
             <div className="global__center-vert" style={{ marginTop: "10px" }}>
@@ -1300,24 +1321,24 @@ class ApplicationDashboard extends Component {
             <React.Fragment>
               {(isLoggedInOmniciaAdmin(this.props.role) ||
                 isLoggedInCustomerAdmin(this.props.role)) && (
-                  <div
-                    className="global__center-vert"
-                    style={{ height: "40px", marginTop: "12px" }}
-                  >
-                    <OmniButton
-                      type="primary"
-                      disabled={!assignPermissions}
-                      label={translate("label.dashboard.assignpermissions")}
-                      onClick={this.openPermissionsModal}
-                    />
-                  </div>
-                )}
+                <div
+                  className="global__center-vert"
+                  style={{ height: "40px", marginTop: "12px" }}
+                >
+                  <OmniButton
+                    type="primary"
+                    disabled={!assignPermissions}
+                    label={translate("label.dashboard.assignpermissions")}
+                    onClick={this.openPermissionsModal}
+                  />
+                </div>
+              )}
               <div className="maindashboard__list">
                 <TableHeader
                   columns={TableColumns}
                   sortColumn={this.sortColumn}
                 />
-                {_.map(submissions, submission => (
+                {_.map(submissions, (submission) => (
                   <Row
                     key={submission.id}
                     className="maindashboard__list__item"
@@ -1326,8 +1347,8 @@ class ApplicationDashboard extends Component {
                         submission.analyzing ||
                         _.get(submission, "sequence_failed.length") ||
                         "") && {
-                        cursor: "not-allowed"
-                      })
+                        cursor: "not-allowed",
+                      }),
                     }}
                   >
                     {isAdmin(role.slug) && (
@@ -1362,7 +1383,7 @@ class ApplicationDashboard extends Component {
                       {(() => {
                         if (
                           _.get(submission, "sequence_inProgress.length") ==
-                          0 &&
+                            0 &&
                           _.get(submission, "sequence_failed.length") != 0
                         ) {
                           return (
@@ -1373,7 +1394,7 @@ class ApplicationDashboard extends Component {
                               buttonStyle={{
                                 padding: "0px",
                                 width: "80px",
-                                marginLeft: "-10px"
+                                marginLeft: "-10px",
                               }}
                             />
                           );
@@ -1441,7 +1462,7 @@ class ApplicationDashboard extends Component {
                             opacity:
                               submission.is_uploading || submission.analyzing
                                 ? 0.2
-                                : 1
+                                : 1,
                           }}
                         />
                       </Dropdown>
@@ -1458,7 +1479,7 @@ class ApplicationDashboard extends Component {
                       className="maindashboard__nodata-icon"
                     />
                     {translate("error.dashboard.notfound", {
-                      type: translate("label.dashboard.applications")
+                      type: translate("label.dashboard.applications"),
                     })}
                   </Row>
                 )}
@@ -1474,7 +1495,7 @@ class ApplicationDashboard extends Component {
                     top: range[0],
                     bottom: range[1],
                     total,
-                    type: translate("label.dashboard.applications")
+                    type: translate("label.dashboard.applications"),
                   })
                 }
                 pageSize={this.state.itemsPerPage}
@@ -1487,7 +1508,7 @@ class ApplicationDashboard extends Component {
           {viewBy === "cards" && (
             <React.Fragment>
               <div className="maindashboard__cards">
-                {_.map(submissions, submission => (
+                {_.map(submissions, (submission) => (
                   <div ref={submission.ref}>
                     <SubmissionCard
                       key={submission.id}
@@ -1512,7 +1533,7 @@ class ApplicationDashboard extends Component {
                       className="maindashboard__nodata-icon"
                     />
                     {translate("error.dashboard.notfound", {
-                      type: translate("label.dashboard.applications")
+                      type: translate("label.dashboard.applications"),
                     })}
                   </Row>
                 )}
@@ -1619,10 +1640,10 @@ class ApplicationDashboard extends Component {
                   {_.get(selectedSubmissionMenu, "broken_x_ref", "") == 1
                     ? `A Sequence in the Application has a cross-reference to another Sequence that is not yet uploaded`
                     : `${_.get(
-                      selectedSubmissionMenu,
-                      "broken_x_ref",
-                      ""
-                    )} Sequences in the Application have the cross-references to other Sequences that are not yet uploaded`}
+                        selectedSubmissionMenu,
+                        "broken_x_ref",
+                        ""
+                      )} Sequences in the Application have the cross-references to other Sequences that are not yet uploaded`}
                 </p>
               </div>
             )}
@@ -1632,7 +1653,7 @@ class ApplicationDashboard extends Component {
                 _.get(selectedSubmissionMenu, "broken_x_ref") == 0
                   ? "no-crossrefs"
                   : "crossrefs"
-                }`}
+              }`}
             >
               {_.get(selectedSubmissionMenu, "broken_x_ref") != 0 && (
                 <div className="">
@@ -1659,7 +1680,7 @@ class ApplicationDashboard extends Component {
                     //   onChange: this.onRowSelected
                     // }}
                     rowSelection={rowSelection}
-                  //scroll={{ y: 200 }}
+                    //scroll={{ y: 200 }}
                   />
                 </div>
               </div>
@@ -1677,19 +1698,21 @@ class ApplicationDashboard extends Component {
               secondary contact and admins*/}
                 {user.is_secondary_contact || isAdmin(role.name) ? (
                   <OmniButton
-                    disabled={!selectedFailedUploads.length || disableRetry} 
+                    disabled={!selectedFailedUploads.length || disableRetry}
                     label="Retry"
                     buttonStyle={{ width: "120px", margin: "10px 0 0 10px" }}
                     onClick={this.retryUpload}
                   />
                 ) : (
-                    ""
-                  )}
+                  ""
+                )}
                 <OmniButton
                   disabled={!selectedFailedUploads.length}
                   label="Delete"
                   buttonStyle={{ width: "120px", margin: "10px 0 0 10px" }}
-                  onClick={e => this.getDeleteSequencesData("failed_sequences")}
+                  onClick={(e) =>
+                    this.getDeleteSequencesData("failed_sequences")
+                  }
                 />
                 <OmniButton
                   type="primary"
@@ -1714,11 +1737,11 @@ const TableColumnNames = {
   ADDEDBY: translate("label.dashboard.addedby"),
   ADDEDON: translate("label.dashboard.addedon"),
   LAST_UPDATED: translate("label.dashboard.lastupdated"),
-  USERS: translate("label.dashboard.users")
+  USERS: translate("label.dashboard.users"),
 };
 
 const Column = styled.div`
-  width: ${props => props.width};
+  width: ${(props) => props.width};
 `;
 
 function mapStateToProps(state) {
@@ -1730,8 +1753,9 @@ function mapStateToProps(state) {
     submissionCount: state.Application.submissionCount,
     selectedSubmission: state.Application.selectedSubmission,
     user: state.Login.user,
+    customer: state.Login.customer,
     access: state.Application.access,
-    sequences: getSequences(state)
+    sequences: getSequences(state),
   };
 }
 
@@ -1741,7 +1765,7 @@ function mapDispatchToProps(dispatch) {
     actions: bindActionCreators(
       { ...ApplicationActions, SubmissionActions },
       dispatch
-    )
+    ),
   };
 }
 
