@@ -140,11 +140,16 @@ class CreateProfile extends Component {
   };
 
   goBack = () => {
-    if (isLoggedInOmniciaRole(this.props.role)) {
-      this.props.history.push("/customers");
-      return;
+    if (!this.props.first_login) {
+      if (isLoggedInOmniciaRole(this.props.role)) {
+        this.props.history.push("/customers");
+        return;
+      }
+      this.props.dispatch(
+        CustomerActions.setSelectedCustomer(this.props.customer)
+      );
+      this.props.history.push("/applications");
     }
-    this.props.history.push("/applications");
   };
 
   save = () => {
@@ -292,21 +297,23 @@ class CreateProfile extends Component {
       }
     }
 
-    this.props.dispatch(
-      LoginActions.createOrUpdateProfile(reqObject, this.props.history),
-      () => {
-        console.log("testt");
-        this.props.profileUpdated && this.goBack();
-      }
-    );
+    // this.props.dispatch(
+    //   LoginActions.createOrUpdateProfile(reqObject, this.props.history),
+    //   () => {
+    //     console.log("testt");
+    //     this.props.profileUpdated && this.goBack();
+    //   }
+    // );
 
     this.props.actions.createOrUpdateProfile(
       reqObject,
       this.props.history,
       () => {
         if (this.props.profileUpdated) {
-          Toast.success("Profile Updated!");
-          this.goBack();
+          this.props.actions.setFirst_login(false, () => {
+            Toast.success("Profile Updated!");
+            this.goBack();
+          });
         }
       }
     );
@@ -521,7 +528,7 @@ class CreateProfile extends Component {
                 onChange={this.onInputChange("lname")}
               />
             </div>
-            {!isLoggedInOmniciaRole(role) && editProfile && !first_login ? (
+            {!isLoggedInOmniciaRole(role) && (editProfile || first_login) ? (
               <>
                 <div className="createProfile__fields">
                   <InputField
@@ -739,6 +746,7 @@ function mapStateToProps(state) {
     user: state.Login.user,
     role: state.Login.role,
     email: state.Login.email,
+    customer: state.Login.customer,
     customerAccounts: state.Login.customerAccounts,
     profileUpdated: state.Login.profileUpdated,
     first_login: state.Login.first_login,

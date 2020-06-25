@@ -22,7 +22,7 @@
     cursor: pointer;
     span {
       padding: 0 8px;
-      font-weight: bold;
+      @include text-bold(16px);
     }
   }
 }

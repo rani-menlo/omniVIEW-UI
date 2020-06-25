@@ -38,7 +38,7 @@ class AuthenticationCode extends Component {
       this.props.history.push("/requestlicense");
       return;
     }
-    this.props.actions.authenticated();
+    // this.props.actions.authenticated();
 
     if (first_login) {
       this.props.history.push("/profile");
@@ -47,19 +47,22 @@ class AuthenticationCode extends Component {
     if (customerAccounts && customerAccounts.length > 1) {
       this.props.history.push("/customer-accounts");
     } else {
-      let obj = {
-        customerId: _.get(customerAccounts[0].customer, "id"),
-      };
-      this.props.actions.switchCustomerAccounts(obj, () => {
-        if (isLoggedInOmniciaRole(customerAccounts[0].role)) {
-          this.props.history.push("/customers");
-          return;
+      this.props.actions.switchCustomerAccounts(
+        { customerId: _.get(customerAccounts[0].customer, "id") },
+        () => {
+          this.props.dispatch(
+            CustomerActions.setSelectedCustomer(customerAccounts[0].customer, 
+            () => {
+              if (isLoggedInOmniciaRole(customerAccounts[0].role)) {
+                this.props.history.push("/customers");
+                return;
+              }
+              this.props.history.push("/applications");
+            }
+          ));
+          // return;
         }
-        this.props.dispatch(
-          CustomerActions.setSelectedCustomer(customerAccounts[0].customer)
-        );
-        this.props.history.push("/applications");
-      });
+      );
     }
   };
 

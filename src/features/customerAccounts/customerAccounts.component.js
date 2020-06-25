@@ -28,7 +28,21 @@ class CustomerAccounts extends Component {
     this.props.dispatch(LoginActions.fetchCustomerAccounts());
   };
 
+  onBackButtonEvent = (e) => {
+    e.preventDefault();
+    if (!this.isBackButtonClicked) {
+      window.history.pushState(null, null, window.location.pathname);
+      this.isBackButtonClicked = false;
+    }
+  };
+
+  componentWillUnmount = () => {
+    window.removeEventListener("popstate", this.onBackButtonEvent);
+  };
+
   componentDidMount() {
+    window.history.pushState(null, null, window.location.pathname);
+    window.addEventListener("popstate", this.onBackButtonEvent);
     this.getCustomerAccounts();
   }
 
