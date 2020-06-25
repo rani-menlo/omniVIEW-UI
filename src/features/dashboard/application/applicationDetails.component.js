@@ -6,14 +6,14 @@ import {
   InputField,
   OmniButton,
   SelectField,
-  NumericInput
+  NumericInput,
 } from "../../../uikit/components";
 import { translate } from "../../../translations/translator";
 
 class ApplicationDetails extends Component {
   static propTypes = {
     cancel: PropTypes.func,
-    submit: PropTypes.func
+    submit: PropTypes.func,
   };
 
   constructor(props) {
@@ -21,24 +21,24 @@ class ApplicationDetails extends Component {
     this.state = {
       region: {
         value: "",
-        error: ""
+        error: "",
       },
       submissionCenter: {
         value: "",
-        error: ""
+        error: "",
       },
       applicationType: {
         value: "",
-        error: ""
+        error: "",
       },
       applicationNo: {
         value: "",
-        error: ""
+        error: "",
       },
       sequences: {
         value: "",
-        error: ""
-      }
+        error: "",
+      },
     };
   }
 
@@ -48,37 +48,37 @@ class ApplicationDetails extends Component {
     this.setState({
       applicationType: { ...applicationType, value: appType },
       region: { ...region, value: selectedRegion },
-      applicationNo: { ...applicationNo, value: appNumber }
+      applicationNo: { ...applicationNo, value: appNumber },
     });
   }
 
-  onSelect = (field, array) => val => {
-    const value = _.find(array, item => item.key == val);
+  onSelect = (field, array) => (val) => {
+    const value = _.find(array, (item) => item.key == val);
     this.setState({ [field]: { value, error: "" } });
   };
 
-  onInputChange = field => e => {
+  onInputChange = (field) => (e) => {
     const { value } = e.target;
     if (value === " ") {
       return;
     }
     this.setState({
-      [field]: { ...this.state[field], value, error: "" }
+      [field]: { ...this.state[field], value, error: "" },
     });
   };
 
   onSubmit = () => {
     Modal.info({
       className: "omni-info-modal",
-      content: 'The Application Number and Application Type are fetched from the US Regional file of the highest numbered Sequence. The same Application Number and Type will be used for all the validations on this Submission after this step. ',
+      content:
+        "The Application Number and Application Type are fetched from the US Regional file of the highest numbered Sequence. The same Application Number and Type will be used for all the validations on this Submission after this step. ",
       okText: translate("label.generic.ok"),
-      okButtonProps:{ className: 'omniButton-primary' },
+      okButtonProps: { className: "omniButton-primary" },
       onOk: () => {
         this.submit();
       },
-   
     });
-  }
+  };
 
   submit = () => {
     const { submit } = this.props;
@@ -87,25 +87,25 @@ class ApplicationDetails extends Component {
     if (!state.region.value) {
       error = true;
       state.region.error = translate("error.form.required", {
-        type: translate("label.newapplication.region")
+        type: translate("label.newapplication.region"),
       });
     }
     if (!state.submissionCenter.value) {
       error = true;
       state.submissionCenter.error = translate("error.form.required", {
-        type: translate("label.newapplication.submissioncenter")
+        type: translate("label.newapplication.submissioncenter"),
       });
     }
     if (!state.applicationType.value) {
       error = true;
       state.applicationType.error = translate("error.form.required", {
-        type: translate("label.newapplication.applicationtype")
+        type: translate("label.newapplication.applicationtype"),
       });
     }
     if (!state.applicationNo.value) {
       error = true;
       state.applicationNo.error = translate("error.form.required", {
-        type: translate("label.newapplication.applicationnumber")
+        type: translate("label.newapplication.applicationnumber"),
       });
     }
     /* if (!state.sequences.value) {
@@ -119,14 +119,23 @@ class ApplicationDetails extends Component {
       return;
     }
 
-    const obj = {
-      region_id: state.region.value.key,
-      submission_center: state.submissionCenter.value.value,
-      application_type_id: state.applicationType.value.key,
-      app_number: state.applicationNo.value,
-      no_of_sequences: this.props.validSequences
-    };
-    submit(obj);
+    Modal.info({
+      className: "omni-info-modal",
+      content:
+        "The Application Number and Application Type are fetched from the US Regional file of the highest numbered Sequence. The same Application Number and Type will be used for all the validations on this Submission after this step. ",
+      okText: translate("label.generic.ok"),
+      okButtonProps: { className: "omniButton-primary" },
+      onOk: () => {
+        const obj = {
+          region_id: state.region.value.key,
+          submission_center: state.submissionCenter.value.value,
+          application_type_id: state.applicationType.value.key,
+          app_number: state.applicationNo.value,
+          no_of_sequences: this.props.validSequences,
+        };
+        submit(obj);
+      },
+    });
   };
 
   render() {
@@ -135,7 +144,7 @@ class ApplicationDetails extends Component {
       sequences,
       region,
       submissionCenter,
-      applicationType
+      applicationType,
     } = this.state;
     const { cancel, regions, centers, types, validSequences } = this.props;
     const style = { marginBottom: "10%" };
@@ -201,7 +210,7 @@ class ApplicationDetails extends Component {
           <OmniButton
             type="primary"
             label={translate("label.button.upload")}
-            onClick={this.onSubmit}
+            onClick={this.submit}
           />
         </div>
       </div>
