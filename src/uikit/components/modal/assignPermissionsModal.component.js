@@ -20,7 +20,7 @@ class AssignPermissions extends Component {
       users: [],
       selectedRole: "",
       order: "asc",
-      noUsersError: false
+      noUsersError: false,
     };
   }
 
@@ -29,7 +29,7 @@ class AssignPermissions extends Component {
       submissions,
       selectedCustomer,
       fileLevelAccessObj,
-      assignGlobalPermissions
+      assignGlobalPermissions,
     } = this.props;
     if (fileLevelAccessObj) {
       this.props.dispatch(
@@ -39,12 +39,12 @@ class AssignPermissions extends Component {
         )
       );
     } else {
-      const submissionIds = _.map(submissions, submission => submission.id);
+      const submissionIds = _.map(submissions, (submission) => submission.id);
       if (assignGlobalPermissions) {
         this.props.dispatch(
           UsermanagementActions.fetchUsers({
             customerId: selectedCustomer.id,
-            includeLoggedInUser: false
+            includeLoggedInUser: false,
           })
         );
         return;
@@ -58,7 +58,7 @@ class AssignPermissions extends Component {
     }
   }
 
-  static getMainUsers = props => {
+  static getMainUsers = (props) => {
     return props.assignGlobalPermissions
       ? props.users
       : props.usersOfFileOrSubmission;
@@ -67,7 +67,7 @@ class AssignPermissions extends Component {
   static getDerivedStateFromProps(props, state) {
     const usersList = AssignPermissions.getMainUsers(props);
     if (usersList.length && !state.users.length) {
-      let roles = _.map(ROLES.CUSTOMER, role => {
+      let roles = _.map(ROLES.CUSTOMER, (role) => {
         const newRole = { ...role };
         newRole.name = getRoleName(newRole.name, true);
         return newRole;
@@ -77,12 +77,12 @@ class AssignPermissions extends Component {
           id: -1,
           name: `${translate("label.generic.all")} ${translate(
             "label.dashboard.users"
-          )}`
-        }
+          )}`,
+        },
       ].concat(roles);
       return {
         users: _.orderBy(
-          _.map(usersList, user => {
+          _.map(usersList, (user) => {
             user.mutated = false;
             user.checked = props.assignGlobalPermissions
               ? user.has_global_access
@@ -92,7 +92,7 @@ class AssignPermissions extends Component {
           ["first_name"]
         ),
         roles,
-        selectedRole: roles[0]
+        selectedRole: roles[0],
       };
     }
     return null;
@@ -104,13 +104,13 @@ class AssignPermissions extends Component {
     closeModal: PropTypes.func,
     assignGlobalPermissions: PropTypes.bool,
     submissions: PropTypes.arrayOf([PropTypes.object]),
-    fileLevelAccessObj: PropTypes.object
+    fileLevelAccessObj: PropTypes.object,
   };
 
   getMenu = () => {
     return (
       <Menu selectedKeys={[`${this.state.selectedRole.id}`]}>
-        {_.map(this.state.roles, role => (
+        {_.map(this.state.roles, (role) => (
           <Menu.Item key={role.id} onClick={this.onMenuClick(role)}>
             {role.name}
           </Menu.Item>
@@ -119,24 +119,30 @@ class AssignPermissions extends Component {
     );
   };
 
-  onMenuClick = role => e => {
+  onMenuClick = (role) => (e) => {
     let users = [...AssignPermissions.getMainUsers(this.props)];
     users =
       role.id == -1
         ? users
         : _.filter(
-          users,
-          usr => {
-            if (role.name === 'Administrators') {
-              return _.get(usr, "roles[0].slug", "").includes("admin")
-            } else if (role.name === 'Publishers') {
-              return _.get(usr, "roles[0].slug", "").includes("publisher")
+            users,
+            (usr) => {
+              if (role.name === "Administrators") {
+                return _.get(usr, "roles", "").length
+                  ? _.get(usr, "roles[0].slug", "").includes("admin")
+                  : _.get(usr, "role_name", "").includes("Admin");
+              } else if (role.name === "Publishers") {
+                return _.get(usr, "roles", "").length
+                  ? _.get(usr, "roles[0].slug", "").includes("publisher")
+                  : _.get(usr, "role_name", "").includes("Publisher");
+              }
+              return _.get(usr, "roles", "").length
+                ? _.get(usr, "roles[0].slug", "").includes("author")
+                : _.get(usr, "role_name", "").includes("Author");
             }
-            return _.get(usr, "roles[0].slug", "").includes("author")
-          }
 
-          // (_.get(usr, "roles[0].id") || _.get(usr, "role_id")) === role.id
-        );
+            // (_.get(usr, "roles[0].id") || _.get(usr, "role_id")) === role.id
+          );
     users = _.orderBy(users, ["first_name"], [this.state.order]);
     if (users.length) {
       this.setState({ users, selectedRole: role, noUsersError: false });
@@ -145,7 +151,7 @@ class AssignPermissions extends Component {
     this.setState({ noUsersError: true, selectedRole: role });
   };
 
-  onCheckboxChange = user => e => {
+  onCheckboxChange = (user) => (e) => {
     const checked = e.target.checked;
     const users = [...this.state.users];
     user.checked = checked;
@@ -156,7 +162,7 @@ class AssignPermissions extends Component {
   update = () => {
     const granted_user_ids = [];
     const revoked_user_ids = [];
-    _.map(AssignPermissions.getMainUsers(this.props), user => {
+    _.map(AssignPermissions.getMainUsers(this.props), (user) => {
       if (user.mutated) {
         if (user.checked) {
           granted_user_ids.push(user.id || user.user_id);
@@ -171,7 +177,7 @@ class AssignPermissions extends Component {
           submissionActions.assignFolderPermissions({
             granted_user_ids,
             revoked_user_ids,
-            file_ids: this.props.fileLevelAccessObj.fileIds
+            file_ids: this.props.fileLevelAccessObj.fileIds,
           })
         );
       } else {
@@ -179,19 +185,19 @@ class AssignPermissions extends Component {
           this.props.dispatch(
             submissionActions.assignGlobalPermissions({
               granted_user_ids,
-              revoked_user_ids
+              revoked_user_ids,
             })
           );
         } else {
           const submission_ids = _.map(
             this.props.submissions,
-            submission => submission.id
+            (submission) => submission.id
           );
           this.props.dispatch(
             submissionActions.assignSubmissionPermissions({
               granted_user_ids,
               revoked_user_ids,
-              submission_ids
+              submission_ids,
             })
           );
         }
@@ -205,7 +211,7 @@ class AssignPermissions extends Component {
     order = order === "asc" ? "desc" : "asc";
     const users = _.orderBy(
       this.state.users,
-      user => {
+      (user) => {
         return _.toLower(user.first_name);
       },
       [order]
@@ -219,7 +225,7 @@ class AssignPermissions extends Component {
       closeModal,
       assignGlobalPermissions,
       submissions,
-      fileLevelAccessObj
+      fileLevelAccessObj,
     } = this.props;
     return (
       <DraggableModal
@@ -236,7 +242,7 @@ class AssignPermissions extends Component {
             <img
               src={`/images/${
                 assignGlobalPermissions ? "global-permissions" : "assign"
-                }.svg`}
+              }.svg`}
               style={{ marginRight: "8px" }}
             />
             <Text
@@ -262,8 +268,8 @@ class AssignPermissions extends Component {
               assignGlobalPermissions
                 ? translate("text.permissions.global")
                 : fileLevelAccessObj
-                  ? translate("text.permissions.filelevel")
-                  : translate("text.permissions.individual")
+                ? translate("text.permissions.filelevel")
+                : translate("text.permissions.individual")
             }
           />
           <div className="assign-permissions-modal__columns">
@@ -288,12 +294,12 @@ class AssignPermissions extends Component {
                           className="global__file-folder"
                         />
                       ) : (
-                          <img
-                            src="/images/file-new.svg"
-                            className="global__file-folder"
-                            style={{ width: "18px", height: "21px" }}
-                          />
-                        )}
+                        <img
+                          src="/images/file-new.svg"
+                          className="global__file-folder"
+                          style={{ width: "18px", height: "21px" }}
+                        />
+                      )}
                       <Text
                         type="medium"
                         size="14px"
@@ -301,16 +307,16 @@ class AssignPermissions extends Component {
                       />
                     </div>
                   ) : (
-                      _.map(submissions, submission => (
-                        <Text
-                          key={submission.id}
-                          type="medium"
-                          size="14px"
-                          text={submission.name}
-                          className="assign-permissions-modal__columns-content-item"
-                        />
-                      ))
-                    )}
+                    _.map(submissions, (submission) => (
+                      <Text
+                        key={submission.id}
+                        type="medium"
+                        size="14px"
+                        text={submission.name}
+                        className="assign-permissions-modal__columns-content-item"
+                      />
+                    ))
+                  )}
                 </div>
               </div>
             )}
@@ -354,7 +360,7 @@ class AssignPermissions extends Component {
               </div>
               <div className="assign-permissions-modal__columns-content">
                 {!this.state.noUsersError &&
-                  _.map(this.state.users, user => {
+                  _.map(this.state.users, (user) => {
                     return (
                       <div
                         key={user.id}
@@ -383,7 +389,7 @@ class AssignPermissions extends Component {
                             text={_.capitalize(
                               getRoleNameByRoleId(
                                 _.get(user, "roles[0].id") ||
-                                _.get(user, "role_id")
+                                  _.get(user, "role_id")
                               )
                             )}
                           />
@@ -401,13 +407,13 @@ class AssignPermissions extends Component {
                           }
                           textStyle={{
                             marginLeft: "auto",
-                            marginRight: "10px"
+                            marginRight: "10px",
                           }}
                         />
                         <PermissionCheckbox
                           disabled={isAdmin(
                             _.get(user, "roles[0].slug") ||
-                            _.get(user, "role_name")
+                              _.get(user, "role_name")
                           )}
                           value={+user.checked}
                           onChange={this.onCheckboxChange(user)}
@@ -434,7 +440,7 @@ class AssignPermissions extends Component {
                       className="maindashboard__nodata-icon"
                     />
                     {translate("error.dashboard.notfound", {
-                      type: translate("label.dashboard.users")
+                      type: translate("label.dashboard.users"),
                     })}
                   </Row>
                 )}
@@ -466,14 +472,17 @@ function mapStateToProps(state) {
   return {
     selectedCustomer: state.Customer.selectedCustomer,
     users: state.Usermanagement.users,
-    usersOfFileOrSubmission: state.Usermanagement.usersOfFileOrSubmission
+    usersOfFileOrSubmission: state.Usermanagement.usersOfFileOrSubmission,
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    dispatch
+    dispatch,
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(AssignPermissions);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(AssignPermissions);
