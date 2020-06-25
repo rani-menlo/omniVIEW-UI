@@ -40,13 +40,11 @@ class PrivateRoute extends Component {
                 let obj = {
                   customerId: _.get(customerAccounts[0].customer, "id"),
                 };
-                // this.props.actions.switchCustomerAccounts(obj, () => {
                 if (isLoggedInOmniciaRole(customerAccounts[0].role)) {
                   return <Redirect to="/customers" />;
                 }
 
                 return <Redirect to="/applications" />;
-                // });
               }
               return;
             }
