@@ -15,6 +15,7 @@ class ProfileMenu extends Component {
   };
 
   switchAccounts = () => {
+    this.props.dispatch(CustomerActions.setSelectedCustomer(null));
     this.props.history.push("/customer-accounts");
   };
 

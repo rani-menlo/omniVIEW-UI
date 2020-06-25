@@ -22,7 +22,7 @@ import {
   DeactivateModal,
   Toast,
 } from "../../../uikit/components";
-import { DEBOUNCE_TIME } from "../../../constants";
+import { DEBOUNCE_TIME, SERVER_URL } from "../../../constants";
 import { translate } from "../../../translations/translator";
 import LicenceInUseUnAssigned from "../../license/licenceInUseUnAssigned.component";
 import AssignLicenceWithUsers from "../../license/assignLicenceWithUsers.component";
@@ -48,7 +48,21 @@ class CustomerDashboard extends Component {
     this.searchCustomers = _.debounce(this.searchCustomers, DEBOUNCE_TIME);
   }
 
+  onBackButtonEvent = (e) => {
+    e.preventDefault();
+    if (!this.isBackButtonClicked) {
+      window.history.pushState(null, null, window.location.pathname);
+      this.isBackButtonClicked = false;
+    }
+  };
+
+  componentWillUnmount = () => {
+    window.removeEventListener("popstate", this.onBackButtonEvent);
+  };
+
   componentDidMount() {
+    window.history.pushState(null, null, window.location.pathname);
+    window.addEventListener("popstate", this.onBackButtonEvent);
     if (isLoggedInOmniciaRole(this.props.role)) {
       this.fetchCustomers();
     } else {

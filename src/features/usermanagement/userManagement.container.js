@@ -317,22 +317,21 @@ class UserManagementContainer extends Component {
             </span>
           </p>
         </Menu.Item>
-        {(isLoggedInOmniciaAdmin(this.props.role) ||
-          isLoggedInCustomerAdmin(this.props.role)) &&
-          this.props.first_login && (
-            <Menu.Item
-              className="maindashboard__list__item-dropdown-menu-item"
-              onClick={this.resendInvitation(usr)}
-            >
-              <p className="global__center-vert">
-                <Icon
-                  type="mail"
-                  style={{ fontSize: "20px", marginRight: "8px" }}
-                />
-                <span>Resend Activation Email</span>
-              </p>
-            </Menu.Item>
-          )}
+        {((isLoggedInOmniciaAdmin(this.props.role) ||
+          isLoggedInCustomerAdmin(this.props.role)) && usr.first_login) && (
+          <Menu.Item
+            className="maindashboard__list__item-dropdown-menu-item"
+            onClick={this.resendInvitation(usr)}
+          >
+            <p className="global__center-vert">
+              <Icon
+                type="mail"
+                style={{ fontSize: "20px", marginRight: "8px" }}
+              />
+              <span>Resend Activation Email</span>
+            </p>
+          </Menu.Item>
+        )}
         {!usr.is_active &&
           usr.user_id != this.props.selectedCustomer.primary_user_id &&
           (isLoggedInOmniciaAdmin(this.props.role) ||

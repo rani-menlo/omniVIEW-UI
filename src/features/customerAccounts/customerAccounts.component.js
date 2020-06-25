@@ -28,7 +28,21 @@ class CustomerAccounts extends Component {
     this.props.dispatch(LoginActions.fetchCustomerAccounts());
   };
 
+  onBackButtonEvent = (e) => {
+    e.preventDefault();
+    if (!this.isBackButtonClicked) {
+      window.history.pushState(null, null, window.location.pathname);
+      this.isBackButtonClicked = false;
+    }
+  };
+
+  componentWillUnmount = () => {
+    window.removeEventListener("popstate", this.onBackButtonEvent);
+  };
+
   componentDidMount() {
+    window.history.pushState(null, null, window.location.pathname);
+    window.addEventListener("popstate", this.onBackButtonEvent);
     this.getCustomerAccounts();
   }
 
@@ -39,6 +53,7 @@ class CustomerAccounts extends Component {
 
   openCustApplications = () => {
     const { selectedCustomer } = this.state;
+    const { role, props, customer } = this.props;
     this.props.dispatch(CustomerActions.setSelectedCustomer(selectedCustomer));
     let postObj = { customerId: selectedCustomer.id };
     this.props.dispatch(
@@ -55,13 +70,11 @@ class CustomerAccounts extends Component {
           return;
         }
 
-        if (isLoggedInOmniciaRole(selectedCustomer.role)) {
+        if (isLoggedInOmniciaRole(role)) {
           this.props.history.push("/customers");
           return;
         }
-        this.props.dispatch(
-          CustomerActions.setSelectedCustomer(selectedCustomer.customer)
-        );
+        this.props.dispatch(CustomerActions.setSelectedCustomer(customer));
         this.props.history.push("/applications");
       })
     );
@@ -77,8 +90,10 @@ class CustomerAccounts extends Component {
         <Header disabled hideMenu />
         <Row align="middle" justify="center" type="flex">
           <Col xs={12} md={12} lg={6} xl={6}>
+            <h3 class="select-customer">
+              {translate("text.customer.viewCustomer")}
+            </h3>
             <div className="customer-accounts">
-              <h3>{translate("text.customer.viewCustomer")}</h3>
               {get(customerProfileAccounts, "length") && (
                 <Row align="middle" justify="center" type="flex" className="">
                   <RadioGroup
@@ -98,13 +113,13 @@ class CustomerAccounts extends Component {
                   </RadioGroup>
                 </Row>
               )}
-              <div style={{ marginTop: "20px", textAlign: "center" }}>
-                <OmniButton
-                  label={translate("label.button.continue")}
-                  onClick={this.openCustApplications}
-                  disabled={!selectedCustomer}
-                />
-              </div>
+            </div>
+            <div style={{ marginTop: "20px", textAlign: "center" }}>
+              <OmniButton
+                label={translate("label.button.continue")}
+                onClick={this.openCustApplications}
+                disabled={!selectedCustomer}
+              />
             </div>
           </Col>
         </Row>

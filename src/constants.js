@@ -102,6 +102,7 @@ const URI = {
   REQUEST_LICENSE: `${path}user/requestLicense`,
   GET_LICENSE_INFO: `${path}user/getLicenseInfo`,
   RESEND_INVITATION_MAIL: `${path}user/resendInvitationMail`,
+  REQUEST_TO_CHANGE_EMAIL: `${path}user/requestToChangeEmail`,
 
   // File
   GET_FILE_SIZE: `${path}file/getFileSize`,

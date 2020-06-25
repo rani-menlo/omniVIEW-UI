@@ -102,17 +102,20 @@ export default (state = initialState, action) => {
         localStorage.setItem("omniview_user_token", _.get(data, "token", ""));
       let customerAccounts = _.get(data.customerProfiles, "userProfiles", []);
       let user = "",
-        role = "";
+        role = "",
+        customer = "";
       if (customerAccounts.length == 1) {
         user = _.get(customerAccounts[0], "userData", "");
         role = _.get(customerAccounts[0], "role", "");
+        customer = _.get(customerAccounts[0], "customer", "");
       }
       return {
         ...state,
         user: user,
         role: role,
+        customer: customer,
         customerAccounts: customerAccounts,
-        first_login: data.first_login,
+        first_login: data.first_login || false,
         otp: {
           ...state.otp,
           invalid_license,
@@ -153,6 +156,12 @@ export default (state = initialState, action) => {
         user: _.get(data.userData.userObject, "user_profile", ""),
         role: _.get(data.userData.userObject, "role", ""),
         customer: _.get(data.userData.userObject, "customer", ""),
+      };
+    }
+    case LoginActionTypes.SET_FIRST_LOGIN: {
+      return {
+        ...state,
+        first_login: action.first_login,
       };
     }
     case LoginActionTypes.AUTHENTICATED: {

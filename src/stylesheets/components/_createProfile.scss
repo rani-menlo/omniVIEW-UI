@@ -45,3 +45,15 @@
     }
   }
 }
+.email-change-modal {
+  &__header {
+    display: flex;
+    margin-bottom: 15px;
+    &-close {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      margin-left: auto;
+    }
+  }
+}

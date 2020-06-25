@@ -41,7 +41,7 @@ export default {
       ApiActions.request(dispatch);
       try {
         const res = await LoginApi.switchAccountByCustomerUserId(customerId);
-        if(!_.get(res, 'data.invalid_license')){
+        if (!_.get(res, "data.invalid_license")) {
           localStorage.setItem(
             "omniview_user_token",
             _.get(res.data.data, "token", "")
@@ -225,6 +225,15 @@ export default {
     return {
       type: LoginActionTypes.USERNAME_EXISTS_ERROR,
       error,
+    };
+  },
+  setFirst_login: (first_login, cb) => {
+    return (dispatch) => {
+      dispatch({
+        type: LoginActionTypes.SET_FIRST_LOGIN,
+        first_login,
+      });
+      cb && cb();
     };
   },
 };
