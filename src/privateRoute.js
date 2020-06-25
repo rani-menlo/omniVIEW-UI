@@ -31,7 +31,8 @@ class PrivateRoute extends Component {
             if (
               authorized &&
               (props.match.path == "/verify/:mode" ||
-                props.match.path == "/auth")
+                props.match.path == "/auth" ||
+                props.match.path == "/profile")
             ) {
               if (customerAccounts && customerAccounts.length > 1) {
                 return <Redirect to="/customer-accounts" />;
@@ -39,18 +40,15 @@ class PrivateRoute extends Component {
                 let obj = {
                   customerId: _.get(customerAccounts[0].customer, "id"),
                 };
-                this.props.actions.switchCustomerAccounts(obj, () => {
-                  if (isLoggedInOmniciaRole(customerAccounts[0].role)) {
-                    return <Redirect to="/customers" />;
-                  }
-                  this.props.dispatch(
-                    CustomerActions.setSelectedCustomer(
-                      customerAccounts[0].customer
-                    )
-                  );
-                  return <Redirect to="/applications" />;
-                });
+                // this.props.actions.switchCustomerAccounts(obj, () => {
+                if (isLoggedInOmniciaRole(customerAccounts[0].role)) {
+                  return <Redirect to="/customers" />;
+                }
+
+                return <Redirect to="/applications" />;
+                // });
               }
+              return;
             }
             return <Component {...props} />;
           }

@@ -35,55 +35,70 @@ import { CustomerActions } from "./redux/actions";
 // };
 
 class App extends Component {
-  componentDidMount() {
-    window.onpopstate = function(event) {
-      console.log(
-        "onpopstate",
-        event.state,
-        !event.state,
-        event,
-        `${SERVER_URL}/verify/email`
-      );
-      let url =
-        window.location.href == `${SERVER_URL}/verify/email` ? true : false;
-      let token = localStorage.getItem("omniview_user_token") ? true : false;
-      if (url && token) {
-        let { customerAccounts } = this.props;
-        event.preventDefault();
-        if (customerAccounts && customerAccounts.length > 1) {
-          window.history.pushState(
-            event.state,
-            document.title,
-            `${SERVER_URL}/customer-accounts`
-          );
-          return;
-        } else {
-          let obj = {
-            customerId: _.get(customerAccounts[0].customer, "id"),
-          };
-          this.props.actions.switchCustomerAccounts(obj, () => {
-            if (isLoggedInOmniciaRole(customerAccounts[0].role)) {
-              window.history.pushState(
-                event.state,
-                document.title,
-                `${SERVER_URL}/customers`
-              );
-              return;
-            }
-            this.props.dispatch(
-              CustomerActions.setSelectedCustomer(customerAccounts[0].customer)
-            );
-            window.history.pushState(
-              event.state,
-              document.title,
-              `${SERVER_URL}/applications`
-            );
-            return;
-          });
-        }
-      }
-    };
-  }
+  // componentDidMount() {
+  //   window.onpopstate = function(event) {
+  //     console.log(
+  //       "onpopstate",
+  //       event.state,
+  //       !event.state,
+  //       event,
+  //       `${SERVER_URL}/verify/email`
+  //     );
+  //     let url =
+  //       window.location.href == `${SERVER_URL}/verify/email` ? true : false;
+  //     let token = localStorage.getItem("omniview_user_token") ? true : false;
+  //     if (url && token) {
+  //       let { customerAccounts, role } = this.props;
+  //       event.preventDefault();
+  //       // if (customerAccounts && customerAccounts.length > 1) {
+  //       //   window.history.pushState(
+  //       //     event.state,
+  //       //     document.title,
+  //       //     `${SERVER_URL}/customer-accounts`
+  //       //   );
+  //       //   return;
+  //       // } else {
+  //       //   let obj = {
+  //       //     customerId: _.get(customerAccounts[0].customer, "id"),
+  //       //   };
+  //       //   this.props.actions.switchCustomerAccounts(obj, () => {
+  //       //     if (isLoggedInOmniciaRole(customerAccounts[0].role)) {
+  //       //       window.history.pushState(
+  //       //         event.state,
+  //       //         document.title,
+  //       //         `${SERVER_URL}/customers`
+  //       //       );
+  //       //       return;
+  //       //     }
+  //       //     this.props.dispatch(
+  //       //       CustomerActions.setSelectedCustomer(customerAccounts[0].customer)
+  //       //     );
+  //       //     window.history.pushState(
+  //       //       event.state,
+  //       //       document.title,
+  //       //       `${SERVER_URL}/applications`
+  //       //     );
+  //       //     return;
+  //       //   });
+  //       // }
+
+  //       if (isLoggedInOmniciaRole(role)) {
+  //         window.history.pushState(
+  //           event.state,
+  //           document.title,
+  //           `${SERVER_URL}/customers`
+  //         );
+  //         return;
+  //       }
+  //       window.history.pushState(
+  //         event.state,
+  //         document.title,
+  //         `${SERVER_URL}/applications`
+  //       );
+  //       return;
+  //     }
+  //   };
+  // }
   render() {
     return <Routes />;
   }
@@ -92,6 +107,7 @@ class App extends Component {
 function mapStateToProps(state) {
   return {
     customerAccounts: state.Login.customerAccounts,
+    role: state.Login.role,
   };
 }
 
