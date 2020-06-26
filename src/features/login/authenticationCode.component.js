@@ -38,7 +38,7 @@ class AuthenticationCode extends Component {
     //   this.props.history.push("/requestlicense");
     //   return;
     // }
-    this.props.actions.authenticated();
+    // this.props.actions.authenticated();
     if (customerAccounts && customerAccounts.length > 1) {
       this.props.history.push("/customer-accounts");
     } else {
@@ -49,12 +49,12 @@ class AuthenticationCode extends Component {
             CustomerActions.setSelectedCustomer(
               customerAccounts[0].customer,
               () => {
-                if (invalid_license) {
+                if (this.props.invalid_license) {
                   this.props.history.push("/requestlicense");
                   return;
                 }
 
-                if (first_login) {
+                if (this.props.first_login) {
                   this.props.history.push("/profile");
                   return;
                 }
@@ -172,7 +172,7 @@ function mapStateToProps(state) {
     verified: state.Login.otp.verified,
     verifying: state.Login.otp.verifying,
     first_login: state.Login.first_login,
-    invalid_license: state.Login.otp.invalid_license,
+    invalid_license: state.Login.invalid_license,
     error: state.Login.otp.error,
     customerAccounts: state.Login.customerAccounts,
   };

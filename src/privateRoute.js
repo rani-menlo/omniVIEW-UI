@@ -41,9 +41,9 @@ class PrivateRoute extends Component {
                 };
                 if (isLoggedInOmniciaRole(customerAccounts[0].role)) {
                   return <Redirect to="/customers" />;
+                } else {
+                  return <Redirect to="/applications" />;
                 }
-
-                return <Redirect to="/applications" />;
               }
               return;
             }
