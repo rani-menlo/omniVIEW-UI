@@ -317,21 +317,22 @@ class UserManagementContainer extends Component {
             </span>
           </p>
         </Menu.Item>
-        {((isLoggedInOmniciaAdmin(this.props.role) ||
-          isLoggedInCustomerAdmin(this.props.role)) && usr.first_login) && (
-          <Menu.Item
-            className="maindashboard__list__item-dropdown-menu-item"
-            onClick={this.resendInvitation(usr)}
-          >
-            <p className="global__center-vert">
-              <Icon
-                type="mail"
-                style={{ fontSize: "20px", marginRight: "8px" }}
-              />
-              <span>Resend Activation Email</span>
-            </p>
-          </Menu.Item>
-        )}
+        {(isLoggedInOmniciaAdmin(this.props.role) ||
+          isLoggedInCustomerAdmin(this.props.role)) &&
+          usr.first_login && (
+            <Menu.Item
+              className="maindashboard__list__item-dropdown-menu-item"
+              onClick={this.resendInvitation(usr)}
+            >
+              <p className="global__center-vert">
+                <Icon
+                  type="mail"
+                  style={{ fontSize: "20px", marginRight: "8px" }}
+                />
+                <span>Resend Activation Email</span>
+              </p>
+            </Menu.Item>
+          )}
         {!usr.is_active &&
           usr.user_id != this.props.selectedCustomer.primary_user_id &&
           (isLoggedInOmniciaAdmin(this.props.role) ||
@@ -976,9 +977,7 @@ class UserManagementContainer extends Component {
                       >
                         <p>
                           {usr.licenses.length > 0
-                            ? getFormattedDate(
-                                _.find(usr.licenses, "expired_date")
-                              )
+                            ? getFormattedDate(usr.licenses[0].expired_date)
                             : "__ /__ /____"}
                         </p>
                         <p style={{ fontWeight: "bold", fontSize: "12px" }}>

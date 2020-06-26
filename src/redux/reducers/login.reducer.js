@@ -18,7 +18,6 @@ const initialState = {
   },
   otp: {
     error: "",
-    invalid_license: false,
     otpReceived: false,
     verified: false,
     verifying: false,
@@ -80,14 +79,8 @@ export default (state = initialState, action) => {
       };
     }
     case LoginActionTypes.VERIFIED_OTP: {
-      const {
-        error,
-        message,
-        data,
-        invalid_license,
-        first_login,
-      } = action.data;
-      if (!invalid_license && error) {
+      const { error, message, data } = action.data;
+      if (error) {
         return {
           ...state,
           customerAccounts: [],
@@ -98,8 +91,7 @@ export default (state = initialState, action) => {
           },
         };
       }
-      !invalid_license &&
-        localStorage.setItem("omniview_user_token", _.get(data, "token", ""));
+      localStorage.setItem("omniview_user_token", _.get(data, "token", ""));
       let customerAccounts = _.get(data.customerProfiles, "userProfiles", []);
       let user = "",
         role = "",
@@ -118,7 +110,6 @@ export default (state = initialState, action) => {
         first_login: data.first_login || false,
         otp: {
           ...state.otp,
-          invalid_license,
           verifying: false,
           verified: true,
         },
@@ -140,11 +131,6 @@ export default (state = initialState, action) => {
         return {
           ...state,
           invalid_license,
-        };
-      }
-      if (!invalid_license && error) {
-        return {
-          ...state,
         };
       }
       // !invalid_license &&
