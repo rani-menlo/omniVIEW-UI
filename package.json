@@ -38,6 +38,7 @@
     "lodash": "^4.17.11",
     "mini-css-extract-plugin": "0.4.3",
     "moment": "^2.22.2",
+    "moment-timezone": "^0.5.31",
     "node-sass": "^4.11.0",
     "optimize-css-assets-webpack-plugin": "5.0.1",
     "pnp-webpack-plugin": "1.1.0",
@@ -80,7 +81,7 @@
   "scripts": {
     "start": "node scripts/start.js",
     "build:staging": "env-cmd .env.staging node scripts/build.js",
-    "build:uat": "env-cmd .env.uat node scripts/build.js",
+    "build:uat": "env-cmd -f .env.uat node scripts/build.js",
     "build:prod": "node scripts/build.js",
     "test": "node scripts/test.js"
   },

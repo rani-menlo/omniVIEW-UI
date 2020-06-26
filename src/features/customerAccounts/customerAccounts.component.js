@@ -3,7 +3,7 @@ import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { CustomerActions, LoginActions } from "../../redux/actions";
 import Header from "../header/header.component";
-import { Loader, OmniButton } from "../../uikit/components";
+import { Loader, OmniButton, ContentLayout } from "../../uikit/components";
 import { Row, Col, Radio } from "antd";
 import { translate } from "../../translations/translator";
 import { get, map } from "lodash";
@@ -63,8 +63,6 @@ class CustomerAccounts extends Component {
           return;
         }
 
-        // this.props.actions.authenticated();
-
         if (this.props.first_login) {
           this.props.history.push("/profile");
           return;
@@ -88,41 +86,43 @@ class CustomerAccounts extends Component {
       <React.Fragment>
         <Loader loading={loading} />
         <Header disabled hideMenu />
-        <Row align="middle" justify="center" type="flex">
-          <Col xs={12} md={12} lg={6} xl={6}>
-            <h3 class="select-customer">
-              {translate("text.customer.viewCustomer")}
-            </h3>
-            <div className="customer-accounts">
-              {get(customerProfileAccounts, "length") && (
-                <Row align="middle" justify="center" type="flex" className="">
-                  <RadioGroup
-                    value={selectedCustomer}
-                    onChange={this.selectCustomer}
-                  >
-                    {map(customerProfileAccounts, (profile) => (
-                      <Radio
-                        key={profile.customerId}
-                        style={radioStyle}
-                        className="global__radio"
-                        value={profile.customer}
-                      >
-                        {get(profile, "companyName", "N/A")}
-                      </Radio>
-                    ))}
-                  </RadioGroup>
-                </Row>
-              )}
-            </div>
-            <div style={{ marginTop: "20px", textAlign: "center" }}>
-              <OmniButton
-                label={translate("label.button.continue")}
-                onClick={this.openCustApplications}
-                disabled={!selectedCustomer}
-              />
-            </div>
-          </Col>
-        </Row>
+        <ContentLayout className="customer-accounts-layout">
+          <h3 class="select-customer">
+            {translate("text.customer.viewCustomer")}
+          </h3>
+          <Row align="middle" justify="center" type="flex">
+            <Col xs={12} md={12} lg={6} xl={6}>
+              <div className="customer-accounts">
+                {get(customerProfileAccounts, "length") && (
+                  <Row align="middle" justify="center" type="flex" className="">
+                    <RadioGroup
+                      value={selectedCustomer}
+                      onChange={this.selectCustomer}
+                    >
+                      {map(customerProfileAccounts, (profile) => (
+                        <Radio
+                          key={profile.customerId}
+                          style={radioStyle}
+                          className="global__radio"
+                          value={profile.customer}
+                        >
+                          {get(profile, "companyName", "N/A")}
+                        </Radio>
+                      ))}
+                    </RadioGroup>
+                  </Row>
+                )}
+              </div>
+              <div style={{ marginTop: "20px", textAlign: "center" }}>
+                <OmniButton
+                  label={translate("label.button.continue")}
+                  onClick={this.openCustApplications}
+                  disabled={!selectedCustomer}
+                />
+              </div>
+            </Col>
+          </Row>
+        </ContentLayout>
       </React.Fragment>
     );
   }

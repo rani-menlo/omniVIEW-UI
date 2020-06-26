@@ -31,8 +31,7 @@ class PrivateRoute extends Component {
             if (
               authorized &&
               (props.match.path == "/verify/:mode" ||
-                props.match.path == "/auth" ||
-                props.match.path == "/profile")
+                props.match.path == "/auth")
             ) {
               if (customerAccounts && customerAccounts.length > 1) {
                 return <Redirect to="/customer-accounts" />;

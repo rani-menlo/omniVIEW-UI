@@ -34,16 +34,11 @@ class AuthenticationCode extends Component {
 
   openDashboard = () => {
     const { user, invalid_license, customerAccounts, first_login } = this.props;
-    if (invalid_license) {
-      this.props.history.push("/requestlicense");
-      return;
-    }
-    // this.props.actions.authenticated();
-
-    if (first_login) {
-      this.props.history.push("/profile");
-      return;
-    }
+    // if (invalid_license) {
+    //   this.props.history.push("/requestlicense");
+    //   return;
+    // }
+    this.props.actions.authenticated();
     if (customerAccounts && customerAccounts.length > 1) {
       this.props.history.push("/customer-accounts");
     } else {
@@ -51,15 +46,27 @@ class AuthenticationCode extends Component {
         { customerId: _.get(customerAccounts[0].customer, "id") },
         () => {
           this.props.dispatch(
-            CustomerActions.setSelectedCustomer(customerAccounts[0].customer, 
-            () => {
-              if (isLoggedInOmniciaRole(customerAccounts[0].role)) {
-                this.props.history.push("/customers");
-                return;
+            CustomerActions.setSelectedCustomer(
+              customerAccounts[0].customer,
+              () => {
+                if (invalid_license) {
+                  this.props.history.push("/requestlicense");
+                  return;
+                }
+
+                if (first_login) {
+                  this.props.history.push("/profile");
+                  return;
+                }
+
+                if (isLoggedInOmniciaRole(customerAccounts[0].role)) {
+                  this.props.history.push("/customers");
+                  return;
+                }
+                this.props.history.push("/applications");
               }
-              this.props.history.push("/applications");
-            }
-          ));
+            )
+          );
           // return;
         }
       );
