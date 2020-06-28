@@ -750,7 +750,6 @@ function mapStateToProps(state) {
     customerAccounts: state.Login.customerAccounts,
     profileUpdated: state.Login.profileUpdated,
     first_login: state.Login.first_login,
-    customer: state.Login.customer,
   };
 }
 

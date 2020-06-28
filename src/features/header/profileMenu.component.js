@@ -138,7 +138,6 @@ function mapStateToProps(state) {
   return {
     user: state.Login.user,
     role: state.Login.role,
-    customer: state.Login.role,
     first_login: state.Login.first_login,
     selectedCustomer: state.Customer.selectedCustomer,
     customerAccounts: state.Login.customerAccounts,

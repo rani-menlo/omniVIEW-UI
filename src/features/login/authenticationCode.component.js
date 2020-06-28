@@ -9,6 +9,7 @@ import Loader from "../../uikit/components/loader";
 import Footer from "../../uikit/components/footer/footer.component";
 import { translate } from "../../translations/translator";
 import { isLoggedInOmniciaRole } from "../../utils";
+import { Toast } from "../../uikit/components";
 
 class AuthenticationCode extends Component {
   constructor(props) {
@@ -34,11 +35,11 @@ class AuthenticationCode extends Component {
 
   openDashboard = () => {
     const { user, invalid_license, customerAccounts, first_login } = this.props;
-    // if (invalid_license) {
-    //   this.props.history.push("/requestlicense");
-    //   return;
-    // }
-    // this.props.actions.authenticated();
+    this.props.actions.authenticated();
+    if (!customerAccounts.length) {
+      Toast.error("No Customers Available for this User");
+      return;
+    }
     if (customerAccounts && customerAccounts.length > 1) {
       this.props.history.push("/customer-accounts");
     } else {
