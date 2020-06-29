@@ -505,6 +505,9 @@ class AddUser extends Component {
           {selectedUser !== 1 &&
           editUser &&
           _.get(selectedUser, "role_id") !== 1 ? (
+            /**
+             * We need to display only the first license from the list of licenses in the edit user screen
+             */
             <React.Fragment>
               <p className="addUser-heading">
                 {`${translate("label.usermgmt.expires")}: ${
@@ -607,14 +610,6 @@ class AddUser extends Component {
                                 )}`}
                               />
                             </div>
-                            {/* <Text
-                              type="regular"
-                              size="14px"
-                              opacity={0.75}
-                              text={`Expires on ${getFormattedDate(
-                                _.get(licence, "expired_date")
-                              )}`}
-                            /> */}
                           </div>
                           <Checkbox
                             checked={licence.checked}

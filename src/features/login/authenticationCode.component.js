@@ -35,14 +35,22 @@ class AuthenticationCode extends Component {
 
   openDashboard = () => {
     const { user, invalid_license, customerAccounts, first_login } = this.props;
-    //this.props.actions.authenticated();
-    if (!customerAccounts.length) {
+    /**
+     * Display the below message when there are no customers for the loggin user
+     */
+    if (_.isEmpty(customerAccounts)) {
       Toast.error("No Customers Available for this User");
       return;
     }
+    /**
+     * Redirect to the list of customers screen when loggin user has more than one customer
+     */
     if (customerAccounts && customerAccounts.length > 1) {
       this.props.history.push("/customer-accounts");
     } else {
+      /**
+       * Switching to the customer
+       */
       this.props.actions.switchCustomerAccounts(
         { customerId: _.get(customerAccounts[0].customer, "id") },
         () => {
@@ -50,20 +58,30 @@ class AuthenticationCode extends Component {
             CustomerActions.setSelectedCustomer(
               customerAccounts[0].customer,
               () => {
+                /**
+                 * If the customer doesn't have any license
+                 */
                 if (this.props.invalid_license) {
                   this.props.history.push("/requestlicense");
                   return;
                 }
-
+                /**
+                 * Force user to redirect to edit profile screen if the user login for the first time to change the temporary password
+                 */
                 if (this.props.first_login) {
                   this.props.history.push("/profile");
                   return;
                 }
-
+                /**
+                 * Redirect to the customers screen if the login user is omnicia user
+                 */
                 if (isLoggedInOmniciaRole(customerAccounts[0].role)) {
                   this.props.history.push("/customers");
                   return;
                 }
+                /**
+                 * Redirect to the applications screen if the login user is other than omnicia users
+                 */
                 this.props.history.push("/applications");
               }
             )
