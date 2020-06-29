@@ -84,7 +84,9 @@
     "build:staging": "env-cmd .env.staging node scripts/build.js",
     "build:uat": "env-cmd -f .env.uat node scripts/build.js",
     "build:prod": "node scripts/build.js",
-    "test": "node scripts/test.js"
+    "test": "node scripts/test.js",
+    "sonar": "node sonar-project.js",
+    "postbuild:prod": "npm run sonar"
   },
   "homepage": ".",
   "eslintConfig": {
@@ -159,6 +161,7 @@
     ]
   },
   "devDependencies": {
-    "babel-plugin-react-intl": "^3.0.1"
+    "babel-plugin-react-intl": "^3.0.1",
+    "sonarqube-scanner": "^2.6.0"
   }
 }
