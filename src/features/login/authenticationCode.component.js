@@ -35,7 +35,7 @@ class AuthenticationCode extends Component {
 
   openDashboard = () => {
     const { user, invalid_license, customerAccounts, first_login } = this.props;
-    this.props.actions.authenticated();
+    //this.props.actions.authenticated();
     if (!customerAccounts.length) {
       Toast.error("No Customers Available for this User");
       return;

@@ -1,3 +1,6 @@
+.customer-accounts-layout {
+  margin-top: -5px;
+}
 .customer-accounts {
   width: 400px;
   max-height: 305px;
@@ -10,7 +13,6 @@
   }
   .ant-radio-wrapper-checked {
     background-color: rgba($blue, 0.25) !important;
-    border-left: 3px solid #979797;
   }
   .ant-radio {
     float: right !important;
@@ -22,9 +24,8 @@
     word-break: break-all;
     white-space: normal;
     display: inline-flex;
-    font-weight: bold;
     color: $black;
-    @include text-regular(16px);
+    @include text-bold(16px);
   }
   &__continue {
     width: 400px;
