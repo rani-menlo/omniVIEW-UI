@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import { CustomerActions, LoginActions } from "../../redux/actions";
 import Header from "../header/header.component";
 import { Loader, OmniButton, ContentLayout } from "../../uikit/components";
-import { Row, Col, Radio } from "antd";
+import { Row, Col, Radio, Button } from "antd";
 import { translate } from "../../translations/translator";
 import { get, map } from "lodash";
 import { isLoggedInOmniciaRole } from "../../utils";
@@ -13,7 +13,9 @@ const RadioGroup = Radio.Group;
 
 const radioStyle = {
   display: "block",
-  lineHeight: "30px",
+  width: "400px",
+  margin: "0",
+  padding: "15px 20px 16px 16px",
 };
 
 class CustomerAccounts extends Component {
@@ -87,12 +89,12 @@ class CustomerAccounts extends Component {
         <Loader loading={loading} />
         <Header disabled hideMenu />
         <ContentLayout className="customer-accounts-layout">
-          <h3 class="select-customer">
+          <h3 className="select-customer">
             {translate("text.customer.viewCustomer")}
           </h3>
           <Row align="middle" justify="center" type="flex">
-            <Col xs={12} md={12} lg={6} xl={6}>
-              <div className="customer-accounts">
+            <Col>
+              <div className="customer-accounts scrollbar">
                 {get(customerProfileAccounts, "length") && (
                   <Row align="middle" justify="center" type="flex" className="">
                     <RadioGroup
@@ -113,11 +115,12 @@ class CustomerAccounts extends Component {
                   </Row>
                 )}
               </div>
-              <div style={{ marginTop: "20px", textAlign: "center" }}>
+              <div>
                 <OmniButton
-                  label={translate("label.button.continue")}
+                  className="customer-accounts__continue"
                   onClick={this.openCustApplications}
                   disabled={!selectedCustomer}
+                  label={translate("label.button.continue")}
                 />
               </div>
             </Col>

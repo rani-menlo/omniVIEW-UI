@@ -10,21 +10,21 @@ import {
   PhoneField,
   Loader,
   DeactivateModal,
-  Text
+  Text,
 } from "../../uikit/components";
 import { Radio, Icon, Switch, Checkbox } from "antd";
 import Header from "../header/header.component";
 import {
   UsermanagementActions,
   CustomerActions,
-  ApiActions
+  ApiActions,
 } from "../../redux/actions";
 import {
   isEmail,
   isPhone,
   getFormattedDate,
   isLoggedInOmniciaAdmin,
-  isLoggedInCustomerAdmin
+  isLoggedInCustomerAdmin,
 } from "../../utils";
 import { translate } from "../../translations/translator";
 import { ROLES } from "../../constants";
@@ -34,7 +34,7 @@ const RadioGroup = Radio.Group;
 
 const radioStyle = {
   display: "block",
-  lineHeight: "30px"
+  lineHeight: "30px",
 };
 
 class AddUser extends Component {
@@ -47,19 +47,19 @@ class AddUser extends Component {
       editUser: false,
       fname: {
         value: "",
-        error: ""
+        error: "",
       },
       lname: {
         value: "",
-        error: ""
+        error: "",
       },
       email: {
         value: "",
-        error: ""
+        error: "",
       },
       phone: {
         value: "",
-        error: ""
+        error: "",
       },
       selectedRole: this.roles[0].id,
       selectedDept: "",
@@ -68,7 +68,7 @@ class AddUser extends Component {
       showDeactivateModal: false,
       statusActive: true,
       secondaryContact: false,
-      licences: []
+      licences: [],
     };
   }
 
@@ -76,7 +76,7 @@ class AddUser extends Component {
     let newState = null;
     if (props.departments.length && !state.selectedDept) {
       newState = {
-        selectedDept: props.departments[0].id
+        selectedDept: props.departments[0].id,
       };
     }
     if (!state.licences.length && props.licences.length) {
@@ -85,7 +85,7 @@ class AddUser extends Component {
       newState = {
         ...newState,
         licences: props.licences,
-        selectedLicences: [selectedLicence]
+        selectedLicences: [selectedLicence],
       };
     }
     return newState;
@@ -121,31 +121,31 @@ class AddUser extends Component {
     return state;
   };
 
-  onPhoneChange = value => {
+  onPhoneChange = (value) => {
     this.setState({ phone: { ...this.state.phone, value, error: "" } });
   };
 
-  onRoleChange = e => {
+  onRoleChange = (e) => {
     this.setState({ selectedRole: e.target.value });
   };
 
-  onDeptChange = e => {
+  onDeptChange = (e) => {
     this.setState({ selectedDept: e.target.value });
   };
 
-  onLicenceSelect = value => {
+  onLicenceSelect = (value) => {
     this.setState({
-      selectedLicence: { ...this.state.selectedLicence, value, error: "" }
+      selectedLicence: { ...this.state.selectedLicence, value, error: "" },
     });
   };
 
-  onInputChange = field => e => {
+  onInputChange = (field) => (e) => {
     const { value } = e.target;
     if (value === " ") {
       return;
     }
     this.setState({
-      [field]: { ...this.state[field], value, error: "" }
+      [field]: { ...this.state[field], value, error: "" },
     });
   };
 
@@ -159,13 +159,13 @@ class AddUser extends Component {
     if (!state.fname.value) {
       error = true;
       state.fname.error = translate("error.form.required", {
-        type: translate("label.form.fname")
+        type: translate("label.form.fname"),
       });
     }
     if (!state.lname.value) {
       error = true;
       state.lname.error = translate("error.form.required", {
-        type: translate("label.form.lname")
+        type: translate("label.form.lname"),
       });
     }
     if (state.email.value) {
@@ -173,13 +173,13 @@ class AddUser extends Component {
       if (!valid) {
         error = true;
         state.email.error = translate("error.form.invalid", {
-          type: translate("label.form.email")
+          type: translate("label.form.email"),
         });
       }
     } else {
       error = true;
       state.email.error = translate("error.form.required", {
-        type: translate("label.form.email")
+        type: translate("label.form.email"),
       });
     }
     if (state.phone.value) {
@@ -187,13 +187,13 @@ class AddUser extends Component {
       if (!valid) {
         error = true;
         state.phone.error = translate("error.form.invalid", {
-          type: translate("label.form.phone")
+          type: translate("label.form.phone"),
         });
       }
     } else {
       error = true;
       state.phone.error = translate("error.form.required", {
-        type: translate("label.form.phone")
+        type: translate("label.form.phone"),
       });
     }
     // licence check only in add user
@@ -220,7 +220,7 @@ class AddUser extends Component {
       roleid: state.selectedRole,
       department_id: state.selectedDept,
       is_secondary_contact: +state.secondaryContact,
-      customer_id: this.props.selectedCustomer.id
+      customer_id: this.props.selectedCustomer.id,
     };
 
     if (state.editUser) {
@@ -230,17 +230,17 @@ class AddUser extends Component {
         UsermanagementActions.updateUser(reqObject, this.props.history)
       );
     } else {
-      _.map(state.selectedLicences, licence => {
+      _.map(state.selectedLicences, (licence) => {
         if (_.includes(_.get(licence, "licences[0].slug"), "omniview")) {
           reqObject["subscriptions"] = {
             ...reqObject["subscriptions"],
-            "omni-view": licence.id
+            "omni-view": licence.id,
           };
         }
         if (_.includes(_.get(licence, "licences[0].slug"), "omnifile")) {
           reqObject["subscriptions"] = {
             ...reqObject["subscriptions"],
-            "omni-file": licence.id
+            "omni-file": licence.id,
           };
         }
       });
@@ -279,35 +279,35 @@ class AddUser extends Component {
     this.props.history.goBack();
   };
 
-  getLicenceAppName = appName => {
+  getLicenceAppName = (appName) => {
     return _.includes(appName, "view") ? "omniVIEW" : "omniFILE";
   };
 
-  onLicenceChecked = licence => e => {
+  onLicenceChecked = (licence) => (e) => {
     const checked = e.target.checked;
     let newLicences = [...this.state.licences];
-    const idx = _.findIndex(newLicences, li => li.id === licence.id);
+    const idx = _.findIndex(newLicences, (li) => li.id === licence.id);
     if (checked) {
       //removing checked property from all objects in licenses array
-      newLicences = _.map(newLicences, licence => _.omit(licence, "checked"));
+      newLicences = _.map(newLicences, (licence) => _.omit(licence, "checked"));
       newLicences[idx].checked = checked;
       this.setState({
         licences: newLicences,
         selectedLicences: [newLicences[idx]],
-        selectedLicenceError: ""
+        selectedLicenceError: "",
       });
     } else {
       newLicences[idx].checked = checked;
       const newSelectedLicences = [...this.state.selectedLicences];
-      _.remove(newSelectedLicences, li => li.id === licence.id);
+      _.remove(newSelectedLicences, (li) => li.id === licence.id);
       this.setState({
         licences: newLicences,
-        selectedLicences: newSelectedLicences
+        selectedLicences: newSelectedLicences,
       });
     }
   };
 
-  onSecondaryContactChecked = e => {
+  onSecondaryContactChecked = (e) => {
     this.setState({ secondaryContact: e.target.checked });
   };
 
@@ -317,7 +317,7 @@ class AddUser extends Component {
       loading,
       selectedUser,
       selectedCustomer,
-      user
+      user,
     } = this.props;
     const {
       fname,
@@ -331,7 +331,7 @@ class AddUser extends Component {
       editUser,
       selectedLicences,
       selectedLicenceError,
-      secondaryContact
+      secondaryContact,
     } = this.state;
     return (
       <React.Fragment>
@@ -372,16 +372,16 @@ class AddUser extends Component {
           <p className="addUser-subtitle">
             {editUser
               ? translate("text.user.editmsg", {
-                  type: _.toLower(translate("label.dashboard.user"))
+                  type: _.toLower(translate("label.dashboard.user")),
                 })
               : translate("text.user.addmsg", {
-                  type: _.toLower(translate("label.dashboard.user"))
+                  type: _.toLower(translate("label.dashboard.user")),
                 })}
           </p>
           <div className="global__hr-line" />
           <p className="addUser-heading">
             {translate("label.user.details", {
-              type: translate("label.dashboard.user")
+              type: translate("label.dashboard.user"),
             })}
           </p>
           <Row className="addUser__fields">
@@ -492,9 +492,7 @@ class AddUser extends Component {
               {translate("label.usermgmt.licensestatus")}:
               <span
                 className={`userManagement__group__users__user__info-text-${
-                  statusActive
-                    ? "active"
-                    : "inactive"
+                  statusActive ? "active" : "inactive"
                 }`}
               >
                 {statusActive
@@ -507,11 +505,18 @@ class AddUser extends Component {
           {selectedUser !== 1 &&
           editUser &&
           _.get(selectedUser, "role_id") !== 1 ? (
+            /**
+             * We need to display only the first license from the list of licenses in the edit user screen
+             */
             <React.Fragment>
               <p className="addUser-heading">
                 {`${translate("label.usermgmt.expires")}: ${
-                  (statusActive)
-                    ? _.get(selectedUser, "licenses.length", 0) ? getFormattedDate(_.find(selectedUser.licenses, 'expired_date')) : "N/A"
+                  statusActive
+                    ? _.get(selectedUser, "licenses.length", 0)
+                      ? getFormattedDate(
+                          _.get(selectedUser.licenses[0], "expired_date")
+                        )
+                      : "N/A"
                     : "N/A"
                 }`}
               </p>
@@ -524,7 +529,7 @@ class AddUser extends Component {
               {translate("text.user.selectrolemsg")}
             </p>
             <RadioGroup value={selectedRole} onChange={this.onRoleChange}>
-              {_.map(this.roles, role => (
+              {_.map(this.roles, (role) => (
                 <Radio
                   key={role.id}
                   style={radioStyle}
@@ -545,7 +550,7 @@ class AddUser extends Component {
               onChange={this.onDeptChange}
               className="global__radio addUser__section__radiogroup"
             >
-              {_.map(departments, dept => (
+              {_.map(departments, (dept) => (
                 <Radio
                   key={dept.id}
                   style={radioStyle}
@@ -567,7 +572,7 @@ class AddUser extends Component {
                 {(licences.length || "") && (
                   <div className="addUser__licences__box">
                     <div className="addUser__licences__box__scroll">
-                      {_.map(licences, licence => (
+                      {_.map(licences, (licence) => (
                         <div
                           className="addUser__licences__box__scroll-item"
                           key={_.get(licence, "licences[0].id")}
@@ -605,14 +610,6 @@ class AddUser extends Component {
                                 )}`}
                               />
                             </div>
-                            {/* <Text
-                              type="regular"
-                              size="14px"
-                              opacity={0.75}
-                              text={`Expires on ${getFormattedDate(
-                                _.get(licence, "expired_date")
-                              )}`}
-                            /> */}
                           </div>
                           <Checkbox
                             checked={licence.checked}
@@ -622,7 +619,7 @@ class AddUser extends Component {
                       ))}
                     </div>
 
-                    {_.map(selectedLicences, licence => {
+                    {_.map(selectedLicences, (licence) => {
                       if (
                         licence.revokedDate &&
                         licence.revokedDate !== "null"
@@ -639,7 +636,7 @@ class AddUser extends Component {
                               expire: _.get(
                                 licence,
                                 "licences[0].unassignValidity"
-                              )
+                              ),
                             })}
                           />
                         );
@@ -715,14 +712,17 @@ function mapStateToProps(state) {
     user: state.Login.user,
     departments: state.Usermanagement.departments,
     licences: state.Usermanagement.licences,
-    selectedCustomer: state.Customer.selectedCustomer
+    selectedCustomer: state.Customer.selectedCustomer,
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    dispatch
+    dispatch,
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(AddUser);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(AddUser);

@@ -216,7 +216,7 @@
   "label.user.areyousureunmarkseccontact": "Are you sure you want to remove the selected users as the Secondary Contacts?",
   "error.user.licenceassigned": "{product} - This license was previously assigned to an account that is now deactivated. {remain} days of access remain. Expires in {expire} days if left unassigned.",
 
-  "text.customer.viewCustomer": "Choose Customer whose applications you would like to work on",
+  "text.customer.viewCustomer": "Select the customer whose applications you want to work on",
   "text.customer.deactivate": "The customer will no longer be able to access the system until an Omnicia administrator enables their account again.",
   "text.customer.activate": "The customer will be now able to access the system.",
   "text.customer.edit": "Make edits to this customer profile below",

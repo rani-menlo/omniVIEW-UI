@@ -143,3 +143,19 @@ p {
   opacity: 0.2;
   cursor: not-allowed !important;
 }
+
+/* width */
+.scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+/* Track */
+.scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Handle */
+.scrollbar::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background-color: rgba($black, 0.25);
+}

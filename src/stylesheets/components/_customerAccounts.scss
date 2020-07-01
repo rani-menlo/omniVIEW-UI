@@ -2,21 +2,46 @@
   margin-top: -5px;
 }
 .customer-accounts {
-  padding: 12px;
-  border-radius: 4px;
+  width: 400px;
+  max-height: 305px;
+  border-radius: 8px;
+  border: solid 1px $spanish-grey;
+  overflow-y: auto;
+  overflow-x: hidden;
+  .global__radio:nth-child(even) {
+    background-color: $froasted-glass;
+  }
+  .ant-radio-wrapper-checked {
+    background-color: rgba($blue, 0.25) !important;
+  }
+  .ant-radio {
+    float: right !important;
+    top: 2px !important;
+  }
   span.ant-radio + * {
-    padding-right: 15px !important;
-    padding-left: 15px !important;
+    padding-right: 30px !important;
+    padding-left: 0 !important;
     word-break: break-all;
     white-space: normal;
     display: inline-flex;
-    font-weight: bold;
     color: $black;
+    @include text-bold(16px);
+  }
+  &__continue {
+    width: 400px;
+    height: 40px !important;
+    margin-top: 32px;
+    border-radius: 4px;
+    background-color: $blue !important;
+    border: none !important;
+    span {
+      color: $white !important;
+      @include text-extra-bold(16px);
+    }
   }
 }
 .select-customer {
-  margin-top: 50px;
-  color: $clear-chill;
+  margin: 72px 0 44px 0;
+  @include text-bold(20px);
   text-align: center;
-  font-weight: bold;
 }
