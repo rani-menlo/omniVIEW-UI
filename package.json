@@ -86,7 +86,7 @@
     "build:prod": "node scripts/build.js",
     "test": "node scripts/test.js",
     "sonar": "node sonar-project.js",
-    "postbuild:prod": "npm run sonar"
+    "postbuild:prod": "yarn sonar"
   },
   "homepage": ".",
   "eslintConfig": {

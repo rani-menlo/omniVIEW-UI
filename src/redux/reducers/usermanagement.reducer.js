@@ -50,6 +50,7 @@ export default (state = initialState, action) => {
           usersFlag: action.usersFlag
         };
       }
+      break;
     }
     case UsermanagementActionTypes.FETCH_CUSTOMER_ADMINS: {
       if (!action.data.error) {
@@ -58,6 +59,7 @@ export default (state = initialState, action) => {
           cAdmins: action.data.data
         };
       }
+      break;
     }
     case UsermanagementActionTypes.FETCH_USERS_OF_FILE_OR_SUBMISSION: {
       if (!action.data.error) {
@@ -66,6 +68,7 @@ export default (state = initialState, action) => {
           usersOfFileOrSubmission: action.data.data
         };
       }
+      break;
     }
     case UsermanagementActionTypes.SET_SELECTED_USER: {
       return {

@@ -160,7 +160,7 @@ class ValidationResults extends Component {
   };
 
   render() {
-    const { onClose, label, sequence, dtdVersion } = this.props;
+    const { onClose, label, sequence } = this.props;
     const { validationResults, sort, selected } = this.state;
     return (
       <React.Fragment>

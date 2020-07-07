@@ -68,7 +68,6 @@ export default (state = initialState, action) => {
         ...state,
         find: {
           ...state.find,
-          searchResults: action.data.data,
           searchResults: _.map(action.data.data, obj => ({
             ...obj,
             hash: uuidv4()

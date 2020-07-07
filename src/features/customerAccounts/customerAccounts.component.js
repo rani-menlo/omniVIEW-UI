@@ -49,13 +49,12 @@ class CustomerAccounts extends Component {
   }
 
   selectCustomer = (e) => {
-    let { value } = e.target;
     this.setState({ selectedCustomer: e.target.value });
   };
 
   openCustApplications = () => {
     const { selectedCustomer } = this.state;
-    const { role, props, customer } = this.props;
+    const { role, customer } = this.props;
     this.props.dispatch(CustomerActions.setSelectedCustomer(selectedCustomer));
     let postObj = { customerId: selectedCustomer.id };
     this.props.dispatch(

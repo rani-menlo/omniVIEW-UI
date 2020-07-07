@@ -10,7 +10,11 @@ import {
   VALID_VALUES_XML_DATA_TOP_LIST,
   VALID_VALUES_XML_DATA,
 } from "../../constants";
-import { isLoggedInCustomerAdmin, isLoggedInOmniciaAdmin, openFileInWindow } from "../../utils";
+import {
+  isLoggedInCustomerAdmin,
+  isLoggedInOmniciaAdmin,
+  openFileInWindow,
+} from "../../utils";
 import { translate } from "../../translations/translator";
 
 class TreeNode extends Component {
@@ -94,8 +98,8 @@ class TreeNode extends Component {
           _.values(consolidatedFolder),
           "ID"
         );
-        let ids = _.map(consolidatedFolder, (value) => value.ID);
-        ids = ids.sort(
+        const unsortedIds = _.map(consolidatedFolder, (value) => value.ID);
+        const ids = unsortedIds.sort(
           new Intl.Collator(undefined, { numeric: true, sensitivity: "base" })
             .compare
         );
@@ -264,8 +268,8 @@ class TreeNode extends Component {
         numeric: true,
         sensitivity: "base",
       });
-      nodeIds = nodeIds.sort(collator.compare);
-      nodes = _.map(nodeIds, (id) => nodesById[id]);
+      const sortedNodeIds = nodeIds.sort(collator.compare);
+      nodes = _.map(sortedNodeIds, (id) => nodesById[id]);
     }
 
     if (properties["_stfKey"] && mode === "standard") {
@@ -304,10 +308,10 @@ class TreeNode extends Component {
       sensitivity: "base",
     });
     const nodesByTitle = _.groupBy(nodes, (node) => node.value.title);
-    let titles = _.map(nodes, (node) => node.value.title);
+    const unSortedTitles = _.map(nodes, (node) => node.value.title);
     const bottomList = [],
       topList = [];
-    titles = titles.sort(collator.compare);
+    let titles = unSortedTitles.sort(collator.compare);
     // ordering based on valid-values.xml data (Refer comment in VALID_VALUES_XML_DATA_BOTTOM_LIST)
     // _.map(VALID_VALUES_XML_DATA.BOTTOM_LIST, item => {
     //   const idx = _.findIndex(titles, title => {
@@ -695,7 +699,11 @@ class TreeNode extends Component {
       return;
     }
     const fileHref = properties["xlink:href"];
-    openFileInWindow(fileHref, properties.fileID, _.get(properties, "title", ""))
+    openFileInWindow(
+      fileHref,
+      properties.fileID,
+      _.get(properties, "title", "")
+    );
   };
 
   toggle = () => {

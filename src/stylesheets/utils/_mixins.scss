@@ -1,40 +1,40 @@
 @mixin text-regular($fontSize: 12px) {
-  font-family: Heebo-Regular;
+  font-family: Heebo-Regular, sans-serif;
   font-weight: normal;
   font-size: $fontSize;
   color: $black;
 }
 
 @mixin text-medium($fontSize: 12px) {
-  font-family: Heebo-Medium;
+  font-family: Heebo-Medium, sans-serif;
   font-weight: 500;
   font-size: $fontSize;
   color: $black;
 }
 
 @mixin text-bold($fontSize: 14px) {
-  font-family: Heebo-Bold;
+  font-family: Heebo-Bold, sans-serif;
   font-weight: bold;
   font-size: $fontSize;
   color: $black;
 }
 
 @mixin text-extra-bold($fontSize: 36px) {
-  font-family: Heebo-ExtraBold;
+  font-family: Heebo-ExtraBold, sans-serif;
   font-weight: 800;
   font-size: $fontSize;
   color: $black;
 }
 
 @mixin text-medium($fontSize: 12px) {
-  font-family: Heebo-Medium;
+  font-family: Heebo-Medium, sans-serif;
   font-weight: 500;
   font-size: $fontSize;
   color: $black;
 }
 
 @mixin text-bold-active($fontSize: 12px) {
-  font-family: Heebo-Bold;
+  font-family: Heebo-Bold, sans-serif;
   font-weight: 800;
   font-size: $fontSize;
   color: $black;
@@ -46,7 +46,7 @@
 }
 @mixin text-meduim-bold-active($fontSize: 12px) {
   @include text-bold-active;
-  font-family: Heebo-Medium;
+  font-family: Heebo-Medium, sans-serif;
   font-size: $fontSize;
 }
 @mixin text-meduim-bold-inactive($fontSize: 12px) {
@@ -57,14 +57,14 @@
 
 @mixin text-normal($fontSize: 12px) {
   @include text-bold-active;
-  font-family: Heebo-Regular;
+  font-family: Heebo-Regular, sans-serif;
   font-weight: normal;
   font-size: $fontSize;
 }
 
 @mixin text-normal-inactive($fontSize: 12px) {
   @include text-bold-inactive;
-  font-family: Heebo-Regular;
+  font-family: Heebo-Regular, sans-serif;
   font-weight: normal;
   font-size: $fontSize;
 }
@@ -98,5 +98,27 @@
   src: url("/fonts/Heebo-Thin.ttf");
 }
 body {
-  font-family: "Heebo-Regular" !important;
+  font-family: "Heebo-Regular", sans-serif !important;
+}
+
+@mixin tabs {
+  margin-left: 10px;
+
+  .ant-tabs {
+    overflow: visible;
+  }
+
+  .ant-tabs-bar {
+    margin-bottom: -5px;
+    border-bottom: 0px;
+  }
+  .ant-tabs-tab {
+    height: auto !important;
+    @include text-bold-inactive;
+    font-weight: normal;
+  }
+
+  .ant-tabs-tab-active {
+    @include text-bold-active;
+  }
 }
