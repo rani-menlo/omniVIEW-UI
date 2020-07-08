@@ -1,5 +1,4 @@
 import _ from "lodash";
-import { message } from "antd";
 import { UsermanagementActionTypes } from "../actionTypes";
 import { Toast } from "../../uikit/components";
 
@@ -12,7 +11,7 @@ const initialState = {
   departments: [],
   licences: [],
   allLicences: [],
-  selectedUser: null
+  selectedUser: null,
 };
 
 export default (state = initialState, action) => {
@@ -20,25 +19,25 @@ export default (state = initialState, action) => {
     case UsermanagementActionTypes.FETCH_DEPARTMENTS: {
       return {
         ...state,
-        departments: _.sortBy(action.data, "name") || []
+        departments: _.sortBy(action.data, "name") || [],
       };
     }
     case UsermanagementActionTypes.FETCH_LICENCES: {
       return {
         ...state,
-        licences: action.data
+        licences: action.data,
       };
     }
     case UsermanagementActionTypes.FETCH_ALL_LICENCES: {
       return {
         ...state,
-        allLicences: _.sortBy(action.data, ["duration", "type_name"])
+        allLicences: _.sortBy(action.data, ["duration", "type_name"]),
       };
     }
     case UsermanagementActionTypes.RESET_ALL_LICENCES: {
       return {
         ...state,
-        allLicences: []
+        allLicences: [],
       };
     }
     case UsermanagementActionTypes.FETCH_USERS: {
@@ -47,7 +46,7 @@ export default (state = initialState, action) => {
           ...state,
           users: action.data.data,
           usersCount: action.data.usercount,
-          usersFlag: action.usersFlag
+          usersFlag: action.usersFlag,
         };
       }
       break;
@@ -56,7 +55,7 @@ export default (state = initialState, action) => {
       if (!action.data.error) {
         return {
           ...state,
-          cAdmins: action.data.data
+          cAdmins: action.data.data,
         };
       }
       break;
@@ -65,7 +64,7 @@ export default (state = initialState, action) => {
       if (!action.data.error) {
         return {
           ...state,
-          usersOfFileOrSubmission: action.data.data
+          usersOfFileOrSubmission: action.data.data,
         };
       }
       break;
@@ -73,7 +72,7 @@ export default (state = initialState, action) => {
     case UsermanagementActionTypes.SET_SELECTED_USER: {
       return {
         ...state,
-        selectedUser: action.user
+        selectedUser: action.user,
       };
     }
     case UsermanagementActionTypes.ADD_USER: {
@@ -84,7 +83,7 @@ export default (state = initialState, action) => {
       return {
         ...state,
         selectedUser: null,
-        licences: []
+        licences: [],
       };
     }
     case UsermanagementActionTypes.UPDATE_USER: {
@@ -94,7 +93,7 @@ export default (state = initialState, action) => {
       }
       return {
         ...state,
-        selectedUser: null
+        selectedUser: null,
       };
     }
     default:

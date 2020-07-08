@@ -549,37 +549,7 @@ class NodeProperties extends Component {
             "name",
             ""
           )} (${_.get(nextSeq || previousSeq, "submission_type", "")})`;
-    /* const nextSeq = _.get(projectJson, "next_seq", "");
-    const previousSeq = _.get(projectJson, "pre_seq", "");
-    let nextSeqName = "";
-    let previousSeqName = "";
-    nextSeqName = nextSeq && nextSeq.name;
-    nextSeqName =
-      nextSeqName &&
-      `${_.get(submission, "name")}\\${nextSeqName} (${_.get(
-        nextSeq,
-        "submission_type",
-        ""
-      )}-${_.get(nextSeq, "submission_sub_type", "")})`;
 
-    previousSeqName = previousSeq && previousSeq.name;
-    previousSeqName =
-      previousSeqName &&
-      `${_.get(submission, "name")}\\${previousSeqName} (${_.get(
-        previousSeq,
-        "submission_type",
-        ""
-      )}-${_.get(previousSeq, "submission_sub_type", "")})`;
-
-    const currentSeq = `${_.get(submission, "name")}\\${_.get(
-      projectJson,
-      "name",
-      ""
-    )} (${_.get(nextSeq || previousSeq, "submission_type", "")}-${_.get(
-      nextSeq || previousSeq,
-      "submission_sub_type",
-      ""
-    )})`; */
     return (
       <React.Fragment>
         <RowItems>
