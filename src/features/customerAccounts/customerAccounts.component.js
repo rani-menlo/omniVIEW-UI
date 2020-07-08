@@ -53,7 +53,7 @@ class CustomerAccounts extends Component {
     if (isNull(value) || isUndefined(value)) {
       return;
     }
-    this.setState({ selectedCustomer: e.target.value });
+    this.setState({ selectedCustomer: value });
   };
 
   openCustApplications = () => {
