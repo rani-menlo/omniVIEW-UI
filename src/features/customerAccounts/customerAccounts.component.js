@@ -6,7 +6,7 @@ import Header from "../header/header.component";
 import { Loader, OmniButton, ContentLayout } from "../../uikit/components";
 import { Row, Col, Radio, Button } from "antd";
 import { translate } from "../../translations/translator";
-import { get, map } from "lodash";
+import { get, map, isNull, isUndefined } from "lodash";
 import { isLoggedInOmniciaRole } from "../../utils";
 
 const RadioGroup = Radio.Group;
@@ -49,13 +49,16 @@ class CustomerAccounts extends Component {
   }
 
   selectCustomer = (e) => {
-    let { value } = e.target;
-    this.setState({ selectedCustomer: e.target.value });
+    const { value } = e.target;
+    if (isNull(value) || isUndefined(value)) {
+      return;
+    }
+    this.setState({ selectedCustomer: value });
   };
 
   openCustApplications = () => {
     const { selectedCustomer } = this.state;
-    const { role, props, customer } = this.props;
+    const { role, customer } = this.props;
     this.props.dispatch(CustomerActions.setSelectedCustomer(selectedCustomer));
     let postObj = { customerId: selectedCustomer.id };
     this.props.dispatch(

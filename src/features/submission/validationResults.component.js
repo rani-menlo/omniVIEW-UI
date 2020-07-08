@@ -4,11 +4,9 @@ import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { Icon, Button } from "antd";
 import { SubmissionActions } from "../../redux/actions";
-import Loader from "../../uikit/components/loader";
 import _ from "lodash";
 import { getValidationsBySequence } from "../../redux/selectors/validationResults.selector";
 import { Text, Row, Toast } from "../../uikit/components";
-import { translate } from "../../translations/translator";
 import { URI, SERVER_URL } from "../../constants";
 
 class ValidationResults extends Component {
@@ -160,7 +158,7 @@ class ValidationResults extends Component {
   };
 
   render() {
-    const { onClose, label, sequence, dtdVersion } = this.props;
+    const { onClose, label, sequence } = this.props;
     const { validationResults, sort, selected } = this.state;
     return (
       <React.Fragment>

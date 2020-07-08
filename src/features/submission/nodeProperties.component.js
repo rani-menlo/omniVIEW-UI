@@ -13,7 +13,7 @@ import {
   getDTD2_2_FormattedDate,
   getDTDVersion,
   getV2_2Date,
-  openFileInWindow
+  openFileInWindow,
 } from "../../utils";
 import { Text } from "../../uikit/components";
 import { Icon } from "antd";
@@ -27,14 +27,14 @@ class NodeProperties extends Component {
     projectJson: PropTypes.object,
     view: PropTypes.oneOf(["current", "lifeCycle"]),
     mode: PropTypes.oneOf(["standard", "qc"]),
-    formFile: PropTypes.array
+    formFile: PropTypes.array,
   };
 
-  getFileName = fullName => {
+  getFileName = (fullName) => {
     return fullName.substring(fullName.lastIndexOf("/") + 1, fullName.length);
   };
 
-  getFileTypeIcon = fileName => {
+  getFileTypeIcon = (fileName) => {
     if (!fileName) {
       return null;
     }
@@ -72,12 +72,12 @@ class NodeProperties extends Component {
     this.loadFile(fileHref, properties.fileID, properties.title);
   };
 
-  openLifeCycleFile = lifeCycle => () => {
+  openLifeCycleFile = (lifeCycle) => () => {
     const fileHref = lifeCycle["xlink:href"];
     this.loadFile(fileHref, lifeCycle.fileID, lifeCycle.title);
   };
 
-  openFormFile = file => () => {
+  openFormFile = (file) => () => {
     const fileHref = file["xlink:href"];
     this.loadFile(fileHref, file.fileID, file.title);
   };
@@ -87,7 +87,7 @@ class NodeProperties extends Component {
       properties,
       mode,
       submission,
-      lifeCycles: lifeCycleData
+      lifeCycles: lifeCycleData,
     } = this.props;
     let lifeCycles = _.intersectionWith(
       lifeCycleData,
@@ -112,7 +112,7 @@ class NodeProperties extends Component {
             <div className="value">
               <table>
                 {_.map(properties["study-categories"], (studyCateg, idx) => {
-                  return _.map(studyCateg, category => {
+                  return _.map(studyCateg, (category) => {
                     return (
                       <tr key={idx}>
                         <td style={{ paddingRight: "10px" }}>
@@ -433,7 +433,7 @@ class NodeProperties extends Component {
       selectedSequence,
       selectedCustomer,
       selectedSubmission,
-      m1Json
+      m1Json,
     } = this.props;
 
     const id = `${_.get(selectedCustomer, "id", "")}_${_.get(
@@ -445,7 +445,7 @@ class NodeProperties extends Component {
     sequenceList = getOrderedSequences(sequenceList);
     const currentIndex = _.findIndex(
       sequenceList,
-      seq => seq.id === _.get(selectedSequence, "id")
+      (seq) => seq.id === _.get(selectedSequence, "id")
     );
     if (currentIndex < 0) {
       return;
@@ -462,56 +462,51 @@ class NodeProperties extends Component {
       //   "submission_type",
       //   ""
       // )}-${_.get(nextSeq, "submission_sub_type", "")})`;
-      nextSeqName && (
-        _.get(
-          nextSeq,
-          "submission_sub_type",
-          ""
-        ) ? `${_.get(submission, "name")}\\${nextSeqName} (${_.get(
-          nextSeq,
-          "submission_type",
-          ""
-        )}-${_.get(nextSeq, "submission_sub_type", "")})`
-        :  getV2_2Date(m1Json) ?  `${_.get(submission, "name")}\\${nextSeqName} (${_.get(
-          nextSeq,
-          "submission_type",
-          ""
-        )}) ${getV2_2Date(
-          m1Json
-        )}` : `${_.get(submission, "name")}\\${nextSeqName} (${_.get(
-          nextSeq,
-          "submission_type",
-          ""
-        )})`
-      );
+      nextSeqName &&
+      (_.get(nextSeq, "submission_sub_type", "")
+        ? `${_.get(submission, "name")}\\${nextSeqName} (${_.get(
+            nextSeq,
+            "submission_type",
+            ""
+          )}-${_.get(nextSeq, "submission_sub_type", "")})`
+        : getV2_2Date(m1Json)
+        ? `${_.get(submission, "name")}\\${nextSeqName} (${_.get(
+            nextSeq,
+            "submission_type",
+            ""
+          )}) ${getV2_2Date(m1Json)}`
+        : `${_.get(submission, "name")}\\${nextSeqName} (${_.get(
+            nextSeq,
+            "submission_type",
+            ""
+          )})`);
 
     previousSeqName = previousSeq && previousSeq.name;
     previousSeqName =
-      previousSeqName &&
       // `${_.get(submission, "name")}\\${previousSeqName} (${_.get(
       //   previousSeq,
       //   "submission_type",
       //   ""
       // )}-${_.get(previousSeq, "submission_sub_type", "")})`;
 
-      previousSeqName && (
-      _.get(previousSeq, "submission_sub_type", "") ? 
-      `${_.get(submission, "name")}\\${previousSeqName} (${_.get(
-        previousSeq,
-        "submission_type",
-        ""
-      )}-${_.get(previousSeq, "submission_sub_type", "")})` : getV2_2Date(m1Json) ? 
-      `${_.get(submission, "name")}\\${previousSeqName} (${_.get(
-        previousSeq,
-        "submission_type",
-        ""
-      )}) ${getV2_2Date(
-        m1Json
-      )}` :  `${_.get(submission, "name")}\\${previousSeqName} (${_.get(
-        previousSeq,
-        "submission_type",
-        ""
-      )})`);
+      previousSeqName &&
+      (_.get(previousSeq, "submission_sub_type", "")
+        ? `${_.get(submission, "name")}\\${previousSeqName} (${_.get(
+            previousSeq,
+            "submission_type",
+            ""
+          )}-${_.get(previousSeq, "submission_sub_type", "")})`
+        : getV2_2Date(m1Json)
+        ? `${_.get(submission, "name")}\\${previousSeqName} (${_.get(
+            previousSeq,
+            "submission_type",
+            ""
+          )}) ${getV2_2Date(m1Json)}`
+        : `${_.get(submission, "name")}\\${previousSeqName} (${_.get(
+            previousSeq,
+            "submission_type",
+            ""
+          )})`);
 
     const currentSeq =
       // getDTDVersion(m1Json) == "2.01"
@@ -529,60 +524,32 @@ class NodeProperties extends Component {
       //     ""
       //   )})`;
 
-        _.get(
-          nextSeq || previousSeq,
-          "submission_sub_type",
-          ""
-        ) ? `${_.get(submission, "name")}\\${_.get(
-          selectedSequence,
-          "name",
-          ""
-        )} (${_.get(nextSeq || previousSeq, "submission_type", "")}-${_.get(
-          nextSeq || previousSeq,
-          "submission_sub_type",
-          ""
-        )})` : getV2_2Date(m1Json) ? `${_.get(submission, "name")}\\${_.get(
-          selectedSequence,
-          "name",
-          ""
-        )} (${_.get(nextSeq || previousSeq, "submission_type", "")}) ${getV2_2Date(
-              m1Json
-            )}` : `${_.get(submission, "name")}\\${_.get(
-              selectedSequence,
-              "name",
-              ""
-            )} (${_.get(nextSeq || previousSeq, "submission_type", "")})`;
-    /* const nextSeq = _.get(projectJson, "next_seq", "");
-    const previousSeq = _.get(projectJson, "pre_seq", "");
-    let nextSeqName = "";
-    let previousSeqName = "";
-    nextSeqName = nextSeq && nextSeq.name;
-    nextSeqName =
-      nextSeqName &&
-      `${_.get(submission, "name")}\\${nextSeqName} (${_.get(
-        nextSeq,
-        "submission_type",
-        ""
-      )}-${_.get(nextSeq, "submission_sub_type", "")})`;
+      _.get(nextSeq || previousSeq, "submission_sub_type", "")
+        ? `${_.get(submission, "name")}\\${_.get(
+            selectedSequence,
+            "name",
+            ""
+          )} (${_.get(nextSeq || previousSeq, "submission_type", "")}-${_.get(
+            nextSeq || previousSeq,
+            "submission_sub_type",
+            ""
+          )})`
+        : getV2_2Date(m1Json)
+        ? `${_.get(submission, "name")}\\${_.get(
+            selectedSequence,
+            "name",
+            ""
+          )} (${_.get(
+            nextSeq || previousSeq,
+            "submission_type",
+            ""
+          )}) ${getV2_2Date(m1Json)}`
+        : `${_.get(submission, "name")}\\${_.get(
+            selectedSequence,
+            "name",
+            ""
+          )} (${_.get(nextSeq || previousSeq, "submission_type", "")})`;
 
-    previousSeqName = previousSeq && previousSeq.name;
-    previousSeqName =
-      previousSeqName &&
-      `${_.get(submission, "name")}\\${previousSeqName} (${_.get(
-        previousSeq,
-        "submission_type",
-        ""
-      )}-${_.get(previousSeq, "submission_sub_type", "")})`;
-
-    const currentSeq = `${_.get(submission, "name")}\\${_.get(
-      projectJson,
-      "name",
-      ""
-    )} (${_.get(nextSeq || previousSeq, "submission_type", "")}-${_.get(
-      nextSeq || previousSeq,
-      "submission_sub_type",
-      ""
-    )})`; */
     return (
       <React.Fragment>
         <RowItems>
@@ -616,10 +583,10 @@ class NodeProperties extends Component {
       getDTDVersion(m1Json) == "2.01"
         ? _.get(m1Json, "[admin][product-description][application-number]", "")
         : _.get(
-          m1Json,
-          "[admin][application-set][application][application-information][application-number][$t]",
-          ""
-        );
+            m1Json,
+            "[admin][application-set][application][application-information][application-number][$t]",
+            ""
+          );
     const companyName = _.get(
       m1Json,
       "[admin][applicant-info][company-name]",
@@ -631,12 +598,12 @@ class NodeProperties extends Component {
     const firstSeq =
       getDTDVersion(m1Json) == "2.01"
         ? `${_.get(submission, "name")}\\${this.getFirstSeq().name ||
-        ""} (${this.getFirstSeq().submission_type || ""}) ${getV2_2Date(
-          m1Json
-        )}`
+            ""} (${this.getFirstSeq().submission_type || ""}) ${getV2_2Date(
+            m1Json
+          )}`
         : `${_.get(submission, "name")}\\${this.getFirstSeq().name ||
-        ""} (${this.getFirstSeq().submission_type ||
-        ""}-${this.getFirstSeq().submission_sub_type || ""})`;
+            ""} (${this.getFirstSeq().submission_type ||
+            ""}-${this.getFirstSeq().submission_sub_type || ""})`;
 
     const lastSeq =
       // getDTDVersion(m1Json) == "2.01"
@@ -645,14 +612,17 @@ class NodeProperties extends Component {
       //       m1Json
       //     )}`
       //   :
-      this.getLastSeq()
-        .submission_sub_type ? `${_.get(submission, "name")}\\${this.getLastSeq().name ||
-        ""} (${this.getLastSeq().submission_type || ""}-${this.getLastSeq()
-          .submission_sub_type || ""})` : getV2_2Date(m1Json) ? `${_.get(submission, "name")}\\${this.getFirstSeq().name ||
+      this.getLastSeq().submission_sub_type
+        ? `${_.get(submission, "name")}\\${this.getLastSeq().name ||
+            ""} (${this.getLastSeq().submission_type || ""}-${this.getLastSeq()
+            .submission_sub_type || ""})`
+        : getV2_2Date(m1Json)
+        ? `${_.get(submission, "name")}\\${this.getFirstSeq().name ||
             ""} (${this.getFirstSeq().submission_type || ""}) ${getV2_2Date(
-              m1Json
-            )}` : `${_.get(submission, "name")}\\${this.getFirstSeq().name ||
-              ""} (${this.getFirstSeq().submission_type || ""})`;
+            m1Json
+          )}`
+        : `${_.get(submission, "name")}\\${this.getFirstSeq().name ||
+            ""} (${this.getFirstSeq().submission_type || ""})`;
     return (
       <React.Fragment>
         <RowItems>
@@ -793,12 +763,12 @@ class NodeProperties extends Component {
     return properties.name === "m1-regional";
   };
 
-  getContacts = applicantInfo => {
+  getContacts = (applicantInfo) => {
     const contacts = _.get(
       applicantInfo,
       "[applicant-contacts][applicant-contact]"
     );
-    return _.map(contacts, contact => {
+    return _.map(contacts, (contact) => {
       let text = _.get(contact, "[applicant-contact-name][$t]", "");
       let contactType = _.get(
         contact,
@@ -807,7 +777,7 @@ class NodeProperties extends Component {
       );
       contactType = _.find(
         _.get(TypesJson, "[applicant-contact-type]", ""),
-        type => type.code === contactType
+        (type) => type.code === contactType
       );
 
       // let phones = contact.telephones.telephone;
@@ -827,7 +797,7 @@ class NodeProperties extends Component {
       );
       phoneType = _.find(
         _.get(TypesJson, "[telephone-number-type]", ""),
-        type => type.code === phoneType
+        (type) => type.code === phoneType
       );
       text = `${text}(${_.get(phoneType, "display", "")}), `;
       text = `${text}${_.get(contact, "[emails][email]", "")}`;
@@ -844,7 +814,7 @@ class NodeProperties extends Component {
       view,
       projectJson,
       formFile,
-      selectedSubmission
+      selectedSubmission,
     } = this.props;
     const m1Properties = m1Json["m1-regional-properties"];
     const applicantInfo = _.get(m1Json, "[admin][applicant-info]");
@@ -858,7 +828,7 @@ class NodeProperties extends Component {
       _.get(
         _.find(
           _.get(TypesJson, "[application-type]", ""),
-          type => type.code === applicationNumber["application-type"]
+          (type) => type.code === applicationNumber["application-type"]
         ),
         "display",
         ""
@@ -867,7 +837,7 @@ class NodeProperties extends Component {
     const submissionType = _.get(
       _.find(
         _.get(TypesJson, "[submission-type]", ""),
-        type =>
+        (type) =>
           type.code ===
           _.get(submissionInfo, "[submission-id][submission-type]", "")
       ),
@@ -919,7 +889,7 @@ class NodeProperties extends Component {
           </div>
         </RowItems>
         <div className="global__hr-line" style={{ background: "#bfc4c7" }} />
-        {_.map(this.getContacts(applicantInfo), contact => {
+        {_.map(this.getContacts(applicantInfo), (contact) => {
           return (
             <RowItems key={contact}>
               <div className="label">Applicant Contact:</div>
@@ -934,7 +904,9 @@ class NodeProperties extends Component {
         </RowItems>
         <RowItems>
           <div className="label">Submission Center:</div>
-          <div className="value">{_.get(selectedSubmission, "submission_center", "")}</div>
+          <div className="value">
+            {_.get(selectedSubmission, "submission_center", "")}
+          </div>
         </RowItems>
         <RowItems>
           <div className="label">Application Type:</div>
@@ -979,7 +951,7 @@ class NodeProperties extends Component {
           </div>
         </RowItems>
         {formFile.length > 0 &&
-          _.map(formFile, file => {
+          _.map(formFile, (file) => {
             return (
               <RowItems key={file}>
                 <div className="label">Form: </div>
@@ -1108,102 +1080,84 @@ class NodeProperties extends Component {
         </RowItems>
         <RowItems>
           <div className="label">Submission Center:</div>
-          <div className="value">{_.get(selectedSubmission, "submission_center", "")}</div>
+          <div className="value">
+            {_.get(selectedSubmission, "submission_center", "")}
+          </div>
         </RowItems>
         <RowItems>
           <div className="label">Product Name:</div>
           <div className="value">
-            {
-              Array.isArray(productNames) && (
-                _.some(productNames, ["type", "established"])
-                  ? _.get(
+            {Array.isArray(productNames) &&
+              (_.some(productNames, ["type", "established"])
+                ? _.get(
                     productDescription,
                     `[prod-name][${productNames.findIndex(
-                      product => product.type === "established"
+                      (product) => product.type === "established"
                     )}][$t]`,
                     ""
                   )
-
-                  : ""
-              )
-            }
-            {
-              !Array.isArray(productNames) && (
-                _.get(productNames, "type") == "established" ? _.get(productNames, "[$t]") : ""
-              )
-            }
+                : "")}
+            {!Array.isArray(productNames) &&
+              (_.get(productNames, "type") == "established"
+                ? _.get(productNames, "[$t]")
+                : "")}
           </div>
         </RowItems>
         <RowItems>
           <div className="label">Proprietary Name:</div>
           <div className="value">
-            {
-              Array.isArray(productNames) && (
-                _.some(productNames, ["type", "proprietary"])
-                  ? _.get(
+            {Array.isArray(productNames) &&
+              (_.some(productNames, ["type", "proprietary"])
+                ? _.get(
                     productDescription,
                     `[prod-name][${productNames.findIndex(
-                      product => product.type === "proprietary"
+                      (product) => product.type === "proprietary"
                     )}][$t]`,
                     ""
                   )
-
-                  : ""
-              )
-            }
-            {
-              !Array.isArray(productNames) && (
-                _.get(productNames, "type") == "proprietary" ? _.get(productNames, "[$t]") : ""
-              )
-            }
+                : "")}
+            {!Array.isArray(productNames) &&
+              (_.get(productNames, "type") == "proprietary"
+                ? _.get(productNames, "[$t]")
+                : "")}
           </div>
         </RowItems>
         <RowItems>
           <div className="label">Chemical Name:</div>
           <div className="value">
-            {
-              Array.isArray(productNames) && (
-                _.some(productNames, ["type", "chemical"])
-                  ? _.get(
+            {Array.isArray(productNames) &&
+              (_.some(productNames, ["type", "chemical"])
+                ? _.get(
                     productDescription,
                     `[prod-name][${productNames.findIndex(
-                      product => product.type === "chemical"
+                      (product) => product.type === "chemical"
                     )}][$t]`,
                     ""
                   )
-
-                  : ""
-              )
-            }
-            {
-              !Array.isArray(productNames) && (
-                _.get(productNames, "type") == "chemical" ? _.get(productNames, "[$t]") : ""
-              )
-            }
+                : "")}
+            {!Array.isArray(productNames) &&
+              (_.get(productNames, "type") == "chemical"
+                ? _.get(productNames, "[$t]")
+                : "")}
           </div>
         </RowItems>
         <RowItems>
           <div className="label">Code Name:</div>
           <div className="value">
-            {
-              Array.isArray(productNames) && (
-                _.some(productNames, ["type", "code"])
-                  ? _.get(
+            {Array.isArray(productNames) &&
+              (_.some(productNames, ["type", "code"])
+                ? _.get(
                     productDescription,
                     `[prod-name][${productNames.findIndex(
-                      product => product.type === "code"
+                      (product) => product.type === "code"
                     )}][$t]`,
                     ""
                   )
-
-                  : ""
-              )
-            }
-            {
-              !Array.isArray(productNames) && (
-                _.get(productNames, "type") == "code" ? _.get(productNames, "[$t]") : ""
-              )
-            }
+                : "")}
+            {!Array.isArray(productNames) &&
+              (_.get(productNames, "type") == "code"
+                ? _.get(productNames, "[$t]")
+                : "")}
           </div>
         </RowItems>
         <RowItems>
@@ -1286,14 +1240,14 @@ class NodeProperties extends Component {
     );
   };
 
-  getLifeCycleId = lifeCycle => {
+  getLifeCycleId = (lifeCycle) => {
     const { submission } = this.props;
     return `${_.get(submission, "name", "")}\\${lifeCycle.sequence} : ${
       lifeCycle.ID
-      }`;
+    }`;
   };
 
-  getModifiedFile = lifeCycle => {
+  getModifiedFile = (lifeCycle) => {
     const { submission } = this.props;
     const modified = lifeCycle["modified-file"] || "";
     const splits = _.split(modified, "/");
@@ -1353,7 +1307,7 @@ class NodeProperties extends Component {
                           visibility:
                             properties.sequence === lifeCycle.sequence
                               ? "visible"
-                              : "hidden"
+                              : "hidden",
                         }}
                       />
                       <a
@@ -1434,7 +1388,7 @@ const RowItems = styled(Row)`
 function mapStateToProps(state) {
   const id = `${_.get(state.Customer.selectedCustomer, "id", "")}_${
     state.Application.selectedSubmission.id
-    }`;
+  }`;
   return {
     role: state.Login.role,
     selectedCustomer: state.Customer.selectedCustomer,
@@ -1445,7 +1399,7 @@ function mapStateToProps(state) {
       state,
       `Submission.lifeCycleJson[${id}].fileLifeCycles`,
       []
-    )
+    ),
   };
 }
 

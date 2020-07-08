@@ -57,7 +57,7 @@
         @include text-bold-inactive;
       }
       &__tabs {
-        @extend tabs;
+        @include tabs;
       }
     }
 
@@ -70,7 +70,7 @@
         @include text-bold-inactive;
       }
       &__tabs {
-        @extend tabs;
+        @include tabs;
       }
     }
 
@@ -149,27 +149,6 @@
       width: 30%;
       @include text-bold-active(14px);
     }
-  }
-}
-tabs {
-  margin-left: 10px;
-
-  .ant-tabs {
-    overflow: visible;
-  }
-
-  .ant-tabs-bar {
-    margin-bottom: -5px;
-    border-bottom: 0px;
-  }
-  .ant-tabs-tab {
-    height: auto !important;
-    @include text-bold-inactive;
-    font-weight: normal;
-  }
-
-  .ant-tabs-tab-active {
-    @include text-bold-active;
   }
 }
 
