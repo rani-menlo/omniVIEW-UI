@@ -40,7 +40,6 @@ class FindNode extends Component {
 
   onCheckboxChange = type => e => {
     this.props.dispatch(SubmissionActions.findMatchBy(type));
-    // this.setState({ [type]: e.target.checked });
   };
 
   search = () => {

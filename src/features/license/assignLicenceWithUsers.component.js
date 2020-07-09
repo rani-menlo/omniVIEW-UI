@@ -120,15 +120,6 @@ class AssignLicenceWithUsers extends Component {
           opacity={0.5}
           text={translate("text.licence.chooseuser")}
         />
-        {/* <div style={{ marginBottom: "15px", textAlign: "right" }}>
-          <IconText
-            text={translate("label.licence.expirationdate")}
-            image="/images/sort-result.svg"
-            imageStyle={{ width: "12px", height: "12px" }}
-            onClick={this.orderByExpireDate}
-          />
-        </div> */}
-
         {(_.get(users, "length") || "") && (
           <div className="licence-modal__content" style={{ marginTop: "15px" }}>
             {_.map(users, user => {

@@ -108,12 +108,6 @@ class ApplicationDetails extends Component {
         type: translate("label.newapplication.applicationnumber"),
       });
     }
-    /* if (!state.sequences.value) {
-      error = true;
-      state.sequences.error = translate("error.form.required", {
-        type: translate("label.newapplication.noofsequences")
-      });
-    } */
     if (error) {
       this.setState(state);
       return;

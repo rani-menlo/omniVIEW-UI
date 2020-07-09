@@ -188,6 +188,9 @@ class ApplicationDashboard extends Component {
       _.get(props, "submissions.length") &&
       !_.get(state, "submissions.length")
     ) {
+      /**
+       * Keeping this commented code for future reference
+       */
       /* let submissions = props.submissions;
       _.map(submissions, submission => {
         if (submission.is_uploading) {
@@ -228,6 +231,9 @@ class ApplicationDashboard extends Component {
       return;
     }
     _.map(this.state.submissions, (submission) => {
+      /**
+       * Polling if the submission is still uploading
+       */
       if (submission.is_uploading && !this.intervals.get(submission.id)) {
         this.startPolling(submission);
         const interval = setInterval(() => {
@@ -241,7 +247,9 @@ class ApplicationDashboard extends Component {
   componentWillUnmount() {
     this.clearAllIntervals();
   }
-
+  /**
+   * clearing the intervals for the submissions uploaded
+   */
   clearAllIntervals = () => {
     if (this.intervals) {
       for (const [key, val] of this.intervals.entries()) {
@@ -251,7 +259,10 @@ class ApplicationDashboard extends Component {
       this.intervals.clear();
     }
   };
-
+  /**
+   * Polling to get the status for the submission which is uploading
+   * @param {*} submission
+   */
   startPolling = async (submission) => {
     const res = await ApplicationApi.monitorStatus({
       submission_id: submission.id,
@@ -268,16 +279,6 @@ class ApplicationDashboard extends Component {
           _.get(data, "is_deleting")
         );
       }
-      // else {
-      //   if (_.isArray(results)) {
-      //     return
-      //   }
-      //   const interval = this.intervals.get(submission.id);
-      //   if (interval) {
-      //     clearInterval(interval);
-      //     this.intervals.delete(interval);
-      //   }
-      // }
     }
   };
 
@@ -289,7 +290,14 @@ class ApplicationDashboard extends Component {
       this.intervals.delete(interval);
     }
   };
-
+  /**
+   * Checking the upload status for the sequence/submission
+   * @param {*} data
+   * @param {*} submission
+   * @param {*} is_uploadingFlag
+   * @param {*} is_submission
+   * @param {*} is_deleting
+   */
   checkSequenceStatus = (
     data,
     submission,
@@ -341,6 +349,7 @@ class ApplicationDashboard extends Component {
       submission.analyzing = false;
       this.clearSubmissionInterval(submission.id);
     }
+    //If the polling stops
     if (
       !submission.is_uploading ||
       (!inProgress.length && (failed.length || failed.length == totalNoOfSeq))
@@ -349,14 +358,19 @@ class ApplicationDashboard extends Component {
       submission.is_uploading = false;
       this.clearSubmissionInterval(submission.id);
     }
-
+    //Updating the upload status for the submission/sequence
     this.updateSubmissions(submission);
   };
-
+  /**
+   * On click of menu on the individual submission
+   * @param {*} submission
+   */
   onMenuClick = (submission) => ({ key }) => {
     this.onMenuItemClick(key, submission);
   };
-
+  /**
+   * Getting menu items
+   */
   getMenu = (submission) => () => {
     const style = {
       marginRight: "8px",
@@ -485,12 +499,19 @@ class ApplicationDashboard extends Component {
       </Menu>
     );
   };
-
+  /**
+   * Fetching applications for the selected customer
+   * @param {*} sortBy
+   * @param {*} orderBy
+   */
   fetchApplications = (sortBy = "name", orderBy = "ASC") => {
     this.props.actions.resetApplications();
     this.setState({ submissions: [], openFailuresModal: false });
     const { viewBy, pageNo, itemsPerPage, searchText } = this.state;
     const { selectedCustomer } = this.props;
+    /**
+     * If applications needs to be displayed in list view
+     */
     if (viewBy === "lists") {
       selectedCustomer &&
         this.props.actions.fetchApplicationsByList(
@@ -509,7 +530,11 @@ class ApplicationDashboard extends Component {
         );
     }
   };
-
+  /**
+   * Changing the view from list to Card or from card to list view
+   * to display applications
+   * @param {*} type
+   */
   changeView = (type) => {
     const TableColumns = [...this.state.TableColumns];
     TableColumns[0].checked = false;
@@ -526,13 +551,14 @@ class ApplicationDashboard extends Component {
       }
     );
   };
-
+  /**
+   * On selecting the submission
+   * @param {*} submission
+   */
   onSubmissionSelected = (submission) => () => {
     if (
       _.get(submission, "is_uploading") ||
       _.get(submission, "analyzing") ||
-      // _.get(submission, "sequence_failed", []).length ==
-      //   _.get(submission, "sequence_count") ||
       _.get(submission, "is_submission") == 1
     ) {
       return;
@@ -544,23 +570,38 @@ class ApplicationDashboard extends Component {
       })
     );
   };
-
+  /**
+   * Redirecting to the customers screen
+   */
   openCustomersScreen = () => {
     this.props.history.push("/");
   };
-
+  /**
+   * On page change in the list view (Pagination)
+   * @param {*} pageNo
+   */
   onPageChange = (pageNo) => {
     this.setState({ pageNo }, () => this.fetchApplications());
   };
-
+  /**
+   * On changing the page size (i.e. no of records to display per page)
+   * @param {*} itemsPerPage
+   */
   onPageSizeChange = (itemsPerPage) => {
     this.setState({ itemsPerPage }, () => this.fetchApplications());
   };
-
+  /**
+   * Columns sort in the applcations list view
+   * @param {*} sortBy
+   * @param {*} orderBy
+   */
   sortColumn = (sortBy, orderBy) => {
     this.fetchApplications(sortBy, orderBy);
   };
-
+  /**
+   * Search
+   * @param {*} e
+   */
   handleSearch = (e) => {
     const searchText = e.target.value;
     this.setState({ searchText });
@@ -568,20 +609,30 @@ class ApplicationDashboard extends Component {
       this.searchApplications();
     }
   };
-
+  /**
+   * Applications search with application name
+   */
   searchApplications = () => {
     this.fetchApplications();
   };
-
+  /**
+   * Clearing the search value from the textbox
+   */
   clearSearch = () => {
     this.setState({ searchText: "" });
     this.searchApplications();
   };
-
+  /**
+   * Redirecting to the usermanagement screen on click of user management button beside application name
+   */
   openUserManagement = () => {
     this.props.history.push("/usermanagement");
   };
-
+  /**
+   * On selecting the each menu item
+   * @param {*} key
+   * @param {*} submission
+   */
   onMenuItemClick = (key, submission) => {
     if (key === "window") {
       this.props.actions.setSelectedSubmission(submission);
@@ -613,7 +664,10 @@ class ApplicationDashboard extends Component {
       this.openSequencesModal(submission);
     }
   };
-
+  /**
+   * Deleteing application
+   * @param {*} submission
+   */
   removeSubmission = (submission) => {
     Modal.confirm({
       className: "omnimodal",
@@ -642,7 +696,10 @@ class ApplicationDashboard extends Component {
       onCancel: () => {},
     });
   };
-
+  /**
+   * Selecting the applications in bulk in list view
+   * @param {*} e
+   */
   checkAll = (e) => {
     const checked = _.get(e, "target.checked", false);
     if (!this.state.submissions.length) {
@@ -670,7 +727,10 @@ class ApplicationDashboard extends Component {
       checkedSubmissions,
     });
   };
-
+  /**
+   * selecting/unselecting the applications in list view
+   * @param {*} submission
+   */
   onCheckboxChange = (submission) => (e) => {
     const checked = e.target.checked;
     const submissions = this.state.submissions.slice(
@@ -701,7 +761,9 @@ class ApplicationDashboard extends Component {
       checkedSubmissions,
     });
   };
-
+  /**
+   * Opening the assign permissions modal
+   */
   openPermissionsModal = () => {
     this.props.dispatch(usermanagementActions.resetUsersOfFileOrSubmission());
     this.setState({ showPermissionsModal: true });
@@ -739,7 +801,9 @@ class ApplicationDashboard extends Component {
       allUploadedSequences: [],
     });
   };
-
+  /**
+   * Assign global permissions to the applications
+   */
   assignGlobalPermissions = () => {
     this.props.dispatch(usermanagementActions.resetUsers());
     this.setState({
@@ -748,7 +812,9 @@ class ApplicationDashboard extends Component {
       checkedSubmissions: this.state.submissions,
     });
   };
-
+  /**
+   * Closing the assign global persmissions modal
+   */
   closePermissionsModal = () => {
     this.state.viewBy === "lists" && this.checkAll();
     this.setState({
@@ -756,28 +822,37 @@ class ApplicationDashboard extends Component {
       assignGlobalPermissions: false,
     });
   };
-
+  /**
+   * Opening the Active licenses modal
+   */
   subscriptionsInUse = () => {
     this.setState({
       showSubscriptionsInUse: true,
       showLicenceUnAssigned: false,
     });
   };
-
+  /**
+   * Assigning the licenses
+   */
   subscriptionsUnAssigned = () => {
     this.setState({
       showLicenceUnAssigned: true,
       showSubscriptionsInUse: false,
     });
   };
-
+  /**
+   * Closing the active licenses modal
+   */
   closeSubscriptionsModal = () => {
     this.setState({
       showSubscriptionsInUse: false,
       showLicenceUnAssigned: false,
     });
   };
-
+  /**
+   * Open users modal
+   * @param {*} license
+   */
   openUsersModal = (license) => {
     this.setState({
       showLicenceUnAssigned: false,
@@ -834,13 +909,6 @@ class ApplicationDashboard extends Component {
           licenses,
         },
         async () => {
-          /* Toast.success(
-            `License has been assigned to ${_.get(
-              selectedUsers,
-              "first_name",
-              ""
-            )} ${_.get(selectedUsers, "last_name", "")}`
-          ); */
           Toast.success("License has been assigned.");
           this.props.dispatch(ApiActions.requestOnDemand());
           const res = await CustomerApi.getCustomerById(
@@ -919,7 +987,10 @@ class ApplicationDashboard extends Component {
       )
     );
   };
-
+  /**
+   * Opening the failed report if there are any sequences failed for the sequence
+   * @param {*} submission
+   */
   openFailures = (submission) => async (e) => {
     e.stopPropagation();
     this.props.dispatch(ApiActions.requestOnDemand());
@@ -947,7 +1018,9 @@ class ApplicationDashboard extends Component {
     });
     this.props.dispatch(ApiActions.successOnDemand());
   };
-
+  /**
+   * Closing the failed report
+   */
   closeFailuresModal = () => {
     this.state.selectedSubmissionMenu.ref.current.scrollIntoView({
       behavior: "smooth",
@@ -1026,25 +1099,11 @@ class ApplicationDashboard extends Component {
   getDeleteSequencesData = (type) => {
     //if user selects sequences from the successfully uploaded sequences modal
     if (type == "sucessfully_uploaded_sequences") {
-      // let selectedSequences = [...this.state.selectedSequences];
-      // const allUploadedSequences = [...this.state.allUploadedSequences];
-      // if (selectedSequences.length == allUploadedSequences.length) {
-      //   this.showDeleteSeqConfirmModal("sucessfully_uploaded_sequences");
-      // } else {
-      //   this.deleteSequences("sucessfully_uploaded_sequences");
-      // }
       this.showDeleteSeqConfirmModal("sucessfully_uploaded_sequences");
       return;
     }
     //if user select sequences from the failure report modal
     this.showDeleteSeqConfirmModal("failed_sequences");
-    // let selectedFailedUploads = [...this.state.selectedFailedUploads];
-    // const reportData = [...this.state.reportData];
-    // if (selectedFailedUploads.length == reportData.length) {
-    //   this.showDeleteSeqConfirmModal("failed_sequences");
-    // } else {
-    //   this.deleteSequences("failed_sequences");
-    // }
   };
 
   //showing delete error once submission or sequence get deleted successfully
@@ -1118,11 +1177,6 @@ class ApplicationDashboard extends Component {
       });
     }
   };
-
-  // onSelectChange = selectedRowKeys => {
-  //   console.log('selectedRowKeys changed: ', selectedRowKeys);
-  //   this.setState({ selectedRowKeys, disableDelete: false });
-  // };
 
   render() {
     const {

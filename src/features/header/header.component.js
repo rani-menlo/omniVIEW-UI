@@ -18,14 +18,22 @@ class Header extends Component {
   goToMain = (history, disabled) => () => {
     const { customerAccounts, role } = this.props;
     if (!disabled) {
+      /**
+       * Redirecting to customers screen if the loggin user is Omnicia user
+       */
       if (isLoggedInOmniciaRole(role)) {
         history.push("/customers");
         return;
       }
+      /**
+       * Redirecting to applications screen if the loggin user is other than Omnicia user
+       */
       history.push("/applications");
     }
   };
-
+  /**
+   * Logout
+   */
   signOut = () => {
     this.props.dispatch(LoginActions.logOut());
     this.props.history.push("/");

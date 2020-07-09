@@ -104,10 +104,6 @@ class PdfViewer extends Component {
     if (type === "doc" || type === "docx" || type === "ppt") {
       url = `https://view.officeapps.live.com/op/embed.aspx?src=${mainFileUrl}`;
     }
-    // commenting below code as it's handeled in the above
-    /* else if (type === "xml") {
-      url = `https://docs.google.com/viewer?url=${mainFileUrl}&embedded=true`;
-    }  */
     else {
       url = mainFileUrl;
     }
