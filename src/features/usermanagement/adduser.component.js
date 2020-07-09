@@ -354,9 +354,6 @@ class AddUser extends Component {
               className="maindashboard-breadcrum"
               style={{ opacity: 0.4, cursor: "not-allowed" }}
             >
-              {/* {`${translate("label.usermgmt.add")} ${translate(
-                "label.dashboard.user"
-              )}`} */}
               {editUser
                 ? translate("label.usermgmt.edit")
                 : translate("label.usermgmt.add")}{" "}
@@ -439,23 +436,6 @@ class AddUser extends Component {
           )}
           {editUser && (
             <React.Fragment>
-              {/* <p className="addUser-heading">Profile Picture</p>
-              <p className="addUser-subtitle" style={{ fontSize: "14px" }}>
-                (Profile picture file size requirements go here)
-              </p>
-              <div className="addUser__profile">
-                <Avatar size={80} icon="user" />
-                <div className="addUser__profile__links">
-                  <p className="addUser__profile__links-link">Replace Photo</p>
-                  <p
-                    className="addUser__profile__links-link"
-                    style={{ marginTop: "15px" }}
-                  >
-                    Delete Photo
-                  </p>
-                </div>
-              </div> */}
-              {/* <p className="addUser-heading">Subscription Details</p> */}
               <p className="addUser-heading">
                 {translate("label.user.accstatus")}
               </p>

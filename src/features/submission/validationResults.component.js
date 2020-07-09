@@ -56,22 +56,6 @@ class ValidationResults extends Component {
   sortColumn = (key) => () => {
     const { validationResults } = this.state;
     const sortBy = this.state.sort === "asc" ? "desc" : "asc";
-    /* if (key === "severity") {
-      validationResults.sort((result1, result2) => {
-        if (result1.severity === "High") {
-          return sortBy === "asc" ? 1 : -1;
-        } else if (result1.severity === "Low") {
-          return sortBy === "asc" ? -1 : 1;
-        } else {
-          return 0;
-        }
-      });
-      this.setState({
-        sort: sortBy,
-        validationResults
-      });
-      return;
-    } */
     const data = _.orderBy(validationResults, key, sortBy);
     this.setState({
       sort: sortBy,

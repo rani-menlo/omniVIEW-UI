@@ -16,7 +16,7 @@ import {
   TableHeader,
   Pagination,
   Toast,
-  ImageLoader
+  ImageLoader,
 } from "../../uikit/components";
 import Header from "../header/header.component";
 import {
@@ -28,14 +28,14 @@ import {
   Dropdown,
   Menu,
   Table,
-  Modal
+  Modal,
 } from "antd";
 import { UsermanagementActions, CustomerActions } from "../../redux/actions";
 import {
   isPhone,
   isEmail,
   getFormattedDate,
-  isLoggedInOmniciaAdmin
+  isLoggedInOmniciaAdmin,
 } from "../../utils";
 import { translate } from "../../translations/translator";
 import AddNewLicence from "../license/addNewLicence.component";
@@ -63,40 +63,40 @@ class AddCustomer extends Component {
       disablePrimaryContactFields: true,
       cname: {
         value: "",
-        error: ""
+        error: "",
       },
       fname: {
         value: "",
-        error: ""
+        error: "",
       },
       lname: {
         value: "",
-        error: ""
+        error: "",
       },
       email: {
         value: "",
-        error: ""
+        error: "",
       },
       phone: {
         value: "",
-        error: ""
+        error: "",
       },
       storageTB: 0,
       storageGB: 0,
       storageError: "",
       storageApplications: {
         value: 0,
-        error: ""
+        error: "",
       },
       subscription: {
         omniView: true,
-        omniFile: false
+        omniFile: false,
       },
       licences: {
         omniView: {},
         omniFile: {},
         omniViewError: "",
-        omniFileError: ""
+        omniFileError: "",
       },
       disableCustomerDetailsTab: false,
       allLicences: null,
@@ -104,7 +104,7 @@ class AddCustomer extends Component {
       showUsersModal: false,
       showAssignLicenceToUser: false,
       assigningLicence: null,
-      selectedUser: null
+      selectedUser: null,
     };
     this.Columns = [
       {
@@ -131,7 +131,7 @@ class AddCustomer extends Component {
             />
           </div>
         ),
-        width: 200
+        width: 200,
       },
       {
         title: translate("label.user.status"),
@@ -152,7 +152,7 @@ class AddCustomer extends Component {
             }
           />
         ),
-        width: 100
+        width: 100,
       },
       {
         title: translate("label.generic.actions"),
@@ -167,8 +167,8 @@ class AddCustomer extends Component {
             onClick={this.removeSecContact(user)}
           />
         ),
-        width: 100
-      }
+        width: 100,
+      },
     ];
   }
 
@@ -180,7 +180,7 @@ class AddCustomer extends Component {
           props.allLicences,
           state.pageNo,
           state.itemsPerPage
-        )
+        ),
       };
     }
     if (
@@ -195,7 +195,7 @@ class AddCustomer extends Component {
           props,
           state,
           props.selectedCustomer.primary_user_id
-        )
+        ),
       };
     }
     return _.size(newState) ? newState : null;
@@ -210,7 +210,7 @@ class AddCustomer extends Component {
   }
 
   static getPrimaryContactDetailsState(props, state, userId) {
-    const admin = _.find(props.cAdmins, admin => admin.user_id == userId);
+    const admin = _.find(props.cAdmins, (admin) => admin.user_id == userId);
     const { fname, lname, email, phone } = state;
     return {
       disablePrimaryContactFields: true,
@@ -218,7 +218,7 @@ class AddCustomer extends Component {
       fname: { ...fname, value: _.get(admin, "first_name", "") },
       lname: { ...lname, value: _.get(admin, "last_name", "") },
       email: { ...email, value: _.get(admin, "email", "") },
-      phone: { ...phone, value: _.get(admin, "phone", "") }
+      phone: { ...phone, value: _.get(admin, "phone", "") },
     };
   }
 
@@ -250,7 +250,7 @@ class AddCustomer extends Component {
       UsermanagementActions.fetchAdmins(
         {
           customerId: customer.id,
-          roles: [ROLE_IDS.CUSTOMER.administrator]
+          roles: [ROLE_IDS.CUSTOMER.administrator],
         },
         cb
       )
@@ -262,7 +262,7 @@ class AddCustomer extends Component {
       UsermanagementActions.fetchAdmins(
         {
           customerId: customer.id,
-          roles: [ROLE_IDS.OMNICIA.administrator]
+          roles: [ROLE_IDS.OMNICIA.administrator],
         },
         cb
       )
@@ -274,7 +274,7 @@ class AddCustomer extends Component {
       UsermanagementActions.fetchUsers({
         customerId: customer.id,
         includeLoggedInUser: true,
-        roles: _.values(ROLE_IDS.CUSTOMER)
+        roles: _.values(ROLE_IDS.CUSTOMER),
       })
     );
   };
@@ -284,7 +284,7 @@ class AddCustomer extends Component {
       UsermanagementActions.fetchUsers({
         customerId: customer.id,
         includeLoggedInUser: true,
-        roles: _.values(ROLE_IDS.OMNICIA)
+        roles: _.values(ROLE_IDS.OMNICIA),
       })
     );
   };
@@ -300,50 +300,30 @@ class AddCustomer extends Component {
     state.storageGB = selectedCustomer.gbSpace || 0;
     state.storageApplications.value = selectedCustomer.max_apps;
     state.statusActive = selectedCustomer.is_active;
-    /* state.subscription.omniView = _.includes(
-      selectedCustomer.application_access,
-      "omniView",
-      false
-    );
-    state.subscription.omniFile = _.includes(
-      selectedCustomer.application_access,
-      "omniFile",
-      false
-    );
-    state.licences.omniView = _.get(
-      selectedCustomer,
-      'subscriptions["omni-view"]',
-      {}
-    );
-    state.licences.omniFile = _.get(
-      selectedCustomer,
-      'subscriptions["omni-file"]',
-      {}
-    ); */
     return state;
   };
 
-  onInputChange = field => e => {
+  onInputChange = (field) => (e) => {
     const { value } = e.target;
     this.setState({
-      [field]: { ...this.state[field], value, error: "" }
+      [field]: { ...this.state[field], value, error: "" },
     });
   };
 
-  onStorageChange = field => e => {
+  onStorageChange = (field) => (e) => {
     const { value } = e.target;
     console.log(value, field);
     this.setState({
       [field]: value,
-      storageError: ""
+      storageError: "",
     });
   };
 
-  onPhoneChange = value => {
+  onPhoneChange = (value) => {
     this.setState({ phone: { ...this.state.phone, value, error: "" } });
   };
 
-  onSubscriptionChecked = e => {
+  onSubscriptionChecked = (e) => {
     const { value, checked } = e.target;
 
     let otherCheckbox = false;
@@ -358,7 +338,7 @@ class AddCustomer extends Component {
     }
 
     this.setState({
-      subscription: { ...this.state.subscription, [value]: checked }
+      subscription: { ...this.state.subscription, [value]: checked },
     });
   };
 
@@ -372,21 +352,21 @@ class AddCustomer extends Component {
     if (!state.cname.value) {
       error = true;
       state.cname.error = translate("error.form.required", {
-        type: translate("label.form.companyname")
+        type: translate("label.form.companyname"),
       });
       window.scrollTo(0, 0);
     }
     if (!state.fname.value) {
       error = true;
       state.fname.error = translate("error.form.required", {
-        type: translate("label.form.fname")
+        type: translate("label.form.fname"),
       });
       window.scrollTo(0, 0);
     }
     if (!state.lname.value) {
       error = true;
       state.lname.error = translate("error.form.required", {
-        type: translate("label.form.lname")
+        type: translate("label.form.lname"),
       });
       window.scrollTo(0, 0);
     }
@@ -395,14 +375,14 @@ class AddCustomer extends Component {
       if (!valid) {
         error = true;
         state.email.error = translate("error.form.invalid", {
-          type: translate("label.form.email")
+          type: translate("label.form.email"),
         });
         window.scrollTo(0, 0);
       }
     } else {
       error = true;
       state.email.error = translate("error.form.required", {
-        type: translate("label.form.email")
+        type: translate("label.form.email"),
       });
       window.scrollTo(0, 0);
     }
@@ -411,21 +391,21 @@ class AddCustomer extends Component {
       if (!valid) {
         error = true;
         state.phone.error = translate("error.form.invalid", {
-          type: translate("label.form.phone")
+          type: translate("label.form.phone"),
         });
         window.scrollTo(0, 0);
       }
     } else {
       error = true;
       state.phone.error = translate("error.form.required", {
-        type: translate("label.form.phone")
+        type: translate("label.form.phone"),
       });
     }
     const storage = Number(state.storageTB) + Number(state.storageGB);
     if (storage === 0) {
       error = true;
       state.storageError = translate("error.form.required", {
-        type: translate("label.form.storage")
+        type: translate("label.form.storage"),
       });
     }
 
@@ -433,7 +413,7 @@ class AddCustomer extends Component {
       if (!state.storageApplications.value) {
         error = true;
         state.storageApplications.error = translate("error.form.required", {
-          type: translate("label.form.noofapplications")
+          type: translate("label.form.noofapplications"),
         });
       }
       /* if (state.subscription.omniView) {
@@ -464,11 +444,11 @@ class AddCustomer extends Component {
       email: state.email.value,
       phone: state.phone.value,
       ...(this.props.selectedCustomer && {
-        is_omnicia: this.props.selectedCustomeris_omnicia
+        is_omnicia: this.props.selectedCustomeris_omnicia,
       }),
       tbSpace: state.storageTB || 0,
       gbSpace: state.storageGB || 0,
-      max_apps: state.storageApplications.value
+      max_apps: state.storageApplications.value,
     };
 
     if (!state.editCustomer) {
@@ -498,27 +478,27 @@ class AddCustomer extends Component {
     }
   };
 
-  hasAllZeros = values => {
-    return _.every(values, value => _.toNumber(value) === 0);
+  hasAllZeros = (values) => {
+    return _.every(values, (value) => _.toNumber(value) === 0);
   };
 
-  onLicenceValueChange = (type, licence) => e => {
+  onLicenceValueChange = (type, licence) => (e) => {
     this.setState({
       licences: {
         ...this.state.licences,
         [type]: {
           ...this.state.licences[type],
-          [licence.slug]: e.target.value
+          [licence.slug]: e.target.value,
         },
-        [`${type}Error`]: ""
-      }
+        [`${type}Error`]: "",
+      },
     });
   };
 
   closeModal = () => {
     this.setState({
       showDeactivateModal: false,
-      openAddNewLicenceModal: false
+      openAddNewLicenceModal: false,
     });
   };
 
@@ -534,7 +514,7 @@ class AddCustomer extends Component {
     this.setState({ showDeactivateModal: false, statusActive: false });
   };
 
-  onTabChange = tab => {
+  onTabChange = (tab) => {
     const { selectedCustomer } = this.props;
     if (selectedCustomer && tab === "subscriptionLicences") {
       this.props.dispatch(
@@ -548,18 +528,18 @@ class AddCustomer extends Component {
     this.setState({ openAddNewLicenceModal: true });
   };
 
-  addNewLicence = licences => {
+  addNewLicence = (licences) => {
     const { selectedCustomer } = this.props;
-    const newLicences = _.map(licences, licence => ({
+    const newLicences = _.map(licences, (licence) => ({
       subscription_type_id: licence.application.id,
       subscription_licence_id: licence.duration.id,
-      number_of_licences: licence.quantity
+      number_of_licences: licence.quantity,
     }));
     this.props.dispatch(
       CustomerActions.addNewLicences(
         {
           customer_id: selectedCustomer.id,
-          subscriptions: newLicences
+          subscriptions: newLicences,
         },
         () => {
           Toast.success("New License(s) Added!");
@@ -570,25 +550,25 @@ class AddCustomer extends Component {
     this.closeModal();
   };
 
-  onPageChange = pageNo => {
+  onPageChange = (pageNo) => {
     this.setState({
       pageNo,
       allLicences: AddCustomer.getItemsBasedOnPagination(
         this.props.allLicences,
         pageNo,
         this.state.itemsPerPage
-      )
+      ),
     });
   };
 
-  onPageSizeChange = itemsPerPage => {
+  onPageSizeChange = (itemsPerPage) => {
     this.setState({
       itemsPerPage,
       allLicences: AddCustomer.getItemsBasedOnPagination(
         this.props.allLicences,
         this.state.pageNo,
         itemsPerPage
-      )
+      ),
     });
   };
 
@@ -604,11 +584,11 @@ class AddCustomer extends Component {
         sortedLicences,
         this.state.pageNo,
         this.state.itemsPerPage
-      )
+      ),
     });
   };
 
-  updateCustomerDetails = customer => {
+  updateCustomerDetails = (customer) => {
     const newState = this.populateState(customer);
     const primaryContact = AddCustomer.getPrimaryContactDetailsState(
       this.props,
@@ -619,7 +599,7 @@ class AddCustomer extends Component {
       {
         ...newState,
         ...primaryContact,
-        allLicences: null
+        allLicences: null,
       },
       () => {
         if (this.state.selectedTab === "subscriptionLicences") {
@@ -631,7 +611,7 @@ class AddCustomer extends Component {
     );
   };
 
-  onCustomerSelected = customer => {
+  onCustomerSelected = (customer) => {
     this.props.dispatch(UsermanagementActions.resetAllLicences());
     this.props.dispatch(
       CustomerActions.setSelectedCustomer(customer, () => {
@@ -650,18 +630,18 @@ class AddCustomer extends Component {
     );
   };
 
-  openUsersModal = license => () => {
+  openUsersModal = (license) => () => {
     this.setState({
       showAssignLicenceToUser: false,
       showUsersModal: true,
-      assigningLicence: license
+      assigningLicence: license,
     });
   };
 
   goBackToUsersModal = () => {
     this.setState({
       showAssignLicenceToUser: false,
-      showUsersModal: true
+      showUsersModal: true,
     });
   };
 
@@ -669,22 +649,22 @@ class AddCustomer extends Component {
     this.setState({
       selectedUser: null,
       showUsersModal: false,
-      assigningLicence: null
+      assigningLicence: null,
     });
   };
 
   closeAssignLicenceToUserModal = () => {
     this.setState({
       selectedUser: null,
-      showAssignLicenceToUser: false
+      showAssignLicenceToUser: false,
     });
   };
 
-  onUserSelect = user => {
+  onUserSelect = (user) => {
     this.setState({
       showAssignLicenceToUser: true,
       showUsersModal: false,
-      selectedUser: user
+      selectedUser: user,
     });
   };
 
@@ -696,7 +676,7 @@ class AddCustomer extends Component {
           ...(_.includes(assigningLicence.type_slug, "view")
             ? { omni_view_license: assigningLicence.id }
             : { omni_file_license: assigningLicence.id }),
-          user_id: selectedUser.user_id
+          user_id: selectedUser.user_id,
         },
         () => {
           Toast.success(
@@ -718,11 +698,11 @@ class AddCustomer extends Component {
       )
     );
     this.setState({
-      showAssignLicenceToUser: false
+      showAssignLicenceToUser: false,
     });
   };
 
-  onPrimaryContactChange = event => {
+  onPrimaryContactChange = (event) => {
     const userId = event.key;
     this.setState({
       ...AddCustomer.getPrimaryContactDetailsState(
@@ -730,11 +710,11 @@ class AddCustomer extends Component {
         this.state,
         userId
       ),
-      ...(userId === "new" && { disablePrimaryContactFields: false })
+      ...(userId === "new" && { disablePrimaryContactFields: false }),
     });
   };
 
-  removeSecContact = user => () => {
+  removeSecContact = (user) => () => {
     Modal.confirm({
       className: "omnimodal",
       title: translate("label.user.seccontact"),
@@ -748,9 +728,9 @@ class AddCustomer extends Component {
               users: [
                 {
                   userId: user.user_id,
-                  is_secondary_contact: 0
-                }
-              ]
+                  is_secondary_contact: 0,
+                },
+              ],
             },
             () => {
               Toast.success("Updated Sceondary Contacts list!");
@@ -758,7 +738,7 @@ class AddCustomer extends Component {
             }
           )
         );
-      }
+      },
     });
   };
 
@@ -766,14 +746,14 @@ class AddCustomer extends Component {
     return (
       <Menu
         selectedKeys={[
-          `${_.get(this.state, "selectedPrimaryContact.user_id", "")}`
+          `${_.get(this.state, "selectedPrimaryContact.user_id", "")}`,
         ]}
       >
         <Menu.Item key="new" onClick={this.onPrimaryContactChange}>
           Add New Contact
         </Menu.Item>
         <Menu.Divider />
-        {_.map(this.props.cAdmins, item => (
+        {_.map(this.props.cAdmins, (item) => (
           <Menu.Item
             key={item.user_id}
             onClick={this.onPrimaryContactChange}
@@ -800,7 +780,7 @@ class AddCustomer extends Component {
       statusActive,
       selectedTab,
       selectedPrimaryContact,
-      disablePrimaryContactFields
+      disablePrimaryContactFields,
     } = this.state;
     const { loading, selectedCustomer, users } = this.props;
     const secContacts = _.filter(users, ["is_secondary_contact", true]);
@@ -854,16 +834,16 @@ class AddCustomer extends Component {
               <p className="addUser-subtitle">
                 {editCustomer
                   ? translate("text.user.editmsg", {
-                      type: _.toLower(translate("label.dashboard.customer"))
+                      type: _.toLower(translate("label.dashboard.customer")),
                     })
                   : translate("text.user.addmsg", {
-                      type: _.toLower(translate("label.dashboard.customer"))
+                      type: _.toLower(translate("label.dashboard.customer")),
                     })}
               </p>
               <div className="global__hr-line" />
               <p className="addUser-heading">
                 {translate("label.user.details", {
-                  type: translate("label.dashboard.company")
+                  type: translate("label.dashboard.company"),
                 })}
               </p>
               <InputField
@@ -878,7 +858,7 @@ class AddCustomer extends Component {
               />
               <p className="addUser-heading">
                 {translate("label.user.details", {
-                  type: translate("label.dashboard.companyprimarycontact")
+                  type: translate("label.dashboard.companyprimarycontact"),
                 })}
               </p>
               {editCustomer && (
@@ -907,7 +887,7 @@ class AddCustomer extends Component {
                         minWidth: "30%",
                         padding: "4px",
                         justifyContent: "space-between",
-                        borderRadius: "4px"
+                        borderRadius: "4px",
                       }}
                     >
                       <Text
@@ -988,7 +968,7 @@ class AddCustomer extends Component {
                     {translate("label.user.details", {
                       type: translate(
                         "label.dashboard.companysecondarycontacts"
-                      )
+                      ),
                     })}
                   </p>
                   <Table
@@ -999,7 +979,7 @@ class AddCustomer extends Component {
                       marginBottom: "40px",
                       width: "60%",
                       borderTop: "1px solid grey",
-                      borderBottom: "1px solid grey"
+                      borderBottom: "1px solid grey",
                     }}
                     scroll={{ y: 200 }}
                   />
@@ -1018,7 +998,7 @@ class AddCustomer extends Component {
                     className="addUser__fields-numeric"
                     style={{ marginRight: "14px" }}
                     label={`${translate("label.form.storageof", {
-                      type: translate("label.storage.tb")
+                      type: translate("label.storage.tb"),
                     })}*`}
                     value={storageTB}
                     onChange={this.onStorageChange("storageTB")}
@@ -1027,7 +1007,7 @@ class AddCustomer extends Component {
                     className="addUser__fields-numeric"
                     style={{ marginRight: "14px" }}
                     label={`${translate("label.form.storageof", {
-                      type: translate("label.storage.gb")
+                      type: translate("label.storage.gb"),
                     })}*`}
                     value={storageGB}
                     onChange={this.onStorageChange("storageGB")}
@@ -1048,113 +1028,6 @@ class AddCustomer extends Component {
                   onChange={this.onInputChange("storageApplications")}
                 />
               </div>
-              {/* {!editCustomer && (
-                <React.Fragment>
-                  <p className="addUser-heading">
-                    {translate("text.customer.subslicences")}
-                  </p>
-                  <div className="addUser__section">
-                    <p className="addUser__section-label addUser__section-label-inactive">
-                      {translate("text.customer.applicationstolicence")}
-                    </p>
-                    <div className="global__center-vert">
-                      <Checkbox
-                        value="omniView"
-                        className="addUser__section-checkbox"
-                        checked={omniView}
-                        onChange={this.onSubscriptionChecked}
-                      >
-                        {translate("label.product.omniview")}
-                      </Checkbox>
-                      <Checkbox
-                        disabled
-                        value="omniFile"
-                        className="addUser__section-checkbox"
-                        checked={omniFile}
-                        onChange={this.onSubscriptionChecked}
-                      >
-                        {translate("label.product.omnifile")}
-                      </Checkbox>
-                    </div>
-                    {omniView && (
-                      <React.Fragment>
-                        <p
-                          className="addUser__section-label addUser__section-label-inactive"
-                          style={{ marginTop: "26px" }}
-                        >
-                          {translate("text.customer.nooflicencetopurchase", {
-                            type: translate("label.product.omniview")
-                          })}
-                        </p>
-                        <div className="addUser__section__licences">
-                          {_.map(allLicences, licence => {
-                            return (
-                              <NumericInput
-                                key={licence.name}
-                                className="addUser__fields-numeric"
-                                style={{ marginRight: "40px" }}
-                                label={`${licence.name}`}
-                                value={_.get(
-                                  licences,
-                                  `omniView[${licence.slug}]`,
-                                  0
-                                )}
-                                onChange={this.onLicenceValueChange(
-                                  "omniView",
-                                  licence
-                                )}
-                              />
-                            );
-                          })}
-                        </div>
-                        {licences.omniViewError && (
-                          <p className="global__field__error-text">
-                            {licences.omniViewError}
-                          </p>
-                        )}
-                      </React.Fragment>
-                    )}
-                    {omniFile && (
-                      <React.Fragment>
-                        <p
-                          className="addUser__section-label addUser__section-label-inactive"
-                          style={{ marginTop: "26px" }}
-                        >
-                          {translate("text.customer.nooflicencetopurchase", {
-                            type: translate("label.product.omnifile")
-                          })}
-                        </p>
-                        <div className="addUser__section__licences">
-                          {_.map(allLicences, licence => {
-                            return (
-                              <NumericInput
-                                key={licence.name}
-                                className="addUser__fields-numeric"
-                                style={{ marginRight: "40px" }}
-                                label={`${licence.name}`}
-                                value={_.get(
-                                  licences,
-                                  `omniFile[${licence.slug}]`,
-                                  0
-                                )}
-                                onChange={this.onLicenceValueChange(
-                                  "omniFile",
-                                  licence
-                                )}
-                              />
-                            );
-                          })}
-                        </div>
-                        {licences.omniFileError && (
-                          <p className="global__field__error-text">
-                            {licences.omniFileError}
-                          </p>
-                        )}
-                      </React.Fragment>
-                    )}
-                  </div>
-                </React.Fragment>
-              )} */}
               {editCustomer && (
                 <React.Fragment>
                   <p className="addUser-heading">
@@ -1216,7 +1089,7 @@ class AddCustomer extends Component {
                   <OmniButton
                     type="add"
                     label={translate("label.button.add", {
-                      type: translate("label.licence.licences")
+                      type: translate("label.licence.licences"),
                     })}
                     onClick={this.openAddNewLicence}
                   />
@@ -1270,14 +1143,17 @@ function mapStateToProps(state) {
     selectedCustomer: state.Customer.selectedCustomer,
     cAdmins: state.Usermanagement.cAdmins,
     role: state.Login.role,
-    users: state.Usermanagement.users
+    users: state.Usermanagement.users,
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    dispatch
+    dispatch,
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(AddCustomer);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(AddCustomer);
