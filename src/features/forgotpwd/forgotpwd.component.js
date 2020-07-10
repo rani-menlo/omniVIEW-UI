@@ -15,15 +15,18 @@ class ForgotPassword extends Component {
     super(props);
     this.state = {
       value: "",
-      success: false
+      success: false,
     };
   }
 
   componentDidMount() {
     this.props.dispatch(LoginActions.setForgotPwdError(""));
   }
-
-  onInputCode = e => {
+  /**
+   * setting the email
+   * @param {*} e
+   */
+  onInputCode = (e) => {
     const value = e.target.value;
     if (value.includes(" ")) {
       return;
@@ -31,14 +34,16 @@ class ForgotPassword extends Component {
     this.props.dispatch(LoginActions.setForgotPwdError(""));
     this.setState({ value });
   };
-
+  /**
+   * Email and reqiured field validations
+   */
   validate = () => {
     const { value } = this.state;
     if (!value) {
       this.props.dispatch(
         LoginActions.setForgotPwdError(
           translate("error.form.required", {
-            type: translate("label.form.email")
+            type: translate("label.form.email"),
           })
         )
       );
@@ -46,7 +51,7 @@ class ForgotPassword extends Component {
       this.props.dispatch(
         LoginActions.setForgotPwdError(
           translate("error.form.invalid", {
-            type: translate("label.form.email")
+            type: translate("label.form.email"),
           })
         )
       );
@@ -58,7 +63,9 @@ class ForgotPassword extends Component {
       );
     }
   };
-
+  /**
+   * Redirecting to login screen
+   */
   cancel = () => {
     this.props.dispatch(LoginActions.setForgotPwdError(""));
     this.props.history.push("/");
@@ -144,13 +151,13 @@ function mapStateToProps(state) {
   return {
     loading: state.Api.loading,
     user: state.Login.user,
-    error: state.Login.forgotPwdError
+    error: state.Login.forgotPwdError,
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    dispatch
+    dispatch,
   };
 }
 

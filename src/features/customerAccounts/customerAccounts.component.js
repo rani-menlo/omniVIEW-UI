@@ -11,6 +11,9 @@ import { isLoggedInOmniciaRole } from "../../utils";
 
 const RadioGroup = Radio.Group;
 
+/**
+ * Radio button style
+ */
 const radioStyle = {
   display: "block",
   width: "400px",
@@ -30,6 +33,12 @@ class CustomerAccounts extends Component {
     this.props.dispatch(LoginActions.fetchCustomerAccounts());
   };
 
+  /**
+   *
+   * @param {Event} e - mouse event
+   * To restrict the user from going back to the previous screens on browser back button
+   * As we have login and authentication screens as the previous screens
+   */
   onBackButtonEvent = (e) => {
     e.preventDefault();
     if (!this.isBackButtonClicked) {
@@ -38,6 +47,9 @@ class CustomerAccounts extends Component {
     }
   };
 
+  /**
+   * calling the browser back function on leaving the component
+   */
   componentWillUnmount = () => {
     window.removeEventListener("popstate", this.onBackButtonEvent);
   };
@@ -48,35 +60,60 @@ class CustomerAccounts extends Component {
     this.getCustomerAccounts();
   }
 
+  /**
+   *
+   * @param {*} e - mouse event
+   * Setting the selected customer object from the list of customer accounts
+   */
   selectCustomer = (e) => {
     const { value } = e.target;
+    /**
+     * checking for null and undefined value
+     */
     if (isNull(value) || isUndefined(value)) {
       return;
     }
     this.setState({ selectedCustomer: value });
   };
 
+  /**
+   * Accessing the applications and other features for the selected customer
+   */
   openCustApplications = () => {
     const { selectedCustomer } = this.state;
     const { role, customer } = this.props;
     this.props.dispatch(CustomerActions.setSelectedCustomer(selectedCustomer));
     let postObj = { customerId: selectedCustomer.id };
+    /**
+     * Switching to the selected customer account
+     */
     this.props.dispatch(
       LoginActions.switchCustomerAccounts(postObj, () => {
+        /**
+         * If the selected customer has no license
+         */
         if (this.props.invalid_license) {
           this.props.history.push("/requestlicense");
           return;
         }
-
+        /**
+         * If the selected customer is accessing for the first time,
+         * forcing the user to edit the profile
+         */
         if (this.props.first_login) {
           this.props.history.push("/profile");
           return;
         }
-
+        /**
+         * Redirecting the user to the customers screen if the user is Omnicia user
+         */
         if (isLoggedInOmniciaRole(role)) {
           this.props.history.push("/customers");
           return;
         }
+        /**
+         * Redirecting the user to the customers screen if the user is other than Omnicia user
+         */
         this.props.dispatch(CustomerActions.setSelectedCustomer(customer));
         this.props.history.push("/applications");
       })

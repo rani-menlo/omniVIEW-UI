@@ -18,6 +18,10 @@ class AuthenticationCode extends Component {
       otp: "",
     };
   }
+  /**
+   * Validate otp, it should allow only 5 digits
+   * @param {*} e 
+   */
   onInputCode = (e) => {
     const { verified, error } = this.props;
     error && this.props.actions.resetOtpError();

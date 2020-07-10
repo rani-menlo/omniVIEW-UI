@@ -73,11 +73,15 @@ class AddNewApplication extends Component {
     );
     this.setState({ isAddingSequence });
   }
-
+  /**
+   * Showing the loaders
+   */
   showLoading = () => {
     this.props.dispatch(ApiActions.requestOnDemand());
   };
-
+  /**
+   * Hiding the loaders
+   */
   hideLoading = () => {
     this.props.dispatch(ApiActions.successOnDemand());
   };
@@ -111,7 +115,10 @@ class AddNewApplication extends Component {
       this.hideLoading
     );
   };
-
+  /**
+   * @param {*} cloud
+   * on selecting the source to transfer the files
+   */
   onCloudSelect = async cloud => {
     if (cloud.name == "AFS") {
       this.getEachCustomerAFSFolders(cloud);
@@ -156,7 +163,10 @@ class AddNewApplication extends Component {
       ftp_files_path: []
     });
   };
-
+  /**
+   * @param {*} remoteDetails 
+   * Showing the ftp details
+   */
   showRemoteFiles = async remoteDetails => {
     remoteDetails.customer_id = this.props.selectedCustomer.id;
     remoteDetails.id = _.get(this.state, "remoteDetails.id", "");
@@ -214,7 +224,10 @@ class AddNewApplication extends Component {
       }
     );
   };
-
+  /**
+   * @param {*} path 
+   * Displaying the files inside the ftp path
+   */
   getContentsOfPath = async path => {
     this.showLoading();
     let showCheckAll = false;
@@ -282,7 +295,10 @@ class AddNewApplication extends Component {
     });
     this.setState({ remoteFiles, checkedAll });
   };
-
+  /**
+   * @param {*} appDetails 
+   * Moving back to the previus screen
+   */
   goBack = async appDetails => {
     let { path, remoteDetails } = this.state;
     if (!path || remoteDetails.root_path === path) {
@@ -311,7 +327,9 @@ class AddNewApplication extends Component {
     });
     return paths;
   };
-
+  /**
+   * Uploading sequences when the submission has valid sequences
+   */
   proceedToUploadSequence = async () => {
     this.showLoading();
     let { selectedCustomer, selectedSubmission } = this.props;
@@ -337,7 +355,11 @@ class AddNewApplication extends Component {
     }
     this.openApplicationsScreen();
   };
-
+  /**
+   * Displaying the application details in the application details screen
+   * If the submission has valid sequences
+   * @param {*} selectedFolder 
+   */
   showApplicationDetails = async selectedFolder => {
     this.setState({
       addApplicationinvalidSeq: [],
@@ -482,7 +504,9 @@ class AddNewApplication extends Component {
       }
     });
   };
-
+  /**
+   * To get the submission lookup data in the application details screen
+   */
   getSubmissionLookupData = async () => {
     let path = this.state.selectedFolderPath;
     this.showLoading();
@@ -516,11 +540,16 @@ class AddNewApplication extends Component {
       this.hideLoading
     );
   };
-
+  /**
+   * Redirecting to the customers screen
+   */
   openCustomersScreen = () => {
     this.props.history.push("/customers");
   };
-
+  /**
+   * Saving the uploaded submission/sequence details
+   * @param {*} obj 
+   */
   saveDetails = async obj => {
     obj.customer_id = this.props.selectedCustomer.id;
     //we need to remove cloud_type_id for cloud type AFS later
@@ -553,12 +582,16 @@ class AddNewApplication extends Component {
     }
     this.openApplicationsScreen();
   };
-
+  /**
+   * Redirect to the applications screen
+   */
   openApplicationsScreen = () => {
     this.setState({ selectedFolderError: "", invalidSeqError: "" });
     this.props.history.push("/applications");
   };
-
+  /**
+   * Displaying add new application title
+   */
   getTitle = () => {
     if (this.state.showApplicationDetails) {
       return this.state.path;
@@ -568,7 +601,9 @@ class AddNewApplication extends Component {
     }
     return translate("label.newapplication.source");
   };
-
+  /**
+   * Displaying the application details text and the current path
+   */
   getSubtitle = () => {
     if (this.state.showApplicationDetails) {
       return translate("text.newapplication.applicationdetails");
@@ -629,7 +664,9 @@ class AddNewApplication extends Component {
       </Breadcrumb>
     );
   };
-
+  /**
+   * When user clicks on Refresh icon
+   */
   getResfreshedFiles = () => {
     if (this.state.selectedCloud == "AFS") {
       this.getEachCustomerAFSFolders({ name: this.state.selectedCloud });
@@ -638,18 +675,22 @@ class AddNewApplication extends Component {
     let { path } = this.state;
     this.getContentsOfPath(path);
   };
-
+  /**
+   * Open the modal containing invalid sequences for the uploaded submission
+   */
   openInvalidSeqModal = () => {
     if (this.state.openInvalidSequenceModal) {
       return;
     }
     this.setState({ openInvalidSequenceModal: true });
   };
-
+  /**
+   * Closing the invalid sequences modal
+   */
   closeInvalidSequenceModal = () => {
     this.setState({ openInvalidSequenceModal: false });
   };
-
+  /**Showing the application details lookup data */
   showAppDetails = () => {
     if (this.state.isAddingSequence) {
       this.proceedToUploadSequence();

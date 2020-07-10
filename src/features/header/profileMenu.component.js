@@ -9,20 +9,27 @@ import { isLoggedInOmniciaAdmin, isLoggedInCustomerAdmin } from "../../utils";
 import { ImageLoader } from "../../uikit/components";
 
 class ProfileMenu extends Component {
+  /**
+   * Logout when user clicks on Signout menu option
+   */
   signOut = () => {
     this.props.dispatch(LoginActions.logOut());
     this.props.history.push("/");
   };
-
+  /**
+   * Redirecting to the list of customers screen
+   */
   switchAccounts = () => {
     this.props.dispatch(CustomerActions.setSelectedCustomer(null));
     this.props.history.push("/customer-accounts");
   };
-
+  /** Redirecting to edit profile screen on clicking of edit profile menu option */
   editProfile = () => {
     this.props.history.push("/profile/edit");
   };
-
+  /**
+   * Redirecting to user management screen when user clicks on Manage users menu option
+   */
   manageUsers = () => {
     this.props.dispatch(
       CustomerActions.setSelectedCustomer(this.props.customer)
@@ -33,7 +40,9 @@ class ProfileMenu extends Component {
       this.props.history.push("/usermanagement");
     }
   };
-
+  /**
+   * Get header menu options
+   */
   getMenu = () => {
     return (
       <Menu className="maindashboard__list__item-dropdown-menu">
@@ -105,11 +114,6 @@ class ProfileMenu extends Component {
     }
     return (
       <div className="profile">
-        {/* <img
-          src="/images/help.svg"
-          className="profile-help"
-          onClick={this.help}
-        /> */}
         <Dropdown overlay={this.getMenu()} trigger={["click"]}>
           <div className="profile__menu">
             <ImageLoader
@@ -118,7 +122,6 @@ class ProfileMenu extends Component {
               height="36px"
               type="circle"
             />
-            {/* <Avatar size={36} icon="user" /> */}
             <span className="profile__menu-username">
               {`${_.get(user, "first_name", "")} ${_.get(
                 user,

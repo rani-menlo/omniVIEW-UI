@@ -75,7 +75,9 @@ class CreateProfile extends Component {
       editProfile: history.location.pathname.includes("/edit"),
     });
   }
-
+  /**
+   * prepopulating the user profile information
+   */
   populateState = () => {
     const { user, email } = this.props;
     const state = { ...this.state };
@@ -296,14 +298,6 @@ class CreateProfile extends Component {
         reqObject.append("profileimage", this.state.selectedFile);
       }
     }
-
-    // this.props.dispatch(
-    //   LoginActions.createOrUpdateProfile(reqObject, this.props.history),
-    //   () => {
-    //     console.log("testt");
-    //     this.props.profileUpdated && this.goBack();
-    //   }
-    // );
 
     this.props.actions.createOrUpdateProfile(
       reqObject,

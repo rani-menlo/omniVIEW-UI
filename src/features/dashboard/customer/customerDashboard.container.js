@@ -69,15 +69,17 @@ class CustomerDashboard extends Component {
       const { customer } = this.props;
       this.onCustomerSelected({ ...customer })();
     }
-    //To prevent browser back button from going back
-    // window.history.pushState(null, document.title, window.location.href);
-    // window.addEventListener("popstate", function(event) {
-    //   window.history.pushState(null, document.title, window.location.href);
-    // });
   }
-
+  /**
+   * Fetching customers
+   * @param {*} sortBy
+   * @param {*} orderBy
+   */
   fetchCustomers = (sortBy = "company_name", orderBy = "ASC") => {
     const { viewBy, pageNo, itemsPerPage, searchText } = this.state;
+    /**
+     * Fetching the customerss in list view
+     */
     if (viewBy === "lists") {
       this.props.actions.fetchCustomersByList(
         pageNo,
@@ -90,16 +92,26 @@ class CustomerDashboard extends Component {
       this.props.actions.fetchCustomers(searchText || "");
     }
   };
-
+  /**
+   * Changing the view to display the customers (list <-> Card)
+   * @param {*} type
+   */
   changeView = (type) => {
     this.setState({ viewBy: type }, () => this.fetchCustomers());
   };
-
+  /**
+   * When user selects the customer to access the applications
+   * realted to the selected customer
+   * @param {*} customer
+   */
   onCustomerSelected = (customer) => () => {
     this.props.actions.setSelectedCustomer(customer);
     this.props.history.push("/applications");
   };
-
+  /**
+   * Opening the active licenses modal
+   * @param {*} customer
+   */
   subscriptionsInUse = (customer) => (event) => {
     event.stopPropagation();
     isLoggedInOmniciaAdmin(this.props.role) &&
@@ -109,7 +121,10 @@ class CustomerDashboard extends Component {
         showLicenceUnAssigned: false,
       });
   };
-
+  /**
+   * Opening the available licenses modal
+   * @param {*} customer
+   */
   subscriptionsUnAssigned = (customer) => (event) => {
     event.stopPropagation();
     isLoggedInOmniciaAdmin(this.props.role) &&
@@ -119,19 +134,27 @@ class CustomerDashboard extends Component {
         showSubscriptionsInUse: false,
       });
   };
-
+  /**
+   * Closing the active licenses modal
+   */
   closeSubscriptionsModal = () => {
     this.setState({
       showSubscriptionsInUse: false,
       showLicenceUnAssigned: false,
     });
   };
-
+  /**
+   * Redirecting to the edit customer screen to edit the selected customer
+   * @param {*} customer
+   */
   editCustomer = (customer) => () => {
     this.props.actions.setSelectedCustomer(customer);
     this.props.history.push("/usermanagement/customer/edit");
   };
-
+  /**
+   * To get menu options for the individial customer
+   * @param {*} customer
+   */
   getMenu = (customer) => () => {
     return (
       <Menu className="maindashboard__list__item-dropdown-menu">
@@ -175,19 +198,32 @@ class CustomerDashboard extends Component {
       </Menu>
     );
   };
-
+  /**
+   * On changing the page in the list view
+   * @param {*} pageNo
+   */
   onPageChange = (pageNo) => {
     this.setState({ pageNo }, () => this.fetchCustomers());
   };
-
+  /**
+   * On changing the size of the records per the page to display
+   * @param {*} itemsPerPage
+   */
   onPageSizeChange = (itemsPerPage) => {
     this.setState({ itemsPerPage }, () => this.fetchCustomers());
   };
-
+  /**
+   * Sorting the columns in the list view
+   * @param {*} sortBy
+   * @param {*} orderBy
+   */
   sortColumn = (sortBy, orderBy) => {
     this.fetchCustomers(sortBy, orderBy);
   };
-
+  /**
+   * Search
+   * @param {*} e
+   */
   handleSearch = (e) => {
     const searchText = e.target.value;
     this.setState({ searchText });
@@ -195,16 +231,22 @@ class CustomerDashboard extends Component {
       this.searchCustomers();
     }
   };
-
+  /**
+   * Search for customers by customer
+   */
   searchCustomers = () => {
     this.fetchCustomers();
   };
-
+  /**
+   * Clear the search value in the texbox
+   */
   clearSearch = () => {
     this.setState({ searchText: "" });
     this.searchCustomers();
   };
-
+  /**
+   * Adding the customer
+   */
   addCustomer = () => {
     this.props.dispatch(UsermanagementActions.resetAllLicences());
     this.props.actions.setSelectedCustomer(null);
@@ -213,7 +255,9 @@ class CustomerDashboard extends Component {
       100
     );
   };
-
+  /**
+   * Opening the user manangement screen
+   */
   openOadminUserManagement = () => {
     const { customer } = this.props;
     this.openUserMgmt(customer)();
@@ -223,11 +267,15 @@ class CustomerDashboard extends Component {
     this.props.actions.setSelectedCustomer(customer);
     this.props.history.push("/usermanagement");
   };
-
+  /**
+   * Close deactive customer modal
+   */
   closeActivateDeactivateModal = () => {
     this.setState({ showDeactivateModal: false });
   };
-
+  /**
+   * Opening the delete customer modal
+   */
   activateDeactivate = () => {
     const { selectedCustomer, searchText } = this.state;
     this.props.dispatch(
@@ -305,13 +353,6 @@ class CustomerDashboard extends Component {
           licenses,
         },
         () => {
-          /* Toast.success(
-            `License has been assigned to ${_.get(
-              selectedUsers,
-              "first_name",
-              ""
-            )} ${_.get(selectedUsers, "last_name", "")}`
-          ); */
           Toast.success("License has been assigned.");
           this.fetchCustomers();
         }

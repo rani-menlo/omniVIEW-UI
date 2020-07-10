@@ -28,7 +28,6 @@ class Subscriptions extends Component {
           state.pageNo,
           state.itemsPerPage
         )
-        // allLicences: props.allLicences
       };
     }
     return null;
@@ -38,7 +37,6 @@ class Subscriptions extends Component {
     const from = (pageNo - 1) * itemsPerPage;
     const to = pageNo * itemsPerPage;
     const newArray = _.slice(array, from, to);
-
     return newArray;
   }
 
@@ -175,13 +173,6 @@ class Subscriptions extends Component {
           licenses
         },
         () => {
-          /* Toast.success(
-            `License has been assigned to ${_.get(
-              selectedUser,
-              "first_name",
-              ""
-            )} ${_.get(selectedUser, "last_name", "")}`
-          ); */
           Toast.success("License has been assigned.");
           this.refreshLicenses();
         }
