@@ -38,7 +38,7 @@ class AuthenticationCode extends Component {
   };
 
   openDashboard = () => {
-    const { user, invalid_license, customerAccounts, first_login } = this.props;
+    const { customerAccounts } = this.props;
     /**
      * Display the below message when there are no customers for the loggin user
      */

@@ -1,7 +1,5 @@
 import React, { Component } from "react";
-import styled from "styled-components";
 import _ from "lodash";
-import uuidv4 from "uuid/v4";
 import { connect } from "react-redux";
 import {
   Loader,
@@ -13,14 +11,11 @@ import {
   NumericInput,
   DeactivateModal,
   Text,
-  TableHeader,
-  Pagination,
   Toast,
   ImageLoader,
 } from "../../uikit/components";
 import Header from "../header/header.component";
 import {
-  Checkbox,
   Switch,
   Tabs,
   Icon,
@@ -31,16 +26,10 @@ import {
   Modal,
 } from "antd";
 import { UsermanagementActions, CustomerActions } from "../../redux/actions";
-import {
-  isPhone,
-  isEmail,
-  getFormattedDate,
-  isLoggedInOmniciaAdmin,
-} from "../../utils";
+import { isPhone, isEmail, isLoggedInOmniciaAdmin } from "../../utils";
 import { translate } from "../../translations/translator";
 import AddNewLicence from "../license/addNewLicence.component";
 import PopoverCustomers from "./popoverCustomers.component";
-import LicenceInUseUnAssigned from "../license/licenceInUseUnAssigned.component";
 import AssignLicence from "../license/assignLicence.component";
 import AssignLicenceWithUsers from "../license/assignLicenceWithUsers.component";
 import Subscriptions from "../license/subscriptions.component";
@@ -810,6 +799,7 @@ class AddCustomer extends Component {
                 <img
                   className="global__cursor-pointer"
                   src="/images/caret-inactive.svg"
+                  alt="inactive"
                   style={{ marginLeft: "5px" }}
                 />
               </Row>

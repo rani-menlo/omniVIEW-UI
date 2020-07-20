@@ -51,7 +51,6 @@ class SequencesModal extends Component {
   render() {
     const { visible, closeModal, submission, sequences } = this.props;
     const { order, selectedSequences } = this.state;
-    const submissionLabel = _.get(submission, "name", "");
     const orderedSequences = getOrderedSequences(sequences, order);
     console.log("sequences", orderedSequences, this.props);
     return (
@@ -66,6 +65,7 @@ class SequencesModal extends Component {
               src="/images/close.svg"
               className="sequences-modal__header-close"
               onClick={closeModal}
+              alt="close"
             />
           </div>
           <div className="sequences-modal__table">
@@ -94,6 +94,7 @@ class SequencesModal extends Component {
               <img
                 src="/images/warning.png"
                 className="sequences-modal__footer-image"
+                alt="alert"
               />
               <Text
                 type="regular"

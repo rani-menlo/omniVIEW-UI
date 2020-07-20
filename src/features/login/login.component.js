@@ -4,7 +4,6 @@ import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { Form, Input, Button, Checkbox } from "antd";
 import PropTypes from "prop-types";
-import _ from "lodash";
 import { LoginActions } from "../../redux/actions";
 import Loader from "../../uikit/components/loader";
 import Footer from "../../uikit/components/footer/footer.component";

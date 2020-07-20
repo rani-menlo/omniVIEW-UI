@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import { Redirect, Route } from "react-router-dom";
 import { isLoggedInOmniciaRole } from "./utils";
 import { bindActionCreators } from "redux";
-import { LoginActions, CustomerActions } from "./redux/actions";
+import { LoginActions } from "./redux/actions";
 
 class PrivateRoute extends Component {
   render() {
@@ -36,9 +36,6 @@ class PrivateRoute extends Component {
               if (customerAccounts && customerAccounts.length > 1) {
                 return <Redirect to="/customer-accounts" />;
               } else {
-                let obj = {
-                  customerId: _.get(customerAccounts[0].customer, "id"),
-                };
                 if (isLoggedInOmniciaRole(customerAccounts[0].role)) {
                   return <Redirect to="/customers" />;
                 } else {

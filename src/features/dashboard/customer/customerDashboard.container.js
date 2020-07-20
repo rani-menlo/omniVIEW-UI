@@ -13,7 +13,6 @@ import {
   TableHeader,
   Row,
   Pagination,
-  OmniCheckbox,
   OmniButton,
   SearchBox,
   ListViewGridView,
@@ -22,7 +21,7 @@ import {
   DeactivateModal,
   Toast,
 } from "../../../uikit/components";
-import { DEBOUNCE_TIME, SERVER_URL } from "../../../constants";
+import { DEBOUNCE_TIME } from "../../../constants";
 import { translate } from "../../../translations/translator";
 import LicenceInUseUnAssigned from "../../license/licenceInUseUnAssigned.component";
 import AssignLicenceWithUsers from "../../license/assignLicenceWithUsers.component";
@@ -163,7 +162,7 @@ class CustomerDashboard extends Component {
           onClick={this.editCustomer(customer)}
         >
           <p>
-            <img src="/images/edit.svg" />
+            <img src="/images/edit.svg" alt="edit-user"/>
             <span>{`${translate("label.usermgmt.edit")} ${translate(
               "label.dashboard.customer"
             )}`}</span>
@@ -174,7 +173,7 @@ class CustomerDashboard extends Component {
           onClick={this.openUserMgmt(customer)}
         >
           <p>
-            <img src="/images/user-management.svg" />
+            <img src="/images/user-management.svg" alt="users"/>
             <span>{translate("label.usermgmt.title")}</span>
           </p>
         </Menu.Item>
@@ -187,7 +186,7 @@ class CustomerDashboard extends Component {
               color: _.get(customer, "is_active", false) ? "red" : "#00d592",
             }}
           >
-            <img src="/images/deactivate.svg" />
+            <img src="/images/deactivate.svg" alt="deactivate-user"/>
             <span>{`${
               _.get(customer, "is_active", false)
                 ? translate("label.usermgmt.deactivate")
@@ -502,6 +501,7 @@ class CustomerDashboard extends Component {
                           <img
                             className="global__cursor-pointer"
                             src="/images/overflow-black.svg"
+                            alt="dropdown-icon"
                             style={{ width: "18px", height: "18px" }}
                           />
                         </Dropdown>

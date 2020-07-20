@@ -1,6 +1,6 @@
 import React from "react";
 import _ from "lodash";
-import { Avatar, Modal, Icon } from "antd";
+import { Modal, Icon } from "antd";
 import { Row, Text, OmniButton, ImageLoader } from "../../uikit/components";
 import { getRoleName, getFormattedDate } from "../../utils";
 import { translate } from "../../translations/translator";
@@ -12,7 +12,7 @@ const UserProfileCard = ({
   onClose,
   onEdit,
   onStatusClick,
-  onAssignLicence
+  onAssignLicence,
 }) => {
   return (
     <Modal
@@ -33,7 +33,6 @@ const UserProfileCard = ({
           height="140px"
           type="circle"
         />
-        {/* <Avatar size={140} icon="user" /> */}
         <Text
           className="userProfileCard-name"
           type="extra_bold"
@@ -51,25 +50,27 @@ const UserProfileCard = ({
           size="16px"
           text={getRoleName(_.get(user, "role_name", ""))}
         />
-        {_.get(user, "role_id") !== 1 && (<Row style={{ justifyContent: "space-between", width: "100%" }}>
-          <Text
-            type="regular"
-            size="16px"
-            text={`${translate("label.usermgmt.licensestatus")}:`}
-          />
-          <Text
-            className={`userProfileCard-${
-              _.get(user, "license_status", false) ? "active" : "inactive"
-            }`}
-            type="regular"
-            size="16px"
-            text={
-              _.get(user, "license_status", 0)
-                ? ` ${translate("label.user.active")}`
-                : ` ${translate("label.user.inactive")}`
-            }
-          />
-        </Row>)}
+        {_.get(user, "role_id") !== 1 && (
+          <Row style={{ justifyContent: "space-between", width: "100%" }}>
+            <Text
+              type="regular"
+              size="16px"
+              text={`${translate("label.usermgmt.licensestatus")}:`}
+            />
+            <Text
+              className={`userProfileCard-${
+                _.get(user, "license_status", false) ? "active" : "inactive"
+              }`}
+              type="regular"
+              size="16px"
+              text={
+                _.get(user, "license_status", 0)
+                  ? ` ${translate("label.user.active")}`
+                  : ` ${translate("label.user.inactive")}`
+              }
+            />
+          </Row>
+        )}
         {_.get(user, "role_id") !== ROLE_IDS.OMNICIA.administrator &&
           _.get(user, "expiryDate") && (
             <Text

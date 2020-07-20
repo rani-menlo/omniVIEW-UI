@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import { CustomerActions, LoginActions } from "../../redux/actions";
 import Header from "../header/header.component";
 import { Loader, OmniButton, ContentLayout } from "../../uikit/components";
-import { Row, Col, Radio, Button } from "antd";
+import { Row, Col, Radio } from "antd";
 import { translate } from "../../translations/translator";
 import { get, map, isNull, isUndefined } from "lodash";
 import { isLoggedInOmniciaRole } from "../../utils";
@@ -81,7 +81,7 @@ class CustomerAccounts extends Component {
    */
   openCustApplications = () => {
     const { selectedCustomer } = this.state;
-    const { role, customer } = this.props;
+    const { role } = this.props;
     this.props.dispatch(CustomerActions.setSelectedCustomer(selectedCustomer));
     let postObj = { customerId: selectedCustomer.id };
     /**
@@ -114,7 +114,7 @@ class CustomerAccounts extends Component {
         /**
          * Redirecting the user to the customers screen if the user is other than Omnicia user
          */
-        this.props.dispatch(CustomerActions.setSelectedCustomer(customer));
+        this.props.dispatch(CustomerActions.setSelectedCustomer(this.props.customer));
         this.props.history.push("/applications");
       })
     );

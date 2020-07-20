@@ -1,5 +1,4 @@
 import _ from "lodash";
-import { message } from "antd";
 import { SubmissionActionTypes } from "../actionTypes";
 import { SubmissionApi } from "../api";
 import { ApiActions } from ".";

@@ -36,7 +36,6 @@ import {
   isLoggedInCustomerAdmin,
   isLoggedInOmniciaAdmin,
   getDTDVersion,
-  getDTD2_2_FormattedDate,
   getV2_2Date
 } from "../../utils";
 import ProfileMenu from "../header/profileMenu.component";

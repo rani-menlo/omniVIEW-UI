@@ -64,6 +64,7 @@ const LicencePreview = ({ closeModal, back, licences, visible, submit }) => {
           src="/images/close.svg"
           className="licence-modal__headers-confirm-close"
           onClick={closeModal}
+          alt="close"
         />
       </div>
       <Text

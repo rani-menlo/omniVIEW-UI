@@ -1,7 +1,6 @@
 import _ from "lodash";
 import uuidv4 from "uuid/v4";
 import { SubmissionActionTypes } from "../actionTypes";
-import { ApiActions } from "../actions";
 
 const initialState = {
   sequences: {},

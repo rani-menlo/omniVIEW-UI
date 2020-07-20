@@ -5,13 +5,7 @@ import { connect } from "react-redux";
 import { Modal, Checkbox, Icon } from "antd";
 import { UsermanagementActions } from "../../redux/actions";
 import { ROLE_IDS } from "../../constants";
-import {
-  IconText,
-  Text,
-  ImageLoader,
-  OmniButton,
-  Row
-} from "../../uikit/components";
+import { Text, ImageLoader, OmniButton, Row } from "../../uikit/components";
 import { translate } from "../../translations/translator";
 import { getFormattedDate } from "../../utils";
 
@@ -21,17 +15,17 @@ class AssignLicenceWithUsers extends Component {
     selectedUsers: PropTypes.arrayOf(PropTypes.object),
     closeModal: PropTypes.func,
     onUserSelect: PropTypes.func,
-    multiSelection: PropTypes.bool
+    multiSelection: PropTypes.bool,
   };
 
   static defaultProps = {
-    multiSelection: true
+    multiSelection: true,
   };
 
   constructor(props) {
     super(props);
     this.state = {
-      selected: new Set()
+      selected: new Set(),
     };
   }
 
@@ -39,27 +33,26 @@ class AssignLicenceWithUsers extends Component {
     const { selectedCustomer, selectedUsers } = this.props;
     selectedUsers &&
       this.setState({ selected: new Set(_.map(selectedUsers, "user_id")) });
-      if(selectedCustomer.is_omnicia == true) {
-        this.props.dispatch(
-          UsermanagementActions.fetchUsers({
-            customerId: this.props.selectedCustomer.id,
-            includeLoggedInUser: false,
-            roles: _.values(ROLE_IDS.OMNICIA) 
-          })
-        ); 
-      } else {
-        this.props.dispatch(
-          UsermanagementActions.fetchUsers({
-            customerId: selectedCustomer.id,
-            includeLoggedInUser: false,
-            roles: _.values(ROLE_IDS.CUSTOMER)
-          })
-        );
-      }
-
+    if (selectedCustomer.is_omnicia == true) {
+      this.props.dispatch(
+        UsermanagementActions.fetchUsers({
+          customerId: this.props.selectedCustomer.id,
+          includeLoggedInUser: false,
+          roles: _.values(ROLE_IDS.OMNICIA),
+        })
+      );
+    } else {
+      this.props.dispatch(
+        UsermanagementActions.fetchUsers({
+          customerId: selectedCustomer.id,
+          includeLoggedInUser: false,
+          roles: _.values(ROLE_IDS.CUSTOMER),
+        })
+      );
+    }
   }
 
-  select = user => () => {
+  select = (user) => () => {
     const { selected } = this.state;
     const { multiSelection } = this.props;
     if (selected.has(user.user_id)) {
@@ -75,7 +68,7 @@ class AssignLicenceWithUsers extends Component {
   };
 
   next = () => {
-    const users = _.map([...this.state.selected], userId => {
+    const users = _.map([...this.state.selected], (userId) => {
       return _.find(this.props.users, { user_id: userId });
     });
     this.props.onUserSelect && this.props.onUserSelect(users);
@@ -122,7 +115,7 @@ class AssignLicenceWithUsers extends Component {
         />
         {(_.get(users, "length") || "") && (
           <div className="licence-modal__content" style={{ marginTop: "15px" }}>
-            {_.map(users, user => {
+            {_.map(users, (user) => {
               return (
                 <div
                   key={user.user_id}
@@ -190,7 +183,7 @@ class AssignLicenceWithUsers extends Component {
               className="maindashboard__nodata-icon"
             />
             {translate("error.dashboard.notfound", {
-              type: translate("label.dashboard.users")
+              type: translate("label.dashboard.users"),
             })}
           </Row>
         )}
@@ -232,13 +225,13 @@ function mapStateToProps(state) {
   return {
     loading: state.Api.loading,
     users: state.Usermanagement.users,
-    selectedCustomer: state.Customer.selectedCustomer
+    selectedCustomer: state.Customer.selectedCustomer,
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    dispatch
+    dispatch,
   };
 }
 

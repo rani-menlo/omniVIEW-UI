@@ -16,7 +16,7 @@ class Header extends Component {
   componentDidMount() {}
 
   goToMain = (history, disabled) => () => {
-    const { customerAccounts, role } = this.props;
+    const { role } = this.props;
     if (!disabled) {
       /**
        * Redirecting to customers screen if the loggin user is Omnicia user
@@ -40,7 +40,7 @@ class Header extends Component {
   };
 
   render() {
-    const { style, history, disabled, hideMenu, props } = this.props;
+    const { style, history, disabled, hideMenu } = this.props;
     return (
       <div className="headerbar" style={style}>
         <img
@@ -75,7 +75,6 @@ function mapDispatchToProps(dispatch) {
 
 function mapStateToProps(state) {
   return {
-    customerAccounts: state.Login.customerAccounts,
     role: state.Login.role,
   };
 }

@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { ResizableBox } from "react-resizable";
 
 class Sidebar extends Component {
   constructor(props) {
@@ -36,7 +35,6 @@ class Sidebar extends Component {
     return (
       <React.Fragment>
         {!this.state.hide && (
-          // <ResizableBox axis="x">
           <div
             style={containerStyle}
             className={`slider ${direction}__${
@@ -45,7 +43,6 @@ class Sidebar extends Component {
           >
             {children}
           </div>
-          // </ResizableBox>
         )}
       </React.Fragment>
     );

@@ -57,10 +57,7 @@ import AssignLicenceWithUsers from "../../license/assignLicenceWithUsers.compone
 import LicenceInUseUnAssigned from "../../license/licenceInUseUnAssigned.component";
 import SubmissionCard from "../submissionCard.component";
 import ApplicationProperties from "./applicationProperties.component";
-import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { getSequences } from "../../../redux/selectors/submissionView.selector";
-// import { Customers } from "./sampleCustomers";
-// import  ApplicationApi  from "../../../redux/api/application.api"
 
 class ApplicationDashboard extends Component {
   constructor(props) {

@@ -6,10 +6,8 @@ import Text from "../text/text.component";
 import { translate } from "../../../translations/translator";
 import { Checkbox, Icon, Modal } from "antd";
 import { OmniButton, PermissionCheckbox, ImageLoader } from "..";
-import Row from "../row/row.component";
-import { getRoleNameByRoleId, isAdmin } from "../../../utils";
-import { CustomerActions, ApiActions } from "../../../redux/actions";
-import { CustomerApi, ApplicationApi, SubmissionApi } from "../../../redux/api";
+import { ApiActions } from "../../../redux/actions";
+import { CustomerApi, ApplicationApi } from "../../../redux/api";
 import submissionApi from "../../../redux/api/submission.api";
 import Toast from "../toast/toast";
 
@@ -291,6 +289,7 @@ class AccessControl extends Component {
             src="/images/close.svg"
             className="assign-permissions-modal__header-close"
             onClick={closeModal}
+            alt="close"
           />
         </div>
         <Text

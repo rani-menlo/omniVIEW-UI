@@ -6,7 +6,6 @@ import _ from "lodash";
 import { TypesJson } from "./types";
 import Row from "../../uikit/components/row/row.component";
 import {
-  isLoggedInAuthor,
   isLoggedInOmniciaAdmin,
   isLoggedInCustomerAdmin,
   getOrderedSequences,
@@ -59,7 +58,7 @@ class NodeProperties extends Component {
     } else {
       src = "file-attachment.svg";
     }
-    return <img src={`/images/${src}`} style={{ marginRight: "8px" }} />;
+    return <img src={`/images/${src}`} alt="file" style={{ marginRight: "8px" }} />;
   };
 
   loadFile = (fileHref, fileID, title) => {

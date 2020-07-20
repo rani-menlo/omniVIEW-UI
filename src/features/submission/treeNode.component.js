@@ -4,12 +4,7 @@ import PropTypes from "prop-types";
 import _ from "lodash";
 import uuidv4 from "uuid/v4";
 import { PermissionCheckbox, Text } from "../../uikit/components";
-import {
-  CHECKBOX,
-  VALID_VALUES_XML_DATA_BOTTOM_LIST,
-  VALID_VALUES_XML_DATA_TOP_LIST,
-  VALID_VALUES_XML_DATA,
-} from "../../constants";
+import { CHECKBOX, VALID_VALUES_XML_DATA } from "../../constants";
 import {
   isLoggedInCustomerAdmin,
   isLoggedInOmniciaAdmin,
@@ -309,8 +304,7 @@ class TreeNode extends Component {
     });
     const nodesByTitle = _.groupBy(nodes, (node) => node.value.title);
     const unSortedTitles = _.map(nodes, (node) => node.value.title);
-    const bottomList = [],
-      topList = [];
+    const topList = [];
     let titles = unSortedTitles.sort(collator.compare);
     // ordering based on valid-values.xml data (Refer comment in VALID_VALUES_XML_DATA_BOTTOM_LIST)
     _.map(VALID_VALUES_XML_DATA.TOP_LIST, (item) => {
@@ -542,6 +536,7 @@ class TreeNode extends Component {
         <img
           src="/images/folder-us.svg"
           className="global__file-folder"
+          alt="us-folder"
           style={style}
         />
       );
@@ -551,6 +546,7 @@ class TreeNode extends Component {
         <img
           src="/images/file-stf.svg"
           className="global__file-folder"
+          alt="file"
           style={style}
         />
       );
@@ -561,6 +557,7 @@ class TreeNode extends Component {
           <img
             src="/images/file-stf.svg"
             className="global__file-folder"
+            alt="file"
             style={style}
           />
         );
@@ -569,6 +566,7 @@ class TreeNode extends Component {
           <img
             src="/images/file-cross-ref.svg"
             className="global__file-folder"
+            alt="cross-references-file"
             style={style}
           />
         );
@@ -577,6 +575,7 @@ class TreeNode extends Component {
           <img
             src="/images/file-new.svg"
             className="global__file-folder"
+            alt="new-file"
             style={style}
           />
         );
@@ -584,6 +583,7 @@ class TreeNode extends Component {
         icon = (
           <img
             src="/images/file-append.svg"
+            alt="file-append"
             className="global__file-folder"
             style={style}
           />
@@ -591,6 +591,7 @@ class TreeNode extends Component {
       } else if (properties.operation === "replace") {
         icon = (
           <img
+            alt="replace-file"
             src="/images/file-replace.svg"
             className="global__file-folder"
             style={style}
@@ -599,6 +600,7 @@ class TreeNode extends Component {
       } else {
         icon = (
           <img
+            alt="delete-file"
             src="/images/file-delete.svg"
             className="global__file-folder"
             style={style}
@@ -752,6 +754,7 @@ class TreeNode extends Component {
                     ? "/images/plus-black.svg"
                     : "/images/minus-black.png"
                 }
+                alt="expand"
                 style={style}
               />
               <Text
@@ -769,7 +772,11 @@ class TreeNode extends Component {
         {this.props.view !== "lifeCycle" && (
           <Menu.Item onClick={this.props.selectInLifeCycle}>
             <div className="global__center-vert">
-              <img src="/images/life-cycle.svg" style={style} />
+              <img
+                src="/images/life-cycle.svg"
+                alt="life-cycle-view"
+                style={style}
+              />
               <Text
                 type="regular"
                 size="12px"
@@ -787,7 +794,11 @@ class TreeNode extends Component {
               disabled={this.state.properties.is_x_ref}
             >
               <div className="global__center-vert">
-                <img src="/images/assign.svg" style={style} />
+                <img
+                  src="/images/assign.svg"
+                  alt="assign-permission"
+                  style={style}
+                />
                 <Text
                   type="regular"
                   size="12px"
@@ -909,6 +920,7 @@ class TreeNode extends Component {
               <Dropdown overlay={this.getMenu} trigger={["click"]}>
                 <img
                   src="/images/overflow-on.svg"
+                  alt="dropdown-icon"
                   className="global__cursor-pointer"
                   style={{ marginLeft: "auto", marginRight: "8px" }}
                 />

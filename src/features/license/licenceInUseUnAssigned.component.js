@@ -13,7 +13,6 @@ import {
 import { translate } from "../../translations/translator";
 import { CustomerActions } from "../../redux/actions";
 import { getFormattedDate, getCombinedLicences } from "../../utils";
-import moment from "moment";
 
 class LicenceInUseUnAssigned extends Component {
   constructor(props) {
@@ -167,6 +166,7 @@ class LicenceInUseUnAssigned extends Component {
       <Row style={{ flexDirection: "column" }}>
         <img
           src="/images/alert-low.svg"
+          alt="alert"
           style={{ width: "40px", height: "40px" }}
         />
         <Text
@@ -215,6 +215,7 @@ class LicenceInUseUnAssigned extends Component {
               />
               <img
                 src="/images/close.svg"
+                alt="close"
                 className="licence-modal__header-close"
                 onClick={closeModal}
               />

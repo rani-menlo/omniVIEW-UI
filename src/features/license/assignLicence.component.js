@@ -31,7 +31,7 @@ const Columns = [
         />
       </div>
     ),
-    width: 200
+    width: 200,
   },
   {
     title: translate("label.user.status"),
@@ -52,7 +52,7 @@ const Columns = [
         }
       />
     ),
-    width: 100
+    width: 100,
   },
   {
     title: translate("label.licence.expirationdate"),
@@ -69,8 +69,8 @@ const Columns = [
         }
       />
     ),
-    width: 150
-  }
+    width: 150,
+  },
 ];
 
 const AssignLicence = ({
@@ -79,7 +79,7 @@ const AssignLicence = ({
   users,
   visible,
   submit,
-  back
+  back,
 }) => {
   const singleUser = !_.isArray(users) || _.get(users, "length") === 1;
   const user = singleUser && (_.isArray(users) ? users[0] : users);
@@ -101,6 +101,7 @@ const AssignLicence = ({
           src="/images/close.svg"
           className="licence-modal__header-close"
           onClick={closeModal}
+          alt="close"
         />
       </div>
       <Text
@@ -129,7 +130,7 @@ const AssignLicence = ({
               date: getFormattedDate(
                 _.get(licence, "purchaseDate", null) ||
                   _.get(licence, "purchase_date", "")
-              )
+              ),
             })}`}
           />
           <Text
@@ -141,7 +142,7 @@ const AssignLicence = ({
                   _.get(licence, "purchase_date", "")
               )
                 .add(_.get(licence, "duration", 0), "days")
-                .calendar()
+                .calendar(),
             })}
           />
           <Table
@@ -166,7 +167,7 @@ const AssignLicence = ({
                 date: getFormattedDate(
                   _.get(licence, "purchaseDate", null) ||
                     _.get(licence, "purchase_date", "")
-                )
+                ),
               }
             )}`}
           />
@@ -222,7 +223,7 @@ const AssignLicence = ({
                   _.get(licence, "purchase_date", "")
               )
                 .add(_.get(licence, "duration", 0), "days")
-                .calendar()
+                .calendar(),
             })}
           />
         </div>

@@ -17,6 +17,7 @@ const ListViewGridView = ({ viewBy, changeView }) => {
               ? "/images/list-view-active.svg"
               : "/images/list-view.svg"
           }
+          alt="list-view"
         />
       </div>
       <div

@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Checkbox, Icon } from "antd";
+import { Icon } from "antd";
 import styled from "styled-components";
 import Row from "../row/row.component";
 import PropTypes from "prop-types";

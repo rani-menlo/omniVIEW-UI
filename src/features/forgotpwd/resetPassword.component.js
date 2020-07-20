@@ -3,18 +3,15 @@ import { connect } from "react-redux";
 import API from "../../redux/api";
 import { ApiActions } from "../../redux/actions";
 import { URI } from "../../constants";
-import _ from "lodash";
 import Header from "../header/header.component";
 import { translate } from "../../translations/translator";
-import Split from "react-split";
-import SplitterLayout from "react-splitter-layout";
 
 import {
   Text,
   OmniButton,
   Loader,
   ContentLayout,
-  InputField
+  InputField,
 } from "../../uikit/components";
 import { isValidPwd } from "../../utils";
 import { LoginActions } from "../../redux/actions";
@@ -25,13 +22,13 @@ class ResetPassword extends Component {
     this.state = {
       password: {
         value: "",
-        error: ""
+        error: "",
       },
       confirmPwd: {
         value: "",
-        error: ""
+        error: "",
       },
-      expired: false
+      expired: false,
     };
   }
 
@@ -39,7 +36,7 @@ class ResetPassword extends Component {
     const { params } = this.props.match;
     this.props.dispatch(ApiActions.requestOnDemand());
     const res = await API.post(URI.RESET_PWD_LINK_EXPIRY, {
-      password: params.key
+      password: params.key,
     });
     this.props.dispatch(ApiActions.successOnDemand());
     if (res.data.expired) {
@@ -47,10 +44,10 @@ class ResetPassword extends Component {
     }
   }
 
-  onInputChange = field => e => {
+  onInputChange = (field) => (e) => {
     const { value } = e.target;
     this.setState({
-      [field]: { ...this.state[field], value, error: "" }
+      [field]: { ...this.state[field], value, error: "" },
     });
   };
 
@@ -70,7 +67,7 @@ class ResetPassword extends Component {
       state.password.error = translate("error.form.required", {
         type: `${translate("label.generic.new")} ${translate(
           "label.form.password"
-        )}`
+        )}`,
       });
     }
     if (state.password.value) {
@@ -79,7 +76,7 @@ class ResetPassword extends Component {
         if (!state.confirmPwd.value) {
           error = true;
           state.confirmPwd.error = translate("error.form.required", {
-            type: translate("label.form.password")
+            type: translate("label.form.password"),
           });
         }
         if (state.password.value !== state.confirmPwd.value) {
@@ -102,7 +99,7 @@ class ResetPassword extends Component {
         {
           key: params.key,
           password: state.password.value,
-          confirmPassword: state.confirmPwd.value
+          confirmPassword: state.confirmPwd.value,
         },
         () => {
           this.goToLogin();
@@ -177,6 +174,7 @@ class ResetPassword extends Component {
               <img
                 src="/images/alert-low.svg"
                 style={{ width: "40px", height: "40px" }}
+                alt="alert"
               />
               <Text
                 type="bold"
@@ -220,13 +218,13 @@ class ResetPassword extends Component {
 
 function mapStateToProps(state) {
   return {
-    loading: state.Api.loading
+    loading: state.Api.loading,
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    dispatch
+    dispatch,
   };
 }
 

@@ -1,6 +1,5 @@
 import { UsermanagementActionTypes } from "../actionTypes";
 import _ from "lodash";
-import moment from "moment";
 import ApiActions from "./api.actions";
 import { UsermanagementApi } from "../api";
 import { Toast } from "../../uikit/components";

@@ -5,7 +5,6 @@ import _ from "lodash";
 import NodeSequenceTree from "./nodeSequenceTree";
 import { PermissionCheckbox } from "../../uikit/components";
 import { CHECKBOX } from "../../constants";
-import { Permissions } from "./permissions";
 import { getOrderedSequences } from "../../utils";
 
 class NodeSequences extends Component {
@@ -143,7 +142,7 @@ class NodeSequences extends Component {
               "selected-sortby"}`}
             onClick={this.sortBy("submission")}
           >
-            <img src="/images/filter-blue.svg" />
+            <img src="/images/filter-blue.svg" alt="filter"/>
             <span className="label">Submission Type</span>
           </div>
           <div
@@ -151,7 +150,7 @@ class NodeSequences extends Component {
               "selected-sortby"}`}
             onClick={this.sortBy("sequence")}
           >
-            <img src="/images/sort.svg" />
+            <img src="/images/sort.svg" alt="sort"/>
             <span className="label">Sequence</span>
           </div>
         </div>

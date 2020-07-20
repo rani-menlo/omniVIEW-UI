@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { Input, Form, Button } from "antd";
 import { connect } from "react-redux";
-import _ from "lodash";
 import { LoginActions } from "../../redux/actions";
 import Loader from "../../uikit/components/loader";
 import Footer from "../../uikit/components/footer/footer.component";

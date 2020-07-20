@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import _ from "lodash";
 import { isLoggedInOmniciaRole } from "../../utils";
 import { bindActionCreators } from "redux";
 import {
@@ -18,8 +17,8 @@ import Header from "../header/header.component";
 import { translate } from "../../translations/translator";
 import { isEmail, isPhone, isValidPwd } from "../../utils";
 import { LoginActions, ApiActions, CustomerActions } from "../../redux/actions";
-import { Upload, Avatar, Checkbox, Modal } from "antd";
-import { IMAGE_SUPPORT_TYPES, DEBOUNCE_TIME } from "../../constants";
+import { Upload, Checkbox, Modal } from "antd";
+import { IMAGE_SUPPORT_TYPES } from "../../constants";
 import { UsermanagementApi } from "../../redux/api";
 
 class CreateProfile extends Component {
@@ -366,7 +365,7 @@ class CreateProfile extends Component {
       phone,
       showChangePassword,
     } = this.state;
-    const { user, first_login, customer, role } = this.props;
+    const { first_login, customer, role } = this.props;
     return (
       <React.Fragment>
         <Loader loading={this.props.loading} />
@@ -605,6 +604,7 @@ class CreateProfile extends Component {
                   <img
                     src="/images/upload.svg"
                     className="createProfile__upload-inner-image"
+                    alt="upload"
                   />
                   <span className="createProfile__upload-inner-drag">
                     Drag & Drop or{" "}
@@ -701,6 +701,7 @@ class CreateProfile extends Component {
                 src="/images/close.svg"
                 className="email-change-modal__header-close"
                 onClick={this.closeEmailModal}
+                alt="close"
               />
             </div>
             <div className="email-change-modal__fields">

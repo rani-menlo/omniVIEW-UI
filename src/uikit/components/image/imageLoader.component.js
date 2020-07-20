@@ -11,7 +11,7 @@ class ImageLoader extends Component {
     super(props);
     this.state = {
       image: "/images/fallback-user.png",
-      loading: true
+      loading: true,
     };
   }
 
@@ -23,7 +23,7 @@ class ImageLoader extends Component {
     globalAccess: PropTypes.bool,
     className: PropTypes.string,
     style: PropTypes.object,
-    onClick: PropTypes.func
+    onClick: PropTypes.func,
   };
 
   async componentDidMount() {
@@ -38,12 +38,12 @@ class ImageLoader extends Component {
       }
       this.setState({
         image: imageData,
-        loading: false
+        loading: false,
       });
     } else {
       this.setState({
         image: "/images/fallback-user.png",
-        loading: false
+        loading: false,
       });
     }
   }
@@ -56,12 +56,12 @@ class ImageLoader extends Component {
       className,
       onClick,
       style,
-      globalAccess
+      globalAccess,
     } = this.props;
     const newStyle = {
       height,
       width,
-      ...style
+      ...style,
     };
     if (this.state.loading) {
       return (
@@ -74,6 +74,7 @@ class ImageLoader extends Component {
       <div style={{ position: "relative", display: "inline-block" }}>
         <img
           className={className}
+          alt="circle"
           style={{ ...newStyle, borderRadius: "80px" }}
           src={this.state.image}
           onClick={onClick}
@@ -81,6 +82,7 @@ class ImageLoader extends Component {
         {globalAccess && (
           <img
             src="/images/globe.svg"
+            alt="global-permissions"
             style={{ position: "absolute", bottom: "2px", right: "5px" }}
             title={translate("label.permissions.globalaccess")}
           />
@@ -88,6 +90,7 @@ class ImageLoader extends Component {
       </div>
     ) : (
       <img
+        alt="circle"
         className={className}
         style={newStyle}
         src={this.state.image}
