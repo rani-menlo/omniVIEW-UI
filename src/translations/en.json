@@ -38,7 +38,7 @@
   "text.generic.viewingpermissions": "Viewing {user}’s structure",
   "text.generic.editlifecycle": "(To edit permissions switch to Life Cycle View)",
   "text.generic.dragdrop": "Drag & Drop or",
-  "text.generic.chooseCsv": "Choose .csv file to upload",
+  "text.generic.chooseCsv": "Choose a .csv File",
 
   "label.role.administrator": "Administrator",
   "label.role.administrators": "Administrators",

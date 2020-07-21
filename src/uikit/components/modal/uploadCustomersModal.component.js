@@ -38,7 +38,7 @@ class UploadCustomersModal extends Component {
     if (
       fileName.substr(fileName.lastIndexOf(".") + 1).toLowerCase() !== "csv"
     ) {
-      Toast.error("Please upload only .csv files");
+      Toast.error("Invalid file type. Please select a valid .csv file.");
       return;
     }
     // Limit the number of uploaded files
