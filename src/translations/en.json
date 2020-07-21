@@ -37,6 +37,8 @@
   "text.generic.editingpermissions": "Editing {user}’s permissions",
   "text.generic.viewingpermissions": "Viewing {user}’s structure",
   "text.generic.editlifecycle": "(To edit permissions switch to Life Cycle View)",
+  "text.generic.dragdrop": "Drag & Drop or",
+  "text.generic.chooseCsv": "Choose .csv file to upload",
 
   "label.role.administrator": "Administrator",
   "label.role.administrators": "Administrators",
@@ -62,6 +64,7 @@
   "label.button.search": "Search",
   "label.button.editpermissions": "Edit Permissions",
   "label.button.editpermissionsglobal": "Edit Permissions of Global User",
+  "label.button.uploadCustomers": "Upload Customers",
   "text.pagination": "Showing - {top}-{bottom} of {total} {type}",
   "text.pagination.noofitems": "Number of Items:",
   "label.pagination.back": "Back",
