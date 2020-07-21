@@ -1,9 +1,10 @@
 import React, { Component } from "react";
-import { Modal, message } from "antd";
+import { Modal, Upload } from "antd";
+import { indexOf, get } from "lodash";
 import { OmniButton } from "..";
 import Text from "../text/text.component";
 import { translate } from "../../../translations/translator";
-import { Upload } from "antd";
+import { Toast } from "../../../uikit/components";
 
 const dummyRequest = ({ file, onSuccess }) => {
   setTimeout(() => {
@@ -14,27 +15,49 @@ const dummyRequest = ({ file, onSuccess }) => {
 class UploadCustomersModal extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
-    this.uploadCustContainer = React.createRef();
+    this.state = {
+      selectedFile: null,
+      fileList: [],
+    };
   }
 
   /**
    * on selection of file
    * @param {Object} info - file object
    */
-  onFileSelected = (info) => {
-    const { file, target } = info;
-    console.log(file, "file");
-    if (target) {
+  onFileSelected = (info, event) => {
+    const { file } = info;
+    let fileList = [...info.fileList];
+    const fileName = file.name;
+    //removing selected file on clicking remove
+    if (file.status === "removed") {
+      this.setState({ selectedFile: null, fileList });
       return;
     }
-    if (file.status === "uploading") {
-      this.props.fileChange(info);
+    //Checking for CSV file
+    if (
+      fileName.substr(fileName.lastIndexOf(".") + 1).toLowerCase() !== "csv"
+    ) {
+      Toast.error("Please upload only .csv files");
+      return;
     }
+    // Limit the number of uploaded files
+    // Only to show one recent uploaded files, and old file will be replaced by the new
+    fileList = fileList.slice(-1);
+    this.setState({ selectedFile: get(file, "originFileObj", ""), fileList });
+  };
+
+  /**
+   * upload csv file
+   */
+  uploadCSV = () => {
+    const { selectedFile } = this.state;
+    this.props.fileChange(selectedFile);
   };
 
   render() {
-    const { closeModal, user } = this.props;
+    const { closeModal } = this.props;
+    const { selectedFile, fileList } = this.state;
     return (
       <Modal
         visible
@@ -61,11 +84,10 @@ class UploadCustomersModal extends Component {
         <div>
           <Upload.Dragger
             className="upload-customers-modal__upload"
-            multiple={false}
-            showUploadList={true}
+            fileList={fileList}
             onChange={this.onFileSelected}
             customRequest={dummyRequest}
-            accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+            accept=".csv"
           >
             <p className="upload-customers-modal__upload-inner">
               <img
@@ -80,13 +102,6 @@ class UploadCustomersModal extends Component {
               </span>
             </p>
           </Upload.Dragger>
-          {/* <input
-            type="file"
-            accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-            ref={this.uploadCustContainer}
-            style={{ display: "none" }}
-            onChange={this.onFileSelected}
-          /> */}
         </div>
 
         <div style={{ marginTop: "12px", textAlign: "right" }}>
@@ -99,7 +114,8 @@ class UploadCustomersModal extends Component {
           <OmniButton
             label={translate("label.button.upload")}
             buttonStyle={{ width: "120px" }}
-            onClick={this.upload}
+            disabled={!selectedFile}
+            onClick={this.uploadCSV}
           />
         </div>
       </Modal>

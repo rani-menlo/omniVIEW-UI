@@ -16,6 +16,10 @@
       margin: 30px 0;
       height: 80px !important;
     }
+    > .ant-upload-list-text {
+      position: relative;
+      top: -15px;
+    }
     &-inner {
       &-image {
         margin-right: 12px;

@@ -394,7 +394,7 @@ class CustomerDashboard extends Component {
   handleFileChange = async (fileObj) => {
     const { file } = fileObj;
     const reqObject = new FormData();
-    reqObject.append("file", file.originFileObj);
+    reqObject.append("file", file);
     this.props.dispatch(ApiActions.requestOnDemand());
     const res = await CustomerApi.uploadCustomers(reqObject);
     if (!res.data.error) {
