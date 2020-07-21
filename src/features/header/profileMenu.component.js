@@ -65,7 +65,7 @@ class ProfileMenu extends Component {
           >
             <p>
               <img
-                src="/images/switch-customers.jpeg"
+                src="/images/switch-customer.svg"
                 style={{ width: "20px", marginRight: "6px" }}
               />
               <span>{translate("text.header.switchcustomers")}</span>

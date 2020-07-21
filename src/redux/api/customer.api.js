@@ -33,4 +33,5 @@ export default {
     api.post(URI.GET_SUBSCRIPTIONS_IN_USE, { customerId }),
   getLicenceLookUps: () => api.get(URI.GET_LICENCE_LOOKUP_INFO),
   addNewLicences: (data) => api.post(URI.ADD_NEW_LICENCES, data),
+  uploadCustomers: (data) => api.post(URI.UPLOAD_CUSTOMERS, data),
 };

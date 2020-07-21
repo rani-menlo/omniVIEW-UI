@@ -9,7 +9,7 @@ const OmniButton = ({
   type,
   buttonStyle,
   disabled,
-  image
+  image,
 }) => {
   if (type === "add") {
     return (
@@ -23,6 +23,7 @@ const OmniButton = ({
       </span>
     );
   }
+
   return (
     <Button
       style={{ ...buttonStyle, opacity: disabled ? 0.2 : 1 }}
@@ -43,12 +44,12 @@ OmniButton.propTypes = {
   className: PropTypes.string,
   buttonStyle: PropTypes.object,
   disabled: PropTypes.bool,
-  image: PropTypes.node
+  image: PropTypes.node,
 };
 
 OmniButton.defaultProps = {
   type: "primary",
-  className: ""
+  className: "",
 };
 
 export default React.memo(OmniButton);

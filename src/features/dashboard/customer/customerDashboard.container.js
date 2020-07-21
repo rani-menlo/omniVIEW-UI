@@ -5,7 +5,11 @@ import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import styled from "styled-components";
 import CustomerCard from "../customerCard.component";
-import { CustomerActions, UsermanagementActions } from "../../../redux/actions";
+import {
+  CustomerActions,
+  UsermanagementActions,
+  ApiActions,
+} from "../../../redux/actions";
 import Header from "../../header/header.component";
 import { isLoggedInOmniciaRole, isLoggedInOmniciaAdmin } from "../../../utils";
 import {
@@ -27,6 +31,8 @@ import { translate } from "../../../translations/translator";
 import LicenceInUseUnAssigned from "../../license/licenceInUseUnAssigned.component";
 import AssignLicenceWithUsers from "../../license/assignLicenceWithUsers.component";
 import AssignLicence from "../../license/assignLicence.component";
+import UploadCustomersModal from "../../../uikit/components/modal/uploadCustomersModal.component";
+import { CustomerApi } from "../../../redux/api";
 
 class CustomerDashboard extends Component {
   constructor(props) {
@@ -41,6 +47,7 @@ class CustomerDashboard extends Component {
       showSubscriptionsInUse: false,
       showLicenceUnAssigned: false,
       showUsersModal: false,
+      showUploadCustomersModal: false,
       showAssignLicenceToUser: false,
       assigningLicence: null,
       selectedUsers: null,
@@ -364,6 +371,46 @@ class CustomerDashboard extends Component {
     });
   };
 
+  /**
+   * The Customer file(CSV Format file) will be uploaded from an interface from omniVIEW Next Gen,
+   * by an Omnicia administrator by clicking on “Upload Customers”.
+   * Open modal with browse option to upload CSV file
+   */
+  openUploadCustomersModal = () => {
+    this.setState({ showUploadCustomersModal: true });
+  };
+
+  /**
+   * Closing upload customers modal
+   */
+  closeuploadCustomersModal = () => {
+    this.setState({ showUploadCustomersModal: false });
+  };
+
+  /**
+   *
+   * @param {Object} fileObj
+   */
+  handleFileChange = async (fileObj) => {
+    const { file } = fileObj;
+    const reqObject = new FormData();
+    reqObject.append("file", file);
+    this.props.dispatch(ApiActions.requestOnDemand());
+    const res = await CustomerApi.uploadCustomers(reqObject);
+    if (!res.data.error) {
+      Toast.success(res.data.message);
+      this.props.dispatch(ApiActions.successOnDemand());
+      this.close();
+    } else {
+      Toast.error(res.data.message);
+      this.props.dispatch(ApiActions.successOnDemand());
+    }
+  };
+
+  close = () => {
+    this.closeuploadCustomersModal();
+  };
+
   render() {
     const {
       viewBy,
@@ -371,6 +418,7 @@ class CustomerDashboard extends Component {
       showSubscriptionsInUse,
       showLicenceUnAssigned,
       showUsersModal,
+      showUploadCustomersModal,
     } = this.state;
     const { customers, loading, customerCount, role } = this.props;
     return (
@@ -412,14 +460,27 @@ class CustomerDashboard extends Component {
               )}
             </div>
             {isLoggedInOmniciaAdmin(role) && (
-              <OmniButton
-                type="add"
-                label={translate("label.button.add", {
-                  type: translate("label.dashboard.customer"),
-                })}
-                onClick={this.addCustomer}
-                // className="global__disabled-box"
-              />
+              <div className="global__center-vert">
+                <OmniButton
+                  type="add"
+                  buttonStyle={{ marginRight: "15px" }}
+                  image={
+                    <img
+                      src="/images/customers_upload.svg"
+                      alt="upload-customers"
+                    />
+                  }
+                  label={translate("label.button.uploadCustomers")}
+                  onClick={this.openUploadCustomersModal}
+                />
+                <OmniButton
+                  type="add"
+                  label={translate("label.button.add", {
+                    type: translate("label.dashboard.customer"),
+                  })}
+                  onClick={this.addCustomer}
+                />
+              </div>
             )}
           </div>
           {viewBy === "lists" && (
@@ -614,6 +675,12 @@ class CustomerDashboard extends Component {
             back={this.goBackToUsersModal}
             submit={this.assignLicence}
           />
+          {showUploadCustomersModal && (
+            <UploadCustomersModal
+              closeModal={this.closeuploadCustomersModal}
+              fileChange={this.handleFileChange}
+            />
+          )}
         </ContentLayout>
       </React.Fragment>
     );
