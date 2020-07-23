@@ -39,6 +39,7 @@
   "text.generic.editlifecycle": "(To edit permissions switch to Life Cycle View)",
   "text.generic.dragdrop": "Drag & Drop or",
   "text.generic.chooseCsv": "Choose a .csv File",
+  "text.generic.errors": "Errors",
 
   "label.role.administrator": "Administrator",
   "label.role.administrators": "Administrators",

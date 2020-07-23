@@ -33,6 +33,7 @@ import AssignLicenceWithUsers from "../../license/assignLicenceWithUsers.compone
 import AssignLicence from "../../license/assignLicence.component";
 import UploadCustomersModal from "../../../uikit/components/modal/uploadCustomersModal.component";
 import { CustomerApi } from "../../../redux/api";
+import ErrorsModal from "../../../uikit/components/modal/errorsModal.component";
 
 class CustomerDashboard extends Component {
   constructor(props) {
@@ -51,6 +52,8 @@ class CustomerDashboard extends Component {
       showAssignLicenceToUser: false,
       assigningLicence: null,
       selectedUsers: null,
+      openErrorsModal: false,
+      customersErrors: [],
     };
     this.searchCustomers = _.debounce(this.searchCustomers, DEBOUNCE_TIME);
   }
@@ -391,24 +394,37 @@ class CustomerDashboard extends Component {
    *
    * @param {Object} fileObj
    */
-  handleFileChange = async (fileObj) => {
-    const { file } = fileObj;
+  handleFileChange = async (file) => {
+    let customersErrors = [];
+    let openErrorsModal = false;
     const reqObject = new FormData();
     reqObject.append("file", file);
     this.props.dispatch(ApiActions.requestOnDemand());
     const res = await CustomerApi.uploadCustomers(reqObject);
     if (!res.data.error) {
-      Toast.success(res.data.message);
+      if (res.data.customers && res.data.customers.length > 0) {
+        customersErrors = res.data.customers;
+        openErrorsModal = true;
+      } else {
+        customersErrors = [];
+        openErrorsModal = false;
+        Toast.success("Customers uploaded successfully");
+        this.changeView("lists");
+      }
       this.props.dispatch(ApiActions.successOnDemand());
-      this.close();
     } else {
-      Toast.error(res.data.message);
+      Toast.error("Please try again!");
       this.props.dispatch(ApiActions.successOnDemand());
     }
+    this.closeuploadCustomersModal();
+    this.setState({ openErrorsModal, customersErrors });
   };
 
-  close = () => {
-    this.closeuploadCustomersModal();
+  /**
+   * Close Errors modal
+   */
+  closeErrorsModal = () => {
+    this.setState({ openErrorsModal: false });
   };
 
   render() {
@@ -419,6 +435,8 @@ class CustomerDashboard extends Component {
       showLicenceUnAssigned,
       showUsersModal,
       showUploadCustomersModal,
+      openErrorsModal,
+      customersErrors,
     } = this.state;
     const { customers, loading, customerCount, role } = this.props;
     return (
@@ -679,6 +697,12 @@ class CustomerDashboard extends Component {
             <UploadCustomersModal
               closeModal={this.closeuploadCustomersModal}
               fileChange={this.handleFileChange}
+            />
+          )}
+          {openErrorsModal && customersErrors.length > 0 && (
+            <ErrorsModal
+              closeModal={this.closeErrorsModal}
+              customersErrors={customersErrors}
             />
           )}
         </ContentLayout>
