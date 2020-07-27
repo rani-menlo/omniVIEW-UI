@@ -7,7 +7,7 @@
   &-licenses {
     border-bottom: 2px solid $sky-of-margritte;
   }
-  &-licenses-number{
+  &-licenses-number {
     color: $sky-of-margritte !important;
   }
   &-assignpermissions {
@@ -69,6 +69,12 @@
           padding: 0px !important;
           &-item {
             border-bottom: 0.2px solid;
+            &-welcomeMail {
+              opacity: 0.6;
+              position: relative;
+              left: -5px;
+              margin-right: 4px !important;
+            }
             > p {
               @include text-regular;
               > img {
