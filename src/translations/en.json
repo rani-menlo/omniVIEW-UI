@@ -66,6 +66,7 @@
   "label.button.editpermissions": "Edit Permissions",
   "label.button.editpermissionsglobal": "Edit Permissions of Global User",
   "label.button.uploadCustomers": "Upload Customers",
+  "label.button.sendWelcomeEmails": "Send Welcome Emails",
   "text.pagination": "Showing - {top}-{bottom} of {total} {type}",
   "text.pagination.noofitems": "Number of Items:",
   "label.pagination.back": "Back",
@@ -73,6 +74,7 @@
   "text.header.search": "Search {type}...",
   "text.header.switchcustomers": "Switch Customer(s)",
 
+  "label.form.afsPath": "Customer Folder Name",
   "label.form.fname": "First Name",
   "label.form.lname": "Last Name",
   "label.form.username": "Username",

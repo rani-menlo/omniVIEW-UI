@@ -65,6 +65,10 @@ class AddCustomer extends Component {
         value: "",
         error: "",
       },
+      afsPath: {
+        value: "",
+        error: "",
+      },
       fname: {
         value: "",
         error: "",
@@ -292,6 +296,7 @@ class AddCustomer extends Component {
   populateState = (selectedCustomer = this.props.selectedCustomer) => {
     const state = { ...this.state };
     state.cname.value = selectedCustomer.company_name;
+    state.afsPath.value = selectedCustomer.afsPath;
     state.fname.value = selectedCustomer.first_name;
     state.lname.value = selectedCustomer.last_name;
     state.email.value = selectedCustomer.email;
@@ -353,6 +358,13 @@ class AddCustomer extends Component {
       error = true;
       state.cname.error = translate("error.form.required", {
         type: translate("label.form.companyname"),
+      });
+      window.scrollTo(0, 0);
+    }
+    if (!state.afsPath.value) {
+      error = true;
+      state.afsPath.error = translate("error.form.required", {
+        type: translate("label.form.afsPath"),
       });
       window.scrollTo(0, 0);
     }
@@ -439,6 +451,7 @@ class AddCustomer extends Component {
 
     let reqObject = {
       customerName: state.cname.value,
+      afsPath: state.afsPath.value,
       first_name: state.fname.value,
       last_name: state.lname.value,
       email: state.email.value,
@@ -766,6 +779,7 @@ class AddCustomer extends Component {
   render() {
     const {
       cname,
+      afsPath,
       fname,
       lname,
       email,
@@ -846,16 +860,29 @@ class AddCustomer extends Component {
                   type: translate("label.dashboard.company"),
                 })}
               </p>
-              <InputField
-                allowSpaces
-                className="addUser__fields-field"
-                style={{ marginRight: "14px" }}
-                label={`${translate("label.form.companyname")}*`}
-                value={cname.value}
-                placeholder={translate("label.form.companyname")}
-                error={cname.error}
-                onChange={this.onInputChange("cname")}
-              />
+              <Row style={{ justifyContent: "start" }}>
+                <InputField
+                  allowSpaces
+                  className="addUser__fields-field"
+                  style={{ marginRight: "14px" }}
+                  label={`${translate("label.form.companyname")}*`}
+                  value={cname.value}
+                  placeholder={translate("label.form.companyname")}
+                  error={cname.error}
+                  onChange={this.onInputChange("cname")}
+                />
+                <InputField
+                  disabled={editCustomer}
+                  allowSpaces
+                  className="addUser__fields-field"
+                  style={{ marginRight: "14px" }}
+                  label={`${translate("label.form.afsPath")}*`}
+                  value={afsPath.value}
+                  placeholder={translate("label.form.afsPath")}
+                  error={afsPath.error}
+                  onChange={this.onInputChange("afsPath")}
+                />
+              </Row>
               <p className="addUser-heading">
                 {translate("label.user.details", {
                   type: translate("label.dashboard.companyprimarycontact"),
