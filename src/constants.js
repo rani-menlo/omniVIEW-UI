@@ -71,6 +71,7 @@ const URI = {
   GET_USER_PROFILES: `${path}customer/getUserProfiles`,
   SWITCH_CUSTOMER: `${path}customer/switchCustomer`,
   UPLOAD_CUSTOMERS: `${path}customer/uploadCustomers`,
+  SEND_WELCOME_EMAILS: `${path}customer/sendWelcomeEmails`,
 
   // Submission
   GET_APPLICATIONS: `${path}submission/getSubmissions`,

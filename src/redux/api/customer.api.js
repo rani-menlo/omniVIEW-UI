@@ -34,4 +34,5 @@ export default {
   getLicenceLookUps: () => api.get(URI.GET_LICENCE_LOOKUP_INFO),
   addNewLicences: (data) => api.post(URI.ADD_NEW_LICENCES, data),
   uploadCustomers: (data) => api.post(URI.UPLOAD_CUSTOMERS, data),
+  sendCustWelcomeEmails: (data) => api.post(URI.SEND_WELCOME_EMAILS, data),
 };
