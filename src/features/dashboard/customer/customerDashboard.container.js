@@ -136,9 +136,7 @@ class CustomerDashboard extends Component {
   static getDerivedStateFromProps(props, state) {
     if (_.get(props, "customers.length") && !_.get(state, "customers.length")) {
       return {
-        customers: _.map(props.customers, (customer) => {
-          return customer;
-        }),
+        customers: [...props.customers]
       };
     }
     return null;
@@ -151,6 +149,7 @@ class CustomerDashboard extends Component {
    */
   fetchCustomers = (sortBy = "company_name", orderBy = "ASC") => {
     const { viewBy, pageNo, itemsPerPage, searchText } = this.state;
+    this.props.dispatch(CustomerActions.resetCustomers());
     const TableColumns = [...this.state.TableColumns];
     TableColumns[0].checked = false;
     this.setState({ customers: [], checkedCustomers: [], TableColumns }, () => {
@@ -250,7 +249,7 @@ class CustomerDashboard extends Component {
         {!customer.welcomeMailSent && (
           <Menu.Item
             className="maindashboard__list__item-dropdown-menu-item"
-            onClick={this.sendWelcomeEmails(customer)}
+            onClick={(event) => this.sendWelcomeEmail(customer, event)}
           >
             <p>
               <img
@@ -492,12 +491,14 @@ class CustomerDashboard extends Component {
         openErrorsModal = false;
         Toast.success("Customers uploaded successfully");
       }
+      this.closeuploadCustomersModal();
       this.props.dispatch(ApiActions.successOnDemand());
     } else {
-      Toast.error("Please try again!");
+      let message =
+        res && res.data.message ? res.data.message : "Please try again!";
+      Toast.error(message);
       this.props.dispatch(ApiActions.successOnDemand());
     }
-    this.closeuploadCustomersModal();
     this.setState({ openErrorsModal, customersErrors, viewBy: "lists" }, () => {
       this.fetchCustomers();
     });
@@ -594,7 +595,34 @@ class CustomerDashboard extends Component {
   /**
    * send welcome emails to the customers
    */
-  sendWelcomeEmails = (customer) => {};
+  sendWelcomeEmails = async () => {
+    const customerIds = this.state.selectedCustomer
+      ? [this.state.selectedCustomer.id]
+      : _.map(this.state.checkedCustomers, "id");
+    this.props.dispatch(ApiActions.requestOnDemand());
+    const res = await CustomerApi.sendCustWelcomeEmails({ customerIds });
+    if (!res.data.error) {
+      this.props.dispatch(ApiActions.successOnDemand());
+      Toast.success("Email(s) have been sent successfully");
+    } else {
+      let message =
+        res && res.data && res.data.message
+          ? res.data.message
+          : "Please try again";
+      Toast.error(message);
+      this.props.dispatch(ApiActions.successOnDemand());
+    }
+    this.fetchCustomers();
+  };
+
+  /**
+   * Send Welcome emails when user clicks on Send Welcome EMails menu option
+   */
+  sendWelcomeEmail = (customer, event) => {
+    this.setState({ selectedCustomer: customer }, () => {
+      this.sendWelcomeEmails();
+    });
+  };
 
   render() {
     const {
@@ -616,7 +644,11 @@ class CustomerDashboard extends Component {
         <Loader loading={loading} />
         <Header />
         <SubHeader>
-          <ListViewGridView viewBy={viewBy} changeView={this.changeView} />
+          <ListViewGridView
+            viewBy={viewBy}
+            changeView={this.changeView}
+            key={this.props.customers}
+          />
           <div style={{ marginLeft: "auto" }}>
             <SearchBox
               placeholder={translate("text.header.search", {
@@ -655,6 +687,7 @@ class CustomerDashboard extends Component {
                         <img src="/images/send.svg" alt="Send welcome emails" />
                       }
                       label={translate("label.button.sendWelcomeEmails")}
+                      onClick={this.sendWelcomeEmails}
                     />
                   )}
                 <OmniButton
@@ -687,7 +720,6 @@ class CustomerDashboard extends Component {
                   sortColumn={this.sortColumn}
                 />
                 {_.map(customers, (customer) => {
-                  console.log(customer);
                   return (
                     <Row
                       key={customer.id}
