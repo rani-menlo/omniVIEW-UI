@@ -134,9 +134,9 @@ class CustomerDashboard extends Component {
   }
 
   static getDerivedStateFromProps(props, state) {
-    if (props.customers !== state.customers) {
+    if (_.get(props, "customers.length") && !_.get(state, "customers.length")) {
       return {
-        customers: props.customers,
+        customers: [...props.customers]
       };
     }
     return null;
@@ -149,6 +149,7 @@ class CustomerDashboard extends Component {
    */
   fetchCustomers = (sortBy = "company_name", orderBy = "ASC") => {
     const { viewBy, pageNo, itemsPerPage, searchText } = this.state;
+    this.props.dispatch(CustomerActions.resetCustomers());
     const TableColumns = [...this.state.TableColumns];
     TableColumns[0].checked = false;
     this.setState({ customers: [], checkedCustomers: [], TableColumns }, () => {
@@ -490,12 +491,14 @@ class CustomerDashboard extends Component {
         openErrorsModal = false;
         Toast.success("Customers uploaded successfully");
       }
+      this.closeuploadCustomersModal();
       this.props.dispatch(ApiActions.successOnDemand());
     } else {
-      Toast.error("Please try again!");
+      let message =
+        res && res.data.message ? res.data.message : "Please try again!";
+      Toast.error(message);
       this.props.dispatch(ApiActions.successOnDemand());
     }
-    this.closeuploadCustomersModal();
     this.setState({ openErrorsModal, customersErrors, viewBy: "lists" }, () => {
       this.fetchCustomers();
     });
@@ -599,8 +602,8 @@ class CustomerDashboard extends Component {
     this.props.dispatch(ApiActions.requestOnDemand());
     const res = await CustomerApi.sendCustWelcomeEmails({ customerIds });
     if (!res.data.error) {
-      Toast.success("Email(s) have been sent successfully");
       this.props.dispatch(ApiActions.successOnDemand());
+      Toast.success("Email(s) have been sent successfully");
     } else {
       let message =
         res && res.data && res.data.message
@@ -609,12 +612,7 @@ class CustomerDashboard extends Component {
       Toast.error(message);
       this.props.dispatch(ApiActions.successOnDemand());
     }
-    this.setState(
-      { viewBy: "lists", pageNo: 1, itemsPerPage: 5, customers: [] },
-      () => {
-        this.fetchCustomers();
-      }
-    );
+    this.fetchCustomers();
   };
 
   /**
@@ -646,7 +644,11 @@ class CustomerDashboard extends Component {
         <Loader loading={loading} />
         <Header />
         <SubHeader>
-          <ListViewGridView viewBy={viewBy} changeView={this.changeView} key={this.props.customers.length}/>
+          <ListViewGridView
+            viewBy={viewBy}
+            changeView={this.changeView}
+            key={this.props.customers}
+          />
           <div style={{ marginLeft: "auto" }}>
             <SearchBox
               placeholder={translate("text.header.search", {
@@ -718,7 +720,6 @@ class CustomerDashboard extends Component {
                   sortColumn={this.sortColumn}
                 />
                 {_.map(customers, (customer) => {
-                  console.log(customer);
                   return (
                     <Row
                       key={customer.id}

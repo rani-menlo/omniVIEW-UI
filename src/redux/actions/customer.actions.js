@@ -43,6 +43,10 @@ export default {
       }
     };
   },
+  resetCustomers: () => ({
+    type: CustomerActionTypes.FETCH_CUSTOMERS,
+    data: { data: [] },
+  }),
   addCustomer: (customer, callback) => {
     return async (dispatch) => {
       ApiActions.request(dispatch);
