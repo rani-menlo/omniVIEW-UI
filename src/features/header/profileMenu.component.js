@@ -58,6 +58,19 @@ class ProfileMenu extends Component {
             )}`}</span>
           </p>
         </Menu.Item>
+        {isLoggedInOmniciaAdmin(this.props.role) && (
+          <Menu.Item
+            className="maindashboard__list__item-dropdown-menu-item"
+            onClick={this.validateApplications}
+          >
+            <p>
+              <img src="/images/user-management.svg" />
+              <span>{`${translate("label.generic.manage")} ${translate(
+                "label.dashboard.applications"
+              )}`}</span>
+            </p>
+          </Menu.Item>
+        )}
         {this.props.customerAccounts && this.props.customerAccounts.length > 1 && (
           <Menu.Item
             className="maindashboard__list__item-dropdown-menu-item"
@@ -105,6 +118,13 @@ class ProfileMenu extends Component {
       `${window.location.origin}/OmniVIEW How-To Guide.pdf`,
       "_blank"
     );
+  };
+
+  /**
+   * redirect to validate applications scree
+   */
+  validateApplications = () => {
+    this.props.history.push("/validateApplications");
   };
 
   render() {

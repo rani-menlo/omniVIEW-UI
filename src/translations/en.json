@@ -141,6 +141,8 @@
   "label.dashboard.assignglobalpermissions": "Assign Global Permissions",
   "label.dashboard.assignpermissions": "Assign Permissions",
   "label.dashboard.submissioncenter": "Submission Center",
+  "label.dashboard.noOfSequences": "# of Sequences",
+  "label.dashboard.applicationStatus": "Application Status",
   "text.dashboard.editproperties": "Here you can change all existing properties of the application.",
   "error.dashboard.notfound": "No {type} found",
 
