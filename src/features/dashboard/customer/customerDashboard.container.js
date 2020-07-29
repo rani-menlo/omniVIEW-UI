@@ -136,7 +136,7 @@ class CustomerDashboard extends Component {
   static getDerivedStateFromProps(props, state) {
     if (_.get(props, "customers.length") && !_.get(state, "customers.length")) {
       return {
-        customers: [...props.customers]
+        customers: [...props.customers],
       };
     }
     return null;
@@ -147,7 +147,7 @@ class CustomerDashboard extends Component {
    * @param {*} sortBy
    * @param {*} orderBy
    */
-  fetchCustomers = (sortBy = "company_name", orderBy = "ASC") => {
+  fetchCustomers = (sortBy = "created_at", orderBy = "ASC") => {
     const { viewBy, pageNo, itemsPerPage, searchText } = this.state;
     this.props.dispatch(CustomerActions.resetCustomers());
     const TableColumns = [...this.state.TableColumns];
@@ -256,7 +256,7 @@ class CustomerDashboard extends Component {
                 src="/images/send-black.svg"
                 className="maindashboard__list__item-dropdown-menu-item-welcomeMail"
               />
-              <span>{`${translate("label.button.sendWelcomeEmails")}`}</span>
+              <span>{`${translate("label.button.sendWelcomeEmail")}`}</span>
             </p>
           </Menu.Item>
         )}
@@ -379,6 +379,7 @@ class CustomerDashboard extends Component {
       )
     );
     this.closeActivateDeactivateModal();
+    this.fetchCustomers();
   };
 
   openActivateDeactivateModal = (customer) => () => {
@@ -461,6 +462,7 @@ class CustomerDashboard extends Component {
    * Open modal with browse option to upload CSV file
    */
   openUploadCustomersModal = () => {
+    this.props.dispatch(CustomerActions.resetUploadCustomerErrors());
     this.setState({ showUploadCustomersModal: true });
   };
 
@@ -468,6 +470,7 @@ class CustomerDashboard extends Component {
    * Closing upload customers modal
    */
   closeuploadCustomersModal = () => {
+    this.props.dispatch(CustomerActions.resetUploadCustomerErrors());
     this.setState({ showUploadCustomersModal: false });
   };
 
@@ -478,6 +481,7 @@ class CustomerDashboard extends Component {
   handleFileChange = async (file) => {
     let customersErrors = [];
     let openErrorsModal = false;
+    this.props.actions.resetUploadCustomerErrors();
     const reqObject = new FormData();
     reqObject.append("file", file);
     this.props.dispatch(ApiActions.requestOnDemand());
@@ -494,9 +498,9 @@ class CustomerDashboard extends Component {
       this.closeuploadCustomersModal();
       this.props.dispatch(ApiActions.successOnDemand());
     } else {
-      let message =
+      let uploadErrorMessage =
         res && res.data.message ? res.data.message : "Please try again!";
-      Toast.error(message);
+      this.props.actions.setUploadCustomerErrors(uploadErrorMessage);
       this.props.dispatch(ApiActions.successOnDemand());
     }
     this.setState({ openErrorsModal, customersErrors, viewBy: "lists" }, () => {
@@ -644,11 +648,7 @@ class CustomerDashboard extends Component {
         <Loader loading={loading} />
         <Header />
         <SubHeader>
-          <ListViewGridView
-            viewBy={viewBy}
-            changeView={this.changeView}
-            key={this.props.customers}
-          />
+          <ListViewGridView viewBy={viewBy} changeView={this.changeView} />
           <div style={{ marginLeft: "auto" }}>
             <SearchBox
               placeholder={translate("text.header.search", {

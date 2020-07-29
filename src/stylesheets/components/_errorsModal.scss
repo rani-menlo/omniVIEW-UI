@@ -20,63 +20,57 @@
   }
   /* Set a fixed scrollable wrapper */
   &__table {
-    height: 400px;
+    width: 100%;
     border: 1px solid rgba(74, 74, 74, 0.25);
-    overflow-y: auto;
-    overflow-x: hidden;
-    /* If we use border,
-     must use table-collapse to avoid
-    a slight movement of the header row */
-    table {
+    tr {
+      border-bottom: 1px solid rgba(74, 74, 74, 0.25);
+      th {
+        padding: 8px 16px;
+      }
+      th:nth-child(1),
+      td:nth-child(1) {
+        width: 40%;
+      }
+      td:nth-child(1) {
+        border-right: 1px solid rgba(74, 74, 74, 0.25);
+      }
+      th:nth-child(2),
+      td:nth-child(2) {
+        width: 60%;
+        padding: 0;
+      }
+      th:nth-child(2) {
+        padding: 8px 16px;
+      }
+    }
+    thead {
+      display: table; /* to take the same width as tr */
       width: 100%;
-      border-collapse: collapse;
       tr {
-        border-bottom: 1px solid rgba(74, 74, 74, 0.25);
         th {
+          background: $froasted-glass;
+          @include text-bold();
+        }
+      }
+    }
+    tbody {
+      display: block; /* to enable vertical scrolling */
+      height: 400px; /* e.g. */
+      overflow-y: auto; /* keeps the scrollbar even if it doesn't need it; display purpose */
+      tr:nth-child(odd) {
+        padding: 8px 16px;
+        background: #fafafa;
+      }
+      tr {
+        td:nth-child(odd) {
           padding: 8px 16px;
         }
-        th:nth-child(1),
-        td:nth-child(1) {
-          width: 40%;
-          border-right: 1px solid rgba(74, 74, 74, 0.25);
-        }
-        th:nth-child(2),
-        td:nth-child(2) {
-          width: 60%;
-          padding: 0;
-        }
-        th:nth-child(2) {
-          padding: 8px 16px;
-        }
       }
-      thead {
-        tr {
-          /* Set header to stick to the top of the container. */
-          th {
-            background: $froasted-glass;
-            @include text-bold();
-            position: sticky;
-            top: 0;
-          }
-        }
-      }
-      tbody {
-        tr {
-          td:nth-child(odd) {
-            padding: 8px 16px;
-          }
-        }
-        tr:nth-child(odd) {
-          td:nth-child(1) {
-            background: #fafafa;
-          }
-        }
-        td:nth-child(2) {
-          > :nth-child(odd) {
-            background: #fafafa;
-          }
-        }
-      }
+    }
+    tr {
+      display: table; /* display purpose; th's border */
+      width: 100%;
+      box-sizing: border-box; /* because of the border (Chrome needs this line, but not FF) */
     }
   }
 }

@@ -10,6 +10,7 @@ const initialState = {
   licencesUnAssigned: [],
   subscriptionsLoading: false,
   licencesUnAssignedLoading: false,
+  customerUploadError: "",
   lookupLicences: {
     licences: [],
     types: [],
@@ -83,6 +84,18 @@ export default (state = initialState, action) => {
             })
           ),
         },
+      };
+    }
+    case CustomerActionTypes.SET_CUSTOMER_UPLOAD_ERROR: {
+      return {
+        ...state,
+        customerUploadError: action.error,
+      };
+    }
+    case CustomerActionTypes.RESET_CUSTOMER_UPLOAD_ERROR: {
+      return {
+        ...state,
+        customerUploadError: "",
       };
     }
     default:
