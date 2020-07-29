@@ -297,6 +297,7 @@
   "label.submissions.open": "Open eCTD Submission",
   "label.submissions.recent": "Recent",
   "label.submissions.customers": "Customers",
+  "label.submissions.validateApplications": "Validate Applications",
   "label.button.export": "Export to PDF",
 
   "label.button.delete": "Delete",

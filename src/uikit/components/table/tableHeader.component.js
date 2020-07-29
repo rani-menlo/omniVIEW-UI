@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Checkbox, Icon } from "antd";
+import { Checkbox, Icon, Switch } from "antd";
 import styled from "styled-components";
 import Row from "../row/row.component";
 import PropTypes from "prop-types";
@@ -10,19 +10,20 @@ class TableHeader extends Component {
   static propTypes = {
     columns: PropTypes.arrayOf(PropTypes.object),
     style: PropTypes.object,
-    sortColumn: PropTypes.func
+    sortColumn: PropTypes.func,
+    checkAll: PropTypes.func,
   };
 
   constructor(props) {
     super(props);
     this.state = {
       sortBy: "",
-      orderBy: "ASC"
+      orderBy: "ASC",
     };
     this.selectedColumn = null;
   }
 
-  order = column => () => {
+  order = (column) => () => {
     if (!column.name || !column.sort) {
       return;
     }
@@ -41,7 +42,7 @@ class TableHeader extends Component {
     );
   };
 
-  getSortIcon = column => {
+  getSortIcon = (column) => {
     if (this.state.sortBy === column.key) {
       if (this.state.orderBy === "ASC") {
         return <IconCustom type="caret-down" />;
@@ -53,10 +54,10 @@ class TableHeader extends Component {
   };
 
   render() {
-    const { columns, style } = this.props;
+    const { columns, style, viewAll, checkAll } = this.props;
     return (
       <div className="tableHeader" style={style}>
-        {_.map(columns, column => (
+        {_.map(columns, (column) => (
           <RowItems
             key={column.name}
             width={column.width}
@@ -75,6 +76,14 @@ class TableHeader extends Component {
               )}
               {column.name}
               {column.sort && this.getSortIcon(column)}
+              {column.toggle && (
+                <div className="tableHeader__item__status">
+                  <Switch size="small" checked={viewAll} onClick={checkAll} />
+                  <span className="tableHeader__item__status__label">
+                    {viewAll ? "All On" : "All Off"}
+                  </span>
+                </div>
+              )}
             </div>
           </RowItems>
         ))}
@@ -84,7 +93,7 @@ class TableHeader extends Component {
 }
 
 const RowItems = styled(Row)`
-  width: ${props => props.width};
+  width: ${(props) => props.width};
   justify-content: normal;
 `;
 
