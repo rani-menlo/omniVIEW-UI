@@ -872,8 +872,6 @@ class AddCustomer extends Component {
                   onChange={this.onInputChange("cname")}
                 />
                 <InputField
-                  disabled={editCustomer}
-                  allowSpaces
                   className="addUser__fields-field"
                   style={{ marginRight: "14px" }}
                   label={`${translate("label.form.afsPath")}*`}
