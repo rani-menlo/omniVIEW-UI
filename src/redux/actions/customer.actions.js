@@ -182,4 +182,15 @@ export default {
       type: CustomerActionTypes.RESET_IN_USE_UN_ASSIGNED,
     };
   },
+  setUploadCustomerErrors: (error) => {
+    return {
+      type: CustomerActionTypes.SET_CUSTOMER_UPLOAD_ERROR,
+      error,
+    };
+  },
+  resetUploadCustomerErrors: () => {
+    return {
+      type: CustomerActionTypes.RESET_CUSTOMER_UPLOAD_ERROR,
+    };
+  },
 };

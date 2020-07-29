@@ -36,4 +36,12 @@
       }
     }
   }
+  &__error {
+    width: 94%;
+    color: $red;
+    text-align: left;
+    position: relative;
+    top: -15px;
+    left: 25px;
+  }
 }

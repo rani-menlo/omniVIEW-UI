@@ -1,10 +1,12 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
 import { Modal, Upload } from "antd";
 import { indexOf, get } from "lodash";
 import { OmniButton } from "..";
 import Text from "../text/text.component";
 import { translate } from "../../../translations/translator";
-import { Toast } from "../../../uikit/components";
+import { CustomerActions } from "../../../redux/actions";
+import { bindActionCreators } from "redux";
 
 const dummyRequest = ({ file, onSuccess }) => {
   setTimeout(() => {
@@ -26,6 +28,8 @@ class UploadCustomersModal extends Component {
    * @param {Object} info - file object
    */
   onFileSelected = (info, event) => {
+    //reseting upload errors, if any
+    this.props.dispatch(CustomerActions.resetUploadCustomerErrors());
     const { file } = info;
     let fileList = [...info.fileList];
     const fileName = file.name;
@@ -38,8 +42,10 @@ class UploadCustomersModal extends Component {
     if (
       fileName.substr(fileName.lastIndexOf(".") + 1).toLowerCase() !== "csv"
     ) {
-      Toast.error("Invalid file type. Please select a valid .csv file.");
-      return;
+      this.props.actions.setUploadCustomerErrors(
+        "Invalid file type. Please select a valid .csv file."
+      );
+      // return;
     }
     // Limit the number of uploaded files
     // Only to show one recent uploaded files, and old file will be replaced by the new
@@ -56,7 +62,7 @@ class UploadCustomersModal extends Component {
   };
 
   render() {
-    const { closeModal } = this.props;
+    const { closeModal, customerUploadError } = this.props;
     const { selectedFile, fileList } = this.state;
     return (
       <Modal
@@ -102,9 +108,16 @@ class UploadCustomersModal extends Component {
               </span>
             </p>
           </Upload.Dragger>
+          {customerUploadError && (
+            <Text
+              type="regular"
+              size="12px"
+              text={customerUploadError}
+              className="upload-customers-modal__error"
+            />
+          )}
         </div>
-
-        <div style={{ marginTop: "12px", textAlign: "right" }}>
+        <div style={{ textAlign: "right" }}>
           <OmniButton
             type="secondary"
             label={translate("label.button.cancel")}
@@ -114,7 +127,7 @@ class UploadCustomersModal extends Component {
           <OmniButton
             label={translate("label.button.upload")}
             buttonStyle={{ width: "120px" }}
-            disabled={!selectedFile}
+            disabled={!selectedFile || customerUploadError}
             onClick={this.uploadCSV}
           />
         </div>
@@ -123,4 +136,20 @@ class UploadCustomersModal extends Component {
   }
 }
 
-export default UploadCustomersModal;
+function mapStateToProps(state) {
+  return {
+    customerUploadError: state.Customer.customerUploadError,
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    actions: bindActionCreators({ ...CustomerActions }, dispatch),
+    dispatch,
+  };
+}
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(UploadCustomersModal);

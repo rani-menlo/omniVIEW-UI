@@ -32,60 +32,54 @@ class ErrorsModal extends Component {
             onClick={closeModal}
           />
         </div>
-        <div className="errors-modal__table scrollbar">
-          <table>
-            <thead>
-              <tr>
-                <th>Title</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody>
-              {customersErrors &&
-                customersErrors.length &&
-                customersErrors.map((customer, index) => {
-                  if (!customer.errorMessages.length) {
-                    return null;
-                  }
-                  return (
-                    <>
-                      <tr key={index}>
-                        <td className="errors-modal__table-customerName">
-                          {" "}
+        <table className="errors-modal__table">
+          <thead>
+            <tr>
+              <th>Customer Name</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody className="scrollbar">
+            {customersErrors &&
+              customersErrors.length &&
+              customersErrors.map((customer, index) => {
+                if (!customer.errorMessages.length) {
+                  return null;
+                }
+                return (
+                  <>
+                    <tr key={index}>
+                      <td className="errors-modal__table-customerName">
+                        {" "}
+                        <Text
+                          type="regular"
+                          text={`${get(customer, "Company Name", "N/A")}`}
+                          size="14px"
+                        />
+                      </td>
+                      <td>
+                        {customer.errorMessages.map((error, idx) => (
                           <Text
                             type="regular"
-                            text={`${get(
-                              customer,
-                              "Company Name",
-                              ""
-                            )} Error Details`}
+                            text={error || "N/A"}
                             size="14px"
+                            textStyle={{
+                              borderBottom: `${
+                                customer.errorMessages.length - 1 == idx
+                                  ? 0
+                                  : 0.5
+                              }px solid rgba(74, 74, 74, 0.25)`,
+                              padding: "8px 16px",
+                            }}
                           />
-                        </td>
-                        <td>
-                          {customer.errorMessages.map((error, idx) => (
-                            <Text
-                              type="regular"
-                              text={error}
-                              size="14px"
-                              textStyle={{
-                                borderBottom: `${
-                                  customer.errorMessages.length - 1 == idx
-                                    ? 0
-                                    : 1
-                                }px solid rgba(74, 74, 74, 0.25)`,
-                                padding: "8px 16px",
-                              }}
-                            />
-                          ))}
-                        </td>
-                      </tr>
-                    </>
-                  );
-                })}
-            </tbody>
-          </table>
-        </div>
+                        ))}
+                      </td>
+                    </tr>
+                  </>
+                );
+              })}
+          </tbody>
+        </table>
         <div style={{ marginTop: "12px", textAlign: "right" }}>
           <OmniButton
             label={translate("label.button.close")}
