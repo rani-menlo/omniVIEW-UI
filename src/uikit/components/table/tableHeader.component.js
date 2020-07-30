@@ -5,7 +5,7 @@ import Row from "../row/row.component";
 import PropTypes from "prop-types";
 import _ from "lodash";
 import OmniCheckbox from "../checkbox/omniCheckbox.component";
-
+import { translate } from "../../../translations/translator";
 class TableHeader extends Component {
   static propTypes = {
     columns: PropTypes.arrayOf(PropTypes.object),
@@ -80,7 +80,9 @@ class TableHeader extends Component {
                 <div className="tableHeader__item__status">
                   <Switch size="small" checked={viewAll} onClick={checkAll} />
                   <span className="tableHeader__item__status__label">
-                    {viewAll ? "All On" : "All Off"}
+                    {viewAll
+                      ? translate("label.generic.allOn")
+                      : translate("label.generic.allOff")}
                   </span>
                 </div>
               )}
