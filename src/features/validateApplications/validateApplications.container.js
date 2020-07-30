@@ -26,6 +26,7 @@ class ValidateApplications extends Component {
       pageNo: 1,
       itemsPerPage: 5,
       checkedApplications: [],
+      selectedCustomer: this.props.selectedCustomer,
       TableColumns: [
         {
           name: TableColumnNames.CUSTOMER,
@@ -91,6 +92,14 @@ class ValidateApplications extends Component {
     };
   }
 
+  componentDidMount() {
+    let selectedCustomer = {
+      id: 0,
+      company_name: "All Customers",
+    };
+    this.setState({ selectedCustomer });
+  }
+
   /**
    * get each column width
    */
@@ -104,6 +113,7 @@ class ValidateApplications extends Component {
    * @param {*} customer
    */
   onCustomerSelected = (customer) => {
+    this.setState({ selectedCustomer: customer });
     this.props.dispatch(CustomerActions.setSelectedCustomer(customer));
   };
 
@@ -199,8 +209,14 @@ class ValidateApplications extends Component {
   };
 
   render() {
-    const { loading, selectedCustomer } = this.props;
-    const { applications, itemsPerPage, pageNo, TableColumns } = this.state;
+    const { loading } = this.props;
+    const {
+      applications,
+      itemsPerPage,
+      pageNo,
+      TableColumns,
+      selectedCustomer,
+    } = this.state;
     let applicationsCount = 3;
     return (
       <>
@@ -214,6 +230,7 @@ class ValidateApplications extends Component {
               content={
                 <PopoverCustomers
                   onCustomerSelected={this.onCustomerSelected}
+                  showAll={true}
                 />
               }
             >
@@ -254,7 +271,7 @@ class ValidateApplications extends Component {
               <Row
                 key={application.id}
                 className="validate-applications-layout__list__item global__cursor-pointer"
-                style={{ justifyContent: "normal", cursor: "default" }}
+                style={{ justifyContent: "normal" }}
               >
                 <Column
                   width={this.getColumnWidth(TableColumnNames.CUSTOMER)}
@@ -299,7 +316,9 @@ class ValidateApplications extends Component {
                     size="small"
                     disabled={get(application, "errors") != 0}
                     className="validate-applications-layout__list__item-text"
-                    checked={application.isViewable}
+                    checked={
+                      get(application, "errors") == 0 && application.isViewable
+                    }
                     onClick={this.onStatusClick(application)}
                   ></Switch>
                   <span

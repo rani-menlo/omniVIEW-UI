@@ -766,6 +766,7 @@ class UserManagementContainer extends Component {
               content={
                 <PopoverCustomers
                   onCustomerSelected={this.onCustomerSelected}
+                  showAll={false}
                 />
               }
             >
