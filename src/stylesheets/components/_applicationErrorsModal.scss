@@ -1,0 +1,63 @@
+.application-errors-modal {
+  height: 100%;
+  padding: 0 14px 14px 14px;
+  & .ant-modal {
+    width: 700px !important;
+  }
+  & .ant-modal-body {
+    padding: 12px 16px !important;
+  }
+  &__header {
+    display: flex;
+    margin-bottom: 12px;
+    cursor: move;
+    &-close {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      margin-left: auto;
+    }
+  }
+  /* Set a fixed scrollable wrapper */
+  &__table {
+    width: 100%;
+    border: 1px solid rgba(74, 74, 74, 0.25);
+    tr {
+      th,
+      td {
+        padding: 8px 16px;
+      }
+      th:nth-child(1),
+      td:nth-child(1) {
+        width: 40%;
+      }
+      th:nth-child(2),
+      td:nth-child(2) {
+        width: 60%;
+      }
+    }
+    thead {
+      display: table; /* to take the same width as tr */
+      width: 100%;
+      tr {
+        th {
+          background: $froasted-glass;
+          @include text-bold();
+        }
+      }
+    }
+    tbody {
+      display: block; /* to enable vertical scrolling */
+      height: 270px;
+      overflow-y: auto; /* keeps the scrollbar even if it doesn't need it; display purpose */
+      tr:nth-child(odd) {
+        background-color: rgba(236, 239, 241, 0.5);
+      }
+    }
+    tr {
+      display: table; /* display purpose; th's border */
+      width: 100%;
+      box-sizing: border-box; /* because of the border (Chrome needs this line, but not FF) */
+    }
+  }
+}

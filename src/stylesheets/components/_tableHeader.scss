@@ -10,5 +10,19 @@
   &__item {
     @include text-bold-active;
     color: $white;
+    &__status {
+      margin-top: 2px;
+      > .ant-switch {
+        background-color: rgba($black, 0.5);
+      }
+      > .ant-switch-checked {
+        background-color: $caribbean-green;
+      }
+      &__label {
+        @include text-regular;
+        color: $white;
+        margin-left: 8px;
+      }
+    }
   }
 }

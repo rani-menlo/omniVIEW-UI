@@ -1,0 +1,47 @@
+.upload-customers-modal {
+  height: 100%;
+  padding: 0 14px 14px 14px;
+  &__header {
+    display: flex;
+    cursor: move;
+    &-close {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      margin-left: auto;
+    }
+  }
+  &__upload {
+    > .ant-upload-drag {
+      margin: 30px 0;
+      height: 80px !important;
+    }
+    > .ant-upload-list-text {
+      position: relative;
+      top: -15px;
+    }
+    > .anticon-paper-clip {
+      top: 3px;
+    }
+    &-inner {
+      &-image {
+        margin-right: 12px;
+      }
+      &-drag {
+        @include text-regular(14px);
+      }
+      &-choose {
+        @include text-regular(14px);
+        color: $blue;
+      }
+    }
+  }
+  &__error {
+    width: 94%;
+    color: $red;
+    text-align: left;
+    position: relative;
+    top: -15px;
+    left: 25px;
+  }
+}

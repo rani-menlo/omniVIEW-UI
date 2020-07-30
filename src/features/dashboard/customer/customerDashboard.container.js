@@ -5,7 +5,11 @@ import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import styled from "styled-components";
 import CustomerCard from "../customerCard.component";
-import { CustomerActions, UsermanagementActions } from "../../../redux/actions";
+import {
+  CustomerActions,
+  UsermanagementActions,
+  ApiActions,
+} from "../../../redux/actions";
 import Header from "../../header/header.component";
 import { isLoggedInOmniciaRole, isLoggedInOmniciaAdmin } from "../../../utils";
 import {
@@ -20,12 +24,16 @@ import {
   ContentLayout,
   DeactivateModal,
   Toast,
+  OmniCheckbox,
 } from "../../../uikit/components";
 import { DEBOUNCE_TIME } from "../../../constants";
 import { translate } from "../../../translations/translator";
 import LicenceInUseUnAssigned from "../../license/licenceInUseUnAssigned.component";
 import AssignLicenceWithUsers from "../../license/assignLicenceWithUsers.component";
 import AssignLicence from "../../license/assignLicence.component";
+import UploadCustomersModal from "../../../uikit/components/modal/uploadCustomersModal.component";
+import { CustomerApi } from "../../../redux/api";
+import ErrorsModal from "../../../uikit/components/modal/errorsModal.component";
 
 class CustomerDashboard extends Component {
   constructor(props) {
@@ -40,9 +48,64 @@ class CustomerDashboard extends Component {
       showSubscriptionsInUse: false,
       showLicenceUnAssigned: false,
       showUsersModal: false,
+      showUploadCustomersModal: false,
       showAssignLicenceToUser: false,
       assigningLicence: null,
       selectedUsers: null,
+      openErrorsModal: false,
+      customersErrors: [],
+      customers: [],
+      checkedCustomers: [],
+      TableColumns: [
+        {
+          name: TableColumnNames.CHECKBOX,
+          checkbox: true,
+          checked: false,
+          sort: false,
+          width: "4%",
+          onCheckboxChange: this.checkAll,
+        },
+        {
+          name: TableColumnNames.CUSTOMER_NAME,
+          key: "company_name",
+          checkbox: false,
+          sort: true,
+          width: "25%",
+        },
+        {
+          name: TableColumnNames.USERS,
+          key: "number_of_users",
+          checkbox: false,
+          sort: true,
+          width: "8%",
+        },
+        {
+          name: TableColumnNames.APPLICATIONS,
+          key: "number_of_submissions",
+          checkbox: false,
+          sort: true,
+          width: "12%",
+        },
+        {
+          name: TableColumnNames.STORAGE,
+          key: "max_space",
+          checkbox: false,
+          sort: true,
+          width: "13%",
+        },
+        {
+          name: TableColumnNames.COMPANY_ADMIN,
+          key: "admin_name",
+          checkbox: false,
+          sort: true,
+          width: "20%",
+        },
+        {
+          name: TableColumnNames.SUBSCRIPTION,
+          checkbox: false,
+          width: "22%",
+        },
+      ],
     };
     this.searchCustomers = _.debounce(this.searchCustomers, DEBOUNCE_TIME);
   }
@@ -69,27 +132,42 @@ class CustomerDashboard extends Component {
       this.onCustomerSelected({ ...customer })();
     }
   }
+
+  static getDerivedStateFromProps(props, state) {
+    if (_.get(props, "customers.length") && !_.get(state, "customers.length")) {
+      return {
+        customers: [...props.customers],
+      };
+    }
+    return null;
+  }
+
   /**
    * Fetching customers
    * @param {*} sortBy
    * @param {*} orderBy
    */
-  fetchCustomers = (sortBy = "company_name", orderBy = "ASC") => {
+  fetchCustomers = (sortBy = "created_at", orderBy = "ASC") => {
     const { viewBy, pageNo, itemsPerPage, searchText } = this.state;
-    /**
-     * Fetching the customerss in list view
-     */
-    if (viewBy === "lists") {
-      this.props.actions.fetchCustomersByList(
-        pageNo,
-        itemsPerPage,
-        sortBy,
-        orderBy,
-        searchText || ""
-      );
-    } else {
-      this.props.actions.fetchCustomers(searchText || "");
-    }
+    this.props.dispatch(CustomerActions.resetCustomers());
+    const TableColumns = [...this.state.TableColumns];
+    TableColumns[0].checked = false;
+    this.setState({ customers: [], checkedCustomers: [], TableColumns }, () => {
+      /**
+       * Fetching the customers in list view
+       */
+      if (viewBy === "lists") {
+        this.props.actions.fetchCustomersByList(
+          pageNo,
+          itemsPerPage,
+          sortBy,
+          orderBy,
+          searchText || ""
+        );
+      } else {
+        this.props.actions.fetchCustomers(searchText || "");
+      }
+    });
   };
   /**
    * Changing the view to display the customers (list <-> Card)
@@ -162,18 +240,32 @@ class CustomerDashboard extends Component {
           onClick={this.editCustomer(customer)}
         >
           <p>
-            <img src="/images/edit.svg" alt="edit-user"/>
+            <img src="/images/edit.svg" alt="edit-user" />
             <span>{`${translate("label.usermgmt.edit")} ${translate(
               "label.dashboard.customer"
             )}`}</span>
           </p>
         </Menu.Item>
+        {!customer.welcomeMailSent && (
+          <Menu.Item
+            className="maindashboard__list__item-dropdown-menu-item"
+            onClick={(event) => this.sendWelcomeEmail(customer, event)}
+          >
+            <p>
+              <img
+                src="/images/send-black.svg"
+                className="maindashboard__list__item-dropdown-menu-item-welcomeMail"
+              />
+              <span>{`${translate("label.button.sendWelcomeEmail")}`}</span>
+            </p>
+          </Menu.Item>
+        )}
         <Menu.Item
           className="maindashboard__list__item-dropdown-menu-item"
           onClick={this.openUserMgmt(customer)}
         >
           <p>
-            <img src="/images/user-management.svg" alt="users"/>
+            <img src="/images/user-management.svg" alt="users" />
             <span>{translate("label.usermgmt.title")}</span>
           </p>
         </Menu.Item>
@@ -186,7 +278,7 @@ class CustomerDashboard extends Component {
               color: _.get(customer, "is_active", false) ? "red" : "#00d592",
             }}
           >
-            <img src="/images/deactivate.svg" alt="deactivate-user"/>
+            <img src="/images/deactivate.svg" alt="deactivate-user" />
             <span>{`${
               _.get(customer, "is_active", false)
                 ? translate("label.usermgmt.deactivate")
@@ -287,6 +379,7 @@ class CustomerDashboard extends Component {
       )
     );
     this.closeActivateDeactivateModal();
+    this.fetchCustomers();
   };
 
   openActivateDeactivateModal = (customer) => () => {
@@ -363,6 +456,178 @@ class CustomerDashboard extends Component {
     });
   };
 
+  /**
+   * The Customer file(CSV Format file) will be uploaded from an interface from omniVIEW Next Gen,
+   * by an Omnicia administrator by clicking on “Upload Customers”.
+   * Open modal with browse option to upload CSV file
+   */
+  openUploadCustomersModal = () => {
+    this.props.dispatch(CustomerActions.resetUploadCustomerErrors());
+    this.setState({ showUploadCustomersModal: true });
+  };
+
+  /**
+   * Closing upload customers modal
+   */
+  closeuploadCustomersModal = () => {
+    this.props.dispatch(CustomerActions.resetUploadCustomerErrors());
+    this.setState({ showUploadCustomersModal: false });
+  };
+
+  /**
+   *
+   * @param {Object} fileObj
+   */
+  handleFileChange = async (file) => {
+    let customersErrors = [];
+    let openErrorsModal = false;
+    this.props.actions.resetUploadCustomerErrors();
+    const reqObject = new FormData();
+    reqObject.append("file", file);
+    this.props.dispatch(ApiActions.requestOnDemand());
+    const res = await CustomerApi.uploadCustomers(reqObject);
+    if (!res.data.error) {
+      if (res.data.customers && res.data.customers.length > 0) {
+        customersErrors = res.data.customers;
+        openErrorsModal = true;
+      } else {
+        customersErrors = [];
+        openErrorsModal = false;
+        Toast.success("Customers uploaded successfully");
+      }
+      this.closeuploadCustomersModal();
+      this.props.dispatch(ApiActions.successOnDemand());
+    } else {
+      let uploadErrorMessage =
+        res && res.data.message ? res.data.message : "Please try again!";
+      this.props.actions.setUploadCustomerErrors(uploadErrorMessage);
+      this.props.dispatch(ApiActions.successOnDemand());
+    }
+    this.setState({ openErrorsModal, customersErrors, viewBy: "lists" }, () => {
+      this.fetchCustomers();
+    });
+  };
+
+  /**
+   * Close Errors modal
+   */
+  closeErrorsModal = () => {
+    this.setState({ openErrorsModal: false });
+  };
+
+  /**
+   * selecting the customer individually
+   * @param {*} customer
+   */
+  onCheckboxChange = (customer) => (e) => {
+    const checked = e.target.checked;
+    const TableColumns = [...this.state.TableColumns];
+    let checkedCustomers = [...this.state.checkedCustomers];
+    let customers = this.state.customers.slice(0, this.state.itemsPerPage);
+    // filtering emails not sent customers
+    let unSentMailCustomers = _.filter(customers, (cust) => {
+      return !cust.welcomeMailSent;
+    });
+    customer.checked = checked;
+    // If customer is selected
+    if (checked) {
+      checkedCustomers.push(customer);
+    } else {
+      checkedCustomers = _.filter(checkedCustomers, (checkedCustomer) => {
+        return checkedCustomer.id !== customer.id;
+      });
+    }
+    //Checking if the emails not customers all are selected or not
+    TableColumns[0].checked = _.every(unSentMailCustomers, ["checked", true]);
+    this.setState({
+      customers,
+      TableColumns,
+      checkedCustomers,
+    });
+  };
+
+  /**
+   * Select all customers
+   * @param {*} e
+   */
+  checkAll = (e) => {
+    const checked = _.get(e, "target.checked", false);
+    // Returing if there are no customers
+    if (!this.state.customers.length) {
+      e.preventDefault();
+      return;
+    }
+    let checkedCustomers = [];
+    let customers = this.state.customers.slice(0, this.state.itemsPerPage);
+    let unSentMailCustomers = _.filter(customers, (customer) => {
+      return !customer.welcomeMailSent;
+    });
+    if (checked) {
+      _.map(customers, (customer) => {
+        if (customer.welcomeMailSent) {
+          _.set(customer, "checked", false);
+        } else {
+          _.set(customer, "checked", true);
+        }
+      });
+      checkedCustomers = [...unSentMailCustomers];
+    } else {
+      customers = _.map(customers, (customer) => ({
+        ...customer,
+        checked,
+      }));
+      checkedCustomers.length = 0;
+    }
+    const TableColumns = [...this.state.TableColumns];
+    TableColumns[0].checked = checked;
+    customers = [...customers];
+    this.setState({
+      customers,
+      TableColumns,
+      checkedCustomers,
+    });
+  };
+
+  /**
+   * calculating table column width
+   */
+  getColumnWidth = _.memoize((name) => {
+    const col = _.find(this.state.TableColumns, (col) => col.name === name);
+    return _.get(col, "width");
+  });
+
+  /**
+   * send welcome emails to the customers
+   */
+  sendWelcomeEmails = async () => {
+    const customerIds = this.state.selectedCustomer
+      ? [this.state.selectedCustomer.id]
+      : _.map(this.state.checkedCustomers, "id");
+    this.props.dispatch(ApiActions.requestOnDemand());
+    const res = await CustomerApi.sendCustWelcomeEmails({ customerIds });
+    if (!res.data.error) {
+      this.props.dispatch(ApiActions.successOnDemand());
+      Toast.success("Email(s) have been sent successfully");
+    } else {
+      let message =
+        res && res.data && res.data.message
+          ? res.data.message
+          : "Please try again";
+      Toast.error(message);
+      this.props.dispatch(ApiActions.successOnDemand());
+    }
+    this.fetchCustomers();
+  };
+
+  /**
+   * Send Welcome emails when user clicks on Send Welcome EMails menu option
+   */
+  sendWelcomeEmail = (customer, event) => {
+    this.setState({ selectedCustomer: customer }, () => {
+      this.sendWelcomeEmails();
+    });
+  };
+
   render() {
     const {
       viewBy,
@@ -370,20 +635,20 @@ class CustomerDashboard extends Component {
       showSubscriptionsInUse,
       showLicenceUnAssigned,
       showUsersModal,
+      showUploadCustomersModal,
+      openErrorsModal,
+      customersErrors,
+      customers,
+      checkedCustomers,
+      TableColumns,
     } = this.state;
-    const { customers, loading, customerCount, role } = this.props;
+    const { loading, customerCount, role } = this.props;
     return (
       <React.Fragment>
         <Loader loading={loading} />
         <Header />
         <SubHeader>
           <ListViewGridView viewBy={viewBy} changeView={this.changeView} />
-          {/* <div className="maindashboard__header__icon maindashboard__header__icon-filter">
-              <img src={FilterIcon} />
-            </div>
-            <span className="maindashboard__header-filter-text">
-              Filters: Off
-            </span> */}
           <div style={{ marginLeft: "auto" }}>
             <SearchBox
               placeholder={translate("text.header.search", {
@@ -411,14 +676,40 @@ class CustomerDashboard extends Component {
               )}
             </div>
             {isLoggedInOmniciaAdmin(role) && (
-              <OmniButton
-                type="add"
-                label={translate("label.button.add", {
-                  type: translate("label.dashboard.customer"),
-                })}
-                onClick={this.addCustomer}
-                // className="global__disabled-box"
-              />
+              <div className="global__center-vert">
+                {viewBy === "lists" &&
+                  checkedCustomers &&
+                  checkedCustomers.length > 0 && (
+                    <OmniButton
+                      type="add"
+                      buttonStyle={{ marginRight: "15px" }}
+                      image={
+                        <img src="/images/send.svg" alt="Send welcome emails" />
+                      }
+                      label={translate("label.button.sendWelcomeEmails")}
+                      onClick={this.sendWelcomeEmails}
+                    />
+                  )}
+                <OmniButton
+                  type="add"
+                  buttonStyle={{ marginRight: "15px" }}
+                  image={
+                    <img
+                      src="/images/customers_upload.svg"
+                      alt="upload-customers"
+                    />
+                  }
+                  label={translate("label.button.uploadCustomers")}
+                  onClick={this.openUploadCustomersModal}
+                />
+                <OmniButton
+                  type="add"
+                  label={translate("label.button.add", {
+                    type: translate("label.dashboard.customer"),
+                  })}
+                  onClick={this.addCustomer}
+                />
+              </div>
             )}
           </div>
           {viewBy === "lists" && (
@@ -428,87 +719,105 @@ class CustomerDashboard extends Component {
                   columns={TableColumns}
                   sortColumn={this.sortColumn}
                 />
-                {_.map(customers, (customer) => (
-                  <Row
-                    key={customer.id}
-                    className="maindashboard__list__item"
-                    style={{
-                      opacity: _.get(customer, "is_active", false) ? 1 : 0.5,
-                    }}
-                  >
-                    <Column
-                      width={getColumnWidth(TableColumnNames.CUSTOMER_NAME)}
-                      className="maindashboard__list__item-text-bold"
-                      onClick={this.onCustomerSelected(customer)}
+                {_.map(customers, (customer) => {
+                  return (
+                    <Row
+                      key={customer.id}
+                      className="maindashboard__list__item"
+                      style={{
+                        opacity: _.get(customer, "is_active", false) ? 1 : 0.5,
+                      }}
                     >
-                      {_.get(customer, "company_name", "")}
-                    </Column>
-                    <Column
-                      width={getColumnWidth(TableColumnNames.USERS)}
-                      className="maindashboard__list__item-text"
-                      onClick={this.onCustomerSelected(customer)}
-                    >
-                      {_.get(customer, "number_of_users", "")}
-                    </Column>
-                    <Column
-                      width={getColumnWidth(TableColumnNames.APPLICATIONS)}
-                      className="maindashboard__list__item-text"
-                      onClick={this.onCustomerSelected(customer)}
-                    >
-                      {_.get(customer, "number_of_submissions", "")}
-                    </Column>
-                    <Column
-                      width={getColumnWidth(TableColumnNames.STORAGE)}
-                      className="maindashboard__list__item-text"
-                      onClick={this.onCustomerSelected(customer)}
-                    >
-                      {_.get(customer, "max_space") || "0"} TB
-                    </Column>
-                    <Column
-                      width={getColumnWidth(TableColumnNames.COMPANY_ADMIN)}
-                      className="maindashboard__list__item-text"
-                      onClick={this.onCustomerSelected(customer)}
-                    >
-                      {_.get(customer, "admin_name", "")}
-                    </Column>
-                    <Column
-                      width={getColumnWidth(TableColumnNames.SUBSCRIPTION)}
-                      className="maindashboard__list__item__row maindashboard__list__item-text"
-                    >
-                      <p>
-                        <span onClick={this.subscriptionsInUse(customer)}>
-                          {`${_.get(
-                            customer,
-                            "assigned_licenses",
-                            0
-                          )} ${translate("label.generic.inuse")} | `}
-                        </span>
-                        <span
-                          onClick={this.subscriptionsUnAssigned(customer)}
-                        >{`${_.get(customer, "revoked_licenses", 0) +
-                          _.get(
-                            customer,
-                            "unassigned_licenses",
-                            0
-                          )} ${translate("label.generic.unassigned")}`}</span>
-                      </p>
-                      {isLoggedInOmniciaAdmin(role) && (
-                        <Dropdown
-                          overlay={this.getMenu(customer)()}
-                          trigger={["click"]}
-                          overlayClassName="maindashboard__list__item-dropdown"
-                        >
-                          <img
-                            className="global__cursor-pointer"
-                            src="/images/overflow-black.svg"
-                            alt="dropdown-icon"
-                            style={{ width: "18px", height: "18px" }}
-                          />
-                        </Dropdown>
-                      )}
-                    </Column>
-                  </Row>
-                ))}
+                      <Column
+                        width={this.getColumnWidth(TableColumnNames.CHECKBOX)}
+                      >
+                        <OmniCheckbox
+                          checked={customer.checked}
+                          disabled={_.get(customer, "welcomeMailSent", true)}
+                          onCheckboxChange={this.onCheckboxChange(customer)}
+                        />
+                      </Column>
+                      <Column
+                        width={this.getColumnWidth(
+                          TableColumnNames.CUSTOMER_NAME
+                        )}
+                        className="maindashboard__list__item-text-bold"
+                        onClick={this.onCustomerSelected(customer)}
+                      >
+                        {_.get(customer, "company_name", "")}
+                      </Column>
+                      <Column
+                        width={this.getColumnWidth(TableColumnNames.USERS)}
+                        className="maindashboard__list__item-text"
+                        onClick={this.onCustomerSelected(customer)}
+                      >
+                        {_.get(customer, "number_of_users", "")}
+                      </Column>
+                      <Column
+                        width={this.getColumnWidth(
+                          TableColumnNames.APPLICATIONS
+                        )}
+                        className="maindashboard__list__item-text"
+                        onClick={this.onCustomerSelected(customer)}
+                      >
+                        {_.get(customer, "number_of_submissions", "")}
+                      </Column>
+                      <Column
+                        width={this.getColumnWidth(TableColumnNames.STORAGE)}
+                        className="maindashboard__list__item-text"
+                        onClick={this.onCustomerSelected(customer)}
+                      >
+                        {_.get(customer, "max_space") || "0"} TB
+                      </Column>
+                      <Column
+                        width={this.getColumnWidth(
+                          TableColumnNames.COMPANY_ADMIN
+                        )}
+                        className="maindashboard__list__item-text"
+                        onClick={this.onCustomerSelected(customer)}
+                      >
+                        {_.get(customer, "admin_name", "")}
+                      </Column>
+                      <Column
+                        width={this.getColumnWidth(
+                          TableColumnNames.SUBSCRIPTION
+                        )}
+                        className="maindashboard__list__item__row maindashboard__list__item-text"
+                      >
+                        <p>
+                          <span onClick={this.subscriptionsInUse(customer)}>
+                            {`${_.get(
+                              customer,
+                              "assigned_licenses",
+                              0
+                            )} ${translate("label.generic.inuse")} | `}
+                          </span>
+                          <span
+                            onClick={this.subscriptionsUnAssigned(customer)}
+                          >{`${_.get(customer, "revoked_licenses", 0) +
+                            _.get(
+                              customer,
+                              "unassigned_licenses",
+                              0
+                            )} ${translate("label.generic.unassigned")}`}</span>
+                        </p>
+                        {isLoggedInOmniciaAdmin(role) && (
+                          <Dropdown
+                            overlay={this.getMenu(customer)()}
+                            trigger={["click"]}
+                            overlayClassName="maindashboard__list__item-dropdown"
+                          >
+                            <img
+                              className="global__cursor-pointer"
+                              src="/images/overflow-black.svg"
+                              style={{ width: "18px", height: "18px" }}
+                            />
+                          </Dropdown>
+                        )}
+                      </Column>
+                    </Row>
+                  );
+                })}
               </div>
               {searchText && !customers.length && (
                 <Row className="maindashboard__nodata">
@@ -614,6 +923,18 @@ class CustomerDashboard extends Component {
             back={this.goBackToUsersModal}
             submit={this.assignLicence}
           />
+          {showUploadCustomersModal && (
+            <UploadCustomersModal
+              closeModal={this.closeuploadCustomersModal}
+              fileChange={this.handleFileChange}
+            />
+          )}
+          {openErrorsModal && customersErrors.length > 0 && (
+            <ErrorsModal
+              closeModal={this.closeErrorsModal}
+              customersErrors={customersErrors}
+            />
+          )}
         </ContentLayout>
       </React.Fragment>
     );
@@ -629,54 +950,6 @@ const TableColumnNames = {
   COMPANY_ADMIN: translate("label.dashboard.companyadmin"),
   SUBSCRIPTION: translate("label.dashboard.subscription"),
 };
-
-const TableColumns = [
-  {
-    name: TableColumnNames.CUSTOMER_NAME,
-    key: "company_name",
-    checkbox: false,
-    sort: true,
-    width: "25%",
-  },
-  {
-    name: TableColumnNames.USERS,
-    key: "number_of_users",
-    checkbox: false,
-    sort: true,
-    width: "8%",
-  },
-  {
-    name: TableColumnNames.APPLICATIONS,
-    key: "number_of_submissions",
-    checkbox: false,
-    sort: true,
-    width: "12%",
-  },
-  {
-    name: TableColumnNames.STORAGE,
-    key: "max_space",
-    checkbox: false,
-    sort: true,
-    width: "13%",
-  },
-  {
-    name: TableColumnNames.COMPANY_ADMIN,
-    key: "admin_name",
-    checkbox: false,
-    sort: true,
-    width: "20%",
-  },
-  {
-    name: TableColumnNames.SUBSCRIPTION,
-    checkbox: false,
-    width: "22%",
-  },
-];
-
-const getColumnWidth = _.memoize((name) => {
-  const col = _.find(TableColumns, (col) => col.name === name);
-  return _.get(col, "width");
-});
 
 const Column = styled.div`
   width: ${(props) => props.width};

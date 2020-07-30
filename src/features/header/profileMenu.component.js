@@ -52,12 +52,25 @@ class ProfileMenu extends Component {
           disabled={this.props.first_login}
         >
           <p>
-            <img src="/images/edit.svg" alt="edit"/>
+            <img src="/images/edit.svg" alt="edit" />
             <span>{`${translate("label.usermgmt.edit")} ${translate(
               "lable.profile.profile"
             )}`}</span>
           </p>
         </Menu.Item>
+        {isLoggedInOmniciaAdmin(this.props.role) && (
+          <Menu.Item
+            className="maindashboard__list__item-dropdown-menu-item"
+            onClick={this.validateApplications}
+          >
+            <p>
+              <img src="/images/manage-app.png" alt="Manage Application" />
+              <span>{`${translate("label.generic.manage")} ${translate(
+                "label.dashboard.applications"
+              )}`}</span>
+            </p>
+          </Menu.Item>
+        )}
         {this.props.customerAccounts && this.props.customerAccounts.length > 1 && (
           <Menu.Item
             className="maindashboard__list__item-dropdown-menu-item"
@@ -65,8 +78,8 @@ class ProfileMenu extends Component {
           >
             <p>
               <img
-                src="/images/switch-customers.jpeg"
-                alt="switch customers"
+                src="/images/switch-customer.svg"
+                alt="Switch Customers"
                 style={{ width: "20px", marginRight: "6px" }}
               />
               <span>{translate("text.header.switchcustomers")}</span>
@@ -81,8 +94,7 @@ class ProfileMenu extends Component {
             disabled={this.props.first_login}
           >
             <p>
-              <img src="/images/user-management.svg" 
-              alt="users"/>
+              <img src="/images/user-management.svg" alt="users" />
               <span>{`${translate("label.generic.manage")} ${translate(
                 "label.dashboard.users"
               )}`}</span>
@@ -94,7 +106,7 @@ class ProfileMenu extends Component {
           onClick={this.signOut}
         >
           <p>
-            <img src="/images/logout.svg" alt="logout"/>
+            <img src="/images/logout.svg" alt="logout" />
             <span>{translate("lable.profile.signout")}</span>
           </p>
         </Menu.Item>
@@ -107,6 +119,13 @@ class ProfileMenu extends Component {
       `${window.location.origin}/OmniVIEW How-To Guide.pdf`,
       "_blank"
     );
+  };
+
+  /**
+   * redirect to validate applications scree
+   */
+  validateApplications = () => {
+    this.props.history.push("/validateApplications");
   };
 
   render() {
