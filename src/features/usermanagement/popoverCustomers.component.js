@@ -9,19 +9,45 @@ class PopoverCustomers extends Component {
     onCustomerSelected: PropTypes.func,
   };
 
+  constructor(props) {
+    super(props);
+    this.state = {
+      selectedCustomer: this.props.selectedCustomer,
+    };
+  }
+
   onCustomerSelected = (customer) => () => {
-    const { selectedCustomer } = this.props;
+    const { selectedCustomer } = this.state;
     if (customer.id === selectedCustomer.id) {
       return;
     }
+    this.setState({ selectedCustomer: customer });
     this.props.onCustomerSelected && this.props.onCustomerSelected(customer);
   };
 
+  componentDidMount() {
+    if (this.props.showAll) {
+      let allCustomersObj = {
+        id: 0,
+        company_name: "All Customers",
+      };
+      this.setState({ selectedCustomer: allCustomersObj });
+    }
+  }
+
   render() {
-    const { customers, customer, selectedCustomer } = this.props;
+    const { customers, customer, showAll } = this.props;
+    const { selectedCustomer } = this.state;
     const sortedCustomers = _.sortBy(customers, (cust) => {
       return cust.id === customer.id ? 0 : 1;
     });
+    if (showAll) {
+      let allCustomersObj = {
+        id: 0,
+        company_name: "All Customers",
+      };
+      sortedCustomers.splice(0, 0, allCustomersObj);
+    }
     return (
       <div className="popoverCustomers">
         {_.map(sortedCustomers, (customer) => (

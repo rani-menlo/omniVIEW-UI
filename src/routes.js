@@ -22,7 +22,8 @@ import SubscriptionsPage from "./features/license/subscriptionsPage.component";
 import RequestLicense from "./features/license/requestLicence.component";
 import AddNewApplication from "./features/dashboard/application/addNewApplication.container";
 import RemoteDetails from "./features/dashboard/application/remoteDetails.component";
-import CustomerAccounts from './features/customerAccounts/customerAccounts.component';
+import CustomerAccounts from "./features/customerAccounts/customerAccounts.component";
+import ValidateApplications from "./features/validateApplications/validateApplications.container";
 
 const Routes = () => {
   return (
@@ -39,11 +40,7 @@ const Routes = () => {
               path="/applications/add"
               component={AddNewApplication}
             />
-            <Route
-              exact
-              path="/sequences/add"
-              component={AddNewApplication}
-            />
+            <Route exact path="/sequences/add" component={AddNewApplication} />
             <PrivateRoute
               exact
               path="/viewer/:type/:fileId?"
@@ -103,6 +100,11 @@ const Routes = () => {
               exact
               path="/subscriptions"
               component={SubscriptionsPage}
+            />
+            <PrivateRoute
+              exact
+              path="/validateApplications"
+              component={ValidateApplications}
             />
             <Redirect to="/" />
           </Switch>
