@@ -323,8 +323,7 @@ class ValidateApplications extends Component {
                   <span
                     className={`${get(application, "errors") != 0 &&
                       "validate-applications-layout__list__item-text-link"}`}
-                    onClick={(e) =>
-                      this.openApplicationsErrorModal(application)
+                    onClick={application.errors != 0 ? e => this.openApplicationsErrorModal(application) : ''
                     }
                   >
                     {get(application, "errors", 0)}

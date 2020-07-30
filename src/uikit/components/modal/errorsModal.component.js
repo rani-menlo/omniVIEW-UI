@@ -53,7 +53,7 @@ class ErrorsModal extends Component {
                         {" "}
                         <Text
                           type="regular"
-                          text={`${get(customer, "Company Name", "N/A")}`}
+                          text={get(customer, "Company Name") || "N/A"}
                           size="14px"
                         />
                       </td>
