@@ -18,7 +18,7 @@ import { get, find, memoize, map, filter, every, set } from "lodash";
 import { CustomerActions } from "../../redux/actions";
 import styled from "styled-components";
 import { translate } from "../../translations/translator";
-
+import ApplicationErrorsModal from "../../uikit/components/modal/applicationErrorsModal.component";
 class ValidateApplications extends Component {
   constructor(props) {
     super(props);
@@ -27,6 +27,7 @@ class ValidateApplications extends Component {
       itemsPerPage: 5,
       checkedApplications: [],
       selectedCustomer: this.props.selectedCustomer,
+      selectedApplication: {},
       TableColumns: [
         {
           name: TableColumnNames.CUSTOMER,
@@ -208,6 +209,24 @@ class ValidateApplications extends Component {
     });
   };
 
+  /**
+   * open application errors modal
+   * @param {*} application
+   */
+  openApplicationsErrorModal = (application) => {
+    this.setState({
+      selectedApplication: application,
+      showApplicationErrorModal: true,
+    });
+  };
+
+  /**
+   * closing application errors modal
+   */
+  closeApplicationsErrorModal = () => {
+    this.setState({ showApplicationErrorModal: false });
+  };
+
   render() {
     const { loading } = this.props;
     const {
@@ -216,6 +235,8 @@ class ValidateApplications extends Component {
       pageNo,
       TableColumns,
       selectedCustomer,
+      selectedApplication,
+      showApplicationErrorModal,
     } = this.state;
     let applicationsCount = 3;
     return (
@@ -302,6 +323,9 @@ class ValidateApplications extends Component {
                   <span
                     className={`${get(application, "errors") != 0 &&
                       "validate-applications-layout__list__item-text-link"}`}
+                    onClick={(e) =>
+                      this.openApplicationsErrorModal(application)
+                    }
                   >
                     {get(application, "errors", 0)}
                   </span>
@@ -362,6 +386,12 @@ class ValidateApplications extends Component {
             onPageChange={this.onPageChange}
             onPageSizeChange={this.onPageSizeChange}
           />
+          {showApplicationErrorModal && (
+            <ApplicationErrorsModal
+              closeModal={this.closeApplicationsErrorModal}
+              application={selectedApplication}
+            />
+          )}
         </ContentLayout>
       </>
     );
