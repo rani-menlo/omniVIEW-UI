@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
+import { CustomerActions } from "../../redux/actions";
 import Header from "../header/header.component";
 import {
   Loader,
@@ -15,17 +16,16 @@ import { Popover, Switch, Icon } from "antd";
 import PopoverCustomers from "../usermanagement/popoverCustomers.component";
 import { isLoggedInOmniciaAdmin } from "../../utils";
 import { get, find, memoize, map, filter, every, set } from "lodash";
-import { CustomerActions } from "../../redux/actions";
 import styled from "styled-components";
 import { translate } from "../../translations/translator";
-import ApplicationErrorsModal from "../../uikit/components/modal/applicationErrorsModal.component";
-class ValidateApplications extends Component {
+
+class ApplicationManagement extends Component {
   constructor(props) {
     super(props);
     this.state = {
       pageNo: 1,
       itemsPerPage: 5,
-      checkedApplications: [],
+      checkedSequences: [],
       selectedCustomer: this.props.selectedCustomer,
       selectedApplication: {},
       TableColumns: [
@@ -42,23 +42,21 @@ class ValidateApplications extends Component {
           width: "20%",
         },
         {
-          name: TableColumnNames.NOOFSEQUENCES,
+          name: TableColumnNames.SEQUENCE,
           key: "expired_date",
           sort: true,
           width: "20%",
         },
         {
-          name: TableColumnNames.ERRORS,
+          name: TableColumnNames.WIP,
           key: "first_name",
           width: "20%",
         },
         {
-          name: TableColumnNames.APPLICATIONSTATUS,
+          name: TableColumnNames.LASTUPDATED,
           key: "first_name",
+          sort: true,
           width: "20%",
-          toggle: true,
-          allViewable: false,
-          onStatusClick: this.checkAll,
         },
       ],
       applications: [
@@ -125,117 +123,6 @@ class ValidateApplications extends Component {
    */
   sortColumn = (sortBy, orderBy) => {};
 
-  handleSwitchChange = (record) => {};
-
-  /**
-   *
-   * @param {*} checked
-   */
-  checkAll = (checked, event) => {
-    // Returing if there are no customers
-    let isViewable = checked;
-    if (!this.state.applications.length) {
-      event.preventDefault();
-      return;
-    }
-    let checkedApplications = [];
-    let applications = this.state.applications.slice(
-      0,
-      this.state.itemsPerPage
-    );
-    // filtering applications without errors
-    let withoutErrorApplications = filter(applications, (application) => {
-      return application.errors == 0;
-    });
-    if (isViewable) {
-      map(applications, (application) => {
-        let viewable = application.errors == 0 ? true : false;
-        set(application, "isViewable", viewable);
-      });
-      checkedApplications = [...withoutErrorApplications];
-    } else {
-      applications = map(applications, (application) => ({
-        ...application,
-        isViewable,
-      }));
-      checkedApplications.length = 0;
-    }
-    const TableColumns = [...this.state.TableColumns];
-    TableColumns[4].allViewable = isViewable;
-    applications = [...applications];
-    this.setState({
-      applications,
-      TableColumns,
-      checkedApplications,
-    });
-  };
-
-  /**
-   *
-   * @param {*} application
-   */
-  onStatusClick = (application) => (checked) => {
-    const TableColumns = [...this.state.TableColumns];
-    let checkedApplications = [...this.state.checkedApplications];
-    let applications = this.state.applications.slice(
-      0,
-      this.state.itemsPerPage
-    );
-    // filtering applications without errors
-    let withoutErrorApplications = filter(applications, (application) => {
-      return application.errors == 0;
-    });
-    application.isViewable = checked;
-    // If customer is selected
-    if (checked) {
-      checkedApplications.push(application);
-    } else {
-      checkedApplications = filter(
-        checkedApplications,
-        (checkedApplication) => {
-          return checkedApplication.id !== application.id;
-        }
-      );
-    }
-    //Checking if the emails not customers all are selected or not
-    TableColumns[4].allViewable = every(withoutErrorApplications, [
-      "isViewable",
-      true,
-    ]);
-    this.setState({
-      applications,
-      TableColumns,
-      checkedApplications,
-    });
-  };
-
-  /**
-   * open application errors modal
-   * @param {*} application
-   */
-  openApplicationsErrorModal = (application) => {
-    this.setState({
-      selectedApplication: application,
-      showApplicationErrorModal: true,
-    });
-  };
-
-  /**
-   * closing application errors modal
-   */
-  closeApplicationsErrorModal = () => {
-    this.setState({ showApplicationErrorModal: false });
-  };
-
-  /**
-   * redirect to application management screen
-   */
-  openApplicationManagement = () => (application) => {
-    this.setState({ selectedApplication: application }, () => {
-      this.props.history.push("/applicationManagement");
-    });
-  };
-
   render() {
     const { loading } = this.props;
     const {
@@ -244,8 +131,6 @@ class ValidateApplications extends Component {
       pageNo,
       TableColumns,
       selectedCustomer,
-      selectedApplication,
-      showApplicationErrorModal,
     } = this.state;
     let applicationsCount = 3;
     return (
@@ -280,47 +165,39 @@ class ValidateApplications extends Component {
             </Popover>
           )}
         </SubHeader>
-        <ContentLayout className="validate-applications-layout">
-          <div className="validate-applications-layout__header">
+        <ContentLayout className="applications-management-layout">
+          <div className="applications-management-layout__header">
             <Text
               type="bold"
               size="24px"
               textStyle={{ paddingLeft: "12px" }}
-              text={translate("label.submissions.validateApplications")}
+              text={translate("label.submissions.applicationManagement")}
             />
           </div>
 
-          <div className="validate-applications-layout__list">
-            <TableHeader
-              columns={TableColumns}
-              sortColumn={this.sortColumn}
-              checkAll={this.checkAll}
-              viewAll={TableColumns[4].allViewable}
-            />
+          <div className="applications-management-layout__list">
+            <TableHeader columns={TableColumns} sortColumn={this.sortColumn} />
             {map(applications, (application) => (
               <Row
                 key={application.id}
-                className="validate-applications-layout__list__item global__cursor-pointer"
+                className="applications-management-layout__list__item global__cursor-pointer"
                 style={{ justifyContent: "normal" }}
               >
                 <Column
                   width={this.getColumnWidth(TableColumnNames.CUSTOMER)}
-                  className="validate-applications-layout__list__item-text"
-                  onClick={this.openApplicationManagement(application)}
+                  className="applications-management-layout__list__item-text"
                 >
                   {get(application, "customer_name", "N/A")}
                 </Column>
                 <Column
                   width={this.getColumnWidth(TableColumnNames.APPLICATION)}
-                  className="validate-applications-layout__list__item-text"
-                  onClick={this.openApplicationManagement(application)}
+                  className="applications-management-layout__list__item-text"
                 >
                   {get(application, "name", "N/A")}
                 </Column>
                 <Column
-                  width={this.getColumnWidth(TableColumnNames.NOOFSEQUENCES)}
-                  className="validate-applications-layout__list__item-text"
-                  onClick={this.openApplicationManagement(application)}
+                  width={this.getColumnWidth(TableColumnNames.SEQUENCE)}
+                  className="applications-management-layout__list__item-text"
                 >
                   {`${get(application, "uploaded_sequences", 0)} of ${get(
                     application,
@@ -328,53 +205,42 @@ class ValidateApplications extends Component {
                     0
                   )}`}
                 </Column>
+
                 <Column
-                  width={this.getColumnWidth(TableColumnNames.ERRORS)}
-                  className="validate-applications-layout__list__item-text"
-                >
-                  <span
-                    className={`${get(application, "errors") != 0 &&
-                      "validate-applications-layout__list__item-text-link"}`}
-                    onClick={
-                      application.errors != 0
-                        ? (e) => this.openApplicationsErrorModal(application)
-                        : ""
-                    }
-                  >
-                    {get(application, "errors", 0)}
-                  </span>
-                </Column>
-                <Column
-                  width={this.getColumnWidth(
-                    TableColumnNames.APPLICATIONSTATUS
-                  )}
-                  className="validate-applications-layout__list__item-text-status"
+                  width={this.getColumnWidth(TableColumnNames.WIP)}
+                  className="applications-management-layout__list__item-text-status"
                 >
                   <Switch
                     size="small"
-                    disabled={get(application, "errors") != 0}
-                    className="validate-applications-layout__list__item-text"
-                    checked={
-                      get(application, "errors") == 0 && application.isViewable
-                    }
-                    onClick={this.onStatusClick(application)}
+                    className="applications-management-layout__list__item-text"
                   ></Switch>
                   <span
-                    className="validate-applications-layout__list__item-text"
+                    className="applications-management-layout__list__item-text"
                     style={{ paddingLeft: "12px" }}
                   >
-                    {application.isViewable ? "On" : "Off"}
+                    {application.isViewable ? "Yes" : "No"}
+                  </span>
+                </Column>
+                <Column
+                  width={this.getColumnWidth(TableColumnNames.LASTUPDATED)}
+                  className="applications-management-layout__list__item-text"
+                >
+                  <span
+                    className={`${get(application, "errors") != 0 &&
+                      "applications-management-layout__list__item-text-link"}`}
+                  >
+                    {get(application, "errors", 0)}
                   </span>
                 </Column>
               </Row>
             ))}
           </div>
           {/* {!get(this.props, "users.length") && (
-              <Row className="validate-applications-layout__nodata">
+              <Row className="applications-management-layout__nodata">
                 <Icon
                   style={{ fontSize: "20px" }}
                   type="exclamation-circle"
-                  className="validate-applications-layout__nodata-icon"
+                  className="applications-management-layout__nodata-icon"
                 />
                 {translate("error.dashboard.notfound", {
                   type: translate("label.dashboard.applications"),
@@ -400,12 +266,6 @@ class ValidateApplications extends Component {
             onPageChange={this.onPageChange}
             onPageSizeChange={this.onPageSizeChange}
           />
-          {showApplicationErrorModal && (
-            <ApplicationErrorsModal
-              closeModal={this.closeApplicationsErrorModal}
-              application={selectedApplication}
-            />
-          )}
         </ContentLayout>
       </>
     );
@@ -419,9 +279,9 @@ const Column = styled.div`
 const TableColumnNames = {
   CUSTOMER: translate("label.dashboard.customer"),
   APPLICATION: translate("label.dashboard.application"),
-  NOOFSEQUENCES: translate("label.dashboard.noOfSequences"),
-  ERRORS: translate("text.generic.errors"),
-  APPLICATIONSTATUS: translate("label.dashboard.applicationStatus"),
+  SEQUENCE: translate("label.dashboard.sequence"),
+  WIP: translate("label.generic.wip"),
+  LASTUPDATED: translate("label.generic.lastUpdated"),
 };
 
 function mapStateToProps(state) {
@@ -441,4 +301,4 @@ function mapDispatchToProps(dispatch) {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(ValidateApplications);
+)(ApplicationManagement);

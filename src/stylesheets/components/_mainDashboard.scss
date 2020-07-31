@@ -69,6 +69,11 @@
           padding: 0px !important;
           &-item {
             border-bottom: 0.2px solid;
+            &-manageApps{
+              position: relative;
+              left: -3px;
+              margin-right: 3px !important;
+            }
             &-welcomeMail {
               opacity: 0.6;
               position: relative;

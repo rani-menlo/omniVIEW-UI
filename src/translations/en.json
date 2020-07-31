@@ -36,6 +36,8 @@
   "label.generic.description": "Description",
   "label.generic.allOn": "All On",
   "label.generic.allOff": "All Off",
+  "label.generic.wip": "WIP",
+  "label.generic.lastUpdated": "Last Updated",
   "text.generic.areyousure": "Are you sure you want to continue?",
   "text.generic.editingpermissions": "Editing {user}’s permissions",
   "text.generic.viewingpermissions": "Viewing {user}’s structure",
@@ -301,6 +303,7 @@
   "label.submissions.recent": "Recent",
   "label.submissions.customers": "Customers",
   "label.submissions.validateApplications": "Validate Applications",
+  "label.submissions.applicationManagement": "Application Management",
   "label.button.export": "Export to PDF",
 
   "label.button.delete": "Delete",

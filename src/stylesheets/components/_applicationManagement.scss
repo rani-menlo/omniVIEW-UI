@@ -1,0 +1,39 @@
+.applications-management-layout {
+  padding: 24px 32px;
+  &__list {
+    margin-top: 24px;
+    .tableHeader {
+      align-items: start;
+    }
+    &__item {
+      padding: 15px 10px;
+      &:nth-child(odd) {
+        background-color: $froasted-glass;
+      }
+      &-text {
+        @include text-medium(14px);
+        word-break: break-word;
+        &-link {
+          color: $blue;
+          text-decoration: underline;
+          cursor: pointer;
+        }
+        &-status {
+          > .ant-switch {
+            background-color: rgba($black, 0.5);
+          }
+          > .ant-switch-checked {
+            background-color: $caribbean-green;
+          }
+        }
+      }
+    }
+  }
+  &__nodata {
+    @include text-bold-active(16px);
+    padding-top: 10%;
+    &-icon {
+      margin-right: 10px;
+    }
+  }
+}
