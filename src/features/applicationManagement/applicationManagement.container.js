@@ -14,6 +14,7 @@ import {
   SelectField,
 } from "../../uikit/components";
 import { Popover, Switch, Icon, Dropdown, Menu } from "antd";
+import { CaretDownOutlined } from "@ant-design/icons";
 import PopoverCustomers from "../usermanagement/popoverCustomers.component";
 import { isLoggedInOmniciaAdmin, getFormattedDate, isToday } from "../../utils";
 import { get, find, memoize, map, filter, every, set } from "lodash";
@@ -361,8 +362,8 @@ class ApplicationManagement extends Component {
                 selectFieldClassName="applications-management-layout__header__selectOptions__field-select"
                 // selectedValue={selectedSequence.value}
                 // error={selectedSequence.error}
+                suffixIcon={<CaretDownOutlined />}
                 options={sequences}
-                showSearch={true}
                 style={{ marginRight: "0" }}
                 label={translate("label.dashboard.sequence")}
                 placeholder={translate("label.generic.all")}
@@ -372,6 +373,7 @@ class ApplicationManagement extends Component {
                 selectFieldClassName="applications-management-layout__header__selectOptions__field-select"
                 // selectedValue={selectedApplication.value}
                 // error={selectedApplication.error}
+                suffixIcon={<CaretDownOutlined />}
                 options={submissions}
                 label={translate("label.dashboard.application")}
                 placeholder={translate("label.generic.all")}
