@@ -16,19 +16,22 @@ const SelectField = ({
   selectFieldStyle,
   className,
   selectFieldClassName,
-  disabled
+  disabled,
+  showSearch,
 }) => {
   return (
     <div style={style} className={className}>
       {label && <p className="global__field-label">{label}</p>}
       <Select
+        showSearch={showSearch || false}
         style={selectFieldStyle}
         defaultValue={selectedValue}
         onChange={onChange}
         className={selectFieldClassName}
         disabled={disabled}
+        placeholder={placeholder || ""}
       >
-        {_.map(options, option => (
+        {_.map(options, (option) => (
           <Option key={option.key}>{option.value}</Option>
         ))}
       </Select>
@@ -51,7 +54,7 @@ SelectField.propTypes = {
   error: PropTypes.string,
   style: PropTypes.object,
   className: PropTypes.string,
-  selectFieldClassName: PropTypes.string
+  selectFieldClassName: PropTypes.string,
 };
 
 export default React.memo(SelectField);

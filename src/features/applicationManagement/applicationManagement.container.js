@@ -11,10 +11,11 @@ import {
   SubHeader,
   TableHeader,
   Pagination,
+  SelectField,
 } from "../../uikit/components";
-import { Popover, Switch, Icon } from "antd";
+import { Popover, Switch, Icon, Dropdown, Menu } from "antd";
 import PopoverCustomers from "../usermanagement/popoverCustomers.component";
-import { isLoggedInOmniciaAdmin } from "../../utils";
+import { isLoggedInOmniciaAdmin, getFormattedDate, isToday } from "../../utils";
 import { get, find, memoize, map, filter, every, set } from "lodash";
 import styled from "styled-components";
 import { translate } from "../../translations/translator";
@@ -27,7 +28,116 @@ class ApplicationManagement extends Component {
       itemsPerPage: 5,
       checkedSequences: [],
       selectedCustomer: this.props.selectedCustomer,
-      selectedApplication: {},
+      //this.props.submissions, -TODO remove once integration is done
+      submissions: [
+        {
+          broken_x_ref: 0,
+          created_at: "2020-07-29T09:23:45.892Z",
+          created_by: "Demo Demo",
+          customer_id: 702,
+          id: 1,
+          key: 1,
+          is_deleting: false,
+          is_submission: 0,
+          is_uploading: false,
+          life_cycle_json_path: "88e16fd5-7673-5eb5-b304-caa609fb06ac",
+          name: "ind000001",
+          value: "ind000001",
+          profile: null,
+          sequence_count: 1,
+          submission_center: "CBER",
+          template_id: null,
+          updated_at: "2020-07-29T09:24:55.510Z",
+        },
+        {
+          broken_x_ref: 0,
+          created_at: "2020-07-29T09:23:45.892Z",
+          created_by: "Demo Demo",
+          customer_id: 702,
+          id: 2,
+          key: 2,
+          is_deleting: false,
+          is_submission: 0,
+          is_uploading: false,
+          life_cycle_json_path: "88e16fd5-7673-5eb5-b304-caa609fb06ac",
+          name: "ind000002",
+          value: "ind000002",
+          profile: null,
+          sequence_count: 1,
+          submission_center: "CBER",
+          template_id: null,
+          updated_at: "2020-07-29T09:24:55.510Z",
+        },
+        {
+          broken_x_ref: 0,
+          created_at: "2020-07-29T09:23:45.892Z",
+          created_by: "Demo Demo",
+          customer_id: 702,
+          id: 758,
+          key: 758,
+          is_deleting: false,
+          is_submission: 0,
+          is_uploading: false,
+          life_cycle_json_path: "88e16fd5-7673-5eb5-b304-caa609fb06ac",
+          name: "ind001368",
+          value: "ind001368",
+          profile: null,
+          sequence_count: 1,
+          submission_center: "CBER",
+          template_id: null,
+          updated_at: "2020-07-29T09:24:55.510Z",
+        },
+      ],
+      selectedApplication: {
+        optionObject: null,
+        value: "",
+        error: "",
+      },
+      submissionCount: 3, //this.props.submissionCount, - TODO - will remove this in the next sprint once integration is done
+      //this.props.sequences,
+      sequences: [
+        {
+          hasAccess: 1,
+          id: 1,
+          key: 1,
+          json_path: "011143d1-d3ab-5442-8406-07b2ba787fb9",
+          name: "0001",
+          value: "0001",
+          relative_seq_name: "0002",
+          submission_id: 758,
+          submission_sub_type: null,
+          submission_type: "original-application",
+        },
+        {
+          hasAccess: 1,
+          id: 2,
+          key: 2,
+          json_path: "011143d1-d3ab-5442-8406-07b2ba787fb9",
+          name: "0002",
+          value: "0002",
+          relative_seq_name: "0003",
+          submission_id: 758,
+          submission_sub_type: null,
+          submission_type: "original-application",
+        },
+        {
+          hasAccess: 1,
+          id: 3,
+          key: 3,
+          json_path: "011143d1-d3ab-5442-8406-07b2ba787fb9",
+          name: "0003",
+          value: "0003",
+          relative_seq_name: "0004",
+          submission_id: 758,
+          submission_sub_type: null,
+          submission_type: "original-application",
+        },
+      ],
+      selectedSequence: {
+        optionObject: null,
+        value: "",
+        error: "",
+      },
       TableColumns: [
         {
           name: TableColumnNames.CUSTOMER,
@@ -50,7 +160,7 @@ class ApplicationManagement extends Component {
         {
           name: TableColumnNames.WIP,
           key: "first_name",
-          width: "20%",
+          width: "15%",
         },
         {
           name: TableColumnNames.LASTUPDATED,
@@ -58,34 +168,39 @@ class ApplicationManagement extends Component {
           sort: true,
           width: "20%",
         },
+        {
+          name: "",
+          key: "",
+          width: "5%",
+        },
       ],
       applications: [
         {
           id: 1,
-          sequence_count: 5,
-          uploaded_sequences: 2,
+          seq_name: "0001",
+          errors: 0,
+          isViewable: false,
+          customer_name: "LOXO",
+          name: "ind000001",
+          created_at: "2020-08-03T05:46:40.407Z",
+        },
+        {
+          id: 1,
+          seq_name: "0002",
           errors: 2,
           isViewable: false,
           customer_name: "LOXO",
           name: "ind000001",
-        },
-        {
-          id: 2,
-          sequence_count: 5,
-          uploaded_sequences: 1,
-          errors: 0,
-          isViewable: true,
-          customer_name: "LOXO",
-          name: "ind000002",
+          created_at: "2020-06-22T17:33:11.645Z",
         },
         {
           id: 1,
-          sequence_count: 5,
-          uploaded_sequences: 3,
+          seq_name: "0003",
           errors: 0,
-          isViewable: false,
+          isViewable: true,
           customer_name: "LOXO",
-          name: "ind000003",
+          name: "ind000001",
+          created_at: "2020-06-22T17:33:11.645Z",
         },
       ],
     };
@@ -96,7 +211,18 @@ class ApplicationManagement extends Component {
       id: 0,
       company_name: "All Customers",
     };
-    this.setState({ selectedCustomer });
+    let { submissions, sequences } = this.state;
+    submissions = map(submissions, (submission) => {
+      submission.key = submission.id;
+      submission.value = submission.name;
+      return submission;
+    });
+    sequences = map(sequences, (seq) => {
+      seq.key = seq.id;
+      seq.value = seq.name;
+      return seq;
+    });
+    this.setState({ selectedCustomer, submissions, sequences });
   }
 
   /**
@@ -123,6 +249,57 @@ class ApplicationManagement extends Component {
    */
   sortColumn = (sortBy, orderBy) => {};
 
+  /**
+   * Refresh sequence for the latest file changes
+   * @param {*} seq
+   */
+  refreshSequence = (seq) => () => {};
+
+  /**
+   * Context menu options
+   * @param {*} application
+   */
+  getMenu = (application) => () => {
+    return (
+      <Menu className="maindashboard__list__item-dropdown-menu">
+        <Menu.Item
+          className="maindashboard__list__item-dropdown-menu-item-refresh"
+          style={{ borderBottom: "0 !important" }}
+          onClick={this.refreshSequence(application)}
+        >
+          <p>
+            <img src="/images/refresh-black.svg" />
+            <span>{translate("label.submissions.refresh")}</span>
+          </p>
+        </Menu.Item>
+      </Menu>
+    );
+  };
+
+  /**
+   * Fetching the applications
+   */
+  fetchApplications = () => {
+    this.props.actions.resetApplications();
+    this.setState({ submissions: [], openFailuresModal: false });
+    const { selectedCustomer } = this.state;
+    let searchText = "";
+    selectedCustomer &&
+      this.props.actions.fetchApplications(selectedCustomer.id, searchText);
+  };
+
+  /**
+   * on changing the application
+   * @param {*} value
+   */
+  onApplicationChange = (value) => {
+    const optionObject = find(
+      this.props.applications,
+      (app) => app.key == value
+    );
+    this.setState({ application: { value, optionObject, error: "" } });
+  };
+
   render() {
     const { loading } = this.props;
     const {
@@ -131,7 +308,12 @@ class ApplicationManagement extends Component {
       pageNo,
       TableColumns,
       selectedCustomer,
+      submissions,
+      sequences,
+      selectedApplication,
+      selectedSequence,
     } = this.state;
+    console.log(submissions, sequences);
     let applicationsCount = 3;
     return (
       <>
@@ -170,9 +352,31 @@ class ApplicationManagement extends Component {
             <Text
               type="bold"
               size="24px"
-              textStyle={{ paddingLeft: "12px" }}
+              className="applications-management-layout__header-title"
               text={translate("label.submissions.applicationManagement")}
             />
+            <div className="applications-management-layout__header__selectOptions">
+              <SelectField
+                className="applications-management-layout__header__selectOptions__field"
+                selectFieldClassName="applications-management-layout__header__selectOptions__field-select"
+                // selectedValue={selectedSequence.value}
+                // error={selectedSequence.error}
+                options={sequences}
+                showSearch={true}
+                style={{ marginRight: "0" }}
+                label={translate("label.dashboard.sequence")}
+                placeholder={translate("label.generic.all")}
+              />
+              <SelectField
+                className="applications-management-layout__header__selectOptions__field"
+                selectFieldClassName="applications-management-layout__header__selectOptions__field-select"
+                // selectedValue={selectedApplication.value}
+                // error={selectedApplication.error}
+                options={submissions}
+                label={translate("label.dashboard.application")}
+                placeholder={translate("label.generic.all")}
+              />
+            </div>
           </div>
 
           <div className="applications-management-layout__list">
@@ -180,7 +384,7 @@ class ApplicationManagement extends Component {
             {map(applications, (application) => (
               <Row
                 key={application.id}
-                className="applications-management-layout__list__item global__cursor-pointer"
+                className="applications-management-layout__list__item"
                 style={{ justifyContent: "normal" }}
               >
                 <Column
@@ -199,11 +403,7 @@ class ApplicationManagement extends Component {
                   width={this.getColumnWidth(TableColumnNames.SEQUENCE)}
                   className="applications-management-layout__list__item-text"
                 >
-                  {`${get(application, "uploaded_sequences", 0)} of ${get(
-                    application,
-                    "sequence_count",
-                    0
-                  )}`}
+                  {get(application, "seq_name", "N/A")}
                 </Column>
 
                 <Column
@@ -212,7 +412,7 @@ class ApplicationManagement extends Component {
                 >
                   <Switch
                     size="small"
-                    className="applications-management-layout__list__item-text"
+                    className="applications-management-layout__list__item-text global__cursor-pointer"
                   ></Switch>
                   <span
                     className="applications-management-layout__list__item-text"
@@ -226,11 +426,26 @@ class ApplicationManagement extends Component {
                   className="applications-management-layout__list__item-text"
                 >
                   <span
-                    className={`${get(application, "errors") != 0 &&
+                    className={`${isToday(application.created_at) &&
                       "applications-management-layout__list__item-text-link"}`}
                   >
-                    {get(application, "errors", 0)}
+                    {isToday(application.created_at)
+                      ? "Today"
+                      : getFormattedDate(application.created_at)}
                   </span>
+                </Column>
+                <Column>
+                  <Dropdown
+                    overlay={this.getMenu(application)}
+                    trigger={["click"]}
+                    overlayClassName="maindashboard__list__item-dropdown"
+                  >
+                    <img
+                      className="global__cursor-pointer"
+                      src="/images/overflow-black.svg"
+                      style={{ width: "18px", height: "18px" }}
+                    />
+                  </Dropdown>
                 </Column>
               </Row>
             ))}
@@ -289,6 +504,9 @@ function mapStateToProps(state) {
     loading: state.Api.loading,
     role: state.Login.role,
     selectedCustomer: state.Customer.selectedCustomer,
+    selectedSubmission: state.Application.selectedSubmission,
+    submissions: state.Application.submissions, //getSubmissionsByCustomer(state),
+    submissionCount: state.Application.submissionCount,
   };
 }
 

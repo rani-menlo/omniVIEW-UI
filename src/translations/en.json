@@ -304,6 +304,7 @@
   "label.submissions.customers": "Customers",
   "label.submissions.validateApplications": "Validate Applications",
   "label.submissions.applicationManagement": "Application Management",
+  "label.submissions.refresh": "Refresh",
   "label.button.export": "Export to PDF",
 
   "label.button.delete": "Delete",
