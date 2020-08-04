@@ -56,6 +56,14 @@ const getFormattedDate = date => {
   return moment(date).format(DATE_FORMAT);
 };
 
+/**
+ * return true if the date is todays date
+ * @param {*} date
+ */
+const isToday = (date) => {
+  return moment(date).isSame(moment(), "day");
+};
+
 const getCombinedLicences = licences => {
   let combinedLicences = [];
   const licencesByName = _.groupBy(licences, "name");
@@ -191,6 +199,7 @@ export {
   getRoleName,
   getRoleNameByRoleId,
   getFormattedDate,
+  isToday,
   getCombinedLicences,
   storeImageData,
   getOrderedSequences,

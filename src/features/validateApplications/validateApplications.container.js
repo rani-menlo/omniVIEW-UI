@@ -227,6 +227,15 @@ class ValidateApplications extends Component {
     this.setState({ showApplicationErrorModal: false });
   };
 
+  /**
+   * redirect to application management screen
+   */
+  openApplicationManagement = () => (application) => {
+    this.setState({ selectedApplication: application }, () => {
+      this.props.history.push("/applicationManagement");
+    });
+  };
+
   render() {
     const { loading } = this.props;
     const {
@@ -297,18 +306,21 @@ class ValidateApplications extends Component {
                 <Column
                   width={this.getColumnWidth(TableColumnNames.CUSTOMER)}
                   className="validate-applications-layout__list__item-text"
+                  onClick={this.openApplicationManagement(application)}
                 >
                   {get(application, "customer_name", "N/A")}
                 </Column>
                 <Column
                   width={this.getColumnWidth(TableColumnNames.APPLICATION)}
                   className="validate-applications-layout__list__item-text"
+                  onClick={this.openApplicationManagement(application)}
                 >
                   {get(application, "name", "N/A")}
                 </Column>
                 <Column
                   width={this.getColumnWidth(TableColumnNames.NOOFSEQUENCES)}
                   className="validate-applications-layout__list__item-text"
+                  onClick={this.openApplicationManagement(application)}
                 >
                   {`${get(application, "uploaded_sequences", 0)} of ${get(
                     application,
@@ -323,7 +335,10 @@ class ValidateApplications extends Component {
                   <span
                     className={`${get(application, "errors") != 0 &&
                       "validate-applications-layout__list__item-text-link"}`}
-                    onClick={application.errors != 0 ? e => this.openApplicationsErrorModal(application) : ''
+                    onClick={
+                      application.errors != 0
+                        ? (e) => this.openApplicationsErrorModal(application)
+                        : ""
                     }
                   >
                     {get(application, "errors", 0)}
