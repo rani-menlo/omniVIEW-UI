@@ -24,6 +24,7 @@ import AddNewApplication from "./features/dashboard/application/addNewApplicatio
 import RemoteDetails from "./features/dashboard/application/remoteDetails.component";
 import CustomerAccounts from "./features/customerAccounts/customerAccounts.component";
 import ValidateApplications from "./features/validateApplications/validateApplications.container";
+import ApplicationManagement from "./features/applicationManagement/applicationManagement.container";
 
 const Routes = () => {
   return (
@@ -105,6 +106,11 @@ const Routes = () => {
               exact
               path="/validateApplications"
               component={ValidateApplications}
+            />
+            <PrivateRoute
+              exact
+              path="/applicationManagement"
+              component={ApplicationManagement}
             />
             <Redirect to="/" />
           </Switch>

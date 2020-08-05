@@ -64,7 +64,11 @@ class ProfileMenu extends Component {
             onClick={this.validateApplications}
           >
             <p>
-              <img src="/images/manage-app.png" alt="Manage Application" />
+              <img
+                className="maindashboard__list__item-dropdown-menu-item-manageApps"
+                src="/images/manage-applications.svg"
+                alt="Manage Application"
+              />
               <span>{`${translate("label.generic.manage")} ${translate(
                 "label.dashboard.applications"
               )}`}</span>
