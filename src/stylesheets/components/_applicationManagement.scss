@@ -18,10 +18,18 @@
         &-select {
           width: 100%;
           > .ant-select-selection {
-            border-color: $black;
+            border-color: rgba(0, 0, 0, 0.5);
+            > .ant-select-arrow {
+              color: $black;
+            }
           }
           > .ant-select-disabled {
             color: rgba(0, 0, 0, 0.65) !important;
+          }
+          > .ant-select-selection-selected-value,
+          > .ant-select-dropdown-menu-item {
+            @include text-regular;
+            font-size: 12px !important;
           }
         }
       }

@@ -18,11 +18,13 @@ const SelectField = ({
   selectFieldClassName,
   disabled,
   showSearch,
+  suffixIcon,
 }) => {
   return (
     <div style={style} className={className}>
       {label && <p className="global__field-label">{label}</p>}
       <Select
+        suffixIcon={suffixIcon || ""}
         showSearch={showSearch || false}
         style={selectFieldStyle}
         defaultValue={selectedValue}
