@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { CustomerActions } from "../../redux/actions";
 import Header from "../header/header.component";
@@ -13,10 +12,10 @@ import {
   Pagination,
   SelectField,
 } from "../../uikit/components";
-import { Popover, Switch, Icon, Dropdown, Menu } from "antd";
+import { Popover, Switch, Dropdown, Menu } from "antd";
 import PopoverCustomers from "../usermanagement/popoverCustomers.component";
 import { isLoggedInOmniciaAdmin, getFormattedDate, isToday } from "../../utils";
-import { get, find, memoize, map, filter, every, set } from "lodash";
+import { get, find, memoize, map, set } from "lodash";
 import styled from "styled-components";
 import { translate } from "../../translations/translator";
 
