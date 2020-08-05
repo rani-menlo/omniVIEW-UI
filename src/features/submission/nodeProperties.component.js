@@ -811,7 +811,6 @@ class NodeProperties extends Component {
       properties,
       sequence,
       view,
-      projectJson,
       formFile,
       selectedSubmission,
     } = this.props;

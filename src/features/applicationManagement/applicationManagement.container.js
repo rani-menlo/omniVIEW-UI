@@ -88,11 +88,6 @@ class ApplicationManagement extends Component {
           updated_at: "2020-07-29T09:24:55.510Z",
         },
       ],
-      selectedApplication: {
-        optionObject: null,
-        value: "",
-        error: "",
-      },
       submissionCount: 3, //this.props.submissionCount, - TODO - will remove this in the next sprint once integration is done
       //this.props.sequences,
       sequences: [
@@ -133,11 +128,7 @@ class ApplicationManagement extends Component {
           submission_type: "original-application",
         },
       ],
-      selectedSequence: {
-        optionObject: null,
-        value: "",
-        error: "",
-      },
+
       TableColumns: [
         {
           name: TableColumnNames.CUSTOMER,
@@ -229,7 +220,7 @@ class ApplicationManagement extends Component {
    * get each column width
    */
   getColumnWidth = memoize((name) => {
-    const col = find(this.state.TableColumns, (col) => col.name === name);
+    const col = find(this.state.TableColumns, (column) => column.name === name);
     return get(col, "width");
   });
 
@@ -310,10 +301,7 @@ class ApplicationManagement extends Component {
       selectedCustomer,
       submissions,
       sequences,
-      selectedApplication,
-      selectedSequence,
     } = this.state;
-    console.log(submissions, sequences);
     let applicationsCount = 3;
     return (
       <>

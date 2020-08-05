@@ -7,7 +7,7 @@ import { translate } from "../../translations/translator";
 import { getFormattedDate } from "../../utils";
 import { Text, OmniButton } from "../../uikit/components";
 import { ApplicationApi } from "../../redux/api";
-import { UPLOAD_FAILED, ANALYZING } from "../../constants";
+import { UPLOAD_FAILED } from "../../constants";
 import { ApiActions } from "../../redux/actions";
 
 class SubmissionCard extends Component {

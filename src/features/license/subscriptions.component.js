@@ -9,13 +9,13 @@ import {
   Row,
   Toast,
   ImageLoader,
-  DeactivateModal
+  DeactivateModal,
 } from "../../uikit/components";
 import { Icon } from "antd";
 import { translate } from "../../translations/translator";
 import AssignLicence from "./assignLicence.component";
 import AssignLicenceWithUsers from "./assignLicenceWithUsers.component";
-import { CustomerActions, UsermanagementActions } from "../../redux/actions";
+import { UsermanagementActions } from "../../redux/actions";
 import { getFormattedDate } from "../../utils";
 
 class Subscriptions extends Component {
@@ -27,7 +27,7 @@ class Subscriptions extends Component {
           props.allLicences,
           state.pageNo,
           state.itemsPerPage
-        )
+        ),
       };
     }
     return null;
@@ -52,7 +52,7 @@ class Subscriptions extends Component {
       removingLicense: null,
       licencesFromProps: [],
       selectedUser: null,
-      showRemoveLicenseModal: false
+      showRemoveLicenseModal: false,
     };
   }
 
@@ -64,25 +64,25 @@ class Subscriptions extends Component {
       );
   }
 
-  onPageChange = pageNo => {
+  onPageChange = (pageNo) => {
     this.setState({
       pageNo,
       allLicences: Subscriptions.getItemsBasedOnPagination(
         this.props.allLicences,
         pageNo,
         this.state.itemsPerPage
-      )
+      ),
     });
   };
 
-  onPageSizeChange = itemsPerPage => {
+  onPageSizeChange = (itemsPerPage) => {
     this.setState({
       itemsPerPage,
       allLicences: Subscriptions.getItemsBasedOnPagination(
         this.props.allLicences,
         this.state.pageNo,
         itemsPerPage
-      )
+      ),
     });
   };
 
@@ -98,22 +98,22 @@ class Subscriptions extends Component {
         sortedLicences,
         this.state.pageNo,
         this.state.itemsPerPage
-      )
+      ),
     });
   };
 
-  openUsersModal = license => () => {
+  openUsersModal = (license) => () => {
     this.setState({
       showAssignLicenceToUser: false,
       showUsersModal: true,
-      assigningLicence: license
+      assigningLicence: license,
     });
   };
 
   goBackToUsersModal = () => {
     this.setState({
       showAssignLicenceToUser: false,
-      showUsersModal: true
+      showUsersModal: true,
     });
   };
 
@@ -121,22 +121,22 @@ class Subscriptions extends Component {
     this.setState({
       selectedUser: null,
       showUsersModal: false,
-      assigningLicence: null
+      assigningLicence: null,
     });
   };
 
   closeAssignLicenceToUserModal = () => {
     this.setState({
       selectedUser: null,
-      showAssignLicenceToUser: false
+      showAssignLicenceToUser: false,
     });
   };
 
-  onUserSelect = user => {
+  onUserSelect = (user) => {
     this.setState({
       showAssignLicenceToUser: true,
       showUsersModal: false,
-      selectedUser: user
+      selectedUser: user,
     });
   };
 
@@ -147,7 +147,7 @@ class Subscriptions extends Component {
         selectedUser: null,
         allLicences: null,
         removingLicense: null,
-        showRemoveLicenseModal: false
+        showRemoveLicenseModal: false,
       },
       () => {
         this.props.dispatch(
@@ -159,18 +159,18 @@ class Subscriptions extends Component {
 
   assignLicence = () => {
     const { assigningLicence, selectedUser } = this.state;
-    const licenses = _.map(selectedUser, user => {
+    const licenses = _.map(selectedUser, (user) => {
       return {
         ...(_.includes(assigningLicence.slug, "view")
           ? { omni_view_license: assigningLicence.id }
           : { omni_file_license: assigningLicence.id }),
-        user_id: user.user_id
+        user_id: user.user_id,
       };
     });
     this.props.dispatch(
       UsermanagementActions.assignLicense(
         {
-          licenses
+          licenses,
         },
         () => {
           Toast.success("License has been assigned.");
@@ -180,7 +180,7 @@ class Subscriptions extends Component {
     );
     this.setState({
       selectedUser: null,
-      showAssignLicenceToUser: false
+      showAssignLicenceToUser: false,
     });
   };
 
@@ -188,7 +188,7 @@ class Subscriptions extends Component {
     this.props.dispatch(
       UsermanagementActions.removeLicense(
         {
-          licenses: [this.state.removingLicense.id]
+          licenses: [this.state.removingLicense.id],
         },
         () => {
           Toast.success(translate("text.licence.removed"));
@@ -198,7 +198,7 @@ class Subscriptions extends Component {
     );
   };
 
-  openRemoveLicenseModal = license => () => {
+  openRemoveLicenseModal = (license) => () => {
     this.setState({ showRemoveLicenseModal: true, removingLicense: license });
   };
 
@@ -216,7 +216,7 @@ class Subscriptions extends Component {
           sortColumn={this.sortColumn}
         />
         <div key={uuidv4()}>
-          {_.map(allLicences, licence => (
+          {_.map(allLicences, (licence) => (
             <Row
               key={licence.id}
               className="maindashboard__list__item"
@@ -294,7 +294,7 @@ class Subscriptions extends Component {
                 top: range[0],
                 bottom: range[1],
                 total,
-                type: translate("label.licence.licences")
+                type: translate("label.licence.licences"),
               })
             }
             pageSize={this.state.itemsPerPage}
@@ -311,7 +311,7 @@ class Subscriptions extends Component {
               className="maindashboard__nodata-icon"
             />
             {translate("error.dashboard.notfound", {
-              type: translate("text.customer.subslicences")
+              type: translate("text.customer.subslicences"),
             })}
           </Row>
         )}
@@ -346,7 +346,7 @@ class Subscriptions extends Component {
               this.state.removingLicense,
               "first_name",
               ""
-            )}  ${_.get(this.state.removingLicense, "last_name", "")}`
+            )}  ${_.get(this.state.removingLicense, "last_name", "")}`,
           })}
           closeModal={this.closeRemoveLicenseModal}
           submit={this.removeLicense}
@@ -356,13 +356,13 @@ class Subscriptions extends Component {
   }
 }
 
-const getColumnWidth = _.memoize(name => {
-  const col = _.find(TableColumns, col => col.name === name);
+const getColumnWidth = _.memoize((name) => {
+  const col = _.find(TableColumns, (col) => col.name === name);
   return _.get(col, "width");
 });
 
 const Column = styled.div`
-  width: ${props => props.width};
+  width: ${(props) => props.width};
 `;
 
 const TableColumnNames = {
@@ -371,7 +371,7 @@ const TableColumnNames = {
   EXPIRATION_DATE: translate("label.licence.expirationdate"),
   STATUS: translate("label.user.status"),
   USER: translate("label.dashboard.user"),
-  ACTIONS: translate("label.generic.actions")
+  ACTIONS: translate("label.generic.actions"),
 };
 
 const TableColumns = [
@@ -379,48 +379,48 @@ const TableColumns = [
     name: TableColumnNames.APPLICATION,
     key: "type_name",
     sort: true,
-    width: "20%"
+    width: "20%",
   },
   {
     name: TableColumnNames.DURATION,
     key: "duration",
     sort: true,
-    width: "20%"
+    width: "20%",
   },
   {
     name: TableColumnNames.EXPIRATION_DATE,
     key: "expired_date",
     sort: true,
-    width: "20%"
+    width: "20%",
   },
   {
     name: TableColumnNames.USER,
     key: "first_name",
     sort: true,
-    width: "20%"
+    width: "20%",
   },
   {
     name: TableColumnNames.STATUS,
     key: "first_name",
-    width: "15%"
+    width: "15%",
   },
   {
     name: TableColumnNames.ACTIONS,
-    width: "10%"
-  }
+    width: "10%",
+  },
 ];
 
 function mapStateToProps(state) {
   return {
     loading: state.Api.loading,
     allLicences: state.Usermanagement.allLicences,
-    selectedCustomer: state.Customer.selectedCustomer
+    selectedCustomer: state.Customer.selectedCustomer,
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    dispatch
+    dispatch,
   };
 }
 

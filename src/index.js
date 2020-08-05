@@ -1,13 +1,9 @@
 import React, { Component } from "react";
-import { isLoggedInOmniciaRole } from "./utils";
-import _ from "lodash";
 import { connect } from "react-redux";
 import ReactDOM from "react-dom";
 import "./stylesheets/main.scss";
 import Routes from "./routes";
 import * as serviceWorker from "./serviceWorker";
-import { SERVER_URL } from "./constants";
-import { CustomerActions } from "./redux/actions";
 
 class App extends Component {
   render() {
