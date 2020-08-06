@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { Modal, Upload } from "antd";
-import { indexOf, get } from "lodash";
+import { get } from "lodash";
 import { OmniButton } from "..";
 import Text from "../text/text.component";
 import { translate } from "../../../translations/translator";
