@@ -472,10 +472,12 @@ class AddUser extends Component {
               {translate("label.usermgmt.licensestatus")}:
               <span
                 className={`userManagement__group__users__user__info-text-${
-                  statusActive ? "active" : "inactive"
+                  statusActive && _.get(selectedUser, "license_status", 1)
+                    ? "active"
+                    : "inactive"
                 }`}
               >
-                {statusActive
+                {statusActive && _.get(selectedUser, "license_status", 1)
                   ? ` ${translate("label.user.active")}`
                   : ` ${translate("label.user.inactive")}`}
               </span>
