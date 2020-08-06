@@ -45,6 +45,7 @@ class Header extends Component {
       <div className="headerbar" style={style}>
         <img
           src="/images/omnicia-logo.svg"
+          alt="Omnicia Logo"
           className={`headerbar-logo ${
             disabled ? "global__cursor-not-allowed" : "global__cursor-pointer"
           }`}
@@ -53,7 +54,7 @@ class Header extends Component {
         {hideMenu ? (
           <div className="headerbar-signout" onClick={this.signOut}>
             <p>
-              <img src="/images/logout.svg" />
+              <img src="/images/logout.svg" alt="Logout"/>
               <span>{translate("lable.profile.signout")}</span>
             </p>
           </div>

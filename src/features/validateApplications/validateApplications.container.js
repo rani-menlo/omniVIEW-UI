@@ -272,6 +272,7 @@ class ValidateApplications extends Component {
                 />
                 <img
                   className="global__cursor-pointer"
+                  alt="Caret"
                   src="/images/caret-inactive.svg"
                   style={{ marginLeft: "5px" }}
                 />

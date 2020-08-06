@@ -122,7 +122,7 @@ class Login extends Component {
         <Loader loading={loading} />
         <div className="global__container">
           <div className="login">
-            <img src="/images/omnicia-logo.svg" className="login-logo" />
+            <img src="/images/omnicia-logo.svg" className="login-logo" alt="Omnicia Logo"/>
             <p className="login-text">{translate("text.login.title")}</p>
             <div className="login__hr-line global__hr-line" />
             {error && <p className="login-error">{error}</p>}

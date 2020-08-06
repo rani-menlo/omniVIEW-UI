@@ -266,7 +266,7 @@ class ApplicationDashboard extends Component {
     });
     if (res) {
       const { data } = res;
-      const results = _.get(data, "result");
+      // const results = _.get(data, "result");
       if (_.get(data, "result.length")) {
         this.checkSequenceStatus(
           _.get(data, "result", null),
@@ -377,7 +377,7 @@ class ApplicationDashboard extends Component {
         {!submission.is_uploading && submission.is_submission == 0 && (
           <Menu.Item key="edit">
             <div className="global__center-vert">
-              <img src="/images/edit.svg" style={style} />
+              <img src="/images/edit.svg" style={style} alt="Edit"/>
               <Text
                 type="regular"
                 size="12px"
@@ -389,7 +389,7 @@ class ApplicationDashboard extends Component {
         {!submission.is_uploading && submission.is_submission == 0 && (
           <Menu.Item key="openinomniview">
             <div className="global__center-vert">
-              <img src="/images/omni-view-cloud.png" style={style} />
+              <img src="/images/omni-view-cloud.png" alt="cloud" style={style} />
               <Text
                 type="regular"
                 size="12px"
@@ -402,7 +402,7 @@ class ApplicationDashboard extends Component {
         {!submission.is_uploading && submission.is_submission == 0 && (
           <Menu.Item disabled>
             <div className="global__center-vert">
-              <img src="/images/omni-file.jpg" style={style} />
+              <img src="/images/omni-file.jpg" alt="File" style={style} />
               <Text
                 type="regular"
                 size="12px"
@@ -415,7 +415,7 @@ class ApplicationDashboard extends Component {
         {!submission.is_uploading && submission.is_submission == 0 && (
           <Menu.Item key="window">
             <div className="global__center-vert">
-              <img src="/images/new-window.png" style={style} />
+              <img src="/images/new-window.png" alt="New Window" style={style} />
               <Text
                 type="regular"
                 size="12px"
@@ -434,7 +434,7 @@ class ApplicationDashboard extends Component {
               style={{ borderTop: "1px solid rgba(74, 74, 74, 0.25)" }}
             >
               <div className="global__center-vert">
-                <img src="/images/assign.svg" style={style} />
+                <img src="/images/assign.svg" alt="Assign" style={style} />
                 <Text
                   type="regular"
                   size="12px"
@@ -445,7 +445,7 @@ class ApplicationDashboard extends Component {
             </Menu.Item>,
             <Menu.Item key="sequence">
               <div className="global__center-vert">
-                <img src="/images/plus-black.svg" style={style} />
+                <img src="/images/plus-black.svg" alt="Add" style={style} />
                 <Text
                   type="regular"
                   size="12px"
@@ -1304,7 +1304,7 @@ class ApplicationDashboard extends Component {
               {isAdmin(role.slug) && submissions.length !== 0 && (
                 <OmniButton
                   type="add"
-                  image={<img src="/images/global-permission-white.svg" />}
+                  image={<img src="/images/global-permission-white.svg" alt="Global permissions"/>}
                   label={translate("label.dashboard.assignglobalpermissions")}
                   className="maindashboard-assignpermissions"
                   buttonStyle={{ marginRight: "4px" }}
@@ -1331,6 +1331,7 @@ class ApplicationDashboard extends Component {
             <div className="global__center-vert" style={{ marginTop: "10px" }}>
               <img
                 src="/images/key.svg"
+                alt="Key"
                 style={{ marginRight: "8px", opacity: 0.5 }}
               />
               <Text
@@ -1507,6 +1508,7 @@ class ApplicationDashboard extends Component {
                             "global__cursor-pointer"
                           }
                           src="/images/overflow-black.svg"
+                          alt="Dropdown"
                           style={{
                             width: "20px",
                             height: "20px",
@@ -1671,6 +1673,7 @@ class ApplicationDashboard extends Component {
               <img
                 src="/images/close.svg"
                 className="licence-modal__header-close"
+                alt="Close"
                 onClick={this.closeFailuresModal}
               />
             </div>
@@ -1679,6 +1682,7 @@ class ApplicationDashboard extends Component {
               <div className="failureResults__info-list">
                 <img
                   src="/images/info_icon.png"
+                  alt="Info"
                   style={{ height: "20px", margin: "-4px 5px 0 0" }}
                 />
                 <Text
@@ -1710,6 +1714,7 @@ class ApplicationDashboard extends Component {
                 <div className="">
                   <img
                     src="/images/error.png"
+                    alt="Error"
                     className=""
                     style={{ height: "20px", margin: "-4px 5px 0 0" }}
                   />

@@ -16,7 +16,7 @@ import { Popover, Switch, Dropdown, Menu } from "antd";
 import { CaretDownOutlined } from "@ant-design/icons";
 import PopoverCustomers from "../usermanagement/popoverCustomers.component";
 import { isLoggedInOmniciaAdmin, getFormattedDate, isToday } from "../../utils";
-import { get, find, memoize, map, set } from "lodash";
+import { get, find, memoize, map } from "lodash";
 import styled from "styled-components";
 import { translate } from "../../translations/translator";
 
@@ -259,7 +259,7 @@ class ApplicationManagement extends Component {
           onClick={this.refreshSequence(application)}
         >
           <p>
-            <img src="/images/refresh-black.svg" />
+            <img src="/images/refresh-black.svg" alt="Refresh"/>
             <span>{translate("label.submissions.refresh")}</span>
           </p>
         </Menu.Item>
@@ -328,6 +328,7 @@ class ApplicationManagement extends Component {
                 />
                 <img
                   className="global__cursor-pointer"
+                  alt="caret-down"
                   src="/images/caret-inactive.svg"
                   style={{ marginLeft: "5px" }}
                 />
@@ -432,6 +433,7 @@ class ApplicationManagement extends Component {
                     <img
                       className="global__cursor-pointer"
                       src="/images/overflow-black.svg"
+                      alt="Dropdown"
                       style={{ width: "18px", height: "18px" }}
                     />
                   </Dropdown>

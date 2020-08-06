@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Modal } from "antd";
 import { OmniButton } from "..";
-import { get, map } from "lodash";
+import { get } from "lodash";
 import Text from "../text/text.component";
 import { translate } from "../../../translations/translator";
 
@@ -28,6 +28,7 @@ class ErrorsModal extends Component {
           />
           <img
             src="/images/close.svg"
+            alt="Close"
             className="errors-modal__header-close"
             onClick={closeModal}
           />

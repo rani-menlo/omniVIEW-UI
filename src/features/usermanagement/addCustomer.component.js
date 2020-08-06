@@ -203,7 +203,7 @@ class AddCustomer extends Component {
   }
 
   static getPrimaryContactDetailsState(props, state, userId) {
-    const admin = _.find(props.cAdmins, (admin) => admin.user_id == userId);
+    const admin = _.find(props.cAdmins, (admin) => Number(admin.user_id) === Number(userId));
     const { fname, lname, email, phone } = state;
     return {
       disablePrimaryContactFields: true,
@@ -222,7 +222,7 @@ class AddCustomer extends Component {
       if (selectedCustomer) {
         const state = this.populateState();
         newState = { ...state, ...newState };
-        if (selectedCustomer.is_omnicia == true) {
+        if (selectedCustomer.is_omnicia === true) {
           this.fetchOmniAdmins();
           this.fetchOmniUsers();
         } else {
@@ -617,7 +617,7 @@ class AddCustomer extends Component {
     this.props.dispatch(UsermanagementActions.resetAllLicences());
     this.props.dispatch(
       CustomerActions.setSelectedCustomer(customer, () => {
-        if (customer.is_omnicia == true) {
+        if (customer.is_omnicia === true) {
           this.fetchOmniAdmins(customer, () => {
             this.updateCustomerDetails(customer);
           });
@@ -778,7 +778,6 @@ class AddCustomer extends Component {
       storageError,
       storageApplications,
       subscription: { omniView, omniFile },
-      licences,
       editCustomer,
       statusActive,
       selectedTab,

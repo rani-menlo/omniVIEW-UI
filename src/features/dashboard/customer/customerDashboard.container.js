@@ -147,7 +147,7 @@ class CustomerDashboard extends Component {
    * @param {*} sortBy
    * @param {*} orderBy
    */
-  fetchCustomers = (sortBy = "created_at", orderBy = "ASC") => {
+  fetchCustomers = (sortBy = "created_at", orderBy = "DESC") => {
     const { viewBy, pageNo, itemsPerPage, searchText } = this.state;
     this.props.dispatch(CustomerActions.resetCustomers());
     const TableColumns = [...this.state.TableColumns];
@@ -240,7 +240,7 @@ class CustomerDashboard extends Component {
           onClick={this.editCustomer(customer)}
         >
           <p>
-            <img src="/images/edit.svg" alt="edit-user" />
+            <img src="/images/edit.svg" alt="edit-user" alt="Edit User"/>
             <span>{`${translate("label.usermgmt.edit")} ${translate(
               "label.dashboard.customer"
             )}`}</span>
@@ -255,6 +255,7 @@ class CustomerDashboard extends Component {
               <img
                 src="/images/send-black.svg"
                 className="maindashboard__list__item-dropdown-menu-item-welcomeMail"
+                alt="Send Welcome Email"
               />
               <span>{`${translate("label.button.sendWelcomeEmail")}`}</span>
             </p>
@@ -810,6 +811,7 @@ class CustomerDashboard extends Component {
                             <img
                               className="global__cursor-pointer"
                               src="/images/overflow-black.svg"
+                              alt="dropdown"
                               style={{ width: "18px", height: "18px" }}
                             />
                           </Dropdown>

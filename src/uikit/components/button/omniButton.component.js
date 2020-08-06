@@ -18,7 +18,7 @@ const OmniButton = ({
         onClick={onClick}
         style={buttonStyle}
       >
-        {image || <img src="/images/plus.svg" />}
+        {image || <img src="/images/plus.svg" alt="plus"/>}
         <span className="omniButton-add-text">{label}</span>
       </span>
     );

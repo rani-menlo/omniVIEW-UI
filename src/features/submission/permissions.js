@@ -1,15 +1,13 @@
-import _ from "lodash";
-
 export class Permissions {
   static GRANTED = {
     file_ids: new Set(),
     submission_ids: new Set(),
-    sequence_ids: new Set()
+    sequence_ids: new Set(),
   };
   static REVOKED = {
     file_ids: new Set(),
     submission_ids: new Set(),
-    sequence_ids: new Set()
+    sequence_ids: new Set(),
   };
 
   static clear() {

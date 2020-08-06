@@ -103,6 +103,7 @@ class AssignLicenceWithUsers extends Component {
           />
           <img
             src="/images/close.svg"
+            alt="Close"
             className="licence-modal__header-close"
             onClick={closeModal}
           />

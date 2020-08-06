@@ -47,6 +47,7 @@ class ApplicationErrorsModal extends Component {
           />
           <img
             src="/images/close.svg"
+            alt="Close"
             className="application-errors-modal__header-close"
             onClick={closeModal}
           />

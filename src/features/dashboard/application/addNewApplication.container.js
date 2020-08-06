@@ -794,6 +794,7 @@ class AddNewApplication extends Component {
             >
               <img
                 src="/images/refresh.png"
+                alt="Refresh"
                 style={{ width: "22px", height: "22px" }}
               />
             </div>
@@ -833,6 +834,7 @@ class AddNewApplication extends Component {
               <Text type="extra_bold" size="16px" text="Invalid Sequences" />
               <img
                 src="/images/close.svg"
+                alt="close"
                 className="licence-modal__header-close"
                 onClick={this.closeInvalidSequenceModal}
               />

@@ -19,6 +19,7 @@ const DeactivateModal = ({
         <span className="deactivate-modal-title">{title}</span>
         <img
           src="/images/close.svg"
+          alt="Close"
           className="deactivate-modal-close"
           style={{
             width: "20px",

@@ -84,6 +84,7 @@ class UploadCustomersModal extends Component {
           <img
             src="/images/close.svg"
             className="upload-customers-modal__header-close"
+            alt="close"
             onClick={closeModal}
           />
         </div>
@@ -99,6 +100,7 @@ class UploadCustomersModal extends Component {
               <img
                 src="/images/upload.svg"
                 className="upload-customers-modal__upload-inner-image"
+                alt="upload"
               />
               <span className="upload-customers-modal__upload-inner-drag">
                 {translate("text.generic.dragdrop")}{" "}

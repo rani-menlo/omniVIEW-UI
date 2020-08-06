@@ -123,7 +123,7 @@ class ForgotPassword extends Component {
               className="global__center-horiz-vert"
               style={{ flexDirection: "column" }}
             >
-              <img src="/images/rite-big.svg" />
+              <img src="/images/rite-big.svg" alt="Tick-mark"/>
               <Text
                 type="regular"
                 opacity={0.5}
