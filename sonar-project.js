@@ -6,7 +6,7 @@ sonarqubeScanner(
     options: {
 		'sonar.projectKey':'omnicia-web',
 		'sonar.projectName':'omnicia-web',
-		'sonar.projectVersion':'0.2', // this is the name and version displayed in the SonarQube UI.
+		'sonar.projectVersion':'0.3', // this is the name and version displayed in the SonarQube UI.
 		'sonar.sources': 'src/', //Path is relative to the sonar-project.properties file. Replace "\" by "/" on Windows.
 		'sonar.sourceEncoding':'UTF-8', //# Encoding of the source code. Default is default system encoding
 		'sonar.exclusions':'**/node_modules/**', //node_module folders which needs to be execlude
