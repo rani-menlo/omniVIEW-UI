@@ -376,10 +376,10 @@ class UserManagementContainer extends Component {
           if (viewBy === "lists") {
             this.props.dispatch(
               UsermanagementActions.fetchUsers({
-                customerId: selectedCustomer.id,
+                customerId: Number(selectedCustomer.id),
                 search: searchText,
-                page: pageNo,
-                limit: itemsPerPage,
+                page: Number(pageNo),
+                limit: Number(itemsPerPage),
                 includeLoggedInUser: true,
                 ...this.selectedFilters,
               })

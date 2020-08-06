@@ -158,8 +158,8 @@ class CustomerDashboard extends Component {
        */
       if (viewBy === "lists") {
         this.props.actions.fetchCustomersByList(
-          pageNo,
-          itemsPerPage,
+          Number(pageNo),
+          Number(itemsPerPage),
           sortBy,
           orderBy,
           searchText || ""

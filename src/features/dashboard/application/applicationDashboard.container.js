@@ -516,9 +516,9 @@ class ApplicationDashboard extends Component {
     if (viewBy === "lists") {
       selectedCustomer &&
         this.props.actions.fetchApplicationsByList(
-          selectedCustomer.id,
-          pageNo,
-          itemsPerPage,
+          Number(selectedCustomer.id),
+          Number(pageNo),
+          Number(itemsPerPage),
           sortBy,
           orderBy,
           searchText || ""
