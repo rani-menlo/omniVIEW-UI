@@ -832,6 +832,7 @@ class CustomerDashboard extends Component {
                 </Row>
               )}
               <Pagination
+                key={customerCount}
                 containerStyle={
                   customerCount > 4 ? { marginTop: "1%" } : { marginTop: "20%" }
                 }
