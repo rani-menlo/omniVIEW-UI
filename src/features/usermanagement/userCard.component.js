@@ -11,7 +11,7 @@ const UserCard = ({
   onAvatarClick,
   onStatusClick,
   onEdit,
-  onAssignLicenseClick
+  onAssignLicenseClick,
 }) => {
   const isActive = _.get(user, "is_active", false);
   return (
@@ -53,22 +53,23 @@ const UserCard = ({
         </p>
 
         {user.role_id !== 1 ? (
-        <React.Fragment>
-          <p className="userManagement__group__users__user__info-text">
-            {translate("label.usermgmt.licensestatus")}:
-            <span
-              className={`userManagement__group__users__user__info-text-${
-                _.get(user, "license_status", 0) ? "active" : "inactive"
-              }`}
-            >
-              {_.get(user, "license_status", 0)
-                ? ` ${translate("label.user.active")}`
-                : ` ${translate("label.user.inactive")}`}
-            </span>
-          </p>
-        </React.Fragment> )  : (
-            ""
-          )}
+          <React.Fragment>
+            <p className="userManagement__group__users__user__info-text">
+              {translate("label.usermgmt.licensestatus")}:
+              <span
+                className={`userManagement__group__users__user__info-text-${
+                  _.get(user, "license_status", 0) ? "active" : "inactive"
+                }`}
+              >
+                {_.get(user, "license_status", 0)
+                  ? ` ${translate("label.user.active")}`
+                  : ` ${translate("label.user.inactive")}`}
+              </span>
+            </p>
+          </React.Fragment>
+        ) : (
+          ""
+        )}
         <p className="userManagement__group__users__user__info-text">
           {translate("label.usermgmt.accountstatus")}:
           <span
@@ -83,15 +84,18 @@ const UserCard = ({
         </p>
 
         {user.role_id !== 1 ? (
-        <React.Fragment>
-          <p className="userManagement__group__users__user__info-text">
-            {`${translate("label.usermgmt.expires")}: ${
-              _.get(user, "license_status")
-                ? getFormattedDate(_.get(user, "expiryDate"))
-                : "N/A"
-            }`}
-          </p>
-        </React.Fragment> )  : (
+          <React.Fragment>
+            <p className="userManagement__group__users__user__info-text">
+              {`${translate("label.usermgmt.expires")}: ${
+                isActive
+                  ? _.get(user, "licenses.length", 0)
+                    ? getFormattedDate(_.get(user.licenses[0], "expired_date"))
+                    : "N/A"
+                  : "N/A"
+              }`}
+            </p>
+          </React.Fragment>
+        ) : (
           ""
         )}
         <p className="userManagement__group__users__user__info-text">
