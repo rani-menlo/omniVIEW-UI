@@ -147,7 +147,7 @@ class CustomerDashboard extends Component {
    * @param {*} sortBy
    * @param {*} orderBy
    */
-  fetchCustomers = (sortBy = "created_at", orderBy = "ASC") => {
+  fetchCustomers = (sortBy = "created_at", orderBy = "DESC") => {
     const { viewBy, pageNo, itemsPerPage, searchText } = this.state;
     this.props.dispatch(CustomerActions.resetCustomers());
     const TableColumns = [...this.state.TableColumns];
