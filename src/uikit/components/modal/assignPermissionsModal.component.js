@@ -129,16 +129,16 @@ class AssignPermissions extends Component {
             (usr) => {
               if (role.name === "Administrators") {
                 return _.get(usr, "roles", "").length
-                  ? _.get(usr, "roles[0].slug", "").includes("admin")
-                  : _.get(usr, "role_name", "").includes("Admin");
+                  ? _.get(usr, "roles[0].slug", "").includes("admin".toLowerCase())
+                  : _.get(usr, "role_name", "").includes("Admin".toLowerCase());
               } else if (role.name === "Publishers") {
                 return _.get(usr, "roles", "").length
-                  ? _.get(usr, "roles[0].slug", "").includes("publisher")
-                  : _.get(usr, "role_name", "").includes("Publisher");
+                  ? _.get(usr, "roles[0].slug", "").includes("publisher".toLowerCase())
+                  : _.get(usr, "role_name", "").includes("Publisher".toLowerCase());
               }
               return _.get(usr, "roles", "").length
-                ? _.get(usr, "roles[0].slug", "").includes("author")
-                : _.get(usr, "role_name", "").includes("Author");
+                ? _.get(usr, "roles[0].slug", "").includes("author".toLowerCase())
+                : _.get(usr, "role_name", "").includes("Author".toLowerCase());
             }
 
             // (_.get(usr, "roles[0].id") || _.get(usr, "role_id")) === role.id
