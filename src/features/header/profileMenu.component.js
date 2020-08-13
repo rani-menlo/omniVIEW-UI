@@ -128,7 +128,7 @@ class ProfileMenu extends Component {
    * redirect to validate applications scree
    */
   validateApplications = () => {
-    this.props.history.push("/validateApplications");
+    this.props.history.push("/applicationStatus");
   };
 
   render() {

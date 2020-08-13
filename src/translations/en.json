@@ -302,7 +302,7 @@
   "label.submissions.open": "Open eCTD Submission",
   "label.submissions.recent": "Recent",
   "label.submissions.customers": "Customers",
-  "label.submissions.validateApplications": "Validate Applications",
+  "label.submissions.applicationStatus": "Application Status",
   "label.submissions.applicationManagement": "Application Management",
   "label.submissions.refresh": "Refresh",
   "label.button.export": "Export to PDF",
