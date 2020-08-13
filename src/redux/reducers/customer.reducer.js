@@ -6,6 +6,7 @@ const initialState = {
   customerCount: 0,
   getCustomers_flag: false,
   selectedCustomer: null,
+  selectedUploadedCustomer: null,
   subscriptionsInUse: [],
   licencesUnAssigned: [],
   subscriptionsLoading: false,
@@ -38,6 +39,12 @@ export default (state = initialState, action) => {
       return {
         ...state,
         selectedCustomer: action.customer,
+      };
+    }
+    case CustomerActionTypes.SET_UPLOADED_SELECTED_CUSTOMER: {
+      return {
+        ...state,
+        selectedUploadedCustomer: action.customer,
       };
     }
     case CustomerActionTypes.SUBSCRIPTIONS_IN_USE: {
