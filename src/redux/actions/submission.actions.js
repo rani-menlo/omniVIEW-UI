@@ -20,14 +20,14 @@ export default {
         } else {
           const res = await SubmissionApi.fetchSequences({
             id: submissionId,
-            userId: user.id ? user.id : user.user_id
+            userId: user.id ? user.id : user.user_id,
           });
           data = res.data;
         }
         dispatch({
           type: SubmissionActionTypes.FETCH_SEQUENCES,
           data,
-          id
+          id,
         });
         ApiActions.success(dispatch);
       } catch (err) {
@@ -35,6 +35,24 @@ export default {
       }
     };
   },
+
+  fetchSubmissionSequences: (data, cb) => {
+    return async (dispatch) => {
+      ApiActions.request(dispatch);
+      try {
+        const res = await SubmissionApi.fetchSubmissionSequences(data);
+        dispatch({
+          type: SubmissionActionTypes.FETCH_SUBMISSION_SEQUENCES,
+          data: res.data,
+        });
+        !res.data.error && cb && cb();
+        ApiActions.success(dispatch);
+      } catch (err) {
+        ApiActions.failure(dispatch);
+      }
+    };
+  },
+
   fetchSequencesWithPermissions: (submissionId, user, callback) => {
     return async (dispatch, getState) => {
       ApiActions.request(dispatch);
@@ -44,13 +62,13 @@ export default {
         const id = `${_.get(selectedCustomer, "id", "")}_${submissionId}`;
         const res = await SubmissionApi.fetchSequencesWithPermissions({
           id: submissionId,
-          userId: user.id ? user.id : user.user_id
+          userId: user.id ? user.id : user.user_id,
         });
         data = res.data;
         dispatch({
           type: SubmissionActionTypes.FETCH_SEQUENCES,
           data,
-          id
+          id,
         });
 
         !callback && ApiActions.success(dispatch);
@@ -71,7 +89,7 @@ export default {
         dispatch({
           type: SubmissionActionTypes.FETCH_SEQUENCES,
           data,
-          id
+          id,
         });
         // ApiActions.success(dispatch);
         callback && callback();
@@ -80,7 +98,7 @@ export default {
       }
     };
   },
-  resetJson: submission => {
+  resetJson: (submission) => {
     return async (dispatch, getState) => {
       ApiActions.request(dispatch);
       try {
@@ -90,7 +108,7 @@ export default {
         dispatch({
           type: SubmissionActionTypes.FETCH_LIFE_CYCLE_JSON,
           data,
-          id
+          id,
         });
         ApiActions.success(dispatch);
       } catch (err) {
@@ -116,14 +134,14 @@ export default {
         } */
         const res = await SubmissionApi.fetchJson({
           fileId: submission.life_cycle_json_path,
-          userId: user.id ? user.id : user.user_id
+          userId: user.id ? user.id : user.user_id,
         });
         data = res.data;
         dispatch({
           type: SubmissionActionTypes.FETCH_LIFE_CYCLE_JSON,
           data,
           // data: lifecyclejson,
-          id
+          id,
         });
         ApiActions.success(dispatch);
         callback && callback();
@@ -178,13 +196,13 @@ export default {
         } */
         const res = await SubmissionApi.fetchJson({
           fileId: sequence.json_path,
-          userId: user.id ? user.id : user.user_id
+          userId: user.id ? user.id : user.user_id,
         });
         data = res.data;
         dispatch({
           type: SubmissionActionTypes.FETCH_SEQUENCE_JSON,
           data,
-          id
+          id,
         });
         ApiActions.success(dispatch);
       } catch (err) {
@@ -220,10 +238,10 @@ export default {
       }
     };
   }, */
-  setSelectedSequence: sequence => {
+  setSelectedSequence: (sequence) => {
     return {
       type: SubmissionActionTypes.SET_SELECTED_SEQUENCE,
-      sequence
+      sequence,
     };
   },
   validateSequence: (sequenceId, callback) => {
@@ -245,7 +263,7 @@ export default {
             type: SubmissionActionTypes.VALIDATE_SEQUENCE,
             data: res.data,
             id,
-            validateSequence_flag: true
+            validateSequence_flag: true,
           });
         }
         ApiActions.success(dispatch);
@@ -255,12 +273,12 @@ export default {
     };
   },
   assignFilePermissions: (data, callback) => {
-    return async dispatch => {
+    return async (dispatch) => {
       ApiActions.request(dispatch);
       try {
         await SubmissionApi.assignFilePermissions(data);
         dispatch({
-          type: SubmissionActionTypes.ASSIGN_PERMISSIONS
+          type: SubmissionActionTypes.ASSIGN_PERMISSIONS,
         });
         callback && callback();
         !callback && ApiActions.success(dispatch);
@@ -270,12 +288,12 @@ export default {
     };
   },
   assignSequencePermissions: (data, callback) => {
-    return async dispatch => {
+    return async (dispatch) => {
       ApiActions.request(dispatch);
       try {
         await SubmissionApi.assignSequencePermissions(data);
         dispatch({
-          type: SubmissionActionTypes.ASSIGN_PERMISSIONS
+          type: SubmissionActionTypes.ASSIGN_PERMISSIONS,
         });
         callback && callback();
         !callback && ApiActions.success(dispatch);
@@ -284,13 +302,13 @@ export default {
       }
     };
   },
-  assignSubmissionPermissions: data => {
-    return async dispatch => {
+  assignSubmissionPermissions: (data) => {
+    return async (dispatch) => {
       ApiActions.request(dispatch);
       try {
         const res = await SubmissionApi.assignSubmissionPermissions(data);
         dispatch({
-          type: SubmissionActionTypes.ASSIGN_PERMISSIONS
+          type: SubmissionActionTypes.ASSIGN_PERMISSIONS,
         });
         if (_.get(res, "data.message") === "Success") {
           Toast.success("Permissions Updated");
@@ -301,13 +319,13 @@ export default {
       }
     };
   },
-  assignFolderPermissions: data => {
-    return async dispatch => {
+  assignFolderPermissions: (data) => {
+    return async (dispatch) => {
       ApiActions.request(dispatch);
       try {
         const res = await SubmissionApi.assignFolderPermissions(data);
         dispatch({
-          type: SubmissionActionTypes.ASSIGN_PERMISSIONS
+          type: SubmissionActionTypes.ASSIGN_PERMISSIONS,
         });
         if (_.get(res, "data.message") === "Success") {
           Toast.success("Permissions Updated");
@@ -318,13 +336,13 @@ export default {
       }
     };
   },
-  assignGlobalPermissions: data => {
-    return async dispatch => {
+  assignGlobalPermissions: (data) => {
+    return async (dispatch) => {
       ApiActions.request(dispatch);
       try {
         const res = await SubmissionApi.assignGlobalPermissions(data);
         dispatch({
-          type: SubmissionActionTypes.ASSIGN_PERMISSIONS
+          type: SubmissionActionTypes.ASSIGN_PERMISSIONS,
         });
         if (_.get(res, "data.message") === "Success") {
           Toast.success("Permissions Updated");
@@ -335,8 +353,8 @@ export default {
       }
     };
   },
-  findText: data => {
-    return async dispatch => {
+  findText: (data) => {
+    return async (dispatch) => {
       ApiActions.request(dispatch);
       try {
         const res = await SubmissionApi.findText(data);
@@ -344,7 +362,7 @@ export default {
           text: data.text,
           type: SubmissionActionTypes.FIND_TEXT,
           data: res.data,
-          find_flag: true
+          find_flag: true,
         });
         ApiActions.success(dispatch);
       } catch (err) {
@@ -352,36 +370,41 @@ export default {
       }
     };
   },
-  findMatchBy: match => {
+  findMatchBy: (match) => {
     return {
       type: SubmissionActionTypes.FIND_MATCH_BY,
-      match
+      match,
     };
   },
   findSortByTitle: () => {
     return {
-      type: SubmissionActionTypes.FIND_SORT_BY_TITLE
+      type: SubmissionActionTypes.FIND_SORT_BY_TITLE,
     };
   },
   findSortByFile: () => {
     return {
-      type: SubmissionActionTypes.FIND_SORT_BY_FILE
+      type: SubmissionActionTypes.FIND_SORT_BY_FILE,
     };
   },
-  findSelectedResult: selected => {
+  findSelectedResult: (selected) => {
     return {
       type: SubmissionActionTypes.FIND_SELECTED_RESULT,
-      selected
+      selected,
     };
   },
   resetFind: () => {
     return {
-      type: SubmissionActionTypes.RESET_FIND
+      type: SubmissionActionTypes.RESET_FIND,
     };
   },
   clearSearchResults: () => {
     return {
-      type: SubmissionActionTypes.CLEAR_SEARCH_RESULTS
+      type: SubmissionActionTypes.CLEAR_SEARCH_RESULTS,
     };
-  }
+  },
+  resetApplicationSequences: () => {
+    return {
+      type: SubmissionActionTypes.RESET_APPLICATION_SEQUENCES,
+    };
+  },
 };

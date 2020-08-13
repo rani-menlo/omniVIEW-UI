@@ -25,7 +25,7 @@ export default {
         dispatch({
           type: ApplicationActionTypes.FETCH_APPLICATIONS,
           data: res.data,
-          customerId
+          customerId,
         });
         ApiActions.success(dispatch);
       } catch (err) {
@@ -41,8 +41,24 @@ export default {
         dispatch({
           type: ApplicationActionTypes.FETCH_APPLICATIONS,
           data: res.data,
-          customerId
+          customerId,
         });
+        ApiActions.success(dispatch);
+      } catch (err) {
+        ApiActions.failure(dispatch);
+      }
+    };
+  },
+  fetchBulkUploadedApplications: (data, cb) => {
+    return async (dispatch) => {
+      ApiActions.request(dispatch);
+      try {
+        const res = await ApplicationApi.fetchBulkuploadedApplications(data);
+        dispatch({
+          type: ApplicationActionTypes.FETCH_BULK_UPLOADED_APPLICATIONS,
+          data: res.data,
+        });
+        !res.data.error && cb && cb();
         ApiActions.success(dispatch);
       } catch (err) {
         ApiActions.failure(dispatch);
@@ -56,7 +72,7 @@ export default {
         const res = await ApplicationApi.fetchAddApplication();
         dispatch({
           type: ApplicationActionTypes.ADD_APPLICATION,
-          data: res.data
+          data: res.data,
         });
         ApiActions.success(dispatch);
       } catch (err) {
@@ -66,13 +82,13 @@ export default {
   },
 
   getSubmissionCenters: () => {
-    return async dispatch => {
+    return async (dispatch) => {
       ApiActions.request(dispatch);
       try {
         const res = await ApplicationApi.fetchSubmissionCenters();
         dispatch({
           type: ApplicationActionTypes.FETCH_SUBMISSION_CENTERS,
-          data: res.data
+          data: res.data,
         });
         ApiActions.success(dispatch);
       } catch (err) {
@@ -81,12 +97,12 @@ export default {
     };
   },
   updateSubmissionCenter: (data, callback) => {
-    return async dispatch => {
+    return async (dispatch) => {
       ApiActions.request(dispatch);
       try {
         const res = await ApplicationApi.updateSubmissionCenter(data);
         dispatch({
-          type: ApplicationActionTypes.UPDATE_SUBMISSION_CENTER
+          type: ApplicationActionTypes.UPDATE_SUBMISSION_CENTER,
         });
         ApiActions.success(dispatch);
         !res.data.error && callback && callback();
@@ -96,12 +112,12 @@ export default {
     };
   },
   retryUploads: (data, callback) => {
-    return async dispatch => {
+    return async (dispatch) => {
       ApiActions.request(dispatch);
       try {
         const res = await ApplicationApi.retryUploads(data);
         dispatch({
-          type: ApplicationActionTypes.RETRY_UPLOADS
+          type: ApplicationActionTypes.RETRY_UPLOADS,
         });
         ApiActions.success(dispatch);
         !res.data.error && callback && callback();
@@ -111,7 +127,7 @@ export default {
     };
   },
   deleteSubmission: (data, callback) => {
-    return async dispatch => {
+    return async (dispatch) => {
       ApiActions.request(dispatch);
       try {
         const res = await ApplicationApi.deleteSubmission(data);
@@ -124,13 +140,18 @@ export default {
   },
   resetApplications: () => {
     return {
-      type: ApplicationActionTypes.RESET_APPLICATIONS
+      type: ApplicationActionTypes.RESET_APPLICATIONS,
     };
   },
-  setSelectedSubmission: submission => {
+  resetbulkUploadedSubmissions: () => {
+    return {
+      type: ApplicationActionTypes.RESET_BULK_UPLOADED_SUBMISSIONS,
+    };
+  },
+  setSelectedSubmission: (submission) => {
     return {
       type: ApplicationActionTypes.SET_SELECTED_SUBMISSION,
-      submission
+      submission,
     };
-  }
+  },
 };

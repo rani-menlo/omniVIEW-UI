@@ -1,7 +1,12 @@
 import React, { Component } from "react";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
-import { CustomerActions } from "../../redux/actions";
+import {
+  CustomerActions,
+  ApplicationActions,
+  SubmissionActions,
+  ApiActions,
+} from "../../redux/actions";
 import Header from "../header/header.component";
 import {
   Loader,
@@ -12,6 +17,7 @@ import {
   TableHeader,
   Pagination,
   SelectField,
+  Toast,
 } from "../../uikit/components";
 import { Popover, Switch, Icon, Dropdown, Menu } from "antd";
 import { CaretDownOutlined } from "@ant-design/icons";
@@ -20,120 +26,20 @@ import { isLoggedInOmniciaAdmin, getFormattedDate, isToday } from "../../utils";
 import { get, find, memoize, map, filter, every, set } from "lodash";
 import styled from "styled-components";
 import { translate } from "../../translations/translator";
+import { ApplicationApi } from "../../redux/api";
 
 class ApplicationManagement extends Component {
   constructor(props) {
     super(props);
     this.state = {
       pageNo: 1,
-      itemsPerPage: 5,
+      limit: 5,
+      submissionSequnces: [],
       checkedSequences: [],
-      selectedCustomer: this.props.selectedCustomer,
+      selectedUploadedCustomer: this.props.selectedUploadedCustomer,
       //this.props.submissions, -TODO remove once integration is done
-      submissions: [
-        {
-          broken_x_ref: 0,
-          created_at: "2020-07-29T09:23:45.892Z",
-          created_by: "Demo Demo",
-          customer_id: 702,
-          id: 1,
-          key: 1,
-          is_deleting: false,
-          is_submission: 0,
-          is_uploading: false,
-          life_cycle_json_path: "88e16fd5-7673-5eb5-b304-caa609fb06ac",
-          name: "ind000001",
-          value: "ind000001",
-          profile: null,
-          sequence_count: 1,
-          submission_center: "CBER",
-          template_id: null,
-          updated_at: "2020-07-29T09:24:55.510Z",
-        },
-        {
-          broken_x_ref: 0,
-          created_at: "2020-07-29T09:23:45.892Z",
-          created_by: "Demo Demo",
-          customer_id: 702,
-          id: 2,
-          key: 2,
-          is_deleting: false,
-          is_submission: 0,
-          is_uploading: false,
-          life_cycle_json_path: "88e16fd5-7673-5eb5-b304-caa609fb06ac",
-          name: "ind000002",
-          value: "ind000002",
-          profile: null,
-          sequence_count: 1,
-          submission_center: "CBER",
-          template_id: null,
-          updated_at: "2020-07-29T09:24:55.510Z",
-        },
-        {
-          broken_x_ref: 0,
-          created_at: "2020-07-29T09:23:45.892Z",
-          created_by: "Demo Demo",
-          customer_id: 702,
-          id: 758,
-          key: 758,
-          is_deleting: false,
-          is_submission: 0,
-          is_uploading: false,
-          life_cycle_json_path: "88e16fd5-7673-5eb5-b304-caa609fb06ac",
-          name: "ind001368",
-          value: "ind001368",
-          profile: null,
-          sequence_count: 1,
-          submission_center: "CBER",
-          template_id: null,
-          updated_at: "2020-07-29T09:24:55.510Z",
-        },
-      ],
-      selectedApplication: {
-        optionObject: null,
-        value: "",
-        error: "",
-      },
-      submissionCount: 3, //this.props.submissionCount, - TODO - will remove this in the next sprint once integration is done
-      //this.props.sequences,
-      sequences: [
-        {
-          hasAccess: 1,
-          id: 1,
-          key: 1,
-          json_path: "011143d1-d3ab-5442-8406-07b2ba787fb9",
-          name: "0001",
-          value: "0001",
-          relative_seq_name: "0002",
-          submission_id: 758,
-          submission_sub_type: null,
-          submission_type: "original-application",
-        },
-        {
-          hasAccess: 1,
-          id: 2,
-          key: 2,
-          json_path: "011143d1-d3ab-5442-8406-07b2ba787fb9",
-          name: "0002",
-          value: "0002",
-          relative_seq_name: "0003",
-          submission_id: 758,
-          submission_sub_type: null,
-          submission_type: "original-application",
-        },
-        {
-          hasAccess: 1,
-          id: 3,
-          key: 3,
-          json_path: "011143d1-d3ab-5442-8406-07b2ba787fb9",
-          name: "0003",
-          value: "0003",
-          relative_seq_name: "0004",
-          submission_id: 758,
-          submission_sub_type: null,
-          submission_type: "original-application",
-        },
-      ],
+      bulkUploadedSubmissions: [],
+      selectedSubmission: this.props.selectedSubmission,
       selectedSequence: {
         optionObject: null,
         value: "",
@@ -142,88 +48,114 @@ class ApplicationManagement extends Component {
       TableColumns: [
         {
           name: TableColumnNames.CUSTOMER,
-          key: "type_name",
+          key: 1,
           sort: true,
           width: "20%",
         },
         {
           name: TableColumnNames.APPLICATION,
-          key: "duration",
+          key: 2,
           sort: true,
           width: "20%",
         },
         {
           name: TableColumnNames.SEQUENCE,
-          key: "expired_date",
+          key: 3,
           sort: true,
           width: "20%",
         },
         {
           name: TableColumnNames.WIP,
-          key: "first_name",
-          width: "15%",
+          key: 4,
+          width: "20%",
+          toggle: true,
+          allViewable: false,
+          onStatusClick: this.checkAll,
         },
         {
           name: TableColumnNames.LASTUPDATED,
-          key: "first_name",
+          key: 5,
           sort: true,
           width: "20%",
         },
-        {
-          name: "",
-          key: "",
-          width: "5%",
-        },
-      ],
-      applications: [
-        {
-          id: 1,
-          seq_name: "0001",
-          errors: 0,
-          isViewable: false,
-          customer_name: "LOXO",
-          name: "ind000001",
-          created_at: "2020-08-03T05:46:40.407Z",
-        },
-        {
-          id: 1,
-          seq_name: "0002",
-          errors: 2,
-          isViewable: false,
-          customer_name: "LOXO",
-          name: "ind000001",
-          created_at: "2020-06-22T17:33:11.645Z",
-        },
-        {
-          id: 1,
-          seq_name: "0003",
-          errors: 0,
-          isViewable: true,
-          customer_name: "LOXO",
-          name: "ind000001",
-          created_at: "2020-06-22T17:33:11.645Z",
-        },
+        // {
+        //   name: "",
+        //   key: "",
+        //   width: "5%",
+        // },
       ],
     };
   }
 
+  /**
+   * Fetch sequences per each submission
+   */
+  fetchAppSequences = (sortByColumnId = 3, order = "ASC") => {
+    this.props.dispatch(SubmissionActions.resetApplicationSequences());
+    this.setState({ submissionSequnces: [] });
+    const { pageNo, limit, selectedSubmission, TableColumns } = this.state;
+    let submissionId = selectedSubmission.submissionId || selectedSubmission.id;
+    let sequenceId = 0;
+    this.props.dispatch(
+      SubmissionActions.fetchSubmissionSequences(
+        {
+          submissionId: Number(submissionId),
+          pageNo: Number(pageNo),
+          limit: Number(limit),
+          sortByColumnId: sortByColumnId,
+          order: order,
+          sequenceId: Number(sequenceId),
+        },
+        () => {
+          TableColumns[3].allViewable = every(this.props.submissionSequnces, [
+            "isWIP",
+            true,
+          ]);
+          this.setState({ TableColumns });
+        }
+      )
+    );
+  };
+
+  static getDerivedStateFromProps(props, state) {
+    if (
+      get(props, "submissionSequnces.length") &&
+      !get(state, "submissionSequnces.length")
+    ) {
+      let submissionSequnces = [...props.submissionSequnces];
+      map(submissionSequnces, (seq) => {
+        seq.key = seq.id;
+        seq.value = seq.name;
+      });
+      return {
+        submissionSequnces: submissionSequnces,
+      };
+    }
+    if (
+      get(props, "bulkUploadedSubmissions.length") &&
+      !get(state, "bulkUploadedSubmissions.length")
+    ) {
+      let bulkUploadedSubmissions = [...props.bulkUploadedSubmissions];
+      map(bulkUploadedSubmissions, (submission) => {
+        if (submission.errorCount === 0) {
+          submission.key = submission.submissionId;
+          submission.value = submission.name;
+        }
+      });
+      return {
+        bulkUploadedSubmissions: bulkUploadedSubmissions,
+      };
+    }
+    return null;
+  }
+
   componentDidMount() {
-    let selectedCustomer = {
-      id: 0,
-      company_name: "All Customers",
-    };
-    let { submissions, sequences } = this.state;
-    submissions = map(submissions, (submission) => {
-      submission.key = submission.id;
-      submission.value = submission.name;
-      return submission;
+    let { selectedSubmission } = this.state;
+    selectedSubmission.key = selectedSubmission.submissionId;
+    selectedSubmission.value = selectedSubmission.name;
+    this.setState({ selectedSubmission }, () => {
+      this.fetchAppSequences();
     });
-    sequences = map(sequences, (seq) => {
-      seq.key = seq.id;
-      seq.value = seq.name;
-      return seq;
-    });
-    this.setState({ selectedCustomer, submissions, sequences });
   }
 
   /**
@@ -239,16 +171,22 @@ class ApplicationManagement extends Component {
    * @param {*} customer
    */
   onCustomerSelected = (customer) => {
-    this.setState({ selectedCustomer: customer });
-    this.props.dispatch(CustomerActions.setSelectedCustomer(customer));
+    this.setState({ selectedUploadedCustomer: customer });
+    this.props.dispatch(
+      CustomerActions.setBulkUploadedSelectedCustomer(customer, () => {
+        this.props.history.push("/applicationStatus");
+      })
+    );
   };
 
   /**
-   *
+   * Sorting the columns in the list view
    * @param {*} sortBy
    * @param {*} orderBy
    */
-  sortColumn = (sortBy, orderBy) => {};
+  sortColumn = (sortBy, orderBy) => {
+    this.fetchAppSequences(sortBy, orderBy);
+  };
 
   /**
    * Refresh sequence for the latest file changes
@@ -283,10 +221,13 @@ class ApplicationManagement extends Component {
   fetchApplications = () => {
     this.props.actions.resetApplications();
     this.setState({ submissions: [], openFailuresModal: false });
-    const { selectedCustomer } = this.state;
+    const { selectedUploadedCustomer } = this.state;
     let searchText = "";
-    selectedCustomer &&
-      this.props.actions.fetchApplications(selectedCustomer.id, searchText);
+    selectedUploadedCustomer &&
+      this.props.actions.fetchApplications(
+        selectedUploadedCustomer.id,
+        searchText
+      );
   };
 
   /**
@@ -301,21 +242,131 @@ class ApplicationManagement extends Component {
     this.setState({ application: { value, optionObject, error: "" } });
   };
 
+  /**
+   *
+   * @param {*} checked
+   */
+  checkAll = (checked, event) => {
+    // Returing if there are no customers
+    let isWIP = checked;
+    if (!this.state.submissionSequnces.length) {
+      event.preventDefault();
+      return;
+    }
+    let checkedSequences = [];
+    let submissionSequnces = this.state.submissionSequnces.slice(
+      0,
+      this.state.limit
+    );
+    // filtering applications without errors
+    // let withoutErrorApplications = filter(submissions, (application) => {
+    //   return application.errors == 0;
+    // });
+    if (isWIP) {
+      map(submissionSequnces, (sequence) => {
+        set(sequence, "isWIP", isWIP);
+      });
+      // checkedSequences = [...withoutErrorApplications];
+    } else {
+      submissionSequnces = map(submissionSequnces, (sequence) => ({
+        ...sequence,
+        isWIP,
+      }));
+      checkedSequences.length = 0;
+    }
+    const TableColumns = [...this.state.TableColumns];
+    TableColumns[3].allViewable = checkedSequences;
+    submissionSequnces = [...submissionSequnces];
+    this.setState(
+      {
+        submissionSequnces,
+        TableColumns,
+        checkedSequences,
+      },
+      () => {
+        let sequences = checked ? checkedSequences : submissionSequnces;
+        this.changeSequenceStatus(sequences, checked);
+      }
+    );
+  };
+
+  /**
+   *
+   * @param {*} sequence
+   */
+  onStatusClick = (sequence) => (checked) => {
+    let uncheckedSequences = [];
+    const TableColumns = [...this.state.TableColumns];
+    let checkedSequences = [...this.state.checkedSequences];
+    let submissionSequnces = this.state.submissionSequnces.slice(
+      0,
+      this.state.limit
+    );
+    sequence.isWIP = checked;
+    // If WIP is selected
+    if (checked) {
+      checkedSequences.push(sequence);
+    } else {
+      checkedSequences = filter(checkedSequences, (checkedSeq) => {
+        return checkedSeq.id !== sequence.id;
+      });
+      uncheckedSequences.push(sequence);
+    }
+    //Checking if the emails not customers all are selected or not
+    TableColumns[3].allViewable = every(submissionSequnces, ["isWIP", true]);
+    this.setState(
+      {
+        submissionSequnces,
+        TableColumns,
+        checkedSequences,
+      },
+      () => {
+        let sequences = checked ? checkedSequences : uncheckedSequences;
+        this.changeSequenceStatus(sequences, checked);
+      }
+    );
+  };
+
+  /**
+   * Toggling sequence status
+   * @param {*} selectedApplications
+   */
+  changeSequenceStatus = async (selectedSequences, status) => {
+    this.props.dispatch(ApiActions.requestOnDemand());
+    const res = await ApplicationApi.updateusequenceStatus({
+      singleSequence: {
+        submissionIds:
+          selectedSequences.length > 0 ? map(selectedSequences, "id") : [],
+      },
+      bulkAction: {
+        submissionId: this.state.selectedSubmission.submissionId,
+        state: status ? 1 : 0,
+      },
+    });
+    if (!res.data.error) {
+      this.props.dispatch(ApiActions.successOnDemand());
+      this.fetchAppSequences();
+    } else {
+      Toast.error(res.data.message);
+      this.props.dispatch(ApiActions.successOnDemand());
+    }
+  };
+
   render() {
-    const { loading } = this.props;
+    const { loading, count } = this.props;
     const {
       applications,
-      itemsPerPage,
+      limit,
       pageNo,
       TableColumns,
-      selectedCustomer,
-      submissions,
+      selectedUploadedCustomer,
+      bulkUploadedSubmissions,
       sequences,
-      selectedApplication,
+      submissionSequnces,
+      selectedSubmission,
       selectedSequence,
     } = this.state;
-    console.log(submissions, sequences);
-    let applicationsCount = 3;
+
     return (
       <>
         <Loader loading={loading} />
@@ -337,7 +388,7 @@ class ApplicationManagement extends Component {
                   type="extra_bold"
                   size="20px"
                   className="userManagement-subheader-title"
-                  text={selectedCustomer.company_name}
+                  text={selectedUploadedCustomer.company_name}
                 />
                 <img
                   className="global__cursor-pointer"
@@ -360,21 +411,23 @@ class ApplicationManagement extends Component {
               <SelectField
                 className="applications-management-layout__header__selectOptions__field"
                 selectFieldClassName="applications-management-layout__header__selectOptions__field-select"
-                // selectedValue={selectedSequence.value}
+                // selectedValue={get(selectedSequence, "value", "")}
                 // error={selectedSequence.error}
                 suffixIcon={<CaretDownOutlined />}
-                options={sequences}
+                options={submissionSequnces || []}
+                // onChange={this.onSelect("applicationType", types)}
                 style={{ marginRight: "0" }}
                 label={translate("label.dashboard.sequence")}
                 placeholder={translate("label.generic.all")}
               />
               <SelectField
+                key={get(selectedSubmission, "key", "")}
                 className="applications-management-layout__header__selectOptions__field"
                 selectFieldClassName="applications-management-layout__header__selectOptions__field-select"
-                // selectedValue={selectedApplication.value}
-                // error={selectedApplication.error}
+                selectedValue={get(selectedSubmission, "value", "")}
+                // error={selectedSubmission.error}
                 suffixIcon={<CaretDownOutlined />}
-                options={submissions}
+                options={bulkUploadedSubmissions || []}
                 label={translate("label.dashboard.application")}
                 placeholder={translate("label.generic.all")}
               />
@@ -382,10 +435,15 @@ class ApplicationManagement extends Component {
           </div>
 
           <div className="applications-management-layout__list">
-            <TableHeader columns={TableColumns} sortColumn={this.sortColumn} />
-            {map(applications, (application) => (
+            <TableHeader
+              columns={TableColumns}
+              sortColumn={this.sortColumn}
+              checkAll={this.checkAll}
+              viewAll={TableColumns[3].allViewable}
+            />
+            {map(submissionSequnces, (sequence) => (
               <Row
-                key={application.id}
+                key={sequence.id}
                 className="applications-management-layout__list__item"
                 style={{ justifyContent: "normal" }}
               >
@@ -393,19 +451,19 @@ class ApplicationManagement extends Component {
                   width={this.getColumnWidth(TableColumnNames.CUSTOMER)}
                   className="applications-management-layout__list__item-text"
                 >
-                  {get(application, "customer_name", "N/A")}
+                  {get(sequence, "company_name", "N/A")}
                 </Column>
                 <Column
                   width={this.getColumnWidth(TableColumnNames.APPLICATION)}
                   className="applications-management-layout__list__item-text"
                 >
-                  {get(application, "name", "N/A")}
+                  {get(this.props.selectedSubmission, "name", "N/A")}
                 </Column>
                 <Column
                   width={this.getColumnWidth(TableColumnNames.SEQUENCE)}
                   className="applications-management-layout__list__item-text"
                 >
-                  {get(application, "seq_name", "N/A")}
+                  {get(sequence, "name", "N/A")}
                 </Column>
 
                 <Column
@@ -415,12 +473,14 @@ class ApplicationManagement extends Component {
                   <Switch
                     size="small"
                     className="applications-management-layout__list__item-text global__cursor-pointer"
+                    checked={get(sequence, "isWIP", false)}
+                    onClick={this.onStatusClick(sequence)}
                   ></Switch>
                   <span
                     className="applications-management-layout__list__item-text"
                     style={{ paddingLeft: "12px" }}
                   >
-                    {application.isViewable ? "Yes" : "No"}
+                    {sequence.isWIP ? "Yes" : "No"}
                   </span>
                 </Column>
                 <Column
@@ -428,27 +488,30 @@ class ApplicationManagement extends Component {
                   className="applications-management-layout__list__item-text"
                 >
                   <span
-                    className={`${isToday(application.created_at) &&
+                    className={`${isToday(sequence.updated_at) &&
                       "applications-management-layout__list__item-text-link"}`}
                   >
-                    {isToday(application.created_at)
+                    {isToday(sequence.updated_at)
                       ? "Today"
-                      : getFormattedDate(application.created_at)}
+                      : getFormattedDate(sequence.updated_at)}
                   </span>
                 </Column>
-                <Column>
-                  <Dropdown
-                    overlay={this.getMenu(application)}
-                    trigger={["click"]}
-                    overlayClassName="maindashboard__list__item-dropdown"
-                  >
-                    <img
-                      className="global__cursor-pointer"
-                      src="/images/overflow-black.svg"
-                      style={{ width: "18px", height: "18px" }}
-                    />
-                  </Dropdown>
-                </Column>
+                {/* TODO-Will use this in the later sprint mostly in Sprint-32 or Sprint-33 so commented*/}
+                {/* {sequence.isWIP && (
+                  <Column>
+                    <Dropdown
+                      overlay={this.getMenu(sequence)}
+                      trigger={["click"]}
+                      overlayClassName="maindashboard__list__item-dropdown"
+                    >
+                      <img
+                        className="global__cursor-pointer"
+                        src="/images/overflow-black.svg"
+                        style={{ width: "18px", height: "18px" }}
+                      />
+                    </Dropdown>
+                  </Column>
+                )} */}
               </Row>
             ))}
           </div>
@@ -465,11 +528,11 @@ class ApplicationManagement extends Component {
               </Row>
             )} */}
           <Pagination
-            key={applicationsCount}
+            key={count}
             containerStyle={
-              applicationsCount > 4 ? { marginTop: "1%" } : { marginTop: "20%" }
+              count > 4 ? { marginTop: "1%" } : { marginTop: "20%" }
             }
-            total={applicationsCount}
+            total={count}
             showTotal={(total, range) =>
               translate("text.pagination", {
                 top: range[0],
@@ -478,7 +541,7 @@ class ApplicationManagement extends Component {
                 type: translate("label.dashboard.applications"),
               })
             }
-            pageSize={itemsPerPage}
+            pageSize={limit}
             current={pageNo}
             onPageChange={this.onPageChange}
             onPageSizeChange={this.onPageSizeChange}
@@ -505,15 +568,21 @@ function mapStateToProps(state) {
   return {
     loading: state.Api.loading,
     role: state.Login.role,
-    selectedCustomer: state.Customer.selectedCustomer,
+    selectedUploadedCustomer: state.Customer.selectedUploadedCustomer,
     selectedSubmission: state.Application.selectedSubmission,
-    submissions: state.Application.submissions, //getSubmissionsByCustomer(state),
+    bulkUploadedSubmissions: state.Application.bulkUploadedSubmissions, //getSubmissionsByCustomer(state),
     submissionCount: state.Application.submissionCount,
+    submissionSequnces: state.Submission.submissionSequnces,
+    count: state.Submission.count,
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
+    actions: bindActionCreators(
+      { ...CustomerActions, ...ApplicationActions, ...SubmissionActions },
+      dispatch
+    ),
     dispatch,
   };
 }
