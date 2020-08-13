@@ -95,10 +95,13 @@ class ValidateApplications extends Component {
     selectedUploadedCustomer &&
       this.props.dispatch(
         ApplicationActions.fetchBulkUploadedApplications(postObj, () => {
-          TableColumns[4].allViewable = every(
-            this.props.bulkUploadedSubmissions,
-            ["applicationStatus", true]
-          );
+          TableColumns[4].allViewable = this.props.bulkUploadedSubmissions
+            .length
+            ? every(this.props.bulkUploadedSubmissions, [
+                "applicationStatus",
+                true,
+              ])
+            : false;
           this.setState({ TableColumns });
         })
       );
@@ -338,6 +341,7 @@ class ValidateApplications extends Component {
         CustomerActions.setBulkUploadedSelectedCustomer(
           selectedUploadedCustomer,
           () => {
+            this.fetchingBulkuploadedApplications();
             this.props.dispatch(
               ApplicationActions.setSelectedSubmission(submission)
             );
@@ -450,12 +454,12 @@ class ValidateApplications extends Component {
                   >
                     {`${
                       !isNull(get(application, "seqCount"))
-                        ? get(application, "seqCount", 0)
+                        ? `${get(application, "seqCount", 0) -
+                            get(application, "errorCount", 0)}`
                         : 0
                     } of ${
                       !isNull(get(application, "seqCount"))
-                        ? `${get(application, "seqCount", 0) +
-                            get(application, "errorCount", 0)}`
+                        ? get(application, "seqCount", 0)
                         : 0
                     }`}
                   </span>

@@ -28,6 +28,7 @@ const SelectField = ({
         showSearch={showSearch || false}
         style={selectFieldStyle}
         defaultValue={selectedValue}
+        value={selectedValue}
         onChange={onChange}
         className={selectFieldClassName}
         disabled={disabled}

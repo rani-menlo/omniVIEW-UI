@@ -6,6 +6,7 @@ import { ApiActions } from "../actions";
 const initialState = {
   sequences: {},
   submissionSequnces: [],
+  allSubmissionSequences: [],
   count: 0,
   selectedSequence: null,
   sequenceJson: {},
@@ -160,6 +161,12 @@ export default (state = initialState, action) => {
       return {
         ...state,
         submissionSequnces: [],
+      };
+    }
+    case SubmissionActionTypes.SET_SEQUENCES: {
+      return {
+        ...state,
+        allSubmissionSequences: action.sequences,
       };
     }
     default:

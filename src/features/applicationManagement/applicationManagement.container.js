@@ -23,7 +23,7 @@ import { Popover, Switch, Icon, Dropdown, Menu } from "antd";
 import { CaretDownOutlined } from "@ant-design/icons";
 import PopoverCustomers from "../usermanagement/popoverCustomers.component";
 import { isLoggedInOmniciaAdmin, getFormattedDate, isToday } from "../../utils";
-import { get, find, memoize, map, filter, every, set } from "lodash";
+import { get, find, memoize, map, filter, every, set, isNull } from "lodash";
 import styled from "styled-components";
 import { translate } from "../../translations/translator";
 import { ApplicationApi } from "../../redux/api";
@@ -35,16 +35,12 @@ class ApplicationManagement extends Component {
       pageNo: 1,
       limit: 5,
       submissionSequnces: [],
+      sequences: [],
       checkedSequences: [],
       selectedUploadedCustomer: this.props.selectedUploadedCustomer,
-      //this.props.submissions, -TODO remove once integration is done
       bulkUploadedSubmissions: [],
       selectedSubmission: this.props.selectedSubmission,
-      selectedSequence: {
-        optionObject: null,
-        value: "",
-        error: "",
-      },
+      selectedSequence: this.props.selectedSequence,
       TableColumns: [
         {
           name: TableColumnNames.CUSTOMER,
@@ -93,9 +89,16 @@ class ApplicationManagement extends Component {
   fetchAppSequences = (sortByColumnId = 3, order = "ASC") => {
     this.props.dispatch(SubmissionActions.resetApplicationSequences());
     this.setState({ submissionSequnces: [] });
-    const { pageNo, limit, selectedSubmission, TableColumns } = this.state;
-    let submissionId = selectedSubmission.submissionId || selectedSubmission.id;
-    let sequenceId = 0;
+    const {
+      pageNo,
+      limit,
+      selectedSubmission,
+      selectedSequence,
+      TableColumns,
+    } = this.state;
+    let submissionId =
+      selectedSubmission.submissionId || selectedSubmission.id || 0;
+    let sequenceId = get(selectedSequence, "id", 0);
     this.props.dispatch(
       SubmissionActions.fetchSubmissionSequences(
         {
@@ -107,10 +110,14 @@ class ApplicationManagement extends Component {
           sequenceId: Number(sequenceId),
         },
         () => {
-          TableColumns[3].allViewable = every(this.props.submissionSequnces, [
-            "isWIP",
-            true,
-          ]);
+          this.props.allSubmissionSequences.length < 2 &&
+            this.props.dispatch(
+              SubmissionActions.setSequences(this.props.submissionSequnces)
+            );
+          this.props.TableColumns[3].allViewable = this.props.submissionSequnces
+            .length
+            ? every(this.props.submissionSequnces, ["isWIP", true])
+            : false;
           this.setState({ TableColumns });
         }
       )
@@ -123,12 +130,19 @@ class ApplicationManagement extends Component {
       !get(state, "submissionSequnces.length")
     ) {
       let submissionSequnces = [...props.submissionSequnces];
+      //Adding key and values to the sequences to set in the Select field
       map(submissionSequnces, (seq) => {
         seq.key = seq.id;
         seq.value = seq.name;
       });
       return {
         submissionSequnces: submissionSequnces,
+        ...(!state.sequences.length && {
+          sequences: [
+            { id: 0, key: 0, name: "All", value: "All" },
+            ...submissionSequnces,
+          ],
+        }),
       };
     }
     if (
@@ -136,24 +150,39 @@ class ApplicationManagement extends Component {
       !get(state, "bulkUploadedSubmissions.length")
     ) {
       let bulkUploadedSubmissions = [...props.bulkUploadedSubmissions];
+      //filtering submissions without errors
+      bulkUploadedSubmissions = filter(bulkUploadedSubmissions, [
+        "errorCount",
+        0,
+      ]);
+      //Adding key and values to the submissions to set in the Select field
       map(bulkUploadedSubmissions, (submission) => {
-        if (submission.errorCount === 0) {
-          submission.key = submission.submissionId;
-          submission.value = submission.name;
-        }
+        submission.key = submission.submissionId;
+        submission.value = submission.name;
       });
       return {
-        bulkUploadedSubmissions: bulkUploadedSubmissions,
+        bulkUploadedSubmissions: [
+          { submissionId: 0, key: 0, name: "All", value: "All" },
+          ...bulkUploadedSubmissions,
+        ],
       };
     }
     return null;
   }
 
   componentDidMount() {
-    let { selectedSubmission } = this.state;
+    let { selectedSubmission, selectedSequence } = this.state;
+    if (isNull(selectedSequence)) {
+      selectedSequence = {
+        id: 0,
+        name: "All",
+        key: 0,
+        value: "All",
+      };
+    }
     selectedSubmission.key = selectedSubmission.submissionId;
     selectedSubmission.value = selectedSubmission.name;
-    this.setState({ selectedSubmission }, () => {
+    this.setState({ selectedSubmission, selectedSequence }, () => {
       this.fetchAppSequences();
     });
   }
@@ -174,7 +203,15 @@ class ApplicationManagement extends Component {
     this.setState({ selectedUploadedCustomer: customer });
     this.props.dispatch(
       CustomerActions.setBulkUploadedSelectedCustomer(customer, () => {
-        this.props.history.push("/applicationStatus");
+        this.props.dispatch(SubmissionActions.setSequences([]));
+        this.setState(
+          { selectedSequence: null, selectedSubmission: null },
+          () => {
+            this.props.dispatch(SubmissionActions.setSelectedSequence(null));
+            this.props.dispatch(ApplicationActions.setSelectedSubmission(null));
+            this.props.history.push("/applicationStatus");
+          }
+        );
       })
     );
   };
@@ -213,33 +250,6 @@ class ApplicationManagement extends Component {
         </Menu.Item>
       </Menu>
     );
-  };
-
-  /**
-   * Fetching the applications
-   */
-  fetchApplications = () => {
-    this.props.actions.resetApplications();
-    this.setState({ submissions: [], openFailuresModal: false });
-    const { selectedUploadedCustomer } = this.state;
-    let searchText = "";
-    selectedUploadedCustomer &&
-      this.props.actions.fetchApplications(
-        selectedUploadedCustomer.id,
-        searchText
-      );
-  };
-
-  /**
-   * on changing the application
-   * @param {*} value
-   */
-  onApplicationChange = (value) => {
-    const optionObject = find(
-      this.props.applications,
-      (app) => app.key == value
-    );
-    this.setState({ application: { value, optionObject, error: "" } });
   };
 
   /**
@@ -352,21 +362,49 @@ class ApplicationManagement extends Component {
     }
   };
 
+  onSelect = (field, array) => (val) => {
+    const value = find(array, (item) => Number(item.key) == Number(val));
+    this.setState({ [field]: value }, () => {
+      if (field === "selectedSubmission") {
+        this.props.dispatch(SubmissionActions.setSequences([]));
+        this.setState(
+          { selectedSequence: null, selectedSubmission: value },
+          () => {
+            this.props.dispatch(SubmissionActions.setSelectedSequence(null));
+            this.props.dispatch(
+              ApplicationActions.setSelectedSubmission(value)
+            );
+          }
+        );
+      } else {
+        this.props.dispatch(SubmissionActions.setSelectedSequence(value));
+      }
+      this.fetchAppSequences();
+    });
+  };
+
   render() {
-    const { loading, count } = this.props;
-    const {
+    const { loading, count, allSubmissionSequences } = this.props;
+    let {
       applications,
       limit,
       pageNo,
       TableColumns,
       selectedUploadedCustomer,
       bulkUploadedSubmissions,
-      sequences,
       submissionSequnces,
       selectedSubmission,
       selectedSequence,
+      sequences,
     } = this.state;
-
+    if (isNull(selectedSequence)) {
+      selectedSequence = {
+        id: 0,
+        name: "All",
+        key: 0,
+        value: "All",
+      };
+    }
     return (
       <>
         <Loader loading={loading} />
@@ -411,23 +449,31 @@ class ApplicationManagement extends Component {
               <SelectField
                 className="applications-management-layout__header__selectOptions__field"
                 selectFieldClassName="applications-management-layout__header__selectOptions__field-select"
-                // selectedValue={get(selectedSequence, "value", "")}
-                // error={selectedSequence.error}
+                selectedValue={get(selectedSequence, "value", "")}
+                disabled={
+                  get(selectedSubmission, "submissionId") === 0 ||
+                  !allSubmissionSequences.length
+                }
                 suffixIcon={<CaretDownOutlined />}
-                options={submissionSequnces || []}
-                // onChange={this.onSelect("applicationType", types)}
+                options={allSubmissionSequences || []}
+                onChange={this.onSelect(
+                  "selectedSequence",
+                  allSubmissionSequences
+                )}
                 style={{ marginRight: "0" }}
                 label={translate("label.dashboard.sequence")}
                 placeholder={translate("label.generic.all")}
               />
               <SelectField
-                key={get(selectedSubmission, "key", "")}
                 className="applications-management-layout__header__selectOptions__field"
                 selectFieldClassName="applications-management-layout__header__selectOptions__field-select"
                 selectedValue={get(selectedSubmission, "value", "")}
-                // error={selectedSubmission.error}
                 suffixIcon={<CaretDownOutlined />}
                 options={bulkUploadedSubmissions || []}
+                onChange={this.onSelect(
+                  "selectedSubmission",
+                  bulkUploadedSubmissions
+                )}
                 label={translate("label.dashboard.application")}
                 placeholder={translate("label.generic.all")}
               />
@@ -515,18 +561,18 @@ class ApplicationManagement extends Component {
               </Row>
             ))}
           </div>
-          {/* {!get(this.props, "users.length") && (
-              <Row className="applications-management-layout__nodata">
-                <Icon
-                  style={{ fontSize: "20px" }}
-                  type="exclamation-circle"
-                  className="applications-management-layout__nodata-icon"
-                />
-                {translate("error.dashboard.notfound", {
-                  type: translate("label.dashboard.applications"),
-                })}
-              </Row>
-            )} */}
+          {!get(this.props, "submissionSequnces.length") && (
+            <Row className="applications-management-layout__nodata">
+              <Icon
+                style={{ fontSize: "20px" }}
+                type="exclamation-circle"
+                className="applications-management-layout__nodata-icon"
+              />
+              {translate("error.dashboard.notfound", {
+                type: translate("label.dashboard.sequences"),
+              })}
+            </Row>
+          )}
           <Pagination
             key={count}
             containerStyle={
@@ -570,9 +616,11 @@ function mapStateToProps(state) {
     role: state.Login.role,
     selectedUploadedCustomer: state.Customer.selectedUploadedCustomer,
     selectedSubmission: state.Application.selectedSubmission,
+    selectedSequence: state.Submission.selectedSequence,
     bulkUploadedSubmissions: state.Application.bulkUploadedSubmissions, //getSubmissionsByCustomer(state),
     submissionCount: state.Application.submissionCount,
     submissionSequnces: state.Submission.submissionSequnces,
+    allSubmissionSequences: state.Submission.allSubmissionSequences,
     count: state.Submission.count,
   };
 }

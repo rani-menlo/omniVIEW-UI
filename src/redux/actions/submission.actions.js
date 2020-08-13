@@ -244,6 +244,20 @@ export default {
       sequence,
     };
   },
+
+  setSequences: (sequences, cb) => {
+    return (dispatch) => {
+      sequences = sequences.length
+        ? [{ id: 0, key: 0, name: "All", value: "All" }, ...sequences]
+        : sequences;
+      dispatch({
+        type: SubmissionActionTypes.SET_SEQUENCES,
+        sequences,
+      });
+      cb && cb();
+    };
+  },
+
   validateSequence: (sequenceId, callback) => {
     return async (dispatch, getState) => {
       ApiActions.request(dispatch);
