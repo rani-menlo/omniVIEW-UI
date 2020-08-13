@@ -98,6 +98,15 @@ export default {
       cb && cb();
     };
   },
+  setBulkUploadedSelectedCustomer: (customer, cb) => {
+    return (dispatch) => {
+      dispatch({
+        type: CustomerActionTypes.SET_UPLOADED_SELECTED_CUSTOMER,
+        customer,
+      });
+      cb && cb();
+    };
+  },
   activateDeactivateCustomer: (customer, search) => {
     return async (dispatch) => {
       ApiActions.request(dispatch);

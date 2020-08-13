@@ -3,6 +3,8 @@ import PropTypes from "prop-types";
 import _ from "lodash";
 import { connect } from "react-redux";
 import { Text } from "../../uikit/components";
+import { CustomerActions } from "../../redux/actions";
+import { bindActionCreators } from "redux";
 
 class PopoverCustomers extends Component {
   static propTypes = {
@@ -18,14 +20,26 @@ class PopoverCustomers extends Component {
 
   onCustomerSelected = (customer) => () => {
     const { selectedCustomer } = this.state;
-    if (customer.id === selectedCustomer.id) {
-      return;
-    }
+    // if (customer.id === selectedCustomer.id) {
+    //   return;
+    // }
     this.setState({ selectedCustomer: customer });
     this.props.onCustomerSelected && this.props.onCustomerSelected(customer);
   };
 
+  /**
+   * Fetching customers
+   * @param {*} sortBy
+   * @param {*} orderBy
+   */
+  fetchCustomers = (sortBy = "created_at", orderBy = "DESC") => {
+    this.props.dispatch(CustomerActions.resetCustomers());
+    let searchText = "";
+    this.props.actions.fetchCustomers(searchText);
+  };
+
   componentDidMount() {
+    // this.fetchCustomers();
     if (this.props.showAll) {
       let allCustomersObj = {
         id: 0,
@@ -36,7 +50,7 @@ class PopoverCustomers extends Component {
   }
 
   render() {
-    const { customers, customer, showAll } = this.props;
+    const { customers, customer, showAll, selectedUploadedCustomer } = this.props;
     const { selectedCustomer } = this.state;
     const sortedCustomers = _.sortBy(customers, (cust) => {
       return cust.id === customer.id ? 0 : 1;
@@ -52,8 +66,9 @@ class PopoverCustomers extends Component {
       <div className="popoverCustomers">
         {_.map(sortedCustomers, (customer) => (
           <Text
-            className={`popoverCustomers-text ${selectedCustomer.id ===
-              customer.id && "popoverCustomers-text-selected"}`}
+            className={`popoverCustomers-text ${(selectedCustomer.id ||
+              selectedUploadedCustomer.id) === customer.id &&
+              "popoverCustomers-text-selected"}`}
             key={customer.id}
             type="extra_bold"
             size="20px"
@@ -70,6 +85,7 @@ function mapStateToProps(state) {
   return {
     customers: state.Customer.customers,
     selectedCustomer: state.Customer.selectedCustomer,
+    selectedUploadedCustomer: state.Customer.selectedUploadedCustomer,
     user: state.Login.user,
     customer: state.Login.customer,
   };
@@ -77,6 +93,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
+    actions: bindActionCreators({ ...CustomerActions }, dispatch),
     dispatch,
   };
 }
