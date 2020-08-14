@@ -367,7 +367,8 @@ class ApplicationManagement extends Component {
       bulkAction: {
         submissionId: this.state.selectedSubmission.submissionId,
         state: status ? 1 : 0,
-        sequenceId: selectedSequences.length > 0 ? map(selectedSequences, "id") : [],
+        sequenceId:
+          selectedSequences.length > 0 ? map(selectedSequences, "id") : [],
       },
     });
     if (!res.data.error) {
@@ -530,7 +531,7 @@ class ApplicationManagement extends Component {
                     style={{
                       width: "72px",
                       textAlign: "center",
-                      dispatch: "block",
+                      display: "block",
                     }}
                   >
                     {get(sequence, "sequence", "N/A")}
