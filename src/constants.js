@@ -85,6 +85,7 @@ const URI = {
   GET_SEQUENCES_WITH_PERMISSIONS: `${path}sequence/getSequences`,
   GETSUBMISSIONSEQUENCES: `${path}sequence/getSubmissionSequences`,
   DELETE_SEQUENCES: `${path}upload/deleteSequences`,
+  UPDATESEQUENCEWIP: `${path}sequence/updateSequenceWIP`,
 
   // Validation
   VALIDATE_SEQUENCE: `${path}validation/sequenceValidation`,

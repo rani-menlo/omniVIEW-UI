@@ -5,6 +5,9 @@ import { ApiActions } from "../actions";
 
 const initialState = {
   sequences: {},
+  submissionSequnces: [],
+  allSubmissionSequences: [],
+  count: 0,
   selectedSequence: null,
   sequenceJson: {},
   lifeCycleJson: {},
@@ -18,8 +21,8 @@ const initialState = {
     matchWholeword: false,
     sortFile: "asc",
     sortTitle: "asc",
-    find_flag: false
-  }
+    find_flag: false,
+  },
 };
 
 export default (state = initialState, action) => {
@@ -31,26 +34,33 @@ export default (state = initialState, action) => {
       }
       return {
         ...state,
-        sequences
+        sequences,
+      };
+    }
+    case SubmissionActionTypes.FETCH_SUBMISSION_SEQUENCES: {
+      return {
+        ...state,
+        submissionSequnces: action.data.data,
+        count: action.data.count,
       };
     }
     case SubmissionActionTypes.FETCH_SEQUENCE_JSON: {
       return {
         ...state,
-        sequenceJson: { ...state.sequenceJson, [action.id]: action.data }
+        sequenceJson: { ...state.sequenceJson, [action.id]: action.data },
       };
     }
     case SubmissionActionTypes.FETCH_LIFE_CYCLE_JSON: {
       return {
         ...state,
-        lifeCycleJson: { ...state.lifeCycleJson, [action.id]: action.data }
+        lifeCycleJson: { ...state.lifeCycleJson, [action.id]: action.data },
       };
     }
 
     case SubmissionActionTypes.SET_SELECTED_SEQUENCE: {
       return {
         ...state,
-        selectedSequence: action.sequence
+        selectedSequence: action.sequence,
       };
     }
     case SubmissionActionTypes.VALIDATE_SEQUENCE: {
@@ -58,9 +68,9 @@ export default (state = initialState, action) => {
         ...state,
         validations: {
           ...state.validations,
-          [action.id]: action.data.data
+          [action.id]: action.data.data,
         },
-        validationsSequence_flag: action.validateSequence_flag
+        validationsSequence_flag: action.validateSequence_flag,
       };
     }
     case SubmissionActionTypes.FIND_TEXT: {
@@ -68,13 +78,13 @@ export default (state = initialState, action) => {
         ...state,
         find: {
           ...state.find,
-          searchResults: _.map(action.data.data, obj => ({
+          searchResults: _.map(action.data.data, (obj) => ({
             ...obj,
-            hash: uuidv4()
+            hash: uuidv4(),
           })),
           searchText: action.text,
-          find_flag: action.find_flag
-        }
+          find_flag: action.find_flag,
+        },
       };
     }
     case SubmissionActionTypes.FIND_SELECTED_RESULT: {
@@ -83,8 +93,8 @@ export default (state = initialState, action) => {
         ...state,
         find: {
           ...state.find,
-          selected: `${search.hash}`
-        }
+          selected: `${search.hash}`,
+        },
       };
     }
     case SubmissionActionTypes.FIND_MATCH_BY: {
@@ -92,8 +102,8 @@ export default (state = initialState, action) => {
         ...state,
         find: {
           ...state.find,
-          [action.match]: !state.find[action.match]
-        }
+          [action.match]: !state.find[action.match],
+        },
       };
     }
     case SubmissionActionTypes.FIND_SORT_BY_TITLE: {
@@ -108,8 +118,8 @@ export default (state = initialState, action) => {
         find: {
           ...state.find,
           searchResults,
-          sortTitle: order
-        }
+          sortTitle: order,
+        },
       };
     }
     case SubmissionActionTypes.FIND_SORT_BY_FILE: {
@@ -124,8 +134,8 @@ export default (state = initialState, action) => {
         find: {
           ...state.find,
           searchResults,
-          sortFile: order
-        }
+          sortFile: order,
+        },
       };
     }
     case SubmissionActionTypes.CLEAR_SEARCH_RESULTS: {
@@ -135,16 +145,28 @@ export default (state = initialState, action) => {
           ...state.find,
           searchResults: [],
           searchText: "",
-          find_flag: false
-        }
+          find_flag: false,
+        },
       };
     }
     case SubmissionActionTypes.RESET_FIND: {
       return {
         ...state,
         find: {
-          ...initialState.find
-        }
+          ...initialState.find,
+        },
+      };
+    }
+    case SubmissionActionTypes.RESET_APPLICATION_SEQUENCES: {
+      return {
+        ...state,
+        submissionSequnces: [],
+      };
+    }
+    case SubmissionActionTypes.SET_SEQUENCES: {
+      return {
+        ...state,
+        allSubmissionSequences: action.sequences,
       };
     }
     default:
