@@ -95,6 +95,7 @@ class ApplicationManagement extends Component {
       selectedSubmission,
       selectedSequence,
       TableColumns,
+      selectedUploadedCustomer,
     } = this.state;
     let submissionId =
       selectedSubmission.submissionId || selectedSubmission.id || 0;
@@ -108,15 +109,19 @@ class ApplicationManagement extends Component {
           sortByColumnId: sortByColumnId,
           order: order,
           sequenceId: Number(sequenceId),
+          customerId: Number(selectedUploadedCustomer.id),
         },
         () => {
           this.props.allSubmissionSequences.length < 2 &&
             this.props.dispatch(
               SubmissionActions.setSequences(this.props.submissionSequnces)
             );
-          this.props.TableColumns[3].allViewable = this.props.submissionSequnces
-            .length
-            ? every(this.props.submissionSequnces, ["isWIP", true])
+          let sequences = [...this.props.submissionSequnces];
+          filter(sequences, (seq) => {
+            return seq.id !== 0;
+          });
+          TableColumns[3].allViewable = sequences.length
+            ? every(sequences, ["isWIP", true])
             : false;
           this.setState({ TableColumns });
         }
@@ -133,7 +138,7 @@ class ApplicationManagement extends Component {
       //Adding key and values to the sequences to set in the Select field
       map(submissionSequnces, (seq) => {
         seq.key = seq.id;
-        seq.value = seq.name;
+        seq.value = seq.sequence;
       });
       return {
         submissionSequnces: submissionSequnces,
@@ -214,6 +219,21 @@ class ApplicationManagement extends Component {
         );
       })
     );
+  };
+
+  /**
+   * On changing the page in the list view
+   * @param {*} pageNo
+   */
+  onPageChange = (pageNo) => {
+    this.setState({ pageNo }, () => this.fetchAppSequences());
+  };
+  /**
+   * On changing the size of the records per the page to display
+   * @param {*} limit
+   */
+  onPageSizeChange = (limit) => {
+    this.setState({ limit }, () => this.fetchAppSequences());
   };
 
   /**
@@ -344,13 +364,10 @@ class ApplicationManagement extends Component {
   changeSequenceStatus = async (selectedSequences, status) => {
     this.props.dispatch(ApiActions.requestOnDemand());
     const res = await ApplicationApi.updateusequenceStatus({
-      singleSequence: {
-        submissionIds:
-          selectedSequences.length > 0 ? map(selectedSequences, "id") : [],
-      },
       bulkAction: {
         submissionId: this.state.selectedSubmission.submissionId,
         state: status ? 1 : 0,
+        sequenceId: selectedSequences.length > 0 ? map(selectedSequences, "id") : [],
       },
     });
     if (!res.data.error) {
@@ -503,13 +520,21 @@ class ApplicationManagement extends Component {
                   width={this.getColumnWidth(TableColumnNames.APPLICATION)}
                   className="applications-management-layout__list__item-text"
                 >
-                  {get(this.props.selectedSubmission, "name", "N/A")}
+                  {get(sequence, "submission", "N/A")}
                 </Column>
                 <Column
                   width={this.getColumnWidth(TableColumnNames.SEQUENCE)}
                   className="applications-management-layout__list__item-text"
                 >
-                  {get(sequence, "name", "N/A")}
+                  <span
+                    style={{
+                      width: "72px",
+                      textAlign: "center",
+                      dispatch: "block",
+                    }}
+                  >
+                    {get(sequence, "sequence", "N/A")}
+                  </span>
                 </Column>
 
                 <Column
