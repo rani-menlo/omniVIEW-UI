@@ -364,12 +364,9 @@ class ApplicationManagement extends Component {
   changeSequenceStatus = async (selectedSequences, status) => {
     this.props.dispatch(ApiActions.requestOnDemand());
     const res = await ApplicationApi.updateusequenceStatus({
-      bulkAction: {
-        submissionId: this.state.selectedSubmission.submissionId,
-        state: status ? 1 : 0,
-        sequenceId:
-          selectedSequences.length > 0 ? map(selectedSequences, "id") : [],
-      },
+      state: status ? 1 : 0,
+      sequenceIds:
+        selectedSequences.length > 0 ? map(selectedSequences, "id") : [],
     });
     if (!res.data.error) {
       this.props.dispatch(ApiActions.successOnDemand());
