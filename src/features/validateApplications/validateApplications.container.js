@@ -12,7 +12,12 @@ import {
   Pagination,
   Toast,
 } from "../../uikit/components";
-import { Popover, Switch, Icon } from "antd";
+import {
+  UPLOAD_FAILED,
+  SCRIPT_ERROR,
+  MISMATCH_SEQUENCES,
+} from "../../constants";
+import { Popover, Switch, Icon, Modal } from "antd";
 import PopoverCustomers from "../usermanagement/popoverCustomers.component";
 import { isLoggedInOmniciaAdmin } from "../../utils";
 import { get, find, memoize, map, filter, every, set, isNull } from "lodash";
@@ -32,8 +37,10 @@ class ValidateApplications extends Component {
       pageNo: 1,
       limit: 5,
       checkedApplications: [],
+      selectedErrors: [],
       selectedUploadedCustomer: this.props.selectedUploadedCustomer,
       selectedApplication: {},
+      reportData: [],
       TableColumns: [
         {
           name: TableColumnNames.CUSTOMER,
@@ -308,11 +315,28 @@ class ValidateApplications extends Component {
    * open application errors modal
    * @param {*} application
    */
-  openApplicationsErrorModal = (application) => {
+  openApplicationsErrorModal = (submission) => async (e) => {
+    e.stopPropagation();
+    this.props.dispatch(ApiActions.requestOnDemand());
+    const res = await ApplicationApi.monitorStatus({
+      submission_id: submission.submissionId,
+    });
+    const { data } = res;
+    const failures = filter(
+      get(data, "result"),
+      (seq) =>
+        seq.status == UPLOAD_FAILED ||
+        seq.status == SCRIPT_ERROR ||
+        seq.status == MISMATCH_SEQUENCES
+    );
+    console.log("failures", failures);
     this.setState({
-      selectedApplication: application,
+      // reportData: _.map(failures, (fail) => ({ key: fail, ...fail })),
+      reportData: failures,
+      selectedApplication: submission,
       showApplicationErrorModal: true,
     });
+    this.props.dispatch(ApiActions.successOnDemand());
   };
 
   /**
@@ -352,6 +376,75 @@ class ValidateApplications extends Component {
     });
   };
 
+  /**
+   * Delete the sequences if user selects on OK button on the confirmation modal
+   */
+  deleteSeq = async () => {
+    let { selectedErrors } = this.state;
+    this.showLoading();
+    selectedErrors = selectedErrors.flatMap((i) => i.pipeline_name);
+    const res = await ApplicationApi.deleteSequences({
+      customer_id: this.state.selectedUploadedCustomer.id,
+      submission_id: this.props.selectedSubmission.id,
+      sequences: selectedErrors,
+    });
+    this.hideLoading();
+    if (!res.data.error) {
+      this.closeApplicationsErrorModal();
+      this.showErrorMsg();
+    } else {
+      Toast.error("Please try again");
+    }
+  };
+
+  showLoading = () => {
+    this.props.dispatch(ApiActions.requestOnDemand());
+  };
+
+  hideLoading = () => {
+    this.props.dispatch(ApiActions.successOnDemand());
+  };
+
+  //showing delete error once submission or sequence get deleted successfully
+  showErrorMsg = () => {
+    let deleteMsg = "";
+    if (this.state.selectedErrors.length === this.reportData.length) {
+      deleteMsg = "Application has";
+    } else if (this.state.sequences.length > 1) {
+      deleteMsg = "Sequences have";
+    } else {
+      deleteMsg = "Sequence has";
+    }
+    Toast.success(`${deleteMsg} been deleted!`);
+    //clearing all the intervals after deleting the submission
+    this.clearAllIntervals();
+    //refresing the application once delete operation is done
+    this.fetchingBulkuploadedApplications();
+  };
+
+  /**
+   * Deleting selected error sequences and showing confirmation modal to display
+   */
+  deleteSequences = (props) => {
+    this.setState({ selectedErrors: props });
+    const reportData = [...this.state.reportData];
+    let content_message = "";
+    content_message =
+      props.length === reportData.length
+        ? "You chose to delete all the Sequences that will remove the Application. Do you wish to continue?"
+        : "Are you sure you want to delete the selected Sequence(s)";
+    Modal.confirm({
+      className: "omnimodal",
+      title: translate("label.generic.delete"),
+      content: content_message,
+      cancelText: translate("label.button.cancel"),
+      onOk: () => {
+        this.deleteSeq();
+      },
+      onCancel: () => {},
+    });
+  };
+
   render() {
     const { loading, bulkUploadedSubmissionsCount } = this.props;
     const {
@@ -362,6 +455,7 @@ class ValidateApplications extends Component {
       selectedUploadedCustomer,
       selectedApplication,
       showApplicationErrorModal,
+      reportData,
     } = this.state;
     return (
       <>
@@ -478,7 +572,7 @@ class ValidateApplications extends Component {
                       "validate-applications-layout__list__item-text-link"}`}
                     onClick={
                       application.errorCount != 0
-                        ? (e) => this.openApplicationsErrorModal(application)
+                        ? this.openApplicationsErrorModal(application)
                         : ""
                     }
                   >
@@ -548,6 +642,8 @@ class ValidateApplications extends Component {
             <ApplicationErrorsModal
               closeModal={this.closeApplicationsErrorModal}
               application={selectedApplication}
+              errors={reportData}
+              onDelete={this.deleteSequences}
             />
           )}
         </ContentLayout>
