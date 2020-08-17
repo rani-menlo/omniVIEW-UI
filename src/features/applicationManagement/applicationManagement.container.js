@@ -196,7 +196,7 @@ class ApplicationManagement extends Component {
    * get each column width
    */
   getColumnWidth = memoize((name) => {
-    const col = find(this.state.TableColumns, (col) => col.name === name);
+    const col = find(this.state.TableColumns, (column) => column.name === name);
     return get(col, "width");
   });
 
@@ -584,7 +584,7 @@ class ApplicationManagement extends Component {
               </Row>
             ))}
           </div>
-          {!get(this.props, "submissionSequnces.length") && (
+          {!get(this.state, "submissionSequnces.length") && (
             <Row className="applications-management-layout__nodata">
               <Icon
                 style={{ fontSize: "20px" }}

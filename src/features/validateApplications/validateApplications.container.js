@@ -605,7 +605,7 @@ class ValidateApplications extends Component {
               </Row>
             ))}
           </div>
-          {!get(this.props, "bulkUploadedSubmissions.length") && (
+          {!get(this.state, "bulkUploadedSubmissions.length") && (
             <Row className="validate-applications-layout__nodata">
               <Icon
                 style={{ fontSize: "20px" }}
