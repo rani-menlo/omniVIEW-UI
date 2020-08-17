@@ -185,6 +185,9 @@ class ApplicationManagement extends Component {
         value: "All",
       };
     }
+    this.props.dispatch(
+      SubmissionActions.setSelectedSequence(selectedSequence)
+    );
     selectedSubmission.key = selectedSubmission.submissionId;
     selectedSubmission.value = selectedSubmission.name;
     this.setState({ selectedSubmission, selectedSequence }, () => {
@@ -209,17 +212,23 @@ class ApplicationManagement extends Component {
     this.props.dispatch(
       CustomerActions.setBulkUploadedSelectedCustomer(customer, () => {
         this.props.dispatch(SubmissionActions.setSequences([]));
+        this.props.dispatch(SubmissionActions.setSelectedSequence(null));
+        this.props.dispatch(ApplicationActions.setSelectedSubmission(null));
         this.setState(
           { selectedSequence: null, selectedSubmission: null },
           () => {
-            this.props.dispatch(SubmissionActions.setSelectedSequence(null));
-            this.props.dispatch(ApplicationActions.setSelectedSubmission(null));
             this.props.history.push("/applicationStatus");
           }
         );
       })
     );
   };
+
+  componentWillUnmount() {
+    this.props.dispatch(SubmissionActions.setSequences([]));
+    this.props.dispatch(SubmissionActions.setSelectedSequence(null));
+    this.props.dispatch(ApplicationActions.setSelectedSubmission(null));
+  }
 
   /**
    * On changing the page in the list view
@@ -382,15 +391,18 @@ class ApplicationManagement extends Component {
     this.setState({ [field]: value }, () => {
       if (field === "selectedSubmission") {
         this.props.dispatch(SubmissionActions.setSequences([]));
-        this.setState(
-          { selectedSequence: null, selectedSubmission: value },
-          () => {
-            this.props.dispatch(SubmissionActions.setSelectedSequence(null));
-            this.props.dispatch(
-              ApplicationActions.setSelectedSubmission(value)
-            );
-          }
-        );
+        const selectedSequence = {
+          id: 0,
+          name: "All",
+          key: 0,
+          value: "All",
+        };
+        this.setState({ selectedSequence, selectedSubmission: value }, () => {
+          this.props.dispatch(
+            SubmissionActions.setSelectedSequence(selectedSequence)
+          );
+          this.props.dispatch(ApplicationActions.setSelectedSubmission(value));
+        });
       } else {
         this.props.dispatch(SubmissionActions.setSelectedSequence(value));
       }
@@ -412,14 +424,6 @@ class ApplicationManagement extends Component {
       selectedSequence,
       sequences,
     } = this.state;
-    if (isNull(selectedSequence)) {
-      selectedSequence = {
-        id: 0,
-        name: "All",
-        key: 0,
-        value: "All",
-      };
-    }
     return (
       <>
         <Loader loading={loading} />
@@ -464,7 +468,11 @@ class ApplicationManagement extends Component {
               <SelectField
                 className="applications-management-layout__header__selectOptions__field"
                 selectFieldClassName="applications-management-layout__header__selectOptions__field-select"
-                selectedValue={get(selectedSequence, "value", "")}
+                selectedValue={
+                  allSubmissionSequences.length
+                    ? `${get(selectedSequence, "key", "")}`
+                    : "All"
+                }
                 disabled={
                   get(selectedSubmission, "submissionId") === 0 ||
                   !allSubmissionSequences.length
@@ -482,7 +490,7 @@ class ApplicationManagement extends Component {
               <SelectField
                 className="applications-management-layout__header__selectOptions__field"
                 selectFieldClassName="applications-management-layout__header__selectOptions__field-select"
-                selectedValue={get(selectedSubmission, "value", "")}
+                selectedValue={`${get(selectedSubmission, "key", "")}`}
                 suffixIcon={<CaretDownOutlined />}
                 options={bulkUploadedSubmissions || []}
                 onChange={this.onSelect(
