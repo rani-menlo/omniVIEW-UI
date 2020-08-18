@@ -128,7 +128,15 @@ class ProfileMenu extends Component {
    * redirect to validate applications scree
    */
   validateApplications = () => {
-    this.props.history.push("/applicationStatus");
+    const customer = {
+      id: 0,
+      company_name: "All Customers",
+    };
+    this.props.dispatch(
+      CustomerActions.setBulkUploadedSelectedCustomer(customer, () => {
+        this.props.history.push("/applicationStatus");
+      })
+    );
   };
 
   render() {
