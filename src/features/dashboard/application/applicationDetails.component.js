@@ -159,6 +159,7 @@ class ApplicationDetails extends Component {
           selectFieldClassName="newlicence__field-select"
           style={style}
           options={centers}
+          selectedValue={_.get(submissionCenter, "value.value")}
           error={submissionCenter.error}
           onChange={this.onSelect("submissionCenter", centers)}
           label={`${translate("label.newapplication.submissioncenter")}*`}
