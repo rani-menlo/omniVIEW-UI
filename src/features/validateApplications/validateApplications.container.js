@@ -523,12 +523,11 @@ class ValidateApplications extends Component {
                   className="validate-applications-layout__list__item-text"
                 >
                   <span
-                    className={`${!isNull(get(application, "seqCount")) &&
+                    className={`${application.seqCount !== 0 &&
                       application.errorCount === 0 &&
-                      "validate-applications-layout__list__item-text-link"}`}
+                        "validate-applications-layout__list__item-text-link"}`}
                     onClick={
-                      !isNull(get(application, "seqCount")) &&
-                      application.errorCount === 0
+                      application.seqCount !== 0 && application.errorCount === 0
                         ? (e) => this.openApplicationManagement(application)
                         : ""
                     }
@@ -548,16 +547,12 @@ class ValidateApplications extends Component {
                       display: "block",
                     }}
                   >
-                    {`${
-                      !isNull(get(application, "seqCount"))
-                        ? `${get(application, "seqCount", 0) -
-                            get(application, "errorCount", 0)}`
-                        : 0
-                    } of ${
-                      !isNull(get(application, "seqCount"))
-                        ? get(application, "seqCount", 0)
-                        : 0
-                    }`}
+                    {`${`${get(application, "seqCount", 0) -
+                      get(application, "errorCount", 0)}`} of ${get(
+                      application,
+                      "seqCount",
+                      0
+                    )}`}
                   </span>
                 </Column>
                 <Column
