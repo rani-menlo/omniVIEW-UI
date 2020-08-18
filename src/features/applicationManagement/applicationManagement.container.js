@@ -97,7 +97,7 @@ class ApplicationManagement extends Component {
   /**
    * Fetch sequences per each submission
    */
-  fetchAppSequences = (sortByColumnId = 3, order = "ASC") => {
+  fetchAppSequences = (sortByColumnId = 5, order = "ASC") => {
     this.props.dispatch(SubmissionActions.resetApplicationSequences());
     this.setState({ submissionSequnces: [] });
     const {
@@ -193,7 +193,7 @@ class ApplicationManagement extends Component {
     return null;
   }
 
-  fetchAppAllSequences(sortByColumnId = 3, order = "ASC") {
+  fetchAppAllSequences(sortByColumnId = 5, order = "ASC") {
     this.props.dispatch(SubmissionActions.resetSubmissionSequencecs());
     this.setState({ allSubmissionSequences: [] });
     const {
