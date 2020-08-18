@@ -286,7 +286,7 @@ class ApplicationManagement extends Component {
    * @param {*} checked
    */
   checkAll = (checked, event) => {
-    // Returing if there are no customers
+    // Returing if there are no sequences
     let isWIP = checked;
     if (!this.state.submissionSequnces.length) {
       event.preventDefault();
@@ -297,15 +297,11 @@ class ApplicationManagement extends Component {
       0,
       this.state.limit
     );
-    // filtering applications without errors
-    // let withoutErrorApplications = filter(submissions, (application) => {
-    //   return application.errors == 0;
-    // });
     if (isWIP) {
       map(submissionSequnces, (sequence) => {
         set(sequence, "isWIP", isWIP);
       });
-      // checkedSequences = [...withoutErrorApplications];
+      checkedSequences = [...submissionSequnces];
     } else {
       submissionSequnces = map(submissionSequnces, (sequence) => ({
         ...sequence,
@@ -314,7 +310,7 @@ class ApplicationManagement extends Component {
       checkedSequences.length = 0;
     }
     const TableColumns = [...this.state.TableColumns];
-    TableColumns[3].allViewable = checkedSequences;
+    TableColumns[3].allViewable = submissionSequnces;
     submissionSequnces = [...submissionSequnces];
     this.setState(
       {

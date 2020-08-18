@@ -408,16 +408,16 @@ class ValidateApplications extends Component {
   //showing delete error once submission or sequence get deleted successfully
   showErrorMsg = () => {
     let deleteMsg = "";
-    if (this.state.selectedErrors.length === this.reportData.length) {
+    if (
+      this.state.selectedApplication.seqCount === this.state.reportData.length
+    ) {
       deleteMsg = "Application has";
-    } else if (this.state.sequences.length > 1) {
+    } else if (this.state.selectedErrors.length > 1) {
       deleteMsg = "Sequences have";
     } else {
       deleteMsg = "Sequence has";
     }
     Toast.success(`${deleteMsg} been deleted!`);
-    //clearing all the intervals after deleting the submission
-    this.clearAllIntervals();
     //refresing the application once delete operation is done
     this.fetchingBulkuploadedApplications();
   };
@@ -430,7 +430,7 @@ class ValidateApplications extends Component {
     const reportData = [...this.state.reportData];
     let content_message = "";
     content_message =
-      props.length === reportData.length
+      this.state.selectedApplication.seqCount === reportData.length
         ? "You chose to delete all the Sequences that will remove the Application. Do you wish to continue?"
         : "Are you sure you want to delete the selected Sequence(s)";
     Modal.confirm({
