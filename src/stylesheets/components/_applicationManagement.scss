@@ -37,6 +37,7 @@
   }
   &__list {
     margin-top: 24px;
+    min-height: 325px;
     .tableHeader {
       align-items: start;
     }
@@ -64,7 +65,8 @@
   }
   &__nodata {
     @include text-bold-active(16px);
-    padding-top: 10%;
+    position: relative;
+    top: -125px;
     &-icon {
       margin-right: 10px;
     }

@@ -642,9 +642,6 @@ class ApplicationManagement extends Component {
           )}
           <Pagination
             key={count}
-            containerStyle={
-              count > 4 ? { marginTop: "1%" } : { marginTop: "20%" }
-            }
             total={count}
             showTotal={(total, range) =>
               translate("text.pagination", {
