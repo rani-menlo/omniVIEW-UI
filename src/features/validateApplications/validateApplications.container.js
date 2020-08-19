@@ -617,11 +617,6 @@ class ValidateApplications extends Component {
             )}
           <Pagination
             key={bulkUploadedSubmissionsCount}
-            containerStyle={
-              bulkUploadedSubmissionsCount > 4
-                ? { marginTop: "1%" }
-                : { marginTop: "20%" }
-            }
             total={bulkUploadedSubmissionsCount}
             showTotal={(total, range) =>
               translate("text.pagination", {
