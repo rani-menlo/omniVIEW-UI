@@ -85,6 +85,7 @@ class ApplicationManagement extends Component {
           sort: true,
           width: "20%",
         },
+        // TODO - This will use it in the next sprint so commented this piece of code
         // {
         //   name: "",
         //   key: "",
@@ -123,10 +124,6 @@ class ApplicationManagement extends Component {
           customerId: Number(selectedUploadedCustomer.id),
         },
         () => {
-          // this.props.allSubmissionSequences.length < 2 &&
-          //   this.props.dispatch(
-          //     SubmissionActions.setSequences(this.props.submissionSequnces)
-          //   );
           let sequences = [...this.props.submissionSequnces];
           filter(sequences, (seq) => {
             return seq.id !== 0;
@@ -237,17 +234,6 @@ class ApplicationManagement extends Component {
 
   componentDidMount() {
     let { selectedSubmission } = this.state;
-    // if (isNull(selectedSequence)) {
-    //   selectedSequence = {
-    //     id: 0,
-    //     name: "All",
-    //     key: 0,
-    //     value: "All",
-    //   };
-    // }
-    // this.props.dispatch(
-    //   SubmissionActions.setSelectedSequence(selectedSequence)
-    // );
     selectedSubmission.key = selectedSubmission.submissionId;
     selectedSubmission.value = selectedSubmission.name;
     this.setState({ selectedSubmission }, () => {
@@ -447,7 +433,6 @@ class ApplicationManagement extends Component {
     const value = find(array, (item) => Number(item.key) == Number(val));
     this.setState({ [field]: value }, () => {
       if (field === "selectedSubmission") {
-        // this.props.actions.resetApplications();
         this.setState({ selectedSubmission: value }, () => {
           this.props.dispatch(ApplicationActions.setSelectedSubmission(value));
           this.fetchAppAllSequences();
@@ -643,7 +628,7 @@ class ApplicationManagement extends Component {
               </Row>
             ))}
           </div>
-          {!get(this.state, "submissionSequnces.length") && (
+          {!get(this.props, "submissionSequnces.length") && !loading && (
             <Row className="applications-management-layout__nodata">
               <Icon
                 style={{ fontSize: "20px" }}
