@@ -166,7 +166,13 @@ export default (state = initialState, action) => {
     case SubmissionActionTypes.SET_SEQUENCES: {
       return {
         ...state,
-        allSubmissionSequences: action.sequences,
+        allSubmissionSequences: action.data,
+      };
+    }
+    case SubmissionActionTypes.RESET_SEQUENCES: {
+      return {
+        ...state,
+        allSubmissionSequences: [],
       };
     }
     default:

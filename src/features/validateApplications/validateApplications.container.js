@@ -385,7 +385,7 @@ class ValidateApplications extends Component {
     selectedErrors = selectedErrors.flatMap((i) => i.pipeline_name);
     const res = await ApplicationApi.deleteSequences({
       customer_id: this.state.selectedUploadedCustomer.id,
-      submission_id: this.props.selectedSubmission.id,
+      submission_id: this.state.selectedApplication.submissionId,
       sequences: selectedErrors,
     });
     this.hideLoading();
@@ -408,16 +408,16 @@ class ValidateApplications extends Component {
   //showing delete error once submission or sequence get deleted successfully
   showErrorMsg = () => {
     let deleteMsg = "";
-    if (this.state.selectedErrors.length === this.reportData.length) {
+    if (
+      this.state.selectedApplication.seqCount === this.state.reportData.length
+    ) {
       deleteMsg = "Application has";
-    } else if (this.state.sequences.length > 1) {
+    } else if (this.state.selectedErrors.length > 1) {
       deleteMsg = "Sequences have";
     } else {
       deleteMsg = "Sequence has";
     }
     Toast.success(`${deleteMsg} been deleted!`);
-    //clearing all the intervals after deleting the submission
-    this.clearAllIntervals();
     //refresing the application once delete operation is done
     this.fetchingBulkuploadedApplications();
   };
@@ -430,7 +430,7 @@ class ValidateApplications extends Component {
     const reportData = [...this.state.reportData];
     let content_message = "";
     content_message =
-      props.length === reportData.length
+      this.state.selectedApplication.seqCount === reportData.length
         ? "You chose to delete all the Sequences that will remove the Application. Do you wish to continue?"
         : "Are you sure you want to delete the selected Sequence(s)";
     Modal.confirm({
@@ -523,10 +523,11 @@ class ValidateApplications extends Component {
                   className="validate-applications-layout__list__item-text"
                 >
                   <span
-                    className={`${get(application, "errorCount") === 0 &&
-                      "validate-applications-layout__list__item-text-link"}`}
+                    className={`${application.seqCount !== 0 &&
+                      application.errorCount === 0 &&
+                        "validate-applications-layout__list__item-text-link"}`}
                     onClick={
-                      application.errorCount === 0
+                      application.seqCount !== 0 && application.errorCount === 0
                         ? (e) => this.openApplicationManagement(application)
                         : ""
                     }
@@ -546,16 +547,12 @@ class ValidateApplications extends Component {
                       display: "block",
                     }}
                   >
-                    {`${
-                      !isNull(get(application, "seqCount"))
-                        ? `${get(application, "seqCount", 0) -
-                            get(application, "errorCount", 0)}`
-                        : 0
-                    } of ${
-                      !isNull(get(application, "seqCount"))
-                        ? get(application, "seqCount", 0)
-                        : 0
-                    }`}
+                    {`${`${get(application, "seqCount", 0) -
+                      get(application, "errorCount", 0)}`} of ${get(
+                      application,
+                      "seqCount",
+                      0
+                    )}`}
                   </span>
                 </Column>
                 <Column
@@ -605,18 +602,19 @@ class ValidateApplications extends Component {
               </Row>
             ))}
           </div>
-          {!get(this.props, "bulkUploadedSubmissions.length") && (
-            <Row className="validate-applications-layout__nodata">
-              <Icon
-                style={{ fontSize: "20px" }}
-                type="exclamation-circle"
-                className="validate-applications-layout__nodata-icon"
-              />
-              {translate("error.dashboard.notfound", {
-                type: translate("label.dashboard.applications"),
-              })}
-            </Row>
-          )}
+          {!get(this.props.bulkUploadedSubmissions, "length") &&
+            !loading && (
+              <Row className="validate-applications-layout__nodata">
+                <Icon
+                  style={{ fontSize: "20px" }}
+                  type="exclamation-circle"
+                  className="validate-applications-layout__nodata-icon"
+                />
+                {translate("error.dashboard.notfound", {
+                  type: translate("label.dashboard.applications"),
+                })}
+              </Row>
+            )}
           <Pagination
             key={bulkUploadedSubmissionsCount}
             containerStyle={

@@ -23,7 +23,17 @@ import { Popover, Switch, Icon, Dropdown, Menu } from "antd";
 import { CaretDownOutlined } from "@ant-design/icons";
 import PopoverCustomers from "../usermanagement/popoverCustomers.component";
 import { isLoggedInOmniciaAdmin, getFormattedDate, isToday } from "../../utils";
-import { get, find, memoize, map, filter, every, set, isNull } from "lodash";
+import {
+  get,
+  find,
+  memoize,
+  map,
+  filter,
+  every,
+  set,
+  isNull,
+  sortBy,
+} from "lodash";
 import styled from "styled-components";
 import { translate } from "../../translations/translator";
 import { ApplicationApi } from "../../redux/api";
@@ -39,6 +49,7 @@ class ApplicationManagement extends Component {
       checkedSequences: [],
       selectedUploadedCustomer: this.props.selectedUploadedCustomer,
       bulkUploadedSubmissions: [],
+      allSubmissionSequences: [],
       selectedSubmission: this.props.selectedSubmission,
       selectedSequence: this.props.selectedSequence,
       TableColumns: [
@@ -74,6 +85,7 @@ class ApplicationManagement extends Component {
           sort: true,
           width: "20%",
         },
+        // TODO - This will use it in the next sprint so commented this piece of code
         // {
         //   name: "",
         //   key: "",
@@ -112,10 +124,6 @@ class ApplicationManagement extends Component {
           customerId: Number(selectedUploadedCustomer.id),
         },
         () => {
-          this.props.allSubmissionSequences.length < 2 &&
-            this.props.dispatch(
-              SubmissionActions.setSequences(this.props.submissionSequnces)
-            );
           let sequences = [...this.props.submissionSequnces];
           filter(sequences, (seq) => {
             return seq.id !== 0;
@@ -134,20 +142,27 @@ class ApplicationManagement extends Component {
       get(props, "submissionSequnces.length") &&
       !get(state, "submissionSequnces.length")
     ) {
-      let submissionSequnces = [...props.submissionSequnces];
+      return {
+        submissionSequnces: [...props.submissionSequnces],
+      };
+    }
+    if (
+      get(props, "allSubmissionSequences.length") &&
+      !get(state, "allSubmissionSequences.length")
+    ) {
+      let allSubmissionSequences = [...props.allSubmissionSequences];
       //Adding key and values to the sequences to set in the Select field
-      map(submissionSequnces, (seq) => {
+      map(allSubmissionSequences, (seq) => {
         seq.key = seq.id;
         seq.value = seq.sequence;
       });
+
+      allSubmissionSequences = sortBy(allSubmissionSequences, (seq) => {
+        return seq.sequence !== "All" && seq.sequence;
+      });
+
       return {
-        submissionSequnces: submissionSequnces,
-        ...(!state.sequences.length && {
-          sequences: [
-            { id: 0, key: 0, name: "All", value: "All" },
-            ...submissionSequnces,
-          ],
-        }),
+        allSubmissionSequences: allSubmissionSequences,
       };
     }
     if (
@@ -175,20 +190,55 @@ class ApplicationManagement extends Component {
     return null;
   }
 
+  fetchAppAllSequences(sortByColumnId = 3, order = "ASC") {
+    this.props.dispatch(SubmissionActions.resetSubmissionSequencecs());
+    this.setState({ allSubmissionSequences: [] });
+    const {
+      pageNo,
+      limit,
+      selectedSubmission,
+      selectedSequence,
+      TableColumns,
+      selectedUploadedCustomer,
+    } = this.state;
+    let submissionId =
+      selectedSubmission.submissionId || selectedSubmission.id || 0;
+    let sequenceId = get(selectedSequence, "id", 0);
+    this.props.dispatch(
+      SubmissionActions.fetchSubmissionSequencesWithoutLimit(
+        {
+          submissionId: Number(submissionId),
+          pageNo: Number(pageNo),
+          limit: Number(selectedSubmission.seqCount),
+          sortByColumnId: sortByColumnId,
+          order: order,
+          sequenceId: Number(sequenceId),
+          customerId: Number(selectedUploadedCustomer.id),
+        },
+        () => {
+          const selectedSequence = {
+            id: 0,
+            name: "All",
+            key: 0,
+            value: "All",
+          };
+          this.setState({ selectedSequence }, () => {
+            this.props.dispatch(
+              SubmissionActions.setSelectedSequence(selectedSequence)
+            );
+          });
+        }
+      )
+    );
+  }
+
   componentDidMount() {
-    let { selectedSubmission, selectedSequence } = this.state;
-    if (isNull(selectedSequence)) {
-      selectedSequence = {
-        id: 0,
-        name: "All",
-        key: 0,
-        value: "All",
-      };
-    }
+    let { selectedSubmission } = this.state;
     selectedSubmission.key = selectedSubmission.submissionId;
     selectedSubmission.value = selectedSubmission.name;
-    this.setState({ selectedSubmission, selectedSequence }, () => {
+    this.setState({ selectedSubmission }, () => {
       this.fetchAppSequences();
+      this.fetchAppAllSequences();
     });
   }
 
@@ -196,7 +246,7 @@ class ApplicationManagement extends Component {
    * get each column width
    */
   getColumnWidth = memoize((name) => {
-    const col = find(this.state.TableColumns, (col) => col.name === name);
+    const col = find(this.state.TableColumns, (column) => column.name === name);
     return get(col, "width");
   });
 
@@ -208,18 +258,24 @@ class ApplicationManagement extends Component {
     this.setState({ selectedUploadedCustomer: customer });
     this.props.dispatch(
       CustomerActions.setBulkUploadedSelectedCustomer(customer, () => {
-        this.props.dispatch(SubmissionActions.setSequences([]));
+        this.props.dispatch(SubmissionActions.resetSubmissionSequencecs());
+        this.props.dispatch(SubmissionActions.setSelectedSequence(null));
+        this.props.dispatch(ApplicationActions.setSelectedSubmission(null));
         this.setState(
           { selectedSequence: null, selectedSubmission: null },
           () => {
-            this.props.dispatch(SubmissionActions.setSelectedSequence(null));
-            this.props.dispatch(ApplicationActions.setSelectedSubmission(null));
             this.props.history.push("/applicationStatus");
           }
         );
       })
     );
   };
+
+  componentWillUnmount() {
+    this.props.dispatch(SubmissionActions.resetSubmissionSequencecs());
+    this.props.dispatch(SubmissionActions.setSelectedSequence(null));
+    this.props.dispatch(ApplicationActions.setSelectedSubmission(null));
+  }
 
   /**
    * On changing the page in the list view
@@ -277,7 +333,7 @@ class ApplicationManagement extends Component {
    * @param {*} checked
    */
   checkAll = (checked, event) => {
-    // Returing if there are no customers
+    // Returing if there are no sequences
     let isWIP = checked;
     if (!this.state.submissionSequnces.length) {
       event.preventDefault();
@@ -288,15 +344,11 @@ class ApplicationManagement extends Component {
       0,
       this.state.limit
     );
-    // filtering applications without errors
-    // let withoutErrorApplications = filter(submissions, (application) => {
-    //   return application.errors == 0;
-    // });
     if (isWIP) {
       map(submissionSequnces, (sequence) => {
         set(sequence, "isWIP", isWIP);
       });
-      // checkedSequences = [...withoutErrorApplications];
+      checkedSequences = [...submissionSequnces];
     } else {
       submissionSequnces = map(submissionSequnces, (sequence) => ({
         ...sequence,
@@ -305,7 +357,7 @@ class ApplicationManagement extends Component {
       checkedSequences.length = 0;
     }
     const TableColumns = [...this.state.TableColumns];
-    TableColumns[3].allViewable = checkedSequences;
+    TableColumns[3].allViewable = submissionSequnces;
     submissionSequnces = [...submissionSequnces];
     this.setState(
       {
@@ -381,16 +433,10 @@ class ApplicationManagement extends Component {
     const value = find(array, (item) => Number(item.key) == Number(val));
     this.setState({ [field]: value }, () => {
       if (field === "selectedSubmission") {
-        this.props.dispatch(SubmissionActions.setSequences([]));
-        this.setState(
-          { selectedSequence: null, selectedSubmission: value },
-          () => {
-            this.props.dispatch(SubmissionActions.setSelectedSequence(null));
-            this.props.dispatch(
-              ApplicationActions.setSelectedSubmission(value)
-            );
-          }
-        );
+        this.setState({ selectedSubmission: value }, () => {
+          this.props.dispatch(ApplicationActions.setSelectedSubmission(value));
+          this.fetchAppAllSequences();
+        });
       } else {
         this.props.dispatch(SubmissionActions.setSelectedSequence(value));
       }
@@ -399,7 +445,7 @@ class ApplicationManagement extends Component {
   };
 
   render() {
-    const { loading, count, allSubmissionSequences } = this.props;
+    const { loading, count } = this.props;
     let {
       applications,
       limit,
@@ -411,15 +457,9 @@ class ApplicationManagement extends Component {
       selectedSubmission,
       selectedSequence,
       sequences,
+      allSubmissionSequences,
     } = this.state;
-    if (isNull(selectedSequence)) {
-      selectedSequence = {
-        id: 0,
-        name: "All",
-        key: 0,
-        value: "All",
-      };
-    }
+
     return (
       <>
         <Loader loading={loading} />
@@ -464,7 +504,11 @@ class ApplicationManagement extends Component {
               <SelectField
                 className="applications-management-layout__header__selectOptions__field"
                 selectFieldClassName="applications-management-layout__header__selectOptions__field-select"
-                selectedValue={get(selectedSequence, "value", "")}
+                selectedValue={
+                  allSubmissionSequences.length
+                    ? `${get(selectedSequence, "key", "")}`
+                    : "All"
+                }
                 disabled={
                   get(selectedSubmission, "submissionId") === 0 ||
                   !allSubmissionSequences.length
@@ -482,7 +526,7 @@ class ApplicationManagement extends Component {
               <SelectField
                 className="applications-management-layout__header__selectOptions__field"
                 selectFieldClassName="applications-management-layout__header__selectOptions__field-select"
-                selectedValue={get(selectedSubmission, "value", "")}
+                selectedValue={`${get(selectedSubmission, "key", "")}`}
                 suffixIcon={<CaretDownOutlined />}
                 options={bulkUploadedSubmissions || []}
                 onChange={this.onSelect(
@@ -584,7 +628,7 @@ class ApplicationManagement extends Component {
               </Row>
             ))}
           </div>
-          {!get(this.props, "submissionSequnces.length") && (
+          {!get(this.props, "submissionSequnces.length") && !loading && (
             <Row className="applications-management-layout__nodata">
               <Icon
                 style={{ fontSize: "20px" }}

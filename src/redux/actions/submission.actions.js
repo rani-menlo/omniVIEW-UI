@@ -53,6 +53,30 @@ export default {
     };
   },
 
+  fetchSubmissionSequencesWithoutLimit: (data, cb) => {
+    return async (dispatch) => {
+      ApiActions.request(dispatch);
+      try {
+        const res = await SubmissionApi.fetchSubmissionSequences(data);
+        let sequences = [];
+        if (!res.data.error) {
+          sequences = res.data.data;
+          sequences = sequences.length
+            ? [{ id: 0, sequence: "All" }, ...sequences]
+            : sequences;
+        }
+        dispatch({
+          type: SubmissionActionTypes.SET_SEQUENCES,
+          data: sequences,
+        });
+        !res.data.error && cb && cb();
+        ApiActions.success(dispatch);
+      } catch (err) {
+        ApiActions.failure(dispatch);
+      }
+    };
+  },
+
   fetchSequencesWithPermissions: (submissionId, user, callback) => {
     return async (dispatch, getState) => {
       ApiActions.request(dispatch);
@@ -419,6 +443,11 @@ export default {
   resetApplicationSequences: () => {
     return {
       type: SubmissionActionTypes.RESET_APPLICATION_SEQUENCES,
+    };
+  },
+  resetSubmissionSequencecs: () => {
+    return {
+      type: SubmissionActionTypes.RESET_SEQUENCES,
     };
   },
 };
