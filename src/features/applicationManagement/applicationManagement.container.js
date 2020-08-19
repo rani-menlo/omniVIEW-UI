@@ -85,6 +85,7 @@ class ApplicationManagement extends Component {
           sort: true,
           width: "20%",
         },
+        // TODO - This will use it in the next sprint so commented this piece of code
         // {
         //   name: "",
         //   key: "",
@@ -123,10 +124,6 @@ class ApplicationManagement extends Component {
           customerId: Number(selectedUploadedCustomer.id),
         },
         () => {
-          // this.props.allSubmissionSequences.length < 2 &&
-          //   this.props.dispatch(
-          //     SubmissionActions.setSequences(this.props.submissionSequnces)
-          //   );
           let sequences = [...this.props.submissionSequnces];
           filter(sequences, (seq) => {
             return seq.id !== 0;
@@ -237,17 +234,6 @@ class ApplicationManagement extends Component {
 
   componentDidMount() {
     let { selectedSubmission } = this.state;
-    // if (isNull(selectedSequence)) {
-    //   selectedSequence = {
-    //     id: 0,
-    //     name: "All",
-    //     key: 0,
-    //     value: "All",
-    //   };
-    // }
-    // this.props.dispatch(
-    //   SubmissionActions.setSelectedSequence(selectedSequence)
-    // );
     selectedSubmission.key = selectedSubmission.submissionId;
     selectedSubmission.value = selectedSubmission.name;
     this.setState({ selectedSubmission }, () => {
@@ -650,7 +636,7 @@ class ApplicationManagement extends Component {
               </Row>
             ))}
           </div>
-          {!get(this.state, "submissionSequnces.length") && (
+          {!get(this.props, "submissionSequnces.length") && !loading && (
             <Row className="applications-management-layout__nodata">
               <Icon
                 style={{ fontSize: "20px" }}
@@ -664,9 +650,6 @@ class ApplicationManagement extends Component {
           )}
           <Pagination
             key={count}
-            containerStyle={
-              count > 4 ? { marginTop: "1%" } : { marginTop: "20%" }
-            }
             total={count}
             showTotal={(total, range) =>
               translate("text.pagination", {

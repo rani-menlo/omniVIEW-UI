@@ -603,7 +603,7 @@ class ValidateApplications extends Component {
             ))}
           </div>
           {!get(this.props.bulkUploadedSubmissions, "length") &&
-            !get(this.state.bulkUploadedSubmissions, "length") && (
+            !loading && (
               <Row className="validate-applications-layout__nodata">
                 <Icon
                   style={{ fontSize: "20px" }}
@@ -617,11 +617,6 @@ class ValidateApplications extends Component {
             )}
           <Pagination
             key={bulkUploadedSubmissionsCount}
-            containerStyle={
-              bulkUploadedSubmissionsCount > 4
-                ? { marginTop: "1%" }
-                : { marginTop: "20%" }
-            }
             total={bulkUploadedSubmissionsCount}
             showTotal={(total, range) =>
               translate("text.pagination", {
