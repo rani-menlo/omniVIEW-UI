@@ -23,8 +23,33 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>Omnicia</title>
+    <style type="text/css">
+      @media print {
+        body {
+          display: none;
+        }
+      }
+    </style>
   </head>
   <body>
+    <script>
+      //Preventing Ctrl+P functionality
+      document.onkeydown = function(event) {
+        event = event || window.event;
+        if (
+          (event.ctrlKey || event.metaKey) &&
+          (event.key == "p" ||
+            event.charCode == 16 ||
+            event.charCode == 112 ||
+            event.keyCode == 80)
+        ) {
+          event.cancelBubble = true;
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          return false;
+        }
+      };
+    </script>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root" style="height: 100%;"></div>
     <!--

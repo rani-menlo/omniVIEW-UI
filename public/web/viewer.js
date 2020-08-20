@@ -2733,7 +2733,7 @@ const OPENED_PDF_FILES = {};
             href.indexOf("https") >= 0
           ) {
             var urlTokens = orginal.split("#");
-            var pdfUrl = urlTokens.length >=1 ? urlTokens[0] : urlTokens;
+            var pdfUrl = urlTokens.length >= 1 ? urlTokens[0] : urlTokens;
             var hashUrl = urlTokens.length > 1 ? urlTokens[1] : "";
             if (!OPENED_PDF_FILES[pdfUrl]) {
               var popupWindow = window.open(orginal, "_blank");
@@ -17344,6 +17344,7 @@ const OPENED_PDF_FILES = {};
       };
       var print = window.print;
       window.print = function print() {
+        return false;
         if (activeService) {
           console.warn(
             "Ignored window.print() because of a pending print job."
@@ -17392,6 +17393,27 @@ const OPENED_PDF_FILES = {};
           dispatchEvent("afterprint");
         }
       }
+
+      /**
+       * Prevent PDF Print on click of CTRL+P
+       * @param {*} event 
+       */
+      function preventPDFPrint(event){
+        event = event || window.event;
+        if (
+          (event.ctrlKey || event.metaKey) &&
+          (event.key == "p" ||
+            event.charCode == 16 ||
+            event.charCode == 112 ||
+            event.keyCode == 80)
+        ) {
+          event.cancelBubble = true;
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          return false;
+        }
+      }
+
       function renderProgress(index, total, l10n) {
         var progressContainer = document.getElementById("printServiceOverlay");
         var progress = Math.round((100 * index) / total);
@@ -17410,38 +17432,20 @@ const OPENED_PDF_FILES = {};
       window.addEventListener(
         "keydown",
         function(event) {
-          if (
-            event.keyCode === 80 &&
-            (event.ctrlKey || event.metaKey) &&
-            !event.altKey &&
-            (!event.shiftKey || window.chrome || window.opera)
-          ) {
-            window.print();
-            if (hasAttachEvent) {
-              return;
-            }
-            event.preventDefault();
-            if (event.stopImmediatePropagation) {
-              event.stopImmediatePropagation();
-            } else {
-              event.stopPropagation();
-            }
-            return;
-          }
+          //preventing the Ctrl+P print on pdf
+          preventPDFPrint(event);
         },
         true
       );
+
       //preventing the right click on pdf
       window.addEventListener("contextmenu", (event) => {
         event.preventDefault();
       });
       if (hasAttachEvent) {
         document.attachEvent("onkeydown", function(event) {
-          event = event || window.event;
-          if (event.keyCode === 80 && event.ctrlKey) {
-            event.keyCode = 0;
-            return false;
-          }
+          //preventing the Ctrl+P print on pdf
+          preventPDFPrint(event);
         });
       }
       if ("onbeforeprint" in window) {
