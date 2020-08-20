@@ -232,19 +232,29 @@ class AddCustomer extends Component {
     };
   }
 
-  async componentDidMount() {
+  /**
+   * Selected customer to edit
+   * @param {*} customer
+   */
+  checkEmptyAfsPath = async (customer) => {
+    // Checking for Customer folder Name is  empty or not
+    this.props.dispatch(ApiActions.requestOnDemand());
+    const res = await API.get(
+      URI.IS_CUSTOMER_FOLDER_EMPTY.replace(":customerId", customer.id)
+    );
+    this.props.dispatch(ApiActions.successOnDemand());
+    if (!res.data.error) {
+      this.setState({ isEmpty: res.data.isEmpty });
+    } else {
+      this.setState({ isEmpty: false });
+    }
+  };
+
+  componentDidMount() {
     const { history, selectedCustomer } = this.props;
     if (history.location.pathname.includes("/edit")) {
       let newState = { editCustomer: true };
-      // Checking for Customer folder Name
-      this.props.dispatch(ApiActions.requestOnDemand());
-      const res = await API.get(
-        URI.IS_CUSTOMER_FOLDER_EMPTY.replace(":customerId", selectedCustomer.id)
-      );
-      this.props.dispatch(ApiActions.successOnDemand());
-      if (!res.data.error) {
-        this.setState({ isEmpty: res.data.isEmpty });
-      }
+      this.checkEmptyAfsPath(selectedCustomer);
       if (selectedCustomer) {
         const state = this.populateState();
         newState = { ...state, ...newState };
@@ -641,6 +651,7 @@ class AddCustomer extends Component {
 
   onCustomerSelected = (customer) => {
     this.props.dispatch(UsermanagementActions.resetAllLicences());
+    this.checkEmptyAfsPath(customer);
     this.props.dispatch(
       CustomerActions.setSelectedCustomer(customer, () => {
         if (customer.is_omnicia == true) {
