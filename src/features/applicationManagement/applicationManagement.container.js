@@ -432,15 +432,15 @@ class ApplicationManagement extends Component {
   onSelect = (field, array) => (val) => {
     const value = find(array, (item) => Number(item.key) == Number(val));
     this.setState({ [field]: value }, () => {
-      const selectedSequence = {
-        id: 0,
-        name: "All",
-        key: 0,
-        value: "All",
-      };
       if (field === "selectedSubmission") {
+        let selectedSequence = {
+          id: 0,
+          name: "All",
+          key: 0,
+          value: "All",
+        };
         // this.props.actions.resetApplications();
-        this.setState({ selectedSequence, selectedSubmission: value }, () => {
+        this.setState({ selectedSequence: selectedSequence, selectedSubmission: value }, () => {
           this.props.dispatch(ApplicationActions.setSelectedSubmission(value));
           this.fetchAppAllSequences();
           this.fetchAppSequences();

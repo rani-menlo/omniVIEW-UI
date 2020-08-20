@@ -72,6 +72,7 @@ const URI = {
   SWITCH_CUSTOMER: `${path}customer/switchCustomer`,
   UPLOAD_CUSTOMERS: `${path}customer/uploadCustomers`,
   SEND_WELCOME_EMAILS: `${path}customer/sendWelcomeEmails`,
+  IS_CUSTOMER_FOLDER_EMPTY: `${path}customer/isCusotmerFolderEmpty/:customerId`,
 
   // Submission
   GET_APPLICATIONS: `${path}submission/getSubmissions`,
