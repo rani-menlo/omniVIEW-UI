@@ -98,7 +98,7 @@ class ApplicationManagement extends Component {
   /**
    * Fetch sequences per each submission
    */
-  fetchAppSequences = (sortByColumnId = 3, order = "ASC") => {
+  fetchAppSequences = (sortByColumnId = 5, order = "DESC") => {
     this.props.dispatch(SubmissionActions.resetApplicationSequences());
     this.setState({ submissionSequnces: [] });
     const {
@@ -190,7 +190,7 @@ class ApplicationManagement extends Component {
     return null;
   }
 
-  fetchAppAllSequences(sortByColumnId = 3, order = "ASC") {
+  fetchAppAllSequences(sortByColumnId = 5, order = "DESC") {
     this.props.dispatch(SubmissionActions.resetSubmissionSequencecs());
     this.setState({ allSubmissionSequences: [] });
     const {
@@ -432,15 +432,23 @@ class ApplicationManagement extends Component {
   onSelect = (field, array) => (val) => {
     const value = find(array, (item) => Number(item.key) == Number(val));
     this.setState({ [field]: value }, () => {
+      const selectedSequence = {
+        id: 0,
+        name: "All",
+        key: 0,
+        value: "All",
+      };
       if (field === "selectedSubmission") {
-        this.setState({ selectedSubmission: value }, () => {
+        // this.props.actions.resetApplications();
+        this.setState({ selectedSequence, selectedSubmission: value }, () => {
           this.props.dispatch(ApplicationActions.setSelectedSubmission(value));
           this.fetchAppAllSequences();
+          this.fetchAppSequences();
         });
       } else {
         this.props.dispatch(SubmissionActions.setSelectedSequence(value));
+        this.fetchAppSequences();
       }
-      this.fetchAppSequences();
     });
   };
 
