@@ -25,15 +25,25 @@ import {
   Table,
   Modal,
 } from "antd";
-import { UsermanagementActions, CustomerActions } from "../../redux/actions";
-import { isPhone, isEmail, isLoggedInOmniciaAdmin } from "../../utils";
+import {
+  UsermanagementActions,
+  CustomerActions,
+  ApiActions,
+} from "../../redux/actions";
+import {
+  isPhone,
+  isEmail,
+  getFormattedDate,
+  isLoggedInOmniciaAdmin,
+} from "../../utils";
 import { translate } from "../../translations/translator";
 import AddNewLicence from "../license/addNewLicence.component";
 import PopoverCustomers from "./popoverCustomers.component";
 import AssignLicence from "../license/assignLicence.component";
 import AssignLicenceWithUsers from "../license/assignLicenceWithUsers.component";
 import Subscriptions from "../license/subscriptions.component";
-import { ROLE_IDS } from "../../constants";
+import { ROLE_IDS, URI } from "../../constants";
+import API from "../../redux/api";
 
 const TabPane = Tabs.TabPane;
 
@@ -50,6 +60,7 @@ class AddCustomer extends Component {
       statusActive: true,
       selectedPrimaryContact: null,
       disablePrimaryContactFields: true,
+      isEmpty: true,
       cname: {
         value: "",
         error: "",
@@ -215,10 +226,29 @@ class AddCustomer extends Component {
     };
   }
 
+  /**
+   * Selected customer to edit
+   * @param {*} customer
+   */
+  checkEmptyAfsPath = async (customer) => {
+    // Checking for Customer folder Name is  empty or not
+    this.props.dispatch(ApiActions.requestOnDemand());
+    const res = await API.get(
+      URI.IS_CUSTOMER_FOLDER_EMPTY.replace(":customerId", customer.id)
+    );
+    this.props.dispatch(ApiActions.successOnDemand());
+    if (!res.data.error) {
+      this.setState({ isEmpty: res.data.isEmpty });
+    } else {
+      this.setState({ isEmpty: false });
+    }
+  };
+
   componentDidMount() {
     const { history, selectedCustomer } = this.props;
     if (history.location.pathname.includes("/edit")) {
       let newState = { editCustomer: true };
+      this.checkEmptyAfsPath(selectedCustomer);
       if (selectedCustomer) {
         const state = this.populateState();
         newState = { ...state, ...newState };
@@ -615,6 +645,7 @@ class AddCustomer extends Component {
 
   onCustomerSelected = (customer) => {
     this.props.dispatch(UsermanagementActions.resetAllLicences());
+    this.checkEmptyAfsPath(customer);
     this.props.dispatch(
       CustomerActions.setSelectedCustomer(customer, () => {
         if (customer.is_omnicia === true) {
@@ -783,6 +814,7 @@ class AddCustomer extends Component {
       selectedTab,
       selectedPrimaryContact,
       disablePrimaryContactFields,
+      isEmpty,
     } = this.state;
     const { loading, selectedCustomer, users } = this.props;
     const secContacts = _.filter(users, ["is_secondary_contact", true]);
@@ -869,6 +901,7 @@ class AddCustomer extends Component {
                   placeholder={translate("label.form.afsPath")}
                   error={afsPath.error}
                   onChange={this.onInputChange("afsPath")}
+                  disabled={editCustomer && !isEmpty}
                 />
               </Row>
               <p className="addUser-heading">

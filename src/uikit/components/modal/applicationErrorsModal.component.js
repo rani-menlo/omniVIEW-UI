@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Modal } from "antd";
+import { Modal, Table } from "antd";
 import { OmniButton } from "..";
 import { get, map } from "lodash";
 import Text from "../text/text.component";
@@ -9,24 +9,40 @@ class ApplicationErrorsModal extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      errors: [
-        {
-          id: 1,
-          sequence_no: "0001",
-          description: "Sequence belongs to another application",
-        },
-        {
-          id: 2,
-          sequence_no: "0002",
-          description: "Sequence belongs to another application",
-        },
-      ],
+      selectedErrorSequences: [],
     };
+    this.uploadFailedColumns = [
+      {
+        title: translate("label.dashboard.sequence"),
+        dataIndex: "pipeline_name",
+        key: "id",
+        render: (text) => <Text type="regular" size="14px" text={text} />,
+      },
+
+      {
+        title: translate("label.generic.description"),
+        dataIndex: "error_message",
+        key: "error",
+        render: (text) => (
+          <Text
+            type="regular"
+            size="14px"
+            text={text}
+            textStyle={{ wordWrap: "break-word", wordBreak: "break-word" }}
+          />
+        ),
+      },
+    ];
   }
 
+  deleteErrorSequences = () => {
+    this.props.onDelete &&
+      this.props.onDelete(this.state.selectedErrorSequences);
+  };
+
   render() {
-    const { closeModal, application } = this.props;
-    const { errors } = this.state;
+    const { closeModal, application, errors } = this.props;
+    const { selectedErrorSequences } = this.state;
     return (
       <Modal
         visible
@@ -52,9 +68,28 @@ class ApplicationErrorsModal extends Component {
             onClick={closeModal}
           />
         </div>
-        <table className="application-errors-modal__table">
+        <div className="application-errors-modal__table">
+          <Table
+            columns={this.uploadFailedColumns}
+            dataSource={errors}
+            pagination={false}
+            // rowSelection={{
+            //   onChange: this.onRowSelected
+            // }}
+            rowSelection={{
+              onChange: (selectedRowKeys, selectedRows) => {
+                this.setState({
+                  selectedErrorSequences: selectedRows,
+                });
+              },
+            }}
+            //scroll={{ y: 200 }}
+          />
+        </div>
+        {/* <table className="application-errors-modal__table">
           <thead>
             <tr>
+              <th>{translate("label.dashboard.sequence")}</th>
               <th>{translate("label.dashboard.sequence")}</th>
               <th>{translate("label.generic.description")}</th>
             </tr>
@@ -70,7 +105,7 @@ class ApplicationErrorsModal extends Component {
                         {" "}
                         <Text
                           type="regular"
-                          text={`${get(error, "sequence_no", "N/A")}`}
+                          text={`${get(error, "pipeline_name", "N/A")}`}
                           size="14px"
                         />
                       </td>
@@ -78,7 +113,7 @@ class ApplicationErrorsModal extends Component {
                         {" "}
                         <Text
                           type="regular"
-                          text={`${get(error, "description", "N/A")}`}
+                          text={`${get(error, "error_message", "N/A")}`}
                           size="14px"
                         />
                       </td>
@@ -87,8 +122,14 @@ class ApplicationErrorsModal extends Component {
                 );
               })}
           </tbody>
-        </table>
+        </table> */}
         <div style={{ marginTop: "12px", textAlign: "right" }}>
+          <OmniButton
+            disabled={!selectedErrorSequences.length}
+            label="Delete"
+            buttonStyle={{ width: "90px", margin: "0 20px 0 10px" }}
+            onClick={this.deleteErrorSequences}
+          />
           <OmniButton
             label={translate("label.button.close")}
             buttonStyle={{ width: "90px" }}

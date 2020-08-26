@@ -103,7 +103,7 @@ const Routes = () => {
             />
             <PrivateRoute
               exact
-              path="/validateApplications"
+              path="/applicationStatus"
               component={ValidateApplications}
             />
             <PrivateRoute

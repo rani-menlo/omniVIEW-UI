@@ -13,7 +13,7 @@ const UserCard = ({
   onEdit,
   onAssignLicenseClick,
 }) => {
-  // const isActive = _.get(user, "is_active", false);
+  const isActive = _.get(user, "is_active", false);
   return (
     <div key={user.user_id} className="userManagement__group__users__user">
       <ImageLoader
@@ -86,8 +86,10 @@ const UserCard = ({
           <React.Fragment>
             <p className="userManagement__group__users__user__info-text">
               {`${translate("label.usermgmt.expires")}: ${
-                _.get(user, "license_status")
-                  ? getFormattedDate(_.get(user, "expiryDate"))
+                isActive
+                  ? _.get(user, "licenses.length", 0)
+                    ? getFormattedDate(_.get(user.licenses[0], "expired_date"))
+                    : "N/A"
                   : "N/A"
               }`}
             </p>

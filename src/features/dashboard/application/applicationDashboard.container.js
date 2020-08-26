@@ -456,24 +456,25 @@ class ApplicationDashboard extends Component {
             </Menu.Item>,
           ]}
         {(isLoggedInOmniciaAdmin(this.props.role) ||
-          isLoggedInCustomerAdmin(this.props.role)) && (
-          <Menu.Item key="delete_sequences">
-            <div className="global__center-vert global__text-red">
-              <Icon
-                type="close-circle"
-                theme="outlined"
-                style={{ fontSize: "18px", marginRight: "4px" }}
-              />
-              <Text
-                type="regular"
-                size="12px"
-                text="Delete Sequences"
-                className="global__text-red"
-                textStyle={{ marginLeft: "2px" }}
-              />
-            </div>
-          </Menu.Item>
-        )}
+          isLoggedInCustomerAdmin(this.props.role)) &&
+          submission.sequence_count > 0 && (
+            <Menu.Item key="delete_sequences">
+              <div className="global__center-vert global__text-red">
+                <Icon
+                  type="close-circle"
+                  theme="outlined"
+                  style={{ fontSize: "18px", marginRight: "4px" }}
+                />
+                <Text
+                  type="regular"
+                  size="12px"
+                  text="Delete Sequences"
+                  className="global__text-red"
+                  textStyle={{ marginLeft: "2px" }}
+                />
+              </div>
+            </Menu.Item>
+          )}
         {(isLoggedInOmniciaAdmin(this.props.role) ||
           isLoggedInCustomerAdmin(this.props.role)) && (
           <Menu.Item key="delete">
@@ -512,9 +513,9 @@ class ApplicationDashboard extends Component {
     if (viewBy === "lists") {
       selectedCustomer &&
         this.props.actions.fetchApplicationsByList(
-          selectedCustomer.id,
-          pageNo,
-          itemsPerPage,
+          Number(selectedCustomer.id),
+          Number(pageNo),
+          Number(itemsPerPage),
           sortBy,
           orderBy,
           searchText || ""
@@ -1537,6 +1538,7 @@ class ApplicationDashboard extends Component {
                   </Row>
                 )}
               <Pagination
+                key={submissionCount}
                 containerStyle={
                   submissionCount > 4
                     ? { marginTop: "1%" }

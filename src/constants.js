@@ -72,6 +72,7 @@ const URI = {
   SWITCH_CUSTOMER: `${path}customer/switchCustomer`,
   UPLOAD_CUSTOMERS: `${path}customer/uploadCustomers`,
   SEND_WELCOME_EMAILS: `${path}customer/sendWelcomeEmails`,
+  IS_CUSTOMER_FOLDER_EMPTY: `${path}customer/isCusotmerFolderEmpty/:customerId`,
 
   // Submission
   GET_APPLICATIONS: `${path}submission/getSubmissions`,
@@ -83,7 +84,9 @@ const URI = {
   // Sequence
   GET_SEQUENCES: `${path}sequence/getSequences`,
   GET_SEQUENCES_WITH_PERMISSIONS: `${path}sequence/getSequences`,
+  GETSUBMISSIONSEQUENCES: `${path}sequence/getSubmissionSequences`,
   DELETE_SEQUENCES: `${path}upload/deleteSequences`,
+  UPDATESEQUENCEWIP: `${path}sequence/updateSequenceWIP`,
 
   // Validation
   VALIDATE_SEQUENCE: `${path}validation/sequenceValidation`,
@@ -142,6 +145,8 @@ const URI = {
   MONITOR_STATUS: `${path}upload/monitorStatus`,
   RETRY_UPLOADS: `${path}upload/retrySequence`,
   GENERATEPDF: `${path}upload/generateErrorReport`,
+  GETBULKUPLOADVALIDATIONRESULTS: `${path}upload/getBulkUploadValidationResults`,
+  EDITAPPLICATIONSTATUS: `${path}upload/editApplicationStatus`,
 };
 
 const DATE_FORMAT = "MM/DD/YYYY";

@@ -158,8 +158,8 @@ class CustomerDashboard extends Component {
        */
       if (viewBy === "lists") {
         this.props.actions.fetchCustomersByList(
-          pageNo,
-          itemsPerPage,
+          Number(pageNo),
+          Number(itemsPerPage),
           sortBy,
           orderBy,
           searchText || ""
@@ -834,6 +834,7 @@ class CustomerDashboard extends Component {
                 </Row>
               )}
               <Pagination
+                key={customerCount}
                 containerStyle={
                   customerCount > 4 ? { marginTop: "1%" } : { marginTop: "20%" }
                 }

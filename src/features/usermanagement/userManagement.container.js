@@ -91,7 +91,7 @@ class UserManagementContainer extends Component {
           key: "first_name",
           checkbox: false,
           sort: true,
-          width: "20%",
+          width: "16%",
         },
         {
           name: TableColumnNames.USER_ROLE,
@@ -133,6 +133,12 @@ class UserManagementContainer extends Component {
           checkbox: false,
           // sort: true,
           width: "10%",
+        },
+        {
+          name: TableColumnNames.DROPDOWN,
+          key: "",
+          checkbox: false,
+          width: "4%",
         },
       ],
     };
@@ -375,10 +381,10 @@ class UserManagementContainer extends Component {
           if (viewBy === "lists") {
             this.props.dispatch(
               UsermanagementActions.fetchUsers({
-                customerId: selectedCustomer.id,
+                customerId: Number(selectedCustomer.id),
                 search: searchText,
-                page: pageNo,
-                limit: itemsPerPage,
+                page: Number(pageNo),
+                limit: Number(itemsPerPage),
                 includeLoggedInUser: true,
                 ...this.selectedFilters,
               })
@@ -985,7 +991,9 @@ class UserManagementContainer extends Component {
                           {typeName}
                         </p>
                       </Column>
-                      <Column>
+                      <Column
+                        width={this.getColumnWidth(TableColumnNames.DROPDOWN)}
+                      >
                         <Dropdown
                           overlay={this.getMenu(usr)}
                           trigger={["click"]}
@@ -1111,6 +1119,7 @@ const TableColumnNames = {
   CONTACT: translate("label.user.seccontact"),
   STATUS: translate("label.user.accstatus"),
   EXP_DATE: translate("label.user.expdateLicenseType"),
+  DROPDOWN: "",
 };
 
 const Column = styled.div`

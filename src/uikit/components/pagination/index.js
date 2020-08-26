@@ -29,7 +29,7 @@ class Pagination extends Component {
   }
 
   componentDidMount() {
-    // this.setPageSizeBasedOnTotal();
+    this.setPageSizeBasedOnTotal();
   }
 
   setPageSizeBasedOnTotal = () => {
