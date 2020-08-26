@@ -320,7 +320,7 @@ class ApplicationManagement extends Component {
           onClick={this.refreshSequence(application)}
         >
           <p>
-            <img src="/images/refresh-black.svg" alt="Refresh"/>
+            <img src="/images/refresh-black.svg" alt="Refresh" />
             <span>{translate("label.submissions.refresh")}</span>
           </p>
         </Menu.Item>
@@ -440,11 +440,16 @@ class ApplicationManagement extends Component {
           value: "All",
         };
         // this.props.actions.resetApplications();
-        this.setState({ selectedSequence: selectedSequence, selectedSubmission: value }, () => {
-          this.props.dispatch(ApplicationActions.setSelectedSubmission(value));
-          this.fetchAppAllSequences();
-          this.fetchAppSequences();
-        });
+        this.setState(
+          { selectedSequence: selectedSequence, selectedSubmission: value },
+          () => {
+            this.props.dispatch(
+              ApplicationActions.setSelectedSubmission(value)
+            );
+            this.fetchAppAllSequences();
+            this.fetchAppSequences();
+          }
+        );
       } else {
         this.props.dispatch(SubmissionActions.setSelectedSequence(value));
         this.fetchAppSequences();
