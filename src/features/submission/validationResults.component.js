@@ -6,7 +6,7 @@ import { Icon, Button } from "antd";
 import { SubmissionActions } from "../../redux/actions";
 import _ from "lodash";
 import { getValidationsBySequence } from "../../redux/selectors/validationResults.selector";
-import { Text, Row, Toast } from "../../uikit/components";
+import { Toast } from "../../uikit/components";
 import { URI, SERVER_URL } from "../../constants";
 
 class ValidationResults extends Component {
@@ -78,6 +78,7 @@ class ValidationResults extends Component {
       return (
         <img
           src="/images/file-new.svg"
+          alt="new-file"
           className="global__file-folder"
           style={{ width: "18px", height: "22px" }}
         />
@@ -87,6 +88,7 @@ class ValidationResults extends Component {
       return (
         <img
           src="/images/file-new.svg"
+          alt="new-file"
           className="global__file-folder"
           style={{ width: "18px", height: "22px" }}
         />
@@ -96,6 +98,7 @@ class ValidationResults extends Component {
       img = (
         <img
           src={`/images/file-${isFile ? "new" : "stf"}.svg`}
+          alt="file"
           className="global__file-folder"
           style={{ width: "18px", height: "22px" }}
         />
@@ -110,6 +113,7 @@ class ValidationResults extends Component {
         img = (
           <img
             src="/images/file-new.svg"
+            alt="new-file"
             className="global__file-folder"
             style={{ width: "18px", height: "22px" }}
           />
@@ -119,6 +123,7 @@ class ValidationResults extends Component {
         img = (
           <img
             src={`/images/file-${isFile ? "new" : "stf"}.svg`}
+            alt="file"
             className="global__file-folder"
             style={{ width: "18px", height: "22px" }}
           />
@@ -150,6 +155,7 @@ class ValidationResults extends Component {
           <div className="validationResults__header">
             <div className="validationResults__header__title global__center-horiz-vert">
               <img
+                alt="folder"
                 src="/images/folder-validate.svg"
                 style={{ marginRight: "5px" }}
               />
@@ -176,6 +182,7 @@ class ValidationResults extends Component {
                       Node{" "}
                       <img
                         className="col-node-icon"
+                        alt="sort"
                         src="/images/sort-result.svg"
                       />
                     </th>
@@ -186,6 +193,7 @@ class ValidationResults extends Component {
                       Error{" "}
                       <img
                         className="col-node-icon"
+                        alt="sort"
                         src="/images/sort-result.svg"
                       />
                     </th>
@@ -196,6 +204,7 @@ class ValidationResults extends Component {
                       Severity{" "}
                       <img
                         className="col-node-icon"
+                        alt="sort"
                         src="/images/sort-result.svg"
                       />
                     </th>
@@ -206,6 +215,7 @@ class ValidationResults extends Component {
                       Description{" "}
                       <img
                         className="col-node-icon"
+                        alt="sort"
                         src="/images/sort-result.svg"
                       />
                     </th>
@@ -244,6 +254,7 @@ class ValidationResults extends Component {
                           <td className="col-error">{validation.error_no}</td>
                           <td className="col-severity">
                             <img
+                              alt="alert"
                               src={this.getAlertIcon(validation.severity)}
                               style={{ marginRight: "8px" }}
                             />

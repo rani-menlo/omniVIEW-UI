@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { LoginActions } from "../../redux/actions";
 import ProfileMenu from "./profileMenu.component";
-import { PropTypes } from "prop-types";
 import { translate } from "../../translations/translator";
 import { withRouter } from "react-router-dom";
 import { isLoggedInOmniciaRole } from "../../utils";
@@ -16,7 +15,7 @@ class Header extends Component {
   componentDidMount() {}
 
   goToMain = (history, disabled) => () => {
-    const { customerAccounts, role } = this.props;
+    const { role } = this.props;
     if (!disabled) {
       /**
        * Redirecting to customers screen if the loggin user is Omnicia user
@@ -45,6 +44,7 @@ class Header extends Component {
       <div className="headerbar" style={style}>
         <img
           src="/images/omnicia-logo.svg"
+          alt="logo"
           className={`headerbar-logo ${
             disabled ? "global__cursor-not-allowed" : "global__cursor-pointer"
           }`}
@@ -53,7 +53,7 @@ class Header extends Component {
         {hideMenu ? (
           <div className="headerbar-signout" onClick={this.signOut}>
             <p>
-              <img src="/images/logout.svg" />
+              <img src="/images/logout.svg" alt="logout"/>
               <span>{translate("lable.profile.signout")}</span>
             </p>
           </div>
@@ -75,7 +75,6 @@ function mapDispatchToProps(dispatch) {
 
 function mapStateToProps(state) {
   return {
-    customerAccounts: state.Login.customerAccounts,
     role: state.Login.role,
   };
 }

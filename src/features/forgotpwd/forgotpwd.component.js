@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { Input, Form, Button } from "antd";
 import { connect } from "react-redux";
-import _ from "lodash";
 import { LoginActions } from "../../redux/actions";
 import Loader from "../../uikit/components/loader";
 import Footer from "../../uikit/components/footer/footer.component";
@@ -124,7 +123,7 @@ class ForgotPassword extends Component {
               className="global__center-horiz-vert"
               style={{ flexDirection: "column" }}
             >
-              <img src="/images/rite-big.svg" />
+              <img src="/images/rite-big.svg" alt="tick"/>
               <Text
                 type="regular"
                 opacity={0.5}

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { Text, ContentLayout, Loader, Row } from "../../uikit/components";
+import { Text, ContentLayout, Loader } from "../../uikit/components";
 import { translate } from "../../translations/translator";
 import Subscriptions from "./subscriptions.component";
 import Header from "../header/header.component";

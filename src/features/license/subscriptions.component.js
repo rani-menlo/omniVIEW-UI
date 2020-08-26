@@ -15,7 +15,7 @@ import { Icon } from "antd";
 import { translate } from "../../translations/translator";
 import AssignLicence from "./assignLicence.component";
 import AssignLicenceWithUsers from "./assignLicenceWithUsers.component";
-import { CustomerActions, UsermanagementActions } from "../../redux/actions";
+import { UsermanagementActions } from "../../redux/actions";
 import { getFormattedDate } from "../../utils";
 
 class Subscriptions extends Component {

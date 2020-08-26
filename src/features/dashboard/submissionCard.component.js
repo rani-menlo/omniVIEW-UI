@@ -1,26 +1,17 @@
 import React, { Component, Suspense } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
-import { Dropdown, Menu, Avatar, Modal, Table } from "antd";
+import { Dropdown, Modal } from "antd";
 import _ from "lodash";
 import { translate } from "../../translations/translator";
 import { getFormattedDate } from "../../utils";
 import {
   Text,
-  Row,
   OmniButton,
-  Loader,
-  ImageLoader
 } from "../../uikit/components";
 import { ApplicationApi } from "../../redux/api";
 import {
-  POLLING_INTERVAL,
-  UPLOAD_SUCCESS,
-  UPLOAD_INPROGRES,
   UPLOAD_FAILED,
-  ANALYZING,
-  UPLOAD_PROCESSING,
-  SCRIPT_ERROR
 } from "../../constants";
 import { ApiActions } from "../../redux/actions";
 

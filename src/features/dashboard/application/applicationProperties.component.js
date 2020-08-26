@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import _ from "lodash";
 import { connect } from "react-redux";
-import { Modal, Dropdown, Icon, Menu } from "antd";
+import { Dropdown, Icon, Menu } from "antd";
 import {
   Text,
   Row,
@@ -90,6 +90,7 @@ class ApplicationProperties extends Component {
             />
             <img
               src="/images/close.svg"
+              alt="close"
               className="licence-modal__header-close"
               onClick={closeModal}
             />

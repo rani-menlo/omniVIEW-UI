@@ -77,12 +77,14 @@ class ImageLoader extends Component {
           style={{ ...newStyle, borderRadius: "80px" }}
           src={this.state.image}
           onClick={onClick}
+          alt="spin"
         />
         {globalAccess && (
           <img
             src="/images/globe.svg"
             style={{ position: "absolute", bottom: "2px", right: "5px" }}
             title={translate("label.permissions.globalaccess")}
+            alt="globe"
           />
         )}
       </div>
@@ -92,6 +94,7 @@ class ImageLoader extends Component {
         style={newStyle}
         src={this.state.image}
         onClick={onClick}
+        alt="image"
       />
     );
   }

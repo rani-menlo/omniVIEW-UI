@@ -1,6 +1,6 @@
 import _ from "lodash";
 import { LoginActionTypes } from "../actionTypes";
-import { ApiActions, LoginActions } from ".";
+import { ApiActions } from ".";
 import { LoginApi } from "../api";
 import { Toast } from "../../uikit/components";
 

@@ -3,11 +3,8 @@ import { connect } from "react-redux";
 import API from "../../redux/api";
 import { ApiActions } from "../../redux/actions";
 import { URI } from "../../constants";
-import _ from "lodash";
 import Header from "../header/header.component";
 import { translate } from "../../translations/translator";
-import Split from "react-split";
-import SplitterLayout from "react-splitter-layout";
 
 import {
   Text,
@@ -176,6 +173,7 @@ class ResetPassword extends Component {
             >
               <img
                 src="/images/alert-low.svg"
+                alt="alert"
                 style={{ width: "40px", height: "40px" }}
               />
               <Text

@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import _ from "lodash";
 import PropTypes from "prop-types";
-
 import Text from "../text/text.component";
 import DraggableModal from "./draggableModal.component";
 import { connect } from "react-redux";
@@ -133,7 +132,7 @@ class OpenSubmissionsModal extends Component {
     return (
       <div className="open-submissions-modal">
         <div className="open-submissions-modal__header">
-          <img className="open-folder" src="/images/open-folder.svg" />
+          <img className="open-folder" src="/images/open-folder.svg" alt="folder"/>
           <Text
             type="regular"
             size="16px"
@@ -141,6 +140,7 @@ class OpenSubmissionsModal extends Component {
           />
           <img
             src="/images/close.svg"
+            alt="close"
             className="assign-permissions-modal__header-close"
             onClick={onClose}
           />

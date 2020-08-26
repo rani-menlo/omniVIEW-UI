@@ -4,7 +4,7 @@ import _ from "lodash";
 import PropTypes from "prop-types";
 import { Icon, Button, Checkbox } from "antd";
 import { translate } from "../../translations/translator";
-import { SearchBox, OmniCheckbox, Text, Row } from "../../uikit/components";
+import { SearchBox, Text, Row } from "../../uikit/components";
 import { SubmissionActions } from "../../redux/actions";
 
 class FindNode extends Component {
@@ -208,6 +208,7 @@ class FindNode extends Component {
                   />
                   <img
                     src={`/images/sort_${this.props.sortTitle}.svg`}
+                    alt="sort"
                     style={{ width: "16px", height: "16px" }}
                   />
                 </div>
@@ -223,6 +224,7 @@ class FindNode extends Component {
                   />
                   <img
                     src={`/images/sort_${this.props.sortFile}.svg`}
+                    alt="sort"
                     style={{ width: "16px", height: "16px" }}
                   />
                 </div>
@@ -230,7 +232,7 @@ class FindNode extends Component {
             )}
             {!(searchResults.length || "") && (
               <Row style={{ flexDirection: "column", marginTop: "28px" }}>
-                <img src="/images/search-file.svg" />
+                <img src="/images/search-file.svg" alt="search"/>
                 <Text
                   type="regular"
                   size="16px"
@@ -269,6 +271,7 @@ class FindNode extends Component {
                                 search.operation
                               )}
                               className="global__file-folder"
+                              alt="folder"
                               style={{ width: "18px", height: "22px" }}
                             />
                           ) : (

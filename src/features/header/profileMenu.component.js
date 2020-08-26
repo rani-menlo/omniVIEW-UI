@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Dropdown, Avatar, Icon, Menu } from "antd";
+import { Dropdown, Icon, Menu } from "antd";
 import { connect } from "react-redux";
 import _ from "lodash";
 import { LoginActions, CustomerActions } from "../../redux/actions";
@@ -52,7 +52,7 @@ class ProfileMenu extends Component {
           disabled={this.props.first_login}
         >
           <p>
-            <img src="/images/edit.svg" />
+            <img src="/images/edit.svg" alt="Edit"/>
             <span>{`${translate("label.usermgmt.edit")} ${translate(
               "lable.profile.profile"
             )}`}</span>
@@ -83,6 +83,7 @@ class ProfileMenu extends Component {
             <p>
               <img
                 src="/images/switch-customer.svg"
+                alt="Switch Customer"
                 style={{ width: "20px", marginRight: "6px" }}
               />
               <span>{translate("text.header.switchcustomers")}</span>
@@ -97,7 +98,7 @@ class ProfileMenu extends Component {
             disabled={this.props.first_login}
           >
             <p>
-              <img src="/images/user-management.svg" />
+              <img src="/images/user-management.svg" alt="User Management"/>
               <span>{`${translate("label.generic.manage")} ${translate(
                 "label.dashboard.users"
               )}`}</span>
@@ -109,7 +110,7 @@ class ProfileMenu extends Component {
           onClick={this.signOut}
         >
           <p>
-            <img src="/images/logout.svg" />
+            <img src="/images/logout.svg" alt="Logout"/>
             <span>{translate("lable.profile.signout")}</span>
           </p>
         </Menu.Item>
@@ -140,7 +141,7 @@ class ProfileMenu extends Component {
   };
 
   render() {
-    const { user, customerAccounts } = this.props;
+    const { user } = this.props;
     if (!user) {
       return null;
     }

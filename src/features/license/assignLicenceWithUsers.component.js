@@ -6,7 +6,6 @@ import { Modal, Checkbox, Icon } from "antd";
 import { UsermanagementActions } from "../../redux/actions";
 import { ROLE_IDS } from "../../constants";
 import {
-  IconText,
   Text,
   ImageLoader,
   OmniButton,
@@ -111,6 +110,7 @@ class AssignLicenceWithUsers extends Component {
           <img
             src="/images/close.svg"
             className="licence-modal__header-close"
+            alt="close"
             onClick={closeModal}
           />
         </div>

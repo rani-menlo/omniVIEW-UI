@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { Dropdown, Menu } from "antd";
+import { Dropdown } from "antd";
 import _ from "lodash";
 import { translate } from "../../translations/translator";
 import { isLoggedInOmniciaAdmin } from "../../utils";
@@ -60,6 +60,7 @@ class CustomerCard extends Component {
                 src={`/images/overflow${
                   this.state.overflowIconClicked ? "-selected" : ""
                 }.svg`}
+                alt="Dropdown"
                 className="customercard__heading-more"
               />
             </Dropdown>
@@ -70,7 +71,7 @@ class CustomerCard extends Component {
           onClick={onSelect && onSelect(customer)}
         >
           <div className="customercard__content__item">
-            <img src="/images/users.svg" />
+            <img src="/images/users.svg" alt="Users"/>
             <span className="customercard__content__item-text">
               {`${_.get(customer, "number_of_users", "0")} ${translate(
                 "label.dashboard.users"
@@ -79,7 +80,7 @@ class CustomerCard extends Component {
           </div>
           <div className="global__hr-line" />
           <div className="customercard__content__item">
-            <img src="/images/applications.svg" />
+            <img src="/images/applications.svg" alt="Applications"/>
             <span className="customercard__content__item-text">
               {`${_.get(customer, "number_of_submissions", "0")} ${translate(
                 "label.dashboard.applications"
@@ -88,7 +89,7 @@ class CustomerCard extends Component {
           </div>
           <div className="global__hr-line" />
           <div className="customercard__content__item">
-            <img src="/images/database.svg" />
+            <img src="/images/database.svg" alt="Database"/>
             <span className="customercard__content__item-text">
               {`${_.get(customer, "max_space") || "0"} ${translate(
                 "label.storage.tb"
@@ -97,7 +98,7 @@ class CustomerCard extends Component {
           </div>
           <div className="global__hr-line" />
           <div className="customercard__content__item">
-            <img src="/images/key.svg" />
+            <img src="/images/key.svg" alt="key"/>
             <span
               className="customercard__content__item-text"
               style={{ fontSize: "14px" }}

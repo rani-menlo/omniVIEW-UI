@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { Modal, Upload } from "antd";
-import { indexOf, get } from "lodash";
+import { get } from "lodash";
 import { OmniButton } from "..";
 import Text from "../text/text.component";
 import { translate } from "../../../translations/translator";
@@ -83,6 +83,7 @@ class UploadCustomersModal extends Component {
           />
           <img
             src="/images/close.svg"
+            alt="close"
             className="upload-customers-modal__header-close"
             onClick={closeModal}
           />
@@ -98,6 +99,7 @@ class UploadCustomersModal extends Component {
             <p className="upload-customers-modal__upload-inner">
               <img
                 src="/images/upload.svg"
+                alt="upload"
                 className="upload-customers-modal__upload-inner-image"
               />
               <span className="upload-customers-modal__upload-inner-drag">

@@ -3,7 +3,6 @@ import { Modal } from "antd";
 import PropTypes from "prop-types";
 import _ from "lodash";
 import {
-  InputField,
   OmniButton,
   SelectField,
   NumericInput,

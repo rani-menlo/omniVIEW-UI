@@ -36,7 +36,6 @@ import {
   isLoggedInCustomerAdmin,
   isLoggedInOmniciaAdmin,
   getDTDVersion,
-  getDTD2_2_FormattedDate,
   getV2_2Date
 } from "../../utils";
 import ProfileMenu from "../header/profileMenu.component";
@@ -1082,6 +1081,7 @@ class SubmissionView extends Component {
               <div className="submissionview__profilebar__title">
                 <img
                   src="/images/omniview-cloud.svg"
+                  alt="cloud"
                   style={{ height: "25px", width: "105px" }}
                 />
               </div>
@@ -1095,7 +1095,7 @@ class SubmissionView extends Component {
                 style={{ padding: "5px 16px 5px 8px", marginLeft: "10px" }}
                 onClick={this.openSubmissionModal}
               >
-                <img src="/images/open-folder.svg" className="global__icon" />
+                <img src="/images/open-folder.svg" className="global__icon" alt="folder"/>
                 <span className="text">Open</span>
               </div>
               {/* <Icon type="close-circle" theme="filled" className="global__icon" /> */}
@@ -1156,6 +1156,7 @@ class SubmissionView extends Component {
               >
                 <img
                   src="/images/folder-validate.svg"
+                  alt="folder"
                   className="global__icon"
                   style={{
                     marginLeft: 0,
@@ -1172,6 +1173,7 @@ class SubmissionView extends Component {
               <FlexBox style={{ cursor: "not-allowed" }}>
                 <img
                   src="/images/list.svg"
+                  alt="list"
                   className="global__icon"
                   style={{
                     opacity: 0.2
@@ -1191,6 +1193,7 @@ class SubmissionView extends Component {
               <div className="submissionview__siders__sequence">
                 <img
                   className="global__cursor-pointer"
+                  alt="arrow"
                   src={
                     this.state.sequencesExpand
                       ? "/images/left-arrow-hide.svg"
@@ -1210,6 +1213,7 @@ class SubmissionView extends Component {
                 </span>
                 <img
                   className="global__cursor-pointer"
+                  alt="arrow"
                   src={
                     this.state.propertiesExpand
                       ? "/images/right-arrow-hide.svg"

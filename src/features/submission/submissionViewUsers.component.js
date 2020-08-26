@@ -2,13 +2,11 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import _ from "lodash";
 import PopoverUsersFilter from "../usermanagement/popoverUsersFilter";
-import { Avatar, Icon } from "antd";
+import { Icon } from "antd";
 import { Text, SearchBox, Row, ImageLoader } from "../../uikit/components";
 import { translate } from "../../translations/translator";
 import {
   getRoleName,
-  isLoggedInOmniciaRole,
-  isLoggedInCustomerAdmin,
   isOmniciaRole,
   isLoggedInOmniciaAdmin
 } from "../../utils";
@@ -113,7 +111,6 @@ class SubmissionViewUsers extends Component {
                 type="circle"
                 globalAccess={_.get(user, "has_global_access")}
               />
-              {/* <Avatar size="small" icon="user" size={35} /> */}
               <div className="submissionViewUsers__users__user__info">
                 <Text
                   type="regular"

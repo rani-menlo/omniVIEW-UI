@@ -62,6 +62,7 @@ const LicencePreview = ({ closeModal, back, licences, visible, submit }) => {
         />
         <img
           src="/images/close.svg"
+          alt="close"
           className="licence-modal__headers-confirm-close"
           onClick={closeModal}
         />

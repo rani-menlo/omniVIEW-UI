@@ -1,5 +1,3 @@
-import _ from "lodash";
-
 export class Permissions {
   static GRANTED = {
     file_ids: new Set(),

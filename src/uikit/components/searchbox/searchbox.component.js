@@ -20,7 +20,7 @@ const SearchBox = ({
       className={`searchBox ${className}`}
       prefix={
         prefixIcon === null ? null : (
-          <img src="/images/search.svg" style={{ marginLeft: "5px" }} />
+          <img src="/images/search.svg" alt="search" style={{ marginLeft: "5px" }} />
         )
       }
       suffix={
@@ -30,6 +30,7 @@ const SearchBox = ({
           ) : (
             <img
               src="/images/close.svg"
+              alt="close"
               style={{
                 width: "20px",
                 height: "20px",

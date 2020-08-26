@@ -22,7 +22,7 @@ const IconText = ({
         size="14px"
         text={text}
       />
-      <img src={image} style={imageStyle} />
+      <img src={image} style={imageStyle} alt="icon"/>
     </div>
   );
 };

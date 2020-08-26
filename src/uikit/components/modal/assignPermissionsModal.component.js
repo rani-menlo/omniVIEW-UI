@@ -2,13 +2,13 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import _ from "lodash";
-import { Modal, Dropdown, Icon, Menu, Avatar } from "antd";
+import { Dropdown, Icon, Menu } from "antd";
 import Text from "../text/text.component";
 import { translate } from "../../../translations/translator";
-import { ROLES, ROLE_IDS } from "../../../constants";
+import { ROLES } from "../../../constants";
 import PermissionCheckbox from "../checkbox/permissionCheckbox.component";
 import { UsermanagementActions } from "../../../redux/actions";
-import { Loader, OmniButton, ImageLoader, DraggableModal } from "..";
+import { OmniButton, ImageLoader, DraggableModal } from "..";
 import { getRoleNameByRoleId, getRoleName, isAdmin } from "../../../utils";
 import submissionActions from "../../../redux/actions/submission.actions";
 import Row from "../row/row.component";
@@ -375,7 +375,6 @@ class AssignPermissions extends Component {
                           style={{ marginRight: "10px" }}
                           globalAccess={_.get(user, "has_global_access")}
                         />
-                        {/* <Avatar size={36} icon="user" /> */}
                         <div>
                           <Text
                             type="regular"

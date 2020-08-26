@@ -31,7 +31,6 @@ import {
   filter,
   every,
   set,
-  isNull,
   sortBy,
 } from "lodash";
 import styled from "styled-components";
@@ -320,7 +319,7 @@ class ApplicationManagement extends Component {
           onClick={this.refreshSequence(application)}
         >
           <p>
-            <img src="/images/refresh-black.svg" />
+            <img src="/images/refresh-black.svg" alt="Refresh"/>
             <span>{translate("label.submissions.refresh")}</span>
           </p>
         </Menu.Item>
@@ -493,6 +492,7 @@ class ApplicationManagement extends Component {
                 />
                 <img
                   className="global__cursor-pointer"
+                  alt="caret-icon"
                   src="/images/caret-inactive.svg"
                   style={{ marginLeft: "5px" }}
                 />

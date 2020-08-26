@@ -4,7 +4,6 @@ import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { Form, Input, Button, Checkbox } from "antd";
 import PropTypes from "prop-types";
-import _ from "lodash";
 import { LoginActions } from "../../redux/actions";
 import Loader from "../../uikit/components/loader";
 import Footer from "../../uikit/components/footer/footer.component";
@@ -123,7 +122,7 @@ class Login extends Component {
         <Loader loading={loading} />
         <div className="global__container">
           <div className="login">
-            <img src="/images/omnicia-logo.svg" className="login-logo" />
+            <img src="/images/omnicia-logo.svg" className="login-logo" alt="logo"/>
             <p className="login-text">{translate("text.login.title")}</p>
             <div className="login__hr-line global__hr-line" />
             {error && <p className="login-error">{error}</p>}

@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import _ from "lodash";
 import PropTypes from "prop-types";
-import { Row, SelectField, NumericInput } from "../../uikit/components";
+import { SelectField, NumericInput } from "../../uikit/components";
 import { translate } from "../../translations/translator";
 import { Icon } from "antd";
 

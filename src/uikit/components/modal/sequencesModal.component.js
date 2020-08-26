@@ -64,6 +64,7 @@ class SequencesModal extends Component {
             <Text type="regular" size="16px" text="Delete Sequences" />
             <img
               src="/images/close.svg"
+              alt="close"
               className="sequences-modal__header-close"
               onClick={closeModal}
             />
@@ -93,6 +94,7 @@ class SequencesModal extends Component {
             <div className="sequences-modal__footer-text">
               <img
                 src="/images/warning.png"
+                alt="warning"
                 className="sequences-modal__footer-image"
               />
               <Text

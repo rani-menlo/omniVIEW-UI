@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import { CustomerActions, LoginActions } from "../../redux/actions";
 import Header from "../header/header.component";
 import { Loader, OmniButton, ContentLayout } from "../../uikit/components";
-import { Row, Col, Radio, Button } from "antd";
+import { Row, Col, Radio } from "antd";
 import { translate } from "../../translations/translator";
 import { get, map, isNull, isUndefined } from "lodash";
 import { isLoggedInOmniciaRole } from "../../utils";

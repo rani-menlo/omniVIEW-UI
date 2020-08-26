@@ -2,7 +2,7 @@ import React from "react";
 import _ from "lodash";
 import { translate } from "../../translations/translator";
 import { getFormattedDate } from "../../utils";
-import { Avatar, Icon, Dropdown } from "antd";
+import { Icon, Dropdown } from "antd";
 import { ImageLoader } from "../../uikit/components";
 
 const UserCard = ({
@@ -25,7 +25,6 @@ const UserCard = ({
         globalAccess={_.get(user, "has_global_access")}
         onClick={onAvatarClick}
       />
-      {/* <Avatar size={48} icon="user" onClick={onAvatarClick} /> */}
       <div className="userManagement__group__users__user__info">
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <p

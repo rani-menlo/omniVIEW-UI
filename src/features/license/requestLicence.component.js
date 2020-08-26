@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { Loader, Text, Row, OmniButton, Toast } from "../../uikit/components";
+import { Loader, Text, OmniButton, Toast } from "../../uikit/components";
 import { LoginActions, ApiActions, CustomerActions } from "../../redux/actions";
 import { translate } from "../../translations/translator";
 import AuthLayout from "../login/authLayout.component";

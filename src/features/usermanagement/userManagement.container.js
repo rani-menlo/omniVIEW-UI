@@ -25,12 +25,11 @@ import {
   CustomerActions,
   ApiActions,
 } from "../../redux/actions";
-import { Avatar, Dropdown, Menu, Icon, Popover, Modal } from "antd";
+import { Dropdown, Menu, Icon, Popover, Modal } from "antd";
 import { translate } from "../../translations/translator";
 import {
   getRoleName,
   getFormattedDate,
-  isLoggedInOmniciaRole,
   isLoggedInOmniciaAdmin,
   isLoggedInCustomerAdmin,
 } from "../../utils";
@@ -268,7 +267,7 @@ class UserManagementContainer extends Component {
           onClick={this.editUser(usr)}
         >
           <p>
-            <img src="/images/user-management.svg" />
+            <img src="/images/user-management.svg" alt="User Management"/>
             <span>{`${translate("label.usermgmt.edit")} ${translate(
               "label.dashboard.user"
             )}`}</span>
@@ -280,7 +279,7 @@ class UserManagementContainer extends Component {
             onClick={this.showLicenceUnAssignedModal(usr)}
           >
             <p>
-              <img src="/images/key.svg" />
+              <img src="/images/key.svg" alt="Key"/>
               <span>{translate("label.usermgmt.assignlicence")}</span>
             </p>
           </Menu.Item>
@@ -292,7 +291,7 @@ class UserManagementContainer extends Component {
               onClick={this.openAccessControlModal(usr)}
             >
               <p>
-                <img src="/images/assign.svg" />
+                <img src="/images/assign.svg" alt="Assign"/>
                 <span>{translate("label.usermgmt.accesscontrol")}</span>
               </p>
             </Menu.Item>
@@ -309,7 +308,7 @@ class UserManagementContainer extends Component {
             }}
           >
             {_.get(usr, "is_active", false) ? (
-              <img src="/images/deactivate.svg" />
+              <img src="/images/deactivate.svg" alt="Deactivate"/>
             ) : (
               <Icon
                 type="check-circle"
@@ -787,6 +786,7 @@ class UserManagementContainer extends Component {
                 <img
                   className="global__cursor-pointer"
                   src="/images/caret-inactive.svg"
+                  alt="caret-inactive"
                   style={{ marginLeft: "5px" }}
                 />
               </Row>
@@ -1002,6 +1002,7 @@ class UserManagementContainer extends Component {
                           <img
                             className="global__cursor-pointer"
                             src="/images/overflow-black.svg"
+                            alt="Dropdown"
                             style={{ width: "18px", height: "18px" }}
                           />
                         </Dropdown>
