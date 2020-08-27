@@ -97,7 +97,11 @@
   font-family: "Heebo-Thin";
   src: url("/fonts/Heebo-Thin.ttf");
 }
+html{
+  overflow: hidden;
+}
 body {
+  overflow: auto;
   font-family: "Heebo-Regular", sans-serif !important;
 }
 
