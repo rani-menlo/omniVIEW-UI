@@ -19,7 +19,7 @@ import {
   SelectField,
   Toast,
 } from "../../uikit/components";
-import { Popover, Switch, Icon, Dropdown, Menu } from "antd";
+import { Popover, Switch, Icon, Menu } from "antd";
 import { CaretDownOutlined } from "@ant-design/icons";
 import PopoverCustomers from "../usermanagement/popoverCustomers.component";
 import { isLoggedInOmniciaAdmin, getFormattedDate, isToday } from "../../utils";

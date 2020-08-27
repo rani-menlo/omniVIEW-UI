@@ -5,7 +5,6 @@ import _ from "lodash";
 import NodeSequenceTree from "./nodeSequenceTree";
 import { PermissionCheckbox } from "../../uikit/components";
 import { CHECKBOX } from "../../constants";
-import { Permissions } from "./permissions";
 import { getOrderedSequences } from "../../utils";
 
 class NodeSequences extends Component {

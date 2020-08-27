@@ -243,6 +243,7 @@ class AssignPermissions extends Component {
               src={`/images/${
                 assignGlobalPermissions ? "global-permissions" : "assign"
               }.svg`}
+              alt="assign permissions"
               style={{ marginRight: "8px" }}
             />
             <Text
@@ -256,6 +257,7 @@ class AssignPermissions extends Component {
             />
             <img
               src="/images/close.svg"
+              alt="close"
               className="assign-permissions-modal__header-close"
               onClick={closeModal}
             />
@@ -296,6 +298,7 @@ class AssignPermissions extends Component {
                       ) : (
                         <img
                           src="/images/file-new.svg"
+                          alt="file"
                           className="global__file-folder"
                           style={{ width: "18px", height: "21px" }}
                         />

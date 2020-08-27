@@ -25,6 +25,7 @@ const DeactivateModal = ({
             height: "20px",
             cursor: "pointer"
           }}
+          alt="close"
           onClick={closeModal}
         />
         <p className="deactivate-modal-content">{content}</p>

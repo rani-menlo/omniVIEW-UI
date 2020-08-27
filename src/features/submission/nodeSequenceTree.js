@@ -4,7 +4,7 @@ import _ from "lodash";
 import PropTypes from "prop-types";
 import { PermissionCheckbox } from "../../uikit/components";
 import { CHECKBOX } from "../../constants";
-import { getDTDVersion, getV2_2Date } from "../../utils";
+import { getV2_2Date } from "../../utils";
 
 class NodeSequenceTree extends Component {
   constructor(props) {
@@ -59,7 +59,7 @@ class NodeSequenceTree extends Component {
     const { sequence, submissionLabel, m1Json } = this.props;
     //As per the (Jira ticket OMNG-764, Sprint-23), we are displaying sequence label
     //based on DTD versions 2.01 and 3.3
-    const dtd_version = getDTDVersion(m1Json);
+    // const dtd_version = getDTDVersion(m1Json);
     const label =
       // dtd_version == "2.01"
       //   ? sequence.submission_type ? `${submissionLabel}\\${sequence.name} (${

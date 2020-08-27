@@ -49,11 +49,10 @@ class SequencesModal extends Component {
   };
 
   render() {
-    const { visible, closeModal, submission, sequences } = this.props;
+    const { visible, closeModal, sequences } = this.props;
     const { order, selectedSequences } = this.state;
-    const submissionLabel = _.get(submission, "name", "");
+    // const submissionLabel = _.get(submission, "name", "");
     const orderedSequences = getOrderedSequences(sequences, order);
-    console.log("sequences", orderedSequences, this.props);
     return (
       <DraggableModal
         visible={visible}

@@ -18,8 +18,8 @@ import Header from "../header/header.component";
 import { translate } from "../../translations/translator";
 import { isEmail, isPhone, isValidPwd } from "../../utils";
 import { LoginActions, ApiActions, CustomerActions } from "../../redux/actions";
-import { Upload, Avatar, Checkbox, Modal } from "antd";
-import { IMAGE_SUPPORT_TYPES, DEBOUNCE_TIME } from "../../constants";
+import { Upload, Checkbox, Modal } from "antd";
+import { IMAGE_SUPPORT_TYPES } from "../../constants";
 import { UsermanagementApi } from "../../redux/api";
 
 const dummyRequest = ({ file, onSuccess }) => {
@@ -395,7 +395,7 @@ class CreateProfile extends Component {
       phone,
       showChangePassword,
     } = this.state;
-    const { user, first_login, customer, role } = this.props;
+    const { first_login, customer, role } = this.props;
     return (
       <React.Fragment>
         <Loader loading={this.props.loading} />
@@ -634,6 +634,7 @@ class CreateProfile extends Component {
                 <p className="createProfile__upload-inner">
                   <img
                     src="/images/upload.svg"
+                    alt="upload"
                     className="createProfile__upload-inner-image"
                   />
                   <span className="createProfile__upload-inner-drag">
@@ -730,6 +731,7 @@ class CreateProfile extends Component {
               />
               <img
                 src="/images/close.svg"
+                alt="close"
                 className="email-change-modal__header-close"
                 onClick={this.closeEmailModal}
               />

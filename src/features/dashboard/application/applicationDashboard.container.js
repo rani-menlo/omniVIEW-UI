@@ -268,7 +268,7 @@ class ApplicationDashboard extends Component {
     });
     if (res) {
       const { data } = res;
-      const results = _.get(data, "result");
+      // const results = _.get(data, "result");
       if (_.get(data, "result.length")) {
         this.checkSequenceStatus(
           _.get(data, "result", null),

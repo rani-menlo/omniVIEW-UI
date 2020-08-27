@@ -19,7 +19,7 @@ class PopoverCustomers extends Component {
   }
 
   onCustomerSelected = (customer) => () => {
-    const { selectedCustomer } = this.state;
+    // const { selectedCustomer } = this.state;
     // if (customer.id === selectedCustomer.id) {
     //   return;
     // }

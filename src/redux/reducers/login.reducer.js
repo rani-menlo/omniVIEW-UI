@@ -1,6 +1,5 @@
 import { LoginActionTypes } from "../actionTypes";
 import _ from "lodash";
-import { message } from "antd";
 import { Toast } from "../../uikit/components";
 
 const initialState = {
@@ -126,7 +125,7 @@ export default (state = initialState, action) => {
       };
     }
     case LoginActionTypes.SWITCH_ACCOUNT: {
-      const { error, message, data, invalid_license } = action.data;
+      const { data, invalid_license } = action.data;
       if (invalid_license) {
         return {
           ...state,

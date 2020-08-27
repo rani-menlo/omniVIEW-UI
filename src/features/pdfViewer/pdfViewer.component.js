@@ -98,7 +98,7 @@ class PdfViewer extends Component {
 
     if (type === "pdf") {
       url = url.substring(0, url.lastIndexOf("?"));
-      return <iframe width="100%" height="100%" src={url} />;
+      return <iframe width="100%" height="100%" src={url} title="pdf" aria-hidden="true"/>;
     }
 
     if (type === "doc" || type === "docx" || type === "ppt") {

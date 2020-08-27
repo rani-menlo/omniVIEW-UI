@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import _ from "lodash";
 import PropTypes from "prop-types";
 import Text from "../text/text.component";
-import DraggableModal from "./draggableModal.component";
 import { connect } from "react-redux";
 import { isLoggedInOmniciaRole } from "../../../utils";
 import { bindActionCreators } from "redux";

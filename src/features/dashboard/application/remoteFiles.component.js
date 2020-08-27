@@ -62,6 +62,7 @@ class RemoteFiles extends Component {
                 <div onDoubleClick={this.goBack} style={{ display: "flex" }}>
                   <img
                     src="/images/folder-back.svg"
+                    alt="back"
                     className="global__file-folder"
                     style={{ width: "22px", height: "22px" }}
                   />
@@ -119,6 +120,7 @@ class RemoteFiles extends Component {
                     ) : (
                       <img
                         src="/images/file-new.svg"
+                        alt="new-file"
                         className="global__file-folder"
                         style={{ width: "18px", height: "21px" }}
                       />

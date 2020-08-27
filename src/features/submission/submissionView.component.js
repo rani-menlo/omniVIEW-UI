@@ -589,12 +589,10 @@ class SubmissionView extends Component {
   createKey = () => {
     const {
       selectedSequence,
-      selectedSubmission,
       sequenceJson,
-      lifeCycleJson,
-      user
+      lifeCycleJson
     } = this.props;
-    const { selectedView, selectedMode } = this.state;
+    // const { selectedView, selectedMode } = this.state;
 
     /* let key = `${selectedView}_${selectedMode}_`;
     if (selectedSequence) {

@@ -99,6 +99,7 @@ const AssignLicence = ({
         />
         <img
           src="/images/close.svg"
+          alt="close"
           className="licence-modal__header-close"
           onClick={closeModal}
         />
