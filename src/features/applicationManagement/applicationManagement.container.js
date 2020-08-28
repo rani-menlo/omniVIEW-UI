@@ -231,10 +231,31 @@ class ApplicationManagement extends Component {
     );
   }
 
+  /**
+   * Fetching applications for the selected customer
+   * @param {*} sortBy
+   * @param {*} orderBy
+   */
+  fetchingBulkuploadedApplications = (sortByColumnId = 2, orderBy = "ASC") => {
+    this.props.dispatch(ApplicationActions.resetbulkUploadedSubmissions());
+    this.setState({ bulkUploadedSubmissions: [] });
+    let postObj = {
+      limit: Number(this.props.bulkUploadedSubmissionsCount),
+      page: 1,
+      order: orderBy,
+      sortByColumnId: Number(sortByColumnId),
+      customerId: Number(get(this.state.selectedUploadedCustomer, "id", 0)),
+    };
+    this.props.dispatch(
+      ApplicationActions.fetchBulkUploadedApplications(postObj)
+    );
+  };
+
   componentDidMount() {
     let { selectedSubmission } = this.state;
     selectedSubmission.key = selectedSubmission.submissionId;
     selectedSubmission.value = selectedSubmission.name;
+    this.fetchingBulkuploadedApplications();
     this.setState({ selectedSubmission }, () => {
       this.fetchAppSequences();
       this.fetchAppAllSequences();
@@ -439,11 +460,16 @@ class ApplicationManagement extends Component {
           value: "All",
         };
         // this.props.actions.resetApplications();
-        this.setState({ selectedSequence: selectedSequence, selectedSubmission: value }, () => {
-          this.props.dispatch(ApplicationActions.setSelectedSubmission(value));
-          this.fetchAppAllSequences();
-          this.fetchAppSequences();
-        });
+        this.setState(
+          { selectedSequence: selectedSequence, selectedSubmission: value },
+          () => {
+            this.props.dispatch(
+              ApplicationActions.setSelectedSubmission(value)
+            );
+            this.fetchAppAllSequences();
+            this.fetchAppSequences();
+          }
+        );
       } else {
         this.props.dispatch(SubmissionActions.setSelectedSequence(value));
         this.fetchAppSequences();
@@ -694,6 +720,8 @@ function mapStateToProps(state) {
     submissionSequnces: state.Submission.submissionSequnces,
     allSubmissionSequences: state.Submission.allSubmissionSequences,
     count: state.Submission.count,
+    bulkUploadedSubmissionsCount:
+      state.Application.bulkUploadedSubmissionsCount,
   };
 }
 

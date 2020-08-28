@@ -118,8 +118,11 @@ class CustomerDashboard extends Component {
     }
   };
 
-  componentWillUnmount = () => {
+  componentWillUnmount() {
     window.removeEventListener("popstate", this.onBackButtonEvent);
+    if(this.state.searchText){
+      this.props.actions.fetchCustomers("");
+    }
   };
 
   componentDidMount() {
