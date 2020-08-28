@@ -153,7 +153,9 @@ class ValidateApplications extends Component {
     this.setState({ selectedUploadedCustomer: customer }, () => {
       this.props.dispatch(
         CustomerActions.setBulkUploadedSelectedCustomer(customer, () => {
-          this.fetchingBulkuploadedApplications();
+          this.setState({ pageNo: 1, limit: 5 }, () =>
+            this.fetchingBulkuploadedApplications()
+          );
         })
       );
     });
@@ -525,7 +527,7 @@ class ValidateApplications extends Component {
                   <span
                     className={`${application.seqCount !== 0 &&
                       application.errorCount === 0 &&
-                        "validate-applications-layout__list__item-text-link"}`}
+                      "validate-applications-layout__list__item-text-link"}`}
                     onClick={
                       application.seqCount !== 0 && application.errorCount === 0
                         ? (e) => this.openApplicationManagement(application)
@@ -602,19 +604,18 @@ class ValidateApplications extends Component {
               </Row>
             ))}
           </div>
-          {!get(this.props.bulkUploadedSubmissions, "length") &&
-            !loading && (
-              <Row className="validate-applications-layout__nodata">
-                <Icon
-                  style={{ fontSize: "20px" }}
-                  type="exclamation-circle"
-                  className="validate-applications-layout__nodata-icon"
-                />
-                {translate("error.dashboard.notfound", {
-                  type: translate("label.dashboard.applications"),
-                })}
-              </Row>
-            )}
+          {!get(this.props.bulkUploadedSubmissions, "length") && !loading && (
+            <Row className="validate-applications-layout__nodata">
+              <Icon
+                style={{ fontSize: "20px" }}
+                type="exclamation-circle"
+                className="validate-applications-layout__nodata-icon"
+              />
+              {translate("error.dashboard.notfound", {
+                type: translate("label.dashboard.applications"),
+              })}
+            </Row>
+          )}
           <Pagination
             key={bulkUploadedSubmissionsCount}
             total={bulkUploadedSubmissionsCount}
