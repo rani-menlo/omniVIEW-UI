@@ -120,7 +120,7 @@ class AddNewApplication extends Component {
    * on selecting the source to transfer the files
    */
   onCloudSelect = async cloud => {
-    if (cloud.name == "AFS") {
+    if (cloud.name.toUpperCase() === "AFS") {
       this.getEachCustomerAFSFolders(cloud);
       return;
     }
