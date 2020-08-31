@@ -549,12 +549,19 @@ class ValidateApplications extends Component {
                       display: "block",
                     }}
                   >
-                    {`${`${get(application, "seqCount", 0) -
-                      get(application, "errorCount", 0)}`} of ${get(
-                      application,
-                      "seqCount",
-                      0
-                    )}`}
+                    {`${
+                      get(application, "errorCount", 0) >
+                      get(application, "seqCount", 0)
+                        ? get(application, "seqCount", 0)
+                        : `${get(application, "seqCount", 0) -
+                            get(application, "errorCount", 0)}`
+                    } of ${
+                      get(application, "seqCount") === 0 &&
+                      get(application, "errorCount") !== 0
+                        ? get(application, "seqCount", 0) +
+                          get(application, "errorCount", 0)
+                        : get(application, "seqCount", 0)
+                    }`}
                   </span>
                 </Column>
                 <Column
