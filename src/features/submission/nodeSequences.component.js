@@ -12,7 +12,7 @@ class NodeSequences extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      order: "desc"
+      order: "desc",
     };
   }
 
@@ -25,27 +25,27 @@ class NodeSequences extends Component {
     onSortByChanged: PropTypes.func,
     submissionLabel: PropTypes.string,
     viewPermissions: PropTypes.bool,
-    editPermissions: PropTypes.bool
+    editPermissions: PropTypes.bool,
   };
 
   static defaultProps = {
     sequences: [],
     sortBy: "submission",
     viewPermissions: false,
-    editPermissions: false
+    editPermissions: false,
   };
 
-  sortBy = sortBy => () => {
+  sortBy = (sortBy) => () => {
     const { onSortByChanged } = this.props;
     this.setState(
       {
-        order: this.state.order === "desc" ? "asc" : "desc"
+        order: this.state.order === "desc" ? "asc" : "desc",
       },
       () => onSortByChanged && onSortByChanged(sortBy)
     );
   };
 
-  onSelected = sequence => () => {
+  onSelected = (sequence) => () => {
     const { onSelectedSequence } = this.props;
     onSelectedSequence && onSelectedSequence(sequence);
   };
@@ -57,9 +57,9 @@ class NodeSequences extends Component {
       submissionLabel,
       viewPermissions,
       editPermissions,
-      m1Json
+      m1Json,
     } = this.props;
-    return _.map(sequences, sequence => (
+    return _.map(sequences, (sequence) => (
       <NodeSequenceTree
         key={sequence.id}
         sequence={sequence}
@@ -77,7 +77,7 @@ class NodeSequences extends Component {
   getListSequence = (sequence, array = []) => {
     array.push(sequence);
     if (_.get(sequence, "childs.length", 0)) {
-      _.map(sequence.childs, seq => {
+      _.map(sequence.childs, (seq) => {
         this.getListSequence(seq, array);
       });
     }
@@ -87,14 +87,14 @@ class NodeSequences extends Component {
   getList = () => {
     const { sequences } = this.props;
     let array = [];
-    _.map(sequences, sequence => {
+    _.map(sequences, (sequence) => {
       array = array.concat(this.getListSequence(sequence));
     });
-    const newArray = _.sortBy(array, s => Number(s.name));
+    const newArray = _.sortBy(array, (s) => Number(s.name));
     return this.state.order === "desc" ? newArray : newArray.reverse();
   };
 
-  onCheckboxChange = sequence => () => {
+  onCheckboxChange = (sequence) => () => {
     /* const sequencesList = [...this.state.sequencesList];
     const idx = _.findIndex(sequencesList, seq => seq.id === sequence.id);
     const newSequence = { ...sequence };
@@ -133,7 +133,7 @@ class NodeSequences extends Component {
       sortBy,
       submissionLabel,
       viewPermissions,
-      editPermissions
+      editPermissions,
     } = this.props;
     return (
       <React.Fragment>
@@ -160,7 +160,7 @@ class NodeSequences extends Component {
             ? this.getTree()
             : _.map(
                 getOrderedSequences(this.props.sequences, this.state.order),
-                sequence => (
+                (sequence) => (
                   <div
                     key={sequence.id}
                     className={`sequenceslist__sequence global__cursor-pointer ${selected ===
@@ -171,7 +171,7 @@ class NodeSequences extends Component {
                           ? sequence.checkboxValue === CHECKBOX.DESELECTED
                             ? 0.3
                             : 1
-                          : 1
+                          : 1,
                     }}
                   >
                     {editPermissions && (
@@ -181,12 +181,23 @@ class NodeSequences extends Component {
                         onChange={this.onCheckboxChange(sequence)}
                       />
                     )}
-                    <Icon
-                      type="folder"
-                      theme="filled"
-                      className="global__file-folder"
-                      onClick={this.onSelected(sequence)}
-                    />
+                    {/* Checking for the WIP sequence, Sprint-32, (OMNG-1086) */}
+                    {sequence.isWIP ? (
+                      <img
+                        src="/images/wip.svg"
+                        onClick={this.onSelected(sequence)}
+                        alt="WIP_Icon"
+                        className="global__file-folder"
+                      />
+                    ) : (
+                      <Icon
+                        type="folder"
+                        theme="filled"
+                        className="global__file-folder"
+                        onClick={this.onSelected(sequence)}
+                      />
+                    )}
+
                     <span
                       className="global__node-text global__cursor-pointer"
                       onClick={this.onSelected(sequence)}

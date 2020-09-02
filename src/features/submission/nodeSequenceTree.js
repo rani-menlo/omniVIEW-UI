@@ -10,7 +10,7 @@ class NodeSequenceTree extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      expand: true
+      expand: true,
     };
   }
 
@@ -20,13 +20,13 @@ class NodeSequenceTree extends Component {
     onCheckboxChange: PropTypes.func,
     submissionLabel: PropTypes.string,
     viewPermissions: PropTypes.bool,
-    editPermissions: PropTypes.bool
+    editPermissions: PropTypes.bool,
   };
 
   static defaultProps = {
     paddingLeft: 0, // px
     viewPermissions: false,
-    editPermissions: false
+    editPermissions: false,
   };
 
   toggle = () => {
@@ -71,12 +71,15 @@ class NodeSequenceTree extends Component {
       //   : sequence.submission_type ? `${submissionLabel}\\${sequence.name} (${sequence.submission_type})` :
       //   `${submissionLabel}\\${sequence.name}`;
 
-        sequence.submission_sub_type
-        ? sequence.submission_type ? `${submissionLabel}\\${sequence.name} (${sequence.submission_type}-${sequence.submission_sub_type})`
-        : `${submissionLabel}\\${sequence.name}`
-        : sequence.submission_type ? `${submissionLabel}\\${sequence.name} (${sequence.submission_type}) ${getV2_2Date(m1Json)}` :
-        `${submissionLabel}\\${sequence.name} ${getV2_2Date(m1Json)}`;
-
+      sequence.submission_sub_type
+        ? sequence.submission_type
+          ? `${submissionLabel}\\${sequence.name} (${sequence.submission_type}-${sequence.submission_sub_type})`
+          : `${submissionLabel}\\${sequence.name}`
+        : sequence.submission_type
+        ? `${submissionLabel}\\${sequence.name} (${
+            sequence.submission_type
+          }) ${getV2_2Date(m1Json)}`
+        : `${submissionLabel}\\${sequence.name} ${getV2_2Date(m1Json)}`;
 
     return label;
   };
@@ -90,7 +93,7 @@ class NodeSequenceTree extends Component {
       submissionLabel,
       editPermissions,
       viewPermissions,
-      onCheckboxChange
+      onCheckboxChange,
     } = this.props;
     //sorting the sequence child array
     const childsArray = _.sortBy(_.get(sequence, "childs"), "name") || [];
@@ -106,7 +109,7 @@ class NodeSequenceTree extends Component {
                 ? sequence.checkboxValue === CHECKBOX.DESELECTED
                   ? 0.3
                   : 1
-                : 1
+                : 1,
           }}
           title={this.getLabel()}
         >
@@ -118,12 +121,22 @@ class NodeSequenceTree extends Component {
             />
           )}
           {this.getCaretIcon()}
-          <Icon
-            type="folder"
-            theme="filled"
-            className="global__file-folder"
-            onClick={onSelected(sequence)}
-          />
+          {/* Checking for the WIP sequence, Sprint-32, (OMNG-1086) */}
+          {sequence.isWIP ? (
+            <img
+              src="/images/wip.svg"
+              alt="WIP_Icon"
+              className="global__file-folder"
+              onClick={onSelected(sequence)}
+            />
+          ) : (
+            <Icon
+              type="folder"
+              theme="filled"
+              className="global__file-folder"
+              onClick={onSelected(sequence)}
+            />
+          )}
           <span
             className="global__node-text global__cursor-pointer"
             onClick={onSelected(sequence)}
@@ -132,7 +145,7 @@ class NodeSequenceTree extends Component {
           </span>
         </div>
         {this.state.expand &&
-          _.map(childsArray, seq => (
+          _.map(childsArray, (seq) => (
             <NodeSequenceTree
               key={seq.id}
               sequence={seq}
