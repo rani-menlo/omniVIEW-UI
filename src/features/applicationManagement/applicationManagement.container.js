@@ -52,6 +52,8 @@ class ApplicationManagement extends Component {
       allSubmissionSequences: [],
       selectedSubmission: this.props.selectedSubmission,
       selectedSequence: this.props.selectedSequence,
+      sortByColumnId: 5,
+      order: "DESC",
       TableColumns: [
         {
           name: TableColumnNames.CUSTOMER,
@@ -98,7 +100,7 @@ class ApplicationManagement extends Component {
   /**
    * Fetch sequences per each submission
    */
-  fetchAppSequences = (sortByColumnId = 5, order = "DESC") => {
+  fetchAppSequences = () => {
     this.props.dispatch(SubmissionActions.resetApplicationSequences());
     this.setState({ submissionSequnces: [] });
     const {
@@ -108,6 +110,8 @@ class ApplicationManagement extends Component {
       selectedSequence,
       TableColumns,
       selectedUploadedCustomer,
+      sortByColumnId,
+      order,
     } = this.state;
     let submissionId =
       selectedSubmission.submissionId || selectedSubmission.id || 0;
@@ -319,7 +323,9 @@ class ApplicationManagement extends Component {
    * @param {*} orderBy
    */
   sortColumn = (sortBy, orderBy) => {
-    this.fetchAppSequences(sortBy, orderBy);
+    this.setState({ sortByColumnId: sortBy, order: orderBy }, () => {
+      this.fetchAppSequences(sortBy, orderBy);
+    });
   };
 
   /**
