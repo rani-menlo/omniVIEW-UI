@@ -10,7 +10,7 @@ import {
   Loader,
   OmniButton,
   Text,
-  Toast
+  Toast,
 } from "../../../uikit/components";
 import { minFourDigitsInString } from "../../../utils";
 import Header from "../../header/header.component";
@@ -23,13 +23,13 @@ const columns = [
   {
     title: "Folder Name",
     key: "folder",
-    dataIndex: "folder"
+    dataIndex: "folder",
   },
   {
     title: "Description",
     key: "message",
-    dataIndex: "message"
-  }
+    dataIndex: "message",
+  },
 ];
 
 class AddNewApplication extends Component {
@@ -63,7 +63,7 @@ class AddNewApplication extends Component {
       checkedAll: false,
       showCheckAll: false,
       showInvalidSeqFooter: false,
-      selectedFolderPath: ""
+      selectedFolderPath: "",
     };
   }
 
@@ -87,12 +87,12 @@ class AddNewApplication extends Component {
   };
 
   //if the source type is AFS/site-to-site vpm connection
-  getEachCustomerAFSFolders = async cloud => {
+  getEachCustomerAFSFolders = async (cloud) => {
     let remoteDetails = {};
     _.set(remoteDetails, "ftp_path", `/${this.props.selectedCustomer.id}`);
     this.showLoading();
     const res = await ApplicationApi.getCustomerAfsFolders({
-      customer_id: this.props.selectedCustomer.id
+      customer_id: this.props.selectedCustomer.id,
     });
     let remoteFiles = null;
     if (!res.data.error) {
@@ -110,7 +110,7 @@ class AddNewApplication extends Component {
         checkedAll: false,
         showRemoteFiles: true,
         enterRemoteDetails: false,
-        showApplicationDetails: false
+        showApplicationDetails: false,
       },
       this.hideLoading
     );
@@ -119,7 +119,7 @@ class AddNewApplication extends Component {
    * @param {*} cloud
    * on selecting the source to transfer the files
    */
-  onCloudSelect = async cloud => {
+  onCloudSelect = async (cloud) => {
     if (cloud.name == "AFS") {
       this.getEachCustomerAFSFolders(cloud);
       return;
@@ -137,7 +137,7 @@ class AddNewApplication extends Component {
         remoteDetails,
         selectedCloud: cloud.name,
         showClouds: false,
-        enterRemoteDetails: true
+        enterRemoteDetails: true,
       },
       this.hideLoading
     );
@@ -150,7 +150,7 @@ class AddNewApplication extends Component {
       invalidSeqError: "",
       showClouds: true,
       enterRemoteDetails: false,
-      showRemoteFiles: false
+      showRemoteFiles: false,
     });
   };
 
@@ -160,14 +160,14 @@ class AddNewApplication extends Component {
       enterRemoteDetails: true,
       selectedFolderError: "",
       invalidSeqError: "",
-      ftp_files_path: []
+      ftp_files_path: [],
     });
   };
   /**
-   * @param {*} remoteDetails 
+   * @param {*} remoteDetails
    * Showing the ftp details
    */
-  showRemoteFiles = async remoteDetails => {
+  showRemoteFiles = async (remoteDetails) => {
     remoteDetails.customer_id = this.props.selectedCustomer.id;
     remoteDetails.id = _.get(this.state, "remoteDetails.id", "");
     this.showLoading();
@@ -178,8 +178,8 @@ class AddNewApplication extends Component {
       res = await ApplicationApi.getContentsOfPath({
         customer_id: this.props.selectedCustomer.id,
         ...(!_.isEmpty(remoteDetails.ftp_path) && {
-          ftp_path: remoteDetails.ftp_path
-        })
+          ftp_path: remoteDetails.ftp_path,
+        }),
       });
       let remoteFiles = null;
       if (!res.data.error) {
@@ -196,7 +196,7 @@ class AddNewApplication extends Component {
           checkedAll: false,
           showRemoteFiles: true,
           enterRemoteDetails: false,
-          showApplicationDetails: false
+          showApplicationDetails: false,
         },
         this.hideLoading
       );
@@ -215,7 +215,7 @@ class AddNewApplication extends Component {
         enterRemoteDetails: false,
         showApplicationDetails: false,
         selectedFolderError: "",
-        invalidSeqError: ""
+        invalidSeqError: "",
       },
       () => {
         this.state.selectedCloud == "AFS"
@@ -225,20 +225,20 @@ class AddNewApplication extends Component {
     );
   };
   /**
-   * @param {*} path 
+   * @param {*} path
    * Displaying the files inside the ftp path
    */
-  getContentsOfPath = async path => {
+  getContentsOfPath = async (path) => {
     this.showLoading();
     let showCheckAll = false;
     const res = await ApplicationApi.getContentsOfPath({
       customer_id: this.props.selectedCustomer.id,
-      ftp_path: path
+      ftp_path: path,
     });
     let remoteFiles = null;
     if (!res.data.error) {
       remoteFiles = res.data.data;
-      showCheckAll = _.some(remoteFiles, file =>
+      showCheckAll = _.some(remoteFiles, (file) =>
         minFourDigitsInString(file.name)
       );
     }
@@ -249,16 +249,16 @@ class AddNewApplication extends Component {
         selectedFolderError: "",
         invalidSeqError: "",
         checkedAll: false,
-        showCheckAll
+        showCheckAll,
       },
       this.hideLoading
     );
   };
 
-  getContents = async file => {
+  getContents = async (file) => {
     let { path } = this.state;
     this.setState({
-      ftp_files_path: [...this.state.ftp_files_path, file.name]
+      ftp_files_path: [...this.state.ftp_files_path, file.name],
     });
     path = `${path}/${file.name}`;
     await this.getContentsOfPath(path);
@@ -269,7 +269,7 @@ class AddNewApplication extends Component {
     let remoteFiles = [...this.state.remoteFiles];
     let checkedArray = [];
     let checkedLength = 0;
-    remoteFiles.forEach(remoteFile => {
+    remoteFiles.forEach((remoteFile) => {
       if (file.name == remoteFile.name) {
         _.set(file, "checked", event.target.checked);
       }
@@ -280,14 +280,14 @@ class AddNewApplication extends Component {
     });
     this.setState({
       remoteFiles,
-      checkedAll: checkedLength == checkedArray.length
+      checkedAll: checkedLength == checkedArray.length,
     });
   };
   //triggers when user clicks on checkall button
-  checkedAllFolders = event => {
+  checkedAllFolders = (event) => {
     let remoteFiles = this.state.remoteFiles;
     let checkedAll = false;
-    remoteFiles.map(file => {
+    remoteFiles.map((file) => {
       if (minFourDigitsInString(file.name)) {
         _.set(file, "checked", event.target.checked);
         checkedAll = event.target.checked;
@@ -296,10 +296,10 @@ class AddNewApplication extends Component {
     this.setState({ remoteFiles, checkedAll });
   };
   /**
-   * @param {*} appDetails 
+   * @param {*} appDetails
    * Moving back to the previus screen
    */
-  goBack = async appDetails => {
+  goBack = async (appDetails) => {
     let { path, remoteDetails } = this.state;
     if (!path || remoteDetails.root_path === path) {
       return;
@@ -333,14 +333,15 @@ class AddNewApplication extends Component {
   proceedToUploadSequence = async () => {
     this.showLoading();
     let { selectedCustomer, selectedSubmission } = this.props;
-    const validSequencesArray = this.state.validSequencesArray;
+    let { validSequencesArray } = this.state;
+    validSequencesArray = validSequencesArray.map((seq) => seq.ftpPath);
     const res = await ApplicationApi.saveSequenceDetails({
       customer_id: selectedCustomer.id,
       submission_id: selectedSubmission.id,
       additional_details: {
         auth_id: this.state.auth_id,
-        sequence_paths: validSequencesArray
-      }
+        sequence_paths: validSequencesArray,
+      },
     });
     if (res.data.error) {
       this.setState(
@@ -355,18 +356,36 @@ class AddNewApplication extends Component {
     }
     this.openApplicationsScreen();
   };
+
+  /**
+   * Ticket-OMNG-1096 ,(Sprint-32), Displaying confirmation modal to rewrite the existing sequences for an application
+   */
+  showConfirmToWIP() {
+    Modal.confirm({
+      className: "omnimodal",
+      title: translate("label.overwriteExistingSequences.title"),
+      content: translate("label.overwriteSequences.confirmation"),
+      okText: translate("label.generic.yes"),
+      cancelText: translate("label.generic.no"),
+      onOk: () => {
+        this.proceedToUploadSequence();
+      },
+      onCancel: () => {},
+    });
+  }
+
   /**
    * Displaying the application details in the application details screen
    * If the submission has valid sequences
-   * @param {*} selectedFolder 
+   * @param {*} selectedFolder
    */
-  showApplicationDetails = async selectedFolder => {
+  showApplicationDetails = async (selectedFolder) => {
     this.setState({
       addApplicationinvalidSeq: [],
       validSequencesArray: [],
       invalidSeqError: "",
       selectedFolderError: "",
-      showInvalidSeqFooter: false
+      showInvalidSeqFooter: false,
     });
 
     let { path, isAddingSequence, selectedFolderPath } = this.state;
@@ -382,12 +401,12 @@ class AddNewApplication extends Component {
       let res = await ApplicationApi.isValidFTPSequenceFolder({
         customer_id: selectedCustomer.id,
         ftp_paths: this.getCheckedPaths(),
-        submission_id: selectedSubmission.id
+        submission_id: selectedSubmission.id,
       });
       if (_.get(res, "data.error")) {
         this.setState(
           {
-            selectedFolderError: _.get(res, "data.message")
+            selectedFolderError: _.get(res, "data.message"),
           },
           this.hideLoading
         );
@@ -407,21 +426,22 @@ class AddNewApplication extends Component {
         this.setState(
           {
             invalidSeqError: "An issue occurred during upload.",
-            addApplicationinvalidSeq
+            addApplicationinvalidSeq,
           },
           this.hideLoading
         );
         return;
       }
       if (validSequences && !invalidSequences) {
-        this.proceedToUploadSequence();
+        this.hideLoading();
+        this.showConfirmToWIP();
         return;
       }
       if (!_.get(res, "data.isSequence")) {
         this.setState(
           {
             selectedFolderError:
-              "Invalid folder. Please select a Sequence folder."
+              "Invalid folder. Please select a Sequence folder.",
           },
           this.hideLoading
         );
@@ -439,14 +459,14 @@ class AddNewApplication extends Component {
       res = await ApplicationApi.isValidAFSSubmissionFolder({
         customer_id: this.props.selectedCustomer.id,
         ...(!_.isEmpty(path) && {
-          afs_path: path
-        })
+          afs_path: path,
+        }),
       });
     } else {
       //Implement submission validations for FTP cloud
       res = await ApplicationApi.isValidFTPSubmissionFolder({
         customer_id: this.props.selectedCustomer.id,
-        ftp_path: path
+        ftp_path: path,
       });
     }
     selectedFolderPath = path;
@@ -474,7 +494,7 @@ class AddNewApplication extends Component {
       selectedRegion,
       appNumber,
       regions,
-      validSequences
+      validSequences,
     };
 
     if (invalidSequences) {
@@ -522,7 +542,7 @@ class AddNewApplication extends Component {
       application_types,
       cloud_types,
       regions,
-      submission_centers
+      submission_centers,
     } = data;
     console.log(this.state);
     this.setState(
@@ -535,7 +555,7 @@ class AddNewApplication extends Component {
         cloud_types,
         regions,
         submission_centers,
-        path
+        path,
       },
       this.hideLoading
     );
@@ -548,20 +568,20 @@ class AddNewApplication extends Component {
   };
   /**
    * Saving the uploaded submission/sequence details
-   * @param {*} obj 
+   * @param {*} obj
    */
-  saveDetails = async obj => {
+  saveDetails = async (obj) => {
     obj.customer_id = this.props.selectedCustomer.id;
     //we need to remove cloud_type_id for cloud type AFS later
     obj.cloud_type_id = 1;
     if (this.state.selectedCloud == "AFS") {
       obj.additional_details = {
-        submission_path: this.state.selectedFolderPath
+        submission_path: this.state.selectedFolderPath,
       };
     } else {
       obj.additional_details = {
         auth_id: this.state.auth_id,
-        submission_path: this.state.selectedFolderPath
+        submission_path: this.state.selectedFolderPath,
       };
     }
     this.showLoading();
@@ -654,8 +674,8 @@ class AddNewApplication extends Component {
             style={{
               ...(index == this.state.ftp_files_path.length - 1 && {
                 opacity: 0.4,
-                cursor: "not-allowed"
-              })
+                cursor: "not-allowed",
+              }),
             }}
           >
             {path}
@@ -693,6 +713,13 @@ class AddNewApplication extends Component {
   /**Showing the application details lookup data */
   showAppDetails = () => {
     if (this.state.isAddingSequence) {
+      let { validSequencesArray } = this.state;
+      //Ticket-OMNG- , (Srint-32), Checking if there are any existing sequences to overwrite
+      let overWrite = _.some(validSequencesArray, ["isWIP", true]);
+      if (overWrite) {
+        this.showConfirmToWIP();
+        return;
+      }
       this.proceedToUploadSequence();
       return;
     }
@@ -729,7 +756,7 @@ class AddNewApplication extends Component {
       showInvalidSeqFooter,
       appNumber,
       appType,
-      selectedRegion
+      selectedRegion,
     } = this.state;
     return (
       <React.Fragment>
@@ -769,7 +796,7 @@ class AddNewApplication extends Component {
               {translate("label.button.add", {
                 type: isAddingSequence
                   ? translate("label.dashboard.sequence")
-                  : translate("label.dashboard.application")
+                  : translate("label.dashboard.application"),
               })}
             </span>
           </div>
@@ -784,7 +811,7 @@ class AddNewApplication extends Component {
                 style={{
                   display: "inline-block",
                   maxWidth: "650px",
-                  wordBreak: "break-all"
+                  wordBreak: "break-all",
                 }}
               >
                 {this.getFtpFilesPath()}
@@ -915,26 +942,26 @@ class AddNewApplication extends Component {
               <ApplicationDetails
                 cancel={this.cancelApplicationDetails}
                 submit={this.saveDetails}
-                regions={_.map(regions, region => ({
+                regions={_.map(regions, (region) => ({
                   key: region.id,
-                  value: region.name
+                  value: region.name,
                 }))}
-                centers={_.map(submission_centers, center => ({
+                centers={_.map(submission_centers, (center) => ({
                   key: center.id,
-                  value: center.name
+                  value: center.name,
                 }))}
-                types={_.map(application_types, type => ({
+                types={_.map(application_types, (type) => ({
                   key: type.id,
-                  value: type.name
+                  value: type.name,
                 }))}
                 validSequences={validSequences}
                 selectedRegion={{
                   key: _.get(selectedRegion, "id"),
-                  value: _.get(selectedRegion, "name")
+                  value: _.get(selectedRegion, "name"),
                 }}
                 appType={{
                   key: _.get(appType, "id"),
-                  value: _.get(appType, "name")
+                  value: _.get(appType, "name"),
                 }}
                 appNumber={appNumber}
               />
@@ -951,7 +978,7 @@ function mapStateToProps(state) {
     loading: state.Api.loading,
     selectedCustomer: state.Customer.selectedCustomer,
     selectedSubmission: state.Application.selectedSubmission,
-    role: state.Login.role
+    role: state.Login.role,
   };
 }
 
