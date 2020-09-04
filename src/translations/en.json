@@ -310,5 +310,7 @@
   "label.button.delete": "Delete",
   "label.deleteSequences.heading": "Delete Sequences",
   "label.deleteSequences.warning": "The application will be temporarily inaccessible while sequences are being deleted.",
-  "label.deleteAllSequences.warning": "You have chosen to delete all the Sequences, instead, do you wish to select"
+  "label.deleteAllSequences.warning": "You have chosen to delete all the Sequences, instead, do you wish to select",
+  "label.overwriteExistingSequences.title": "Overwrite Existing Sequences",
+  "label.overwriteSequences.confirmation": "A few sequences already exist. Do you want to continue to overwrite the existing sequences?"
 }
