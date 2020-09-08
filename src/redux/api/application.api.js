@@ -41,6 +41,10 @@ export default {
     api.get(URI.GET_FTP_DETAILS.replace("{customerId}", customerId)),
   getCustomerAfsFolders: (data) => api.post(URI.GET_CUSTOMER_AFS_FOLDERS, data),
   getContentsOfPath: (data) => api.post(URI.GET_FTP_CONTENTS, data),
+  getDirectoriesAndFiles: (data) =>
+    api.post(URI.GET_DIRECTORIES_AND_FILES, data),
+  uploadAFSMultipleApplications: (data) =>
+    api.post(URI.GET_DIRECTORIES_FROM_MULTIPLE_APPLICATION, data),
   isValidAFSSubmissionFolder: (data) => api.post(URI.IS_AFS_FOLDER, data),
   isValidFTPSubmissionFolder: (data) => api.post(URI.IS_VALID_FOLDER, data),
   isValidFTPSequenceFolder: (data) =>

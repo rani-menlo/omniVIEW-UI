@@ -12,7 +12,7 @@ const onSelect = (cb, cloud) => () => {
 
 const ChooseCloud = ({ onCloudSelect, role }) => {
   const buttonStyle = {
-    width: "12%",
+    width: "107px",
     height: "100px"
   };
   let clouds = CLOUDS;
