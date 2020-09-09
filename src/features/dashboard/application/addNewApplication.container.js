@@ -306,11 +306,19 @@ class AddNewApplication extends Component {
   };
 
   getContents = async (file) => {
-    let { path } = this.state;
+    let { path, selectedCloud } = this.state;
+    console.log(
+      [...this.state.ftp_files_path, file.name],
+      this.state.ftp_files_path
+    );
+    let ftp_files_path =
+      selectedCloud === "FTP"
+        ? [...this.state.ftp_files_path, file.name]
+        : [...this.state.ftp_files_path, file.fullName];
     this.setState({
-      ftp_files_path: [...this.state.ftp_files_path, file.name],
+      ftp_files_path,
     });
-    path = `${path}/${file.name}`;
+    path = selectedCloud === "FTP" ? `${path}/${file.name}` : file.fullName;
     if (this.state.selectedCloud === "FTP") {
       await this.getContentsOfPath(path);
     } else {
@@ -468,18 +476,18 @@ class AddNewApplication extends Component {
 
   /**
    * Ticket-OMNG-1100 ,(Sprint-32), Uploading multiple submissions via site-to-site connector
-   * @param {*} path
    */
   uploadSiteToSiteMultipleSubmissions = async () => {
     this.showLoading();
     let { remoteFiles } = this.state;
     let submission_path = [];
     remoteFiles.map((file) => {
-      file.checked && submission_path.push(`/${_.get(file, "name", "")}`);
+      file.checked && submission_path.push(`${_.get(file, "name", "")}`);
     });
     let res = await ApplicationApi.uploadAFSMultipleApplications({
       customer_id: this.props.selectedCustomer.id,
-      submission_path: submission_path,
+      submission_ids: submission_path,
+      submission_path: _.get(this.state, "path", ""),
     });
     this.hideLoading();
     if (!_.get(res, "data.error")) {
