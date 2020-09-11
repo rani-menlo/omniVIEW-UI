@@ -10,7 +10,7 @@ import {
   Row,
   OmniButton,
   Loader,
-  ImageLoader
+  ImageLoader,
 } from "../../uikit/components";
 import { ApplicationApi } from "../../redux/api";
 import {
@@ -20,7 +20,7 @@ import {
   UPLOAD_FAILED,
   ANALYZING,
   UPLOAD_PROCESSING,
-  SCRIPT_ERROR
+  SCRIPT_ERROR,
 } from "../../constants";
 import { ApiActions } from "../../redux/actions";
 
@@ -29,7 +29,7 @@ class SubmissionCard extends Component {
     submission: PropTypes.object,
     onSelect: PropTypes.func,
     onMenuItemClick: PropTypes.func,
-    customer: PropTypes.object
+    customer: PropTypes.object,
   };
 
   constructor(props) {
@@ -39,46 +39,48 @@ class SubmissionCard extends Component {
       reportData: [],
       openFailuresModal: false,
       selectedRows: [],
-      crossRefs: false
+      crossRefs: false,
     };
     this.Columns = [
       {
         title: "Sequence #",
         dataIndex: "pipeline_name",
         key: "id",
-        render: text => <Text type="regular" size="14px" text={text || 1001} />,
-        width: 110
+        render: (text) => (
+          <Text type="regular" size="14px" text={text || 1001} />
+        ),
+        width: 110,
       },
 
       {
         title: "Error Description",
         dataIndex: "error_message",
         key: "error",
-        render: text => (
+        render: (text) => (
           <Text
             type="regular"
             size="14px"
             text={text}
             textStyle={{ wordWrap: "break-word", wordBreak: "break-word" }}
           />
-        )
-      }
+        ),
+      },
     ];
   }
 
   openFailures = async () => {
     this.props.dispatch(ApiActions.requestOnDemand());
     const res = await ApplicationApi.monitorStatus({
-      submission_id: this.props.submission.id
+      submission_id: this.props.submission.id,
     });
     const { data } = res;
     const failures = _.filter(
       _.get(data, "result"),
-      seq => seq.status == UPLOAD_FAILED
+      (seq) => seq.status == UPLOAD_FAILED
     );
     this.setState({
       reportData: failures,
-      openFailuresModal: true
+      openFailuresModal: true,
     });
     this.props.dispatch(ApiActions.successOnDemand());
   };
@@ -93,7 +95,7 @@ class SubmissionCard extends Component {
   };
 
   //Opens this modal to display the cross referenced sequences
-  openCrossrefsModal = e => {
+  openCrossrefsModal = (e) => {
     e.stopPropagation();
     if (this.state.crossRefs) {
       return;
@@ -101,7 +103,7 @@ class SubmissionCard extends Component {
     this.setState({ crossRefs: true });
   };
 
-  closeCrossrefsModal = e => {
+  closeCrossrefsModal = (e) => {
     e.stopPropagation();
     this.setState({ crossRefs: false }, () => {
       e.stopPropagation();
@@ -114,7 +116,7 @@ class SubmissionCard extends Component {
       onSelect,
       getMenu,
       customer,
-      openFailures
+      openFailures,
     } = this.props;
     const { crossRefs } = this.state;
     const uploading = _.get(submission, "is_uploading");
@@ -129,8 +131,8 @@ class SubmissionCard extends Component {
           className="submissioncard"
           style={{
             ...((uploading || submission.analyzing || is_deleting) && {
-              cursor: "not-allowed"
-            })
+              cursor: "not-allowed",
+            }),
           }}
         >
           {/* Heading of the application card */}
@@ -139,8 +141,8 @@ class SubmissionCard extends Component {
               className="submissioncard__heading-text global__cursor-pointer"
               style={{
                 ...((uploading || submission.analyzing || is_deleting) && {
-                  cursor: "not-allowed"
-                })
+                  cursor: "not-allowed",
+                }),
               }}
               onClick={onSelect && onSelect(submission)}
             >
@@ -172,118 +174,137 @@ class SubmissionCard extends Component {
                 // _.get(submission, "sequence_failed.length") ==
                 //   _.get(submission, "sequence_count") ||
                 "") && {
-                cursor: "not-allowed"
-              })
+                cursor: "not-allowed",
+              }),
             }}
             onClick={onSelect && onSelect(submission)}
           >
-            {/* when delete sequences is inprogress displaying below block */}
-            {
-              is_deleting && (
-                <React.Fragment>
-                  <div style={{ padding: "10px" }}>
-                    <Text      
-                      type="medium"
-                      textStyle={{ marginTop: "30%", textAlign: "center" }}
-                      text="Delete Sequence(s) is in progress..."
-                    />
-                  </div>
-                </React.Fragment>
-              )
-            }
-            {((uploading ||
-              submission.analyzing ||
-              (_.get(submission, "sequence_failed.length") &&
-                is_submission == 1) || 
-              "") && !is_deleting) && (
+            {/* When uploading multiple submissions via site to site connector,
+            in the backend pre-validations will be done, so till the time we need
+            to show the message "Validation is in progress" as part of the story OMNG-1100, Sprint-32 */}
+            {submission.sequence_count === 0 && (
               <React.Fragment>
                 <div style={{ padding: "10px" }}>
-                  {/* Displaying uploaded sequences by total sequences */}
-                  {(_.get(submission, "sequence_inProgress.length") || "") && (
-                    <Text
-                      type="medium"
-                      textStyle={{ color: "#00d592" }}
-                      text={`Sequences Uploaded: ${_.get(
-                        submission,
-                        "sequence_success.length",
-                        0
-                      ) +
-                        _.get(
-                          submission,
-                          "sequence_processing.length",
-                          0
-                        )} / ${_.get(submission, "sequence_count", 0)}`}
-                    />
-                  )}
-                  {/* Displaying processing sequences and sucess sequences by total sequences when there are no pending sequences */}
-                  {!(_.get(submission, "sequence_inProgress.length") || "") && (
-                    <Text
-                      type="medium"
-                      textStyle={{ color: "#00d592" }}
-                      text={`Sequences Uploaded: ${_.get(
-                        submission,
-                        "sequence_success.length",
-                        0
-                      ) +
-                        _.get(
-                          submission,
-                          "sequence_processing.length",
-                          0
-                        )} / ${_.get(submission, "sequence_count", 0)}`}
-                    />
-                  )}
-                  {/* Displaying Failed Sequences */}
-                  {/* {(_.get(submission, "sequence_failed.length") || "") && ( */}
-                  {/* {_.get(submission, "sequence_failed.length") ==
-                    _.get(submission, "sequence_count") && ( */}
                   <Text
                     type="medium"
-                    textStyle={{ color: "red" }}
-                    text={`Sequences Failed: ${_.get(
-                      submission,
-                      "sequence_failed.length",
-                      0
-                    )}`}
+                    textStyle={{ marginTop: "30%", textAlign: "center" }}
+                    text="Validation is in progress..."
                   />
-                  {/* )} */}
-                  {/* )} */}
-                  {submission.analyzing &&
-                    !(_.get(submission, "sequence_failed.length") || "") && (
-                      <Text
-                        type="medium"
-                        textStyle={{ marginTop: "12%", textAlign: "center" }}
-                        text="Processing uploaded sequence(s)..."
-                      />
-                    )}
-                  {uploading &&
-                    !submission.analyzing &&
-                    (_.get(submission, "sequence_inProgress.length") || "") && (
-                      <Text
-                        type="medium"
-                        textStyle={{ marginTop: "12%", textAlign: "center" }}
-                        text="Upload is in progress..."
-                      />
-                    )}
                 </div>
-                {_.get(submission, "sequence_inProgress.length") == 0 &&
-                  _.get(submission, "sequence_failed.length") != 0 && (
-                    <OmniButton
-                      className="submissioncard__content-report"
-                      label="View Report"
-                      onClick={openFailures}
-                      type="danger"
-                      buttonStyle={{ borderColor: "unset" }}
-                    />
-                  )}
               </React.Fragment>
             )}
+            {/* when delete sequences is inprogress displaying below block */}
+            {is_deleting && (
+              <React.Fragment>
+                <div style={{ padding: "10px" }}>
+                  <Text
+                    type="medium"
+                    textStyle={{ marginTop: "30%", textAlign: "center" }}
+                    text="Delete Sequence(s) is in progress..."
+                  />
+                </div>
+              </React.Fragment>
+            )}
+            {(uploading ||
+              submission.analyzing ||
+              (_.get(submission, "sequence_failed.length") &&
+                is_submission == 1) ||
+              "") &&
+              !is_deleting &&
+              submission.sequence_count !== 0 && (
+                <React.Fragment>
+                  <div style={{ padding: "10px" }}>
+                    {/* Displaying uploaded sequences by total sequences */}
+                    {(_.get(submission, "sequence_inProgress.length") ||
+                      "") && (
+                      <Text
+                        type="medium"
+                        textStyle={{ color: "#00d592" }}
+                        text={`Sequences Uploaded: ${_.get(
+                          submission,
+                          "sequence_success.length",
+                          0
+                        ) +
+                          _.get(
+                            submission,
+                            "sequence_processing.length",
+                            0
+                          )} / ${_.get(submission, "sequence_count", 0)}`}
+                      />
+                    )}
+                    {/* Displaying processing sequences and sucess sequences by total sequences when there are no pending sequences */}
+                    {!(
+                      _.get(submission, "sequence_inProgress.length") || ""
+                    ) && (
+                      <Text
+                        type="medium"
+                        textStyle={{ color: "#00d592" }}
+                        text={`Sequences Uploaded: ${_.get(
+                          submission,
+                          "sequence_success.length",
+                          0
+                        ) +
+                          _.get(
+                            submission,
+                            "sequence_processing.length",
+                            0
+                          )} / ${_.get(submission, "sequence_count", 0)}`}
+                      />
+                    )}
+                    {/* Displaying Failed Sequences */}
+                    {/* {(_.get(submission, "sequence_failed.length") || "") && ( */}
+                    {/* {_.get(submission, "sequence_failed.length") ==
+                    _.get(submission, "sequence_count") && ( */}
+                    <Text
+                      type="medium"
+                      textStyle={{ color: "red" }}
+                      text={`Sequences Failed: ${_.get(
+                        submission,
+                        "sequence_failed.length",
+                        0
+                      )}`}
+                    />
+                    {/* )} */}
+                    {/* )} */}
+                    {submission.analyzing &&
+                      !(_.get(submission, "sequence_failed.length") || "") && (
+                        <Text
+                          type="medium"
+                          textStyle={{ marginTop: "12%", textAlign: "center" }}
+                          text="Processing uploaded sequence(s)..."
+                        />
+                      )}
+                    {uploading &&
+                      !submission.analyzing &&
+                      (_.get(submission, "sequence_inProgress.length") ||
+                        "") && (
+                        <Text
+                          type="medium"
+                          textStyle={{ marginTop: "12%", textAlign: "center" }}
+                          text="Upload is in progress..."
+                        />
+                      )}
+                  </div>
+                  {_.get(submission, "sequence_inProgress.length") == 0 &&
+                    _.get(submission, "sequence_failed.length") != 0 && (
+                      <OmniButton
+                        className="submissioncard__content-report"
+                        label="View Report"
+                        onClick={openFailures}
+                        type="danger"
+                        buttonStyle={{ borderColor: "unset" }}
+                      />
+                    )}
+                </React.Fragment>
+              )}
             {/* Sequence is uploaded successfully (or) process of deleting sequences is done and able to access the application */}
             {!uploading &&
               !submission.analyzing &&
               // !(
               //   submission.sequence_failed && submission.sequence_failed.length
               // ) &&
-              is_submission == 0 && !is_deleting && (
+              is_submission == 0 &&
+              !is_deleting && (
                 <React.Fragment>
                   <div className="submissioncard__content__item">
                     <p className="submissioncard__content__item-label">
@@ -309,7 +330,7 @@ class SubmissionCard extends Component {
                           maxWidth: "90px",
                           overflow: "hidden",
                           textOverflow: "ellipsis",
-                          textAlign: "right"
+                          textAlign: "right",
                         }}
                         title={_.get(submission, "created_by", "")}
                       >
