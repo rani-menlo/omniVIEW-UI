@@ -136,7 +136,7 @@ const URI = {
   GET_CUSTOMER_AFS_FOLDERS: `${path}upload/listCustomerAFS`,
   GET_FTP_CONTENTS: `${path}upload/getContentsOfFTPPath`,
   GET_DIRECTORIES_AND_FILES: `${path}upload/getDirectoriesAndFiles`,
-  GET_DIRECTORIES_FROM_MULTIPLE_APPLICATION: `${path}upload/getDirectoriesFromMultipleApplication`,
+  SAVE_MULTIPLE_SUBMISSIONS_FROM_WORK_FOLDER: `${path}upload/saveMultipleSubmissionsFromWorkFolder`,
   IS_AFS_FOLDER: `${path}upload/isValidAFSSubmissionFolder`,
   IS_VALID_FOLDER: `${path}upload/isValidFTPSubmissionFolder`,
   IS_VALID_SEQUENCE_FOLDER: `${path}upload/isValidFTPSequenceFolder`,

@@ -124,18 +124,32 @@ class AddNewApplication extends Component {
    */
   getSiteToSiteApplicationsFolders = async (
     cloud = "Site to Site Connector",
-    path = ""
+    path
   ) => {
     this.showLoading();
     let showCheckAll = false;
-    let { remoteDetails, selectedCloud } = this.state;
+    let { selectedCloud } = this.state;
     let remoteFiles = null;
     let res = await ApplicationApi.getDirectoriesAndFiles({
       customer_id: this.props.selectedCustomer.id,
-      afs_path: path,
+      workFolderPath: path || "",
     });
     if (!res.data.error) {
       remoteFiles = res.data.data;
+      if (!path && remoteFiles.length) {
+        let workfolderpath = _.get(remoteFiles[0], "fullName", "");
+        let ftp_path =
+          workfolderpath.lastIndexOf(_.get(remoteFiles[0], "name")) > -1
+            ? workfolderpath
+                .split(_.get(remoteFiles[0], "name"))
+                .join("")
+                .replace(/\/$/, "")
+            : "";
+        let remoteDetails = {};
+        _.set(remoteDetails, "ftp_path", ftp_path);
+        this.setState({ remoteDetails });
+        path = ftp_path;
+      }
       showCheckAll = _.some(remoteFiles, (file) =>
         validatingApplicationFolderNames(file.name)
       );
@@ -306,32 +320,27 @@ class AddNewApplication extends Component {
   };
 
   getContents = async (file) => {
-    let { path, selectedCloud } = this.state;
-    console.log(
-      [...this.state.ftp_files_path, file.name],
-      this.state.ftp_files_path
+    let { path } = this.state;
+    await this.setState(
+      {
+        ftp_files_path: [...this.state.ftp_files_path, file.name],
+      },
+      () => {
+        path = `${path}/${file.name}`;
+        if (this.state.selectedCloud === "FTP") {
+          this.getContentsOfPath(path);
+        } else {
+          this.getSiteToSiteApplicationsFolders(
+            "Site to Site Connector ",
+            path
+          );
+        }
+      }
     );
-    let ftp_files_path =
-      selectedCloud === "FTP"
-        ? [...this.state.ftp_files_path, file.name]
-        : [...this.state.ftp_files_path, file.fullName];
-    this.setState({
-      ftp_files_path,
-    });
-    path = selectedCloud === "FTP" ? `${path}/${file.name}` : file.fullName;
-    if (this.state.selectedCloud === "FTP") {
-      await this.getContentsOfPath(path);
-    } else {
-      await this.getSiteToSiteApplicationsFolders(
-        "Site to Site Connector ",
-        path
-      );
-    }
   };
 
   //triggering the event when user clicks on checkbox
   checkedFolder = (file, event) => {
-    console.log("this.state", this.state, file);
     let remoteFiles = [...this.state.remoteFiles];
     const { selectedCloud, isAddingSequence } = this.state;
     let checkedArray = [];
@@ -480,14 +489,14 @@ class AddNewApplication extends Component {
   uploadSiteToSiteMultipleSubmissions = async () => {
     this.showLoading();
     let { remoteFiles } = this.state;
-    let submission_path = [];
+    let submission_names = [];
     remoteFiles.map((file) => {
-      file.checked && submission_path.push(`${_.get(file, "name", "")}`);
+      file.checked && submission_names.push(`${_.get(file, "name", "")}`);
     });
     let res = await ApplicationApi.uploadAFSMultipleApplications({
-      customer_id: this.props.selectedCustomer.id,
-      submission_ids: submission_path,
-      submission_path: _.get(this.state, "path", ""),
+      customerId: this.props.selectedCustomer.id,
+      submissionNames: submission_names,
+      submissionParentPath: _.get(this.state, "path", ""),
     });
     this.hideLoading();
     if (!_.get(res, "data.error")) {
@@ -688,7 +697,6 @@ class AddNewApplication extends Component {
       regions,
       submission_centers,
     } = data;
-    console.log(this.state);
     this.setState(
       {
         selectedFolderError: "",
@@ -787,7 +795,7 @@ class AddNewApplication extends Component {
     if (file_name == "root" && index == 0) {
       let ftp_files_path = [...this.state.ftp_files_path];
       ftp_files_path = ["root"];
-      let path = `${_.get(this.state.remoteDetails, "ftp_path", "")}`;
+      let path = _.get(this.state.remoteDetails, "ftp_path", "");
       this.setState({ ftp_files_path, path }, () => {
         if (this.state.selectedCloud === "FTP") {
           this.getContentsOfPath(path);
@@ -1079,9 +1087,9 @@ class AddNewApplication extends Component {
             {showRemoteFiles && (
               <RemoteFiles
                 isSequence={isAddingSequence}
-                currentPath={selectedCloud === "FTP" && path}
-                rootPath={selectedCloud === "FTP" && remoteDetails.ftp_path}
-                remoteFiles={remoteFiles}
+                currentPath={path || ""}
+                rootPath={_.get(remoteDetails, "ftp_path", "")}
+                remoteFiles={remoteFiles || []}
                 cancel={
                   selectedCloud == "FTP"
                     ? this.enterRemoteDetails

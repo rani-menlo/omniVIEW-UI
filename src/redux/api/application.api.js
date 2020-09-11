@@ -44,7 +44,7 @@ export default {
   getDirectoriesAndFiles: (data) =>
     api.post(URI.GET_DIRECTORIES_AND_FILES, data),
   uploadAFSMultipleApplications: (data) =>
-    api.post(URI.GET_DIRECTORIES_FROM_MULTIPLE_APPLICATION, data),
+    api.post(URI.SAVE_MULTIPLE_SUBMISSIONS_FROM_WORK_FOLDER, data),
   isValidAFSSubmissionFolder: (data) => api.post(URI.IS_AFS_FOLDER, data),
   isValidFTPSubmissionFolder: (data) => api.post(URI.IS_VALID_FOLDER, data),
   isValidFTPSequenceFolder: (data) =>
