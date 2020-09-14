@@ -12,7 +12,10 @@ import {
   Text,
   Toast,
 } from "../../../uikit/components";
-import { minFourDigitsInString } from "../../../utils";
+import {
+  minFourDigitsInString,
+  validatingApplicationFolderNames,
+} from "../../../utils";
 import Header from "../../header/header.component";
 import ApplicationDetails from "./applicationDetails.component";
 import ChooseCloud from "./chooseCloud.component";
@@ -115,6 +118,60 @@ class AddNewApplication extends Component {
       this.hideLoading
     );
   };
+
+  /**
+   * OMNG-1100, Sprint-32, Fetching Site to site submission folders
+   */
+  getSiteToSiteApplicationsFolders = async (
+    cloud = "Site to Site Connector",
+    path
+  ) => {
+    this.showLoading();
+    let showCheckAll = false;
+    let { selectedCloud } = this.state;
+    let remoteFiles = null;
+    let res = await ApplicationApi.getDirectoriesAndFiles({
+      customer_id: this.props.selectedCustomer.id,
+      workFolderPath: path || "",
+    });
+    if (!res.data.error) {
+      remoteFiles = res.data.data;
+      if (!path && remoteFiles.length) {
+        let workfolderpath = _.get(remoteFiles[0], "fullName", "");
+        let ftp_path =
+          workfolderpath.lastIndexOf(_.get(remoteFiles[0], "name")) > -1
+            ? workfolderpath
+                .split(_.get(remoteFiles[0], "name"))
+                .join("")
+                .replace(/\/$/, "")
+            : "";
+        let remoteDetails = {};
+        _.set(remoteDetails, "ftp_path", ftp_path);
+        this.setState({ remoteDetails });
+        path = ftp_path;
+      }
+      showCheckAll = _.some(remoteFiles, (file) =>
+        validatingApplicationFolderNames(file.name)
+      );
+    }
+    this.setState(
+      {
+        selectedCloud: cloud.name,
+        showClouds: false,
+        path,
+        remoteFiles,
+        selectedFolderError: "",
+        invalidSeqError: "",
+        checkedAll: false,
+        showRemoteFiles: true,
+        enterRemoteDetails: false,
+        showApplicationDetails: false,
+        showCheckAll,
+      },
+      this.hideLoading
+    );
+  };
+
   /**
    * @param {*} cloud
    * on selecting the source to transfer the files
@@ -122,6 +179,13 @@ class AddNewApplication extends Component {
   onCloudSelect = async (cloud) => {
     if (cloud.name == "AFS") {
       this.getEachCustomerAFSFolders(cloud);
+      return;
+    }
+    /**
+     * OMNG-1100, Sprint-32, Fetching Site to Site Application
+     */
+    if (cloud.name === "Site to Site Connector") {
+      this.getSiteToSiteApplicationsFolders(cloud, "");
       return;
     }
     this.showLoading();
@@ -257,16 +321,28 @@ class AddNewApplication extends Component {
 
   getContents = async (file) => {
     let { path } = this.state;
-    this.setState({
-      ftp_files_path: [...this.state.ftp_files_path, file.name],
-    });
-    path = `${path}/${file.name}`;
-    await this.getContentsOfPath(path);
+    await this.setState(
+      {
+        ftp_files_path: [...this.state.ftp_files_path, file.name],
+      },
+      () => {
+        path = `${path}/${file.name}`;
+        if (this.state.selectedCloud === "FTP") {
+          this.getContentsOfPath(path);
+        } else {
+          this.getSiteToSiteApplicationsFolders(
+            "Site to Site Connector ",
+            path
+          );
+        }
+      }
+    );
   };
 
   //triggering the event when user clicks on checkbox
   checkedFolder = (file, event) => {
     let remoteFiles = [...this.state.remoteFiles];
+    const { selectedCloud, isAddingSequence } = this.state;
     let checkedArray = [];
     let checkedLength = 0;
     remoteFiles.forEach((remoteFile) => {
@@ -274,6 +350,14 @@ class AddNewApplication extends Component {
         _.set(file, "checked", event.target.checked);
       }
       if (minFourDigitsInString(remoteFile.name)) {
+        checkedArray.push(remoteFile);
+        remoteFile.checked && checkedLength++;
+      }
+      if (
+        !isAddingSequence &&
+        selectedCloud !== "FTP" &&
+        validatingApplicationFolderNames(remoteFile.name)
+      ) {
         checkedArray.push(remoteFile);
         remoteFile.checked && checkedLength++;
       }
@@ -289,6 +373,10 @@ class AddNewApplication extends Component {
     let checkedAll = false;
     remoteFiles.map((file) => {
       if (minFourDigitsInString(file.name)) {
+        _.set(file, "checked", event.target.checked);
+        checkedAll = event.target.checked;
+      }
+      if (validatingApplicationFolderNames(file.name)) {
         _.set(file, "checked", event.target.checked);
         checkedAll = event.target.checked;
       }
@@ -311,7 +399,11 @@ class AddNewApplication extends Component {
     }
     this.setState({ ftp_files_path });
     path = path.substring(0, path.lastIndexOf("/"));
-    this.getContentsOfPath(path);
+    if (this.state.selectedCloud === "FTP") {
+      this.getContentsOfPath(path);
+    } else {
+      this.getSiteToSiteApplicationsFolders("Site to Site Connector ", path);
+    }
   };
 
   getCheckedPaths = () => {
@@ -360,7 +452,7 @@ class AddNewApplication extends Component {
   /**
    * Ticket-OMNG-1096 ,(Sprint-32), Displaying confirmation modal to rewrite the existing sequences for an application
    */
-  showConfirmToWIP() {
+  showConfirmToWIP = () => {
     Modal.confirm({
       className: "omnimodal",
       title: translate("label.overwriteExistingSequences.title"),
@@ -372,7 +464,58 @@ class AddNewApplication extends Component {
       },
       onCancel: () => {},
     });
-  }
+  };
+
+  /**
+   * Ticket-OMNG-1100 ,(Sprint-32), Showing information modal to letting the user to know about the
+   * azure coping and uploading submissions at the background will take some time inorder to view the applications
+   * in the application dashboard
+   */
+  showUploadingSubmissionsInfoModal = (msg) => {
+    Modal.info({
+      className: "omni-info-modal",
+      content: msg,
+      okText: translate("label.generic.ok"),
+      okButtonProps: { className: "omniButton-primary" },
+      onOk: () => {
+        this.props.history.push("/applications");
+      },
+    });
+  };
+
+  /**
+   * Ticket-OMNG-1100 ,(Sprint-32), Uploading multiple submissions via site-to-site connector
+   */
+  uploadSiteToSiteMultipleSubmissions = async () => {
+    this.showLoading();
+    let { remoteFiles } = this.state;
+    let submission_names = [];
+    remoteFiles.map((file) => {
+      file.checked && submission_names.push(`${_.get(file, "name", "")}`);
+    });
+    let res = await ApplicationApi.uploadAFSMultipleApplications({
+      customerId: this.props.selectedCustomer.id,
+      submissionNames: submission_names,
+      submissionParentPath: _.get(this.state, "path", ""),
+    });
+    this.hideLoading();
+    if (!_.get(res, "data.error")) {
+      this.showUploadingSubmissionsInfoModal(
+        _.get(
+          res.data,
+          "message",
+          translate("label.addApplication.prevalidationMsg")
+        )
+      );
+      return;
+    }
+    if (_.get(res, "data.error")) {
+      this.setState({
+        selectedFolderError: _.get(res, "data.message"),
+      });
+      return;
+    }
+  };
 
   /**
    * Displaying the application details in the application details screen
@@ -388,10 +531,20 @@ class AddNewApplication extends Component {
       showInvalidSeqFooter: false,
     });
 
-    let { path, isAddingSequence, selectedFolderPath } = this.state;
+    let {
+      path,
+      isAddingSequence,
+      selectedFolderPath,
+      selectedCloud,
+    } = this.state;
     let { selectedCustomer, selectedSubmission } = this.props;
     path = `${path}/${_.get(selectedFolder, "name", "")}`;
     path = _.replace(path, new RegExp("//", "g"), "/");
+    //As per the ticket OMNG-1100, Sprint-32, creating separate function for uploading multiple submissions via site-to-site connector
+    if (!isAddingSequence && selectedCloud !== "FTP") {
+      this.uploadSiteToSiteMultipleSubmissions();
+      return;
+    }
     // if we are addding sequence, condition passes
     if (isAddingSequence) {
       if (!this.getCheckedPaths().length) {
@@ -544,7 +697,6 @@ class AddNewApplication extends Component {
       regions,
       submission_centers,
     } = data;
-    console.log(this.state);
     this.setState(
       {
         selectedFolderError: "",
@@ -643,21 +795,32 @@ class AddNewApplication extends Component {
     if (file_name == "root" && index == 0) {
       let ftp_files_path = [...this.state.ftp_files_path];
       ftp_files_path = ["root"];
-      let path = `${this.state.remoteDetails.ftp_path}`;
+      let path = _.get(this.state.remoteDetails, "ftp_path", "");
       this.setState({ ftp_files_path, path }, () => {
-        this.getContentsOfPath(path);
+        if (this.state.selectedCloud === "FTP") {
+          this.getContentsOfPath(path);
+        } else {
+          this.getSiteToSiteApplicationsFolders(
+            "Site to Site Connector ",
+            path
+          );
+        }
       });
       return;
     }
     let ftp_files_path = [...this.state.ftp_files_path];
-    let path = this.state.remoteDetails.ftp_path;
+    let path = _.get(this.state.remoteDetails, "ftp_path", "");
     ftp_files_path = ftp_files_path.slice(0, index + 1);
     ftp_files_path = _.tail(ftp_files_path);
     let files = ftp_files_path.length ? ftp_files_path.join("/") : "";
     path = `${path}/${files}`;
     ftp_files_path = ["root", ...ftp_files_path];
     this.setState({ ftp_files_path, path });
-    this.getContentsOfPath(path);
+    if (this.state.selectedCloud === "FTP") {
+      this.getContentsOfPath(path);
+    } else {
+      this.getSiteToSiteApplicationsFolders("Site to Site Connector ", path);
+    }
   };
 
   //displaying ftp files path
@@ -693,7 +856,11 @@ class AddNewApplication extends Component {
       return;
     }
     let { path } = this.state;
-    this.getContentsOfPath(path);
+    if (this.state.selectedCloud == "FTP") {
+      this.getContentsOfPath(path);
+      return;
+    }
+    this.getSiteToSiteApplicationsFolders(path);
   };
   /**
    * Open the modal containing invalid sequences for the uploaded submission
@@ -920,13 +1087,13 @@ class AddNewApplication extends Component {
             {showRemoteFiles && (
               <RemoteFiles
                 isSequence={isAddingSequence}
-                currentPath={path}
-                rootPath={remoteDetails.ftp_path}
-                remoteFiles={remoteFiles}
+                currentPath={path || ""}
+                rootPath={_.get(remoteDetails, "ftp_path", "")}
+                remoteFiles={remoteFiles || []}
                 cancel={
-                  selectedCloud == "AFS"
-                    ? this.showClouds
-                    : this.enterRemoteDetails
+                  selectedCloud == "FTP"
+                    ? this.enterRemoteDetails
+                    : this.showClouds
                 }
                 openContents={this.getContents}
                 goBack={this.goBack}

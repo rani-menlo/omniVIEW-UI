@@ -4,6 +4,13 @@
     display: flex;
     justify-content: space-evenly;
     width: 100%;
+    button {
+      span {
+        word-break: break-all;
+        white-space: break-spaces;
+        width: 65px;
+      }
+    }
     &__item {
       border-radius: 4px;
       padding: 20px;
@@ -27,9 +34,9 @@
       }
     }
   }
-  &__remotefiles_scroll{
+  &__remotefiles_scroll {
     height: 320px;
-     overflow-y: auto;
+    overflow-y: auto;
   }
 }
 .invalid-sequences-table {
@@ -49,24 +56,24 @@
     width: 60%;
   }
 }
-.refresh{
+.refresh {
   display: inline-block;
   float: right;
   cursor: pointer;
-  &.afs{
+  &.afs {
     margin-top: -22px;
   }
-  &.non-afs{
+  &.non-afs {
     margin-top: -3px;
   }
 }
-.omni-info-modal{
-  .ant-modal-confirm-body .ant-modal-confirm-content{
+.omni-info-modal {
+  .ant-modal-confirm-body .ant-modal-confirm-content {
     font-size: 13px;
     font-weight: 600;
     margin-top: 0px !important;
   }
-  .ant-btn-primary{
+  .ant-btn-primary {
     font-size: 12px;
   }
 }

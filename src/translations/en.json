@@ -164,7 +164,7 @@
   "label.newapplication.cloud": "Cloud",
   "label.newapplication.server": "Server",
   "label.newapplication.source": "Source",
-  "text.newapplication.choosesource": "Choose your source cloud/server to connect with.",
+  "text.newapplication.choosesource": "Choose the connector you want to use for transferring the relevant applications/sequences.",
   "text.newapplication.serverdetails": "Enter your source cloud/server details to connect. Fields with an * are mandatory.",
   "text.newapplication.directory": "Select the submission folder which you want to upload.",
   "text.newapplication.applicationdetails": "Enter the details for the selected submission. Fields with an * are mandatory.",
@@ -312,5 +312,6 @@
   "label.deleteSequences.warning": "The application will be temporarily inaccessible while sequences are being deleted.",
   "label.deleteAllSequences.warning": "You have chosen to delete all the Sequences, instead, do you wish to select",
   "label.overwriteExistingSequences.title": "Overwrite Existing Sequences",
-  "label.overwriteSequences.confirmation": "A few sequences already exist. Do you want to continue to overwrite the existing sequences?"
+  "label.overwriteSequences.confirmation": "A few sequences already exist. Do you want to continue to overwrite the existing sequences?",
+  "label.addApplication.prevalidationMsg": "The pre-validation of the Selected Applications/Sequences is in progress. The tile will remain inaccessible until the validation process is complete."
 }

@@ -3,7 +3,10 @@ import _ from "lodash";
 import React, { Component } from "react";
 import { translate } from "../../../translations/translator";
 import { OmniButton, Text } from "../../../uikit/components";
-import { minFourDigitsInString } from "../../../utils";
+import {
+  minFourDigitsInString,
+  validatingApplicationFolderNames,
+} from "../../../utils";
 
 class RemoteFiles extends Component {
   constructor(props) {
@@ -12,11 +15,13 @@ class RemoteFiles extends Component {
     this.state = { selected: null };
   }
 
-  select = file => () => {
-    this.setState({ selected: file });
+  select = (file) => () => {
+    if (this.props.cloud === "FTP") {
+      this.setState({ selected: file });
+    }
   };
 
-  openContents = file => () => {
+  openContents = (file) => () => {
     this.props.openContents && this.props.openContents(file);
     this.setState({ selected: null });
   };
@@ -34,7 +39,7 @@ class RemoteFiles extends Component {
     this.props.selectFolder && this.props.selectFolder(file, e);
   };
 
-  selectAll = event => {
+  selectAll = (event) => {
     this.props.selectAll && this.props.selectAll(event);
   };
 
@@ -47,13 +52,13 @@ class RemoteFiles extends Component {
       isSequence,
       checkedAll,
       showCheckAll,
-      cloud
+      cloud,
     } = this.props;
     const { selected } = this.state;
     return (
       <React.Fragment>
         <div className="addnewapplication__remotefiles">
-          {(rootPath != currentPath || (isSequence && showCheckAll)) && (
+          {(rootPath != currentPath || showCheckAll) && (
             <div
               className="addnewapplication__remotefiles-file global__center-vert global__cursor-pointer"
               style={{ backgroundColor: "#fff" }}
@@ -68,16 +73,20 @@ class RemoteFiles extends Component {
                   <Text type="extra_bold" size="14px" text=".." />
                 </div>
               )}
-              {isSequence && showCheckAll && (
+              {showCheckAll && (cloud !== "FTP" || isSequence) && (
                 <div
                   style={{
                     display: "flex",
                     justifyContent: "flex-end",
                     width: "100%",
                     marginRight:
-                      this.remoteFilesScroll.current.scrollHeight > 320
+                      _.get(
+                        this.remoteFilesScroll.current,
+                        "scrollHeight",
+                        "0"
+                      ) > 320
                         ? "15px"
-                        : "0"
+                        : "0",
                   }}
                 >
                   <Text type="extra_bold" size="14px" text="Select All" />
@@ -99,10 +108,11 @@ class RemoteFiles extends Component {
               return (
                 <div
                   key={index}
-                  className={`addnewapplication__remotefiles-file global__center-vert global__cursor-pointer ${(_.get(
+                  className={`addnewapplication__remotefiles-file global__center-vert global__cursor-pointer ${((_.get(
                     selected,
                     "name"
-                  ) === file.name ||
+                  ) === file.name &&
+                    cloud === "FTP") ||
                     file.checked) &&
                     "global__node-selected"}`}
                   onClick={!isSequence && this.select(file)}
@@ -129,20 +139,36 @@ class RemoteFiles extends Component {
                     <div
                       style={{
                         display: "flex",
-                        justifyContent: "flex-end"
+                        justifyContent: "flex-end",
                       }}
                     >
                       <Checkbox
                         style={{ margin: "2px 5px 0 5px" }}
-                        onChange={e => this.selectFolder(file, e)}
+                        onChange={(e) => this.selectFolder(file, e)}
                         checked={file.checked}
                       />
                     </div>
                   )}
+                  {/* Site-To-Site application folder structure */}
+                  {cloud != "FTP" &&
+                    validatingApplicationFolderNames(file.name) && (
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "flex-end",
+                        }}
+                      >
+                        <Checkbox
+                          style={{ margin: "2px 5px 0 5px" }}
+                          onChange={(e) => this.selectFolder(file, e)}
+                          checked={file.checked}
+                        />
+                      </div>
+                    )}
                 </div>
               );
             })}
-            {cloud == "AFS" && remoteFiles.length == 0 && (
+            {cloud == "FTP" && remoteFiles.length == 0 && (
               <Text
                 type="extra_bold"
                 size="14px"

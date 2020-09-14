@@ -135,6 +135,8 @@ const URI = {
   GET_FTP_DETAILS: `${path}upload/getSavedFTPDetails/{customerId}`,
   GET_CUSTOMER_AFS_FOLDERS: `${path}upload/listCustomerAFS`,
   GET_FTP_CONTENTS: `${path}upload/getContentsOfFTPPath`,
+  GET_DIRECTORIES_AND_FILES: `${path}upload/getDirectoriesAndFiles`,
+  SAVE_MULTIPLE_SUBMISSIONS_FROM_WORK_FOLDER: `${path}upload/saveMultipleSubmissionsFromWorkFolder`,
   IS_AFS_FOLDER: `${path}upload/isValidAFSSubmissionFolder`,
   IS_VALID_FOLDER: `${path}upload/isValidFTPSubmissionFolder`,
   IS_VALID_SEQUENCE_FOLDER: `${path}upload/isValidFTPSequenceFolder`,
@@ -241,10 +243,15 @@ const CLOUDS = {
     name: "FTP",
     disabled: false,
   },
+  //Commented code will use later, so not removing the commented code
   // afs: {
   //   name: "AFS",
   //   disabled: false
   // },
+  siteTosite: {
+    name: `Site to Site Connector`,
+    disabled: false,
+  },
   oneDrive: {
     name: "ONE DRIVE",
     disabled: true,
@@ -254,6 +261,19 @@ const CLOUDS = {
     disabled: true,
   },
 };
+
+const APPLICATION_TYPES = [
+  /^[anda]+?\d{6}$/,
+  /^[bla]+?\d{6}$/,
+  /^[dmf]+?\d{6}$/,
+  /^[eua]+?\d{6}$/,
+  /^[ide]+?\d{6}$/,
+  /^[ind]+?\d{6}$/,
+  /^[nda]+?\d{6}$/,
+  /^[pma]+?\d{6}$/,
+  /^[510k]+?\d{6}$/,
+  /^[si]+?\d{6}$/,
+];
 
 export {
   URI,
@@ -276,4 +296,5 @@ export {
   VALID_VALUES_XML_DATA,
   CLOUDS,
   OPENED_WINDOWS,
+  APPLICATION_TYPES,
 };
