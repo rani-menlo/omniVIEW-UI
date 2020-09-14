@@ -16,7 +16,9 @@ class RemoteFiles extends Component {
   }
 
   select = (file) => () => {
-    this.setState({ selected: file });
+    if (this.props.cloud === "FTP") {
+      this.setState({ selected: file });
+    }
   };
 
   openContents = (file) => () => {
@@ -29,7 +31,9 @@ class RemoteFiles extends Component {
   };
 
   submit = () => {
-    this.props.submit && this.props.submit(this.state.selected);
+    if (this.state.selected) {
+      this.props.submit && this.props.submit(this.state.selected);
+    }
   };
 
   //triggers when a checkbox is checked
@@ -71,7 +75,7 @@ class RemoteFiles extends Component {
                   <Text type="extra_bold" size="14px" text=".." />
                 </div>
               )}
-              {showCheckAll && (cloud !== 'FTP' || isSequence) && (
+              {showCheckAll && (cloud !== "FTP" || isSequence) && (
                 <div
                   style={{
                     display: "flex",
@@ -109,7 +113,8 @@ class RemoteFiles extends Component {
                   className={`addnewapplication__remotefiles-file global__center-vert global__cursor-pointer ${((_.get(
                     selected,
                     "name"
-                  ) === file.name && cloud === "FTP") ||
+                  ) === file.name &&
+                    cloud === "FTP") ||
                     file.checked) &&
                     "global__node-selected"}`}
                   onClick={!isSequence && this.select(file)}
