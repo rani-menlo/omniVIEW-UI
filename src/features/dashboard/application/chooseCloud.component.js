@@ -13,13 +13,14 @@ const onSelect = (cb, cloud) => () => {
 const ChooseCloud = ({ onCloudSelect, role }) => {
   const buttonStyle = {
     width: "107px",
-    height: "100px"
+    height: "100px",
   };
   let clouds = CLOUDS;
   //omitting the afs cloud if the logged in user is not o_odmin
   if (!isLoggedInOmniciaAdmin(role)) {
-    clouds = _.omit(clouds, "afs");
+    clouds = _.omit(clouds, "siteTosite");
   }
+
   return (
     <div className="addnewapplication__cloud">
       {_.map(clouds, (val, key) => (
@@ -37,12 +38,12 @@ const ChooseCloud = ({ onCloudSelect, role }) => {
 };
 
 ChooseCloud.propTypes = {
-  onCloudSelect: PropTypes.func
+  onCloudSelect: PropTypes.func,
 };
 
 function mapStateToProps(state) {
   return {
-    role: state.Login.role
+    role: state.Login.role,
   };
 }
 

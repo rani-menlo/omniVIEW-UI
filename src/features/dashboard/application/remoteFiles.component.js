@@ -31,9 +31,7 @@ class RemoteFiles extends Component {
   };
 
   submit = () => {
-    if (this.state.selected) {
-      this.props.submit && this.props.submit(this.state.selected);
-    }
+    this.props.submit && this.props.submit(this.state.selected);
   };
 
   //triggers when a checkbox is checked
