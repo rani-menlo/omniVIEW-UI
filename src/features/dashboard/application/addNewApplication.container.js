@@ -504,7 +504,7 @@ class AddNewApplication extends Component {
         _.get(
           res.data,
           "message",
-          "Applications are being updated. Please wait..."
+          translate("label.addApplication.prevalidationMsg")
         )
       );
       return;
