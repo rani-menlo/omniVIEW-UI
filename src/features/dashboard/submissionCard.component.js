@@ -182,7 +182,7 @@ class SubmissionCard extends Component {
             {/* When uploading multiple submissions via site to site connector,
             in the backend pre-validations will be done, so till the time we need
             to show the message "Validation is in progress" as part of the story OMNG-1100, Sprint-32 */}
-            {submission.sequence_count === 0 && (
+            {submission.sequence_count === 0 && uploading && (
               <React.Fragment>
                 <div style={{ padding: "10px" }}>
                   <Text
