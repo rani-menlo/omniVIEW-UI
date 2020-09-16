@@ -504,9 +504,9 @@ class TreeNode extends Component {
               modifiedFile.lastIndexOf("#") + 1
             );
             file = _.find(array, { ID: modifiedFile });
-            file.showInCurrentView = true;
+            _.set(file, "showInCurrentView", true);
           } else {
-            file.showInCurrentView = true;
+            _.set(file, "showInCurrentView", true);
           }
         }
       }
