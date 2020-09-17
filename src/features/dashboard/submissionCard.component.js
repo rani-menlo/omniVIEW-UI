@@ -168,6 +168,7 @@ class SubmissionCard extends Component {
             style={{
               ...((uploading ||
                 submission.analyzing ||
+                submission.sequence_count === 0 ||
                 is_deleting ||
                 (_.get(submission, "sequence_failed.length") &&
                   is_submission == 1) ||
