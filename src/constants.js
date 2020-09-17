@@ -62,6 +62,7 @@ const URI = {
   EDIT_CUSTOMER: `${path}customer/editCustomer`,
   ACTIVATE_DEACTIVATE_CUSTOMER: `${path}customer/activateOrDeactivateCustomer`,
   GET_CUSTOMERS: `${path}customer/getCustomers`,
+  GET_CUSTOMERS_LIST: `${path}customer/getCustomersList`,
   GET_DEPARTMENTS: `${path}customer/getDepartments`,
   GET_AVAILABLE_LICENCES: `${path}customer/getAvailableLicences`,
   GET_ALL_LICENCES: `${path}customer/getAllLicences/:customer_id`,
