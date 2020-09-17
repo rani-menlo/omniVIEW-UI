@@ -20,6 +20,9 @@ export default {
       },
     });
   },
+  fetchPopoverCustomers: () => {
+    return api.get(URI.GET_CUSTOMERS_LIST);
+  },
   fetchCustomersByUserId: (data) => {
     return api.post(URI.GET_ACCESSED_CUSTOMERS, data);
   },

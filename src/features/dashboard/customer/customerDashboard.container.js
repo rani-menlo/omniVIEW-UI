@@ -120,8 +120,8 @@ class CustomerDashboard extends Component {
   };
 
   componentWillUnmount() {
-    window.removeEventListener("popstate", this.onBackButtonEvent);
-    this.props.actions.fetchCustomers("");
+    // window.removeEventListener("popstate", this.onBackButtonEvent);
+    // this.props.actions.fetchCustomers("");
   }
 
   /**
@@ -928,7 +928,9 @@ class CustomerDashboard extends Component {
                 ref={this.loaderRef}
                 style={{
                   display:
-                    customers.length === customerCount || loading ? "none" : "block",
+                    customers.length === customerCount || loading
+                      ? "none"
+                      : "block",
                   textAlign: "center",
                 }}
               >

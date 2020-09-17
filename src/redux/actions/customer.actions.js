@@ -43,8 +43,28 @@ export default {
       }
     };
   },
+  fetchPopoverCustomers: () => {
+    return async (dispatch) => {
+      ApiActions.request(dispatch);
+      try {
+        const res = await CustomerApi.fetchPopoverCustomers();
+        dispatch({
+          type: CustomerActionTypes.FETCH_POPOVER_CUSTOMERS,
+          data: res.data,
+        });
+        ApiActions.success(dispatch);
+      } catch (err) {
+        console.log(err);
+        ApiActions.failure(dispatch);
+      }
+    };
+  },
   resetCustomers: () => ({
     type: CustomerActionTypes.FETCH_CUSTOMERS,
+    data: { data: [] },
+  }),
+  resetPopoverCustomers: () => ({
+    type: CustomerActionTypes.FETCH_POPOVER_CUSTOMERS,
     data: { data: [] },
   }),
   addCustomer: (customer, callback) => {
