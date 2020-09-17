@@ -323,7 +323,7 @@ class ApplicationManagement extends Component {
    * @param {*} orderBy
    */
   sortColumn = (sortBy, orderBy) => {
-    this.setState({ sortByColumnId: sortBy, order: orderBy }, () => {
+    this.setState({ sortByColumnId: sortBy, order: orderBy, pageNo: 1 }, () => {
       this.fetchAppSequences(sortBy, orderBy);
     });
   };

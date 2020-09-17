@@ -5,9 +5,9 @@ import { ApiActions } from ".";
 import { Toast } from "../../uikit/components";
 
 export default {
-  fetchCustomersByList: (pageNo, itemsPerPage, sortBy, order, search) => {
+  fetchCustomersByList: (pageNo, itemsPerPage, sortBy, order, search, loader = true) => {
     return async (dispatch) => {
-      ApiActions.request(dispatch);
+      loader && ApiActions.request(dispatch);
       try {
         const res = await CustomerApi.fetchCustomersByList(
           pageNo,

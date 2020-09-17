@@ -25,6 +25,7 @@ import {
   ContentLayout,
   DeactivateModal,
   Toast,
+  Text,
 } from "../../../uikit/components";
 import { DEBOUNCE_TIME, SERVER_URL } from "../../../constants";
 import { translate } from "../../../translations/translator";
@@ -127,10 +128,10 @@ class CustomerDashboard extends Component {
   /**
    * OMNG-1112, Sprint-32, Loading customers on demand
    */
-  loadCustomersOnDemand = (itemsPerPage) => {
+  loadCustomersOnDemand = (itemsPerPage, loader) => {
     itemsPerPage += 20;
     this.setState({ itemsPerPage }, () => {
-      this.fetchCustomers();
+      this.fetchCustomers(loader);
     });
   };
 
@@ -144,7 +145,7 @@ class CustomerDashboard extends Component {
         _.map(entries, (entry) => {
           // 1.0 means totally visible in viewport
           if (entry.intersectionRatio >= 1.0) {
-            this.loadCustomersOnDemand(this.state.itemsPerPage);
+            this.loadCustomersOnDemand(this.state.itemsPerPage, false);
             // unobserve once data loaded
             if (this.state.customers.length === this.props.customerCount) {
               this.observer.unobserve(this.loaderRef.current);
@@ -165,7 +166,7 @@ class CustomerDashboard extends Component {
     window.history.pushState(null, null, window.location.pathname);
     window.addEventListener("popstate", this.onBackButtonEvent);
     if (isLoggedInOmniciaRole(this.props.role)) {
-      this.loadCustomersOnDemand(0);
+      this.loadCustomersOnDemand(0, true);
       this.initLazyLoading();
     } else {
       const { customer } = this.props;
@@ -187,7 +188,7 @@ class CustomerDashboard extends Component {
    * @param {*} sortBy
    * @param {*} orderBy
    */
-  fetchCustomers = (sortBy = "created_at", orderBy = "DESC") => {
+  fetchCustomers = (loader = true, sortBy = "created_at", orderBy = "DESC") => {
     const { viewBy, pageNo, itemsPerPage, searchText } = this.state;
     searchText && this.props.dispatch(CustomerActions.resetCustomers());
     const TableColumns = [...this.state.TableColumns];
@@ -201,7 +202,8 @@ class CustomerDashboard extends Component {
         Number(itemsPerPage),
         sortBy,
         orderBy,
-        searchText || ""
+        searchText || "",
+        loader
       );
       // if (viewBy === "lists") {
       // } else {
@@ -215,7 +217,14 @@ class CustomerDashboard extends Component {
    */
   changeView = (type) => {
     let itemsPerPage = type === "lists" ? 5 : 20;
-    this.setState({ viewBy: type, itemsPerPage }, () => this.fetchCustomers());
+    this.setState({ viewBy: type, itemsPerPage, pageNo: 1 }, () => {
+      if (type === "lists") {
+        this.fetchCustomers();
+      } else {
+        this.loadCustomersOnDemand(itemsPerPage, true);
+        this.initLazyLoading();
+      }
+    });
   };
   /**
    * When user selects the customer to access the applications
@@ -350,7 +359,7 @@ class CustomerDashboard extends Component {
    * @param {*} orderBy
    */
   sortColumn = (sortBy, orderBy) => {
-    this.fetchCustomers(sortBy, orderBy);
+    this.fetchCustomers( true, sortBy, orderBy);
   };
   /**
    * Search
@@ -923,18 +932,21 @@ class CustomerDashboard extends Component {
                     })}
                   </Row>
                 )}
-
               <div
                 ref={this.loaderRef}
                 style={{
                   display:
-                    customers.length === customerCount || loading
-                      ? "none"
-                      : "block",
+                    customers.length === customerCount || loading ? "none" : "block",
                   textAlign: "center",
                 }}
               >
                 <Spin size="large" />
+                <Text
+                  type="extra_bold"
+                  size="20px"
+                  textAlign="center"
+                  text="Loading..."
+                />
               </div>
             </>
           )}
