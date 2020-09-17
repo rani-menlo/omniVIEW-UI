@@ -928,7 +928,7 @@ class CustomerDashboard extends Component {
                 ref={this.loaderRef}
                 style={{
                   display:
-                    customers.length === customerCount ? "none" : "block",
+                    customers.length === customerCount || loading ? "none" : "block",
                   textAlign: "center",
                 }}
               >
