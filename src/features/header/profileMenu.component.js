@@ -128,6 +128,10 @@ class ProfileMenu extends Component {
    * redirect to validate applications scree
    */
   validateApplications = () => {
+    // returning if user is  in the same page and still clicks on menu option to navigate
+    if (this.props.location.pathname === "/applicationStatus") {
+      return;
+    }
     const customer = {
       id: 0,
       company_name: "All Customers",

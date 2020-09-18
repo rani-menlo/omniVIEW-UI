@@ -121,8 +121,7 @@ class CustomerDashboard extends Component {
   };
 
   componentWillUnmount() {
-    // window.removeEventListener("popstate", this.onBackButtonEvent);
-    // this.props.actions.fetchCustomers("");
+    window.removeEventListener("popstate", this.onBackButtonEvent);
   }
 
   /**
@@ -205,10 +204,6 @@ class CustomerDashboard extends Component {
         searchText || "",
         loader
       );
-      // if (viewBy === "lists") {
-      // } else {
-      //   this.props.actions.fetchCustomers(searchText || "");
-      // }
     });
   };
   /**

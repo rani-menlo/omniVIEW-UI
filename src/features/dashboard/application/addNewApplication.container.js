@@ -587,7 +587,13 @@ class AddNewApplication extends Component {
       }
       if (validSequences && !invalidSequences) {
         this.hideLoading();
-        this.showConfirmToWIP();
+        //Ticket-OMNG- , (Srint-32), Checking if there are any existing sequences to overwrite
+        let overWrite = _.some(validSequencesArray, ["isWIP", true]);
+        if (overWrite) {
+          this.showConfirmToWIP();
+          return;
+        }
+        this.proceedToUploadSequence();
         return;
       }
       if (!_.get(res, "data.isSequence")) {
