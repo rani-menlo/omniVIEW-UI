@@ -32,14 +32,15 @@ class PopoverCustomers extends Component {
    * @param {*} sortBy
    * @param {*} orderBy
    */
-  fetchCustomers = (sortBy = "created_at", orderBy = "DESC") => {
-    this.props.dispatch(CustomerActions.resetCustomers());
-    let searchText = "";
-    this.props.actions.fetchCustomers(searchText);
+  fetchCustomers = () => {
+    this.props.dispatch(CustomerActions.resetPopoverCustomers());
+    this.props.actions.fetchPopoverCustomers();
   };
 
   componentDidMount() {
-    // this.fetchCustomers();
+    // if (!_.get(this.props, "popOverCustomers").length) {
+    // }
+    this.fetchCustomers();
     if (this.props.showAll) {
       let allCustomersObj = {
         id: 0,
@@ -50,9 +51,14 @@ class PopoverCustomers extends Component {
   }
 
   render() {
-    const { customers, customer, showAll, selectedUploadedCustomer } = this.props;
+    const {
+      popOverCustomers,
+      customer,
+      showAll,
+      selectedUploadedCustomer,
+    } = this.props;
     const { selectedCustomer } = this.state;
-    const sortedCustomers = _.sortBy(customers, (cust) => {
+    const sortedCustomers = _.sortBy(popOverCustomers, (cust) => {
       return cust.id === customer.id ? 0 : 1;
     });
     if (showAll) {
@@ -83,7 +89,7 @@ class PopoverCustomers extends Component {
 
 function mapStateToProps(state) {
   return {
-    customers: state.Customer.customers,
+    popOverCustomers: state.Customer.popOverCustomers,
     selectedCustomer: state.Customer.selectedCustomer,
     selectedUploadedCustomer: state.Customer.selectedUploadedCustomer,
     user: state.Login.user,

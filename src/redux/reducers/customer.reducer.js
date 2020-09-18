@@ -3,6 +3,7 @@ import _ from "lodash";
 
 const initialState = {
   customers: [],
+  popOverCustomers: [],
   customerCount: 0,
   getCustomers_flag: false,
   selectedCustomer: null,
@@ -26,6 +27,12 @@ export default (state = initialState, action) => {
         customers: action.data.data,
         customerCount: action.data.customerCount,
         getCustomers_flag: true,
+      };
+    }
+    case CustomerActionTypes.FETCH_POPOVER_CUSTOMERS: {
+      return {
+        ...state,
+        popOverCustomers: action.data.data,
       };
     }
     case CustomerActionTypes.ADD_CUSTOMER: {

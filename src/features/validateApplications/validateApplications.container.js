@@ -182,7 +182,9 @@ class ValidateApplications extends Component {
    * @param {*} orderBy
    */
   sortColumn = (sortBy, orderBy) => {
-    this.fetchingBulkuploadedApplications(sortBy, orderBy);
+    this.setState({ pageNo: 1 }, () =>
+      this.fetchingBulkuploadedApplications(sortBy, orderBy)
+    );
   };
 
   /**

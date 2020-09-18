@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import _ from "lodash";
-import { Icon, Dropdown, Menu } from "antd";
+import { Icon, Dropdown, Menu, Spin } from "antd";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import styled from "styled-components";
@@ -25,6 +25,7 @@ import {
   ContentLayout,
   DeactivateModal,
   Toast,
+  Text,
 } from "../../../uikit/components";
 import { DEBOUNCE_TIME, SERVER_URL } from "../../../constants";
 import { translate } from "../../../translations/translator";
@@ -107,6 +108,7 @@ class CustomerDashboard extends Component {
         },
       ],
     };
+    this.loaderRef = React.createRef();
     this.searchCustomers = _.debounce(this.searchCustomers, DEBOUNCE_TIME);
   }
 
@@ -120,16 +122,51 @@ class CustomerDashboard extends Component {
 
   componentWillUnmount() {
     window.removeEventListener("popstate", this.onBackButtonEvent);
-    if(this.state.searchText){
-      this.props.actions.fetchCustomers("");
-    }
+  }
+
+  /**
+   * OMNG-1112, Sprint-32, Loading customers on demand
+   */
+  loadCustomersOnDemand = (itemsPerPage, loader) => {
+    itemsPerPage += 20;
+    this.setState({ itemsPerPage }, () => {
+      this.fetchCustomers(loader);
+    });
+  };
+
+  /**
+   * OMNG-1112, Sprint-32, Loading customers on demand - Implemeted Intersection Observers functionality for lazy loading
+   */
+  initLazyLoading = () => {
+    // configuring IntersectionObserver for lazy loading the data
+    this.observer = new IntersectionObserver(
+      (entries) => {
+        _.map(entries, (entry) => {
+          // 1.0 means totally visible in viewport
+          if (entry.intersectionRatio >= 1.0) {
+            this.loadCustomersOnDemand(this.state.itemsPerPage, false);
+            // unobserve once data loaded
+            if (this.state.customers.length === this.props.customerCount) {
+              this.observer.unobserve(this.loaderRef.current);
+            }
+          }
+        });
+      },
+      {
+        root: null,
+        rootMargin: "0px",
+        threshold: 1.0,
+      }
+    );
+    this.observer.observe(this.loaderRef.current);
   };
 
   componentDidMount() {
     window.history.pushState(null, null, window.location.pathname);
     window.addEventListener("popstate", this.onBackButtonEvent);
     if (isLoggedInOmniciaRole(this.props.role)) {
-      this.fetchCustomers();
+      this.loadCustomersOnDemand(0, true);
+      this.initLazyLoading();
     } else {
       const { customer } = this.props;
       this.onCustomerSelected({ ...customer })();
@@ -137,7 +174,7 @@ class CustomerDashboard extends Component {
   }
 
   static getDerivedStateFromProps(props, state) {
-    if (_.get(props, "customers.length") && !_.get(state, "customers.length")) {
+    if (_.get(props, "customers.length")) {
       return {
         customers: [...props.customers],
       };
@@ -150,26 +187,23 @@ class CustomerDashboard extends Component {
    * @param {*} sortBy
    * @param {*} orderBy
    */
-  fetchCustomers = (sortBy = "created_at", orderBy = "DESC") => {
+  fetchCustomers = (loader = true, sortBy = "created_at", orderBy = "DESC") => {
     const { viewBy, pageNo, itemsPerPage, searchText } = this.state;
-    this.props.dispatch(CustomerActions.resetCustomers());
+    searchText && this.props.dispatch(CustomerActions.resetCustomers());
     const TableColumns = [...this.state.TableColumns];
     TableColumns[0].checked = false;
     this.setState({ customers: [], checkedCustomers: [], TableColumns }, () => {
       /**
        * Fetching the customers in list view
        */
-      if (viewBy === "lists") {
-        this.props.actions.fetchCustomersByList(
-          Number(pageNo),
-          Number(itemsPerPage),
-          sortBy,
-          orderBy,
-          searchText || ""
-        );
-      } else {
-        this.props.actions.fetchCustomers(searchText || "");
-      }
+      this.props.actions.fetchCustomersByList(
+        Number(pageNo),
+        Number(itemsPerPage),
+        sortBy,
+        orderBy,
+        searchText || "",
+        loader
+      );
     });
   };
   /**
@@ -177,7 +211,15 @@ class CustomerDashboard extends Component {
    * @param {*} type
    */
   changeView = (type) => {
-    this.setState({ viewBy: type }, () => this.fetchCustomers());
+    let itemsPerPage = type === "lists" ? 5 : 20;
+    this.setState({ viewBy: type, itemsPerPage, pageNo: 1 }, () => {
+      if (type === "lists") {
+        this.fetchCustomers();
+      } else {
+        this.loadCustomersOnDemand(itemsPerPage, true);
+        this.initLazyLoading();
+      }
+    });
   };
   /**
    * When user selects the customer to access the applications
@@ -312,7 +354,7 @@ class CustomerDashboard extends Component {
    * @param {*} orderBy
    */
   sortColumn = (sortBy, orderBy) => {
-    this.fetchCustomers(sortBy, orderBy);
+    this.fetchCustomers( true, sortBy, orderBy);
   };
   /**
    * Search
@@ -335,7 +377,8 @@ class CustomerDashboard extends Component {
    * Clear the search value in the texbox
    */
   clearSearch = () => {
-    this.setState({ searchText: "" });
+    let itemsPerPage = this.state.viewBy === "lists" ? 5 : 20;
+    this.setState({ searchText: "", itemsPerPage });
     this.searchCustomers();
   };
   /**
@@ -856,7 +899,7 @@ class CustomerDashboard extends Component {
             </React.Fragment>
           )}
           {viewBy === "cards" && (
-            <React.Fragment>
+            <>
               <div className="maindashboard__cards">
                 {_.map(customers, (customer) => (
                   <CustomerCard
@@ -884,7 +927,23 @@ class CustomerDashboard extends Component {
                     })}
                   </Row>
                 )}
-            </React.Fragment>
+              <div
+                ref={this.loaderRef}
+                style={{
+                  display:
+                    customers.length === customerCount || loading ? "none" : "block",
+                  textAlign: "center",
+                }}
+              >
+                <Spin size="large" />
+                <Text
+                  type="extra_bold"
+                  size="20px"
+                  textAlign="center"
+                  text="Loading..."
+                />
+              </div>
+            </>
           )}
           <DeactivateModal
             isActive={_.get(this.state, "selectedCustomer.is_active", false)}

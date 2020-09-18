@@ -560,7 +560,7 @@ class ApplicationDashboard extends Component {
     if (
       _.get(submission, "is_uploading") ||
       _.get(submission, "analyzing") ||
-      _.get(submission, "is_submission") == 1 ||
+      _.get(submission, "is_submission") === 1 ||
       _.get(submission, "sequence_count") === 0
     ) {
       return;
