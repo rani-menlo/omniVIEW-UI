@@ -482,7 +482,7 @@ class AddCustomer extends Component {
       email: state.email.value,
       phone: state.phone.value,
       ...(this.props.selectedCustomer && {
-        is_omnicia: this.props.selectedCustomeris_omnicia,
+        is_omnicia: this.props.selectedCustomer.is_omnicia,
       }),
       tbSpace: state.storageTB || 0,
       gbSpace: state.storageGB || 0,
