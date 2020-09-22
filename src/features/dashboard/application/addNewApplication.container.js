@@ -134,6 +134,15 @@ class AddNewApplication extends Component {
       customer_id: this.props.selectedCustomer.id,
       workFolderPath: path || "",
     });
+    if (res.data.error) {
+      this.setState(
+        {
+          selectedFolderError: res.data.message || "Remote machine unavailable",
+        },
+        this.hideLoading
+      );
+      return;
+    }
     if (!res.data.error) {
       remoteFiles = res.data.data;
       if (!path && remoteFiles.length) {
@@ -486,13 +495,18 @@ class AddNewApplication extends Component {
   /**
    * Ticket-OMNG-1100 ,(Sprint-32), Uploading multiple submissions via site-to-site connector
    */
-  uploadSiteToSiteMultipleSubmissions = async () => {
-    this.showLoading();
+  uploadSiteToSiteMultipleSubmissions = async (selectedFolder) => {
     let { remoteFiles } = this.state;
     let submission_names = [];
     remoteFiles.map((file) => {
       file.checked && submission_names.push(`${_.get(file, "name", "")}`);
     });
+    if (!selectedFolder && !submission_names.length) {
+      return;
+    }
+    this.showLoading();
+    if (submission_names) {
+    }
     let res = await ApplicationApi.uploadAFSMultipleApplications({
       customerId: this.props.selectedCustomer.id,
       submissionNames: submission_names,
@@ -542,7 +556,7 @@ class AddNewApplication extends Component {
     path = _.replace(path, new RegExp("//", "g"), "/");
     //As per the ticket OMNG-1100, Sprint-32, creating separate function for uploading multiple submissions via site-to-site connector
     if (!isAddingSequence && selectedCloud !== "FTP") {
-      this.uploadSiteToSiteMultipleSubmissions();
+      this.uploadSiteToSiteMultipleSubmissions(selectedFolder);
       return;
     }
     // if we are addding sequence, condition passes
@@ -1081,7 +1095,11 @@ class AddNewApplication extends Component {
 
           <div style={{ marginTop: "20px" }}>
             {showClouds && (
-              <ChooseCloud onCloudSelect={this.onCloudSelect} role={role} />
+              <ChooseCloud
+                onCloudSelect={this.onCloudSelect}
+                role={role}
+                isSequence={isAddingSequence}
+              />
             )}
             {enterRemoteDetails && (
               <RemoteDetails
