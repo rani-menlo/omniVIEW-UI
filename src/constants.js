@@ -262,7 +262,10 @@ const CLOUDS = {
     disabled: true,
   },
 };
-
+/**
+ * While uploading applications via Site-to-Site connector,
+ * Application names should match with any of the the below list.
+ */
 const APPLICATION_TYPES = [
   /^[anda]+?\d{6}$/,
   /^[bla]+?\d{6}$/,
@@ -274,6 +277,7 @@ const APPLICATION_TYPES = [
   /^[pma]+?\d{6}$/,
   /^[510k]+?\d{6}$/,
   /^[si]+?\d{6}$/,
+  /^[0-9]{6}$/,
 ];
 
 export {
