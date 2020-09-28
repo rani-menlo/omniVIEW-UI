@@ -13,8 +13,8 @@ import {
   getDTD2_2_FormattedDate,
   getDTDVersion,
   getV2_2Date,
-  openFileInWindow,
 } from "../../utils";
+import openFileInWindow from "../pdfViewer/pdfUtil.js";
 import { Text } from "../../uikit/components";
 import { Icon } from "antd";
 

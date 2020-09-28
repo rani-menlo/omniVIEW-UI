@@ -2695,30 +2695,58 @@ const OPENED_PDF_FILES = {};
           }, 1000);
         }
       }
-      function webViewerClick(evt) {
+      async function webViewerClick(evt) {
         console.log(evt);
-        var originalString = PDFViewerApplication.url;
-        console.log("originalString", originalString);
-        originalString = originalString.split("$$$")[0];
-        originalString = originalString.split("&")[0];
-        originalString = originalString.split("fileid=");
-        var fileId = "";
-        console.log("originalString", originalString);
+        // var originalString = PDFViewerApplication.url;
+        // console.log("originalString", originalString);
+        // originalString = originalString.split("$$$")[0];
+        // originalString = originalString.split("&")[0];
+        // originalString = originalString.split("fileid=");
+        // var fileId = "";
+        // console.log("originalString", originalString);
         // if (evt.target.tagName == "A") {
         //   PDFViewerApplication.previousVisitedPage = PDFViewerApplication.pdfViewer.currentPageNumber
         // }
-        if (originalString.length > 1) {
-          fileId = originalString[1];
-        } else {
-          originalString = originalString[0];
+        // if (originalString.length > 1) {
+        //   fileId = originalString[1];
+        // } else {
+        //   originalString = originalString[0];
+        //   var splitString = originalString.split("/");
+        //   fileId = splitString[splitString.length - 1];
+        // }
+        // console.log("fileId", fileId);
+
+        // var hrefsublink = evt.target.href;
+
+        // hrefsublink = hrefsublink.replace(SERVER_URL, "");
+        evt.preventDefault();
+        let path = evt.target.pathname;
+        path = path && path.split("/").join("$$$@@@$$$");
+        let reqParam = window.location.search || "";
+        reqParam = reqParam.substring(1);
+        const paths = reqParam.split("/");
+        let file_id = paths[paths.length - 1];
+        var url = `https://autest.omniciainc.com/api/v1/file/getNewPath/${file_id}$$$***$$$${path}`;
+        const token = localStorage.getItem("omniview_user_token");
+        const res = await fetch(url, {
+          method: "GET",
+          headers: { "x-auth-token": token },
+        }); 
+        const data = await res.json();
+        console.log("data", data);
+
+        let fileId = data.data.fileID;
+
+        var originalString = PDFViewerApplication.url;
+        if (fileId) {
           var splitString = originalString.split("/");
-          fileId = splitString[splitString.length - 1];
+          splitString[splitString.length - 1] = fileId;
+          originalString = splitString.join("/");
         }
-        console.log("fileId", fileId);
 
-        var hrefsublink = evt.target.href;
+     var hrefsublink = evt.target.href;
 
-        hrefsublink = hrefsublink.replace(SERVER_URL, "");
+        hrefsublink = hrefsublink && hrefsublink.replace(SERVER_URL, "");
 
         var orginal = `${SERVER_URL}/${PDF_ROUTER}?fileid=${fileId}&path=${hrefsublink}`;
         console.log("after---->", orginal);
@@ -2733,30 +2761,38 @@ const OPENED_PDF_FILES = {};
             href.indexOf("https") >= 0
           ) {
             var urlTokens = orginal.split("#");
-            var pdfUrl = urlTokens.length >= 1 ? urlTokens[0] : urlTokens;
+            var pdfUrl = urlTokens.length >=1 ? urlTokens[0] : urlTokens;
             var hashUrl = urlTokens.length > 1 ? urlTokens[1] : "";
-            if (!OPENED_PDF_FILES[pdfUrl]) {
-              var popupWindow = window.open(orginal, "_blank");
-              OPENED_PDF_FILES[pdfUrl] = popupWindow;
+            if (!OPENED_PDF_FILES[fileId]) {
+              debugger;
+              var popupWindow = window.open(orginal, fileId);
+              debugger;
+              OPENED_PDF_FILES[fileId] = popupWindow;
+              debugger;
               popupWindow.onbeforeunload = function() {
-                OPENED_PDF_FILES[pdfUrl] = null;
+                OPENED_PDF_FILES[fileId] = null;
               };
             } else {
-              var openedWindow = OPENED_PDF_FILES[pdfUrl];
+              console.log("dfsdfsdfsd", OPENED_PDF_FILES);
+              var openedWindow = OPENED_PDF_FILES[fileId];
+              debugger;
               openedWindow.focus();
+              debugger;
               var page = hashUrl.charAt(1);
+              debugger;
               page = Number(page) + 1;
               openedWindow = openedWindow[1] || openedWindow[0];
               openedWindow.PDFViewerApplication.toolbar.setPageNumber(page);
               openedWindow.PDFViewerApplication.page = page;
             }
-            evt.preventDefault();
+            // evt.preventDefault();
           }
         }
-
+        debugger;
         if (!PDFViewerApplication.secondaryToolbar.isOpen) {
           return;
         }
+        debugger;
         var appConfig = PDFViewerApplication.appConfig;
         if (
           PDFViewerApplication.pdfViewer.containsElement(evt.target) ||
@@ -17344,7 +17380,6 @@ const OPENED_PDF_FILES = {};
       };
       var print = window.print;
       window.print = function print() {
-        return false;
         if (activeService) {
           console.warn(
             "Ignored window.print() because of a pending print job."
@@ -17393,27 +17428,6 @@ const OPENED_PDF_FILES = {};
           dispatchEvent("afterprint");
         }
       }
-
-      /**
-       * Prevent PDF Print on click of CTRL+P
-       * @param {*} event 
-       */
-      function preventPDFPrint(event){
-        event = event || window.event;
-        if (
-          (event.ctrlKey || event.metaKey) &&
-          (event.key == "p" ||
-            event.charCode == 16 ||
-            event.charCode == 112 ||
-            event.keyCode == 80)
-        ) {
-          event.cancelBubble = true;
-          event.preventDefault();
-          event.stopImmediatePropagation();
-          return false;
-        }
-      }
-
       function renderProgress(index, total, l10n) {
         var progressContainer = document.getElementById("printServiceOverlay");
         var progress = Math.round((100 * index) / total);
@@ -17432,20 +17446,38 @@ const OPENED_PDF_FILES = {};
       window.addEventListener(
         "keydown",
         function(event) {
-          //preventing the Ctrl+P print on pdf
-          preventPDFPrint(event);
+          if (
+            event.keyCode === 80 &&
+            (event.ctrlKey || event.metaKey) &&
+            !event.altKey &&
+            (!event.shiftKey || window.chrome || window.opera)
+          ) {
+            window.print();
+            if (hasAttachEvent) {
+              return;
+            }
+            event.preventDefault();
+            if (event.stopImmediatePropagation) {
+              event.stopImmediatePropagation();
+            } else {
+              event.stopPropagation();
+            }
+            return;
+          }
         },
         true
       );
-
       //preventing the right click on pdf
       window.addEventListener("contextmenu", (event) => {
         event.preventDefault();
       });
       if (hasAttachEvent) {
         document.attachEvent("onkeydown", function(event) {
-          //preventing the Ctrl+P print on pdf
-          preventPDFPrint(event);
+          event = event || window.event;
+          if (event.keyCode === 80 && event.ctrlKey) {
+            event.keyCode = 0;
+            return false;
+          }
         });
       }
       if ("onbeforeprint" in window) {

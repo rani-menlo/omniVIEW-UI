@@ -4,7 +4,6 @@ import { isValidPhoneNumber } from "react-phone-number-input";
 import {
   DATE_FORMAT,
   ROLE_IDS,
-  OPENED_WINDOWS,
   APPLICATION_TYPES,
 } from "./constants";
 import { translate } from "./translations/translator";
@@ -164,32 +163,7 @@ const getDTD2_2_FormattedDate = (date, format) => {
   return moment(date).format(dateFormat);
 };
 
-const openFileInWindow = (fileHref, fileID, title) => {
-  let type = "";
-  let url = "";
-  if (fileHref) {
-    type = fileHref.substring(fileHref.lastIndexOf(".") + 1);
-  }
-  if (type.includes("pdf") && fileID) {
-    url = `${process.env.PUBLIC_URL}/viewer/pdf/${fileID}`;
-  } else {
-    if (fileID) {
-      url = `${process.env.PUBLIC_URL}/viewer/${type}/${fileID}`;
-    }
-  }
-  let openedWindow = OPENED_WINDOWS[url];
-  if (!openedWindow) {
-    openedWindow = window.open(url, "_blank");
-    OPENED_WINDOWS[url] = openedWindow;
-    openedWindow.onbeforeunload = function() {
-      OPENED_WINDOWS[url] = null;
-    };
-    openedWindow.addEventListener("load", function() {
-      openedWindow.document.title = title || "";
-    });
-  }
-  openedWindow.focus();
-};
+
 
 /**
  * Checking the application folder name from the list of application types for site to site connector
@@ -230,6 +204,5 @@ export {
   getDTDVersion,
   getDTD2_2_FormattedDate,
   getV2_2Date,
-  openFileInWindow,
   validatingApplicationFolderNames,
 };
