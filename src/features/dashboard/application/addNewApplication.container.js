@@ -128,7 +128,7 @@ class AddNewApplication extends Component {
   ) => {
     this.showLoading();
     let showCheckAll = false;
-    let { selectedCloud } = this.state;
+    let { selectedCloud, isAddingSequence } = this.state;
     let remoteFiles = null;
     let res = await ApplicationApi.getDirectoriesAndFiles({
       customer_id: this.props.selectedCustomer.id,
@@ -159,9 +159,15 @@ class AddNewApplication extends Component {
         this.setState({ remoteDetails });
         path = ftp_path;
       }
-      showCheckAll = _.some(remoteFiles, (file) =>
-        validatingApplicationFolderNames(file.name)
+      if(isAddingSequence){
+        showCheckAll = _.some(remoteFiles, (file) =>
+        minFourDigitsInString(file.name)
       );
+      }else{
+        showCheckAll = _.some(remoteFiles, (file) =>
+          validatingApplicationFolderNames(file.name)
+        );
+      }
     }
     this.setState(
       {
@@ -362,6 +368,7 @@ class AddNewApplication extends Component {
         checkedArray.push(remoteFile);
         remoteFile.checked && checkedLength++;
       }
+      //OMNG-1126, Sprint-33 - Add Sequence via Site-to-Site connector
       if (
         !isAddingSequence &&
         selectedCloud !== "FTP" &&
@@ -564,6 +571,11 @@ class AddNewApplication extends Component {
       if (!this.getCheckedPaths().length) {
         return;
       }
+      //Sprint-33, OMNG-1126, API for saving sequences to the existing application via Site-to-Site connector
+      // if(selectedCloud !== "FTP"){
+      //   this.saveAFSSequences();
+      //   return;
+      // }
       this.showLoading();
       let res = await ApplicationApi.isValidFTPSequenceFolder({
         customer_id: selectedCustomer.id,
@@ -1098,7 +1110,6 @@ class AddNewApplication extends Component {
               <ChooseCloud
                 onCloudSelect={this.onCloudSelect}
                 role={role}
-                isSequence={isAddingSequence}
               />
             )}
             {enterRemoteDetails && (

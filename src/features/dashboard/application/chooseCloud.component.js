@@ -10,15 +10,14 @@ const onSelect = (cb, cloud) => () => {
   cb && cb(cloud);
 };
 
-const ChooseCloud = ({ onCloudSelect, role, isSequence }) => {
+const ChooseCloud = ({ onCloudSelect, role }) => {
   const buttonStyle = {
     width: "107px",
     height: "100px",
   };
   let clouds = CLOUDS;
   //omitting the afs cloud if the logged in user is not o_odmin
-  //TODO - For this sprint added isSequence flag to make Site to Site unavailable for Adding Sequences (Backend Dependency)
-  if (!isLoggedInOmniciaAdmin(role) || isSequence) {
+  if (!isLoggedInOmniciaAdmin(role)) {
     clouds = _.omit(clouds, "siteTosite");
   }
 

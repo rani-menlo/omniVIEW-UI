@@ -150,7 +150,7 @@ class RemoteFiles extends Component {
                     </div>
                   )}
                   {/* Site-To-Site application folder structure */}
-                  {cloud != "FTP" &&
+                  {cloud != "FTP" && !isSequence &&
                     validatingApplicationFolderNames(file.name) && (
                       <div
                         style={{
