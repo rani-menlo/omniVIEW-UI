@@ -333,10 +333,8 @@ class ValidateApplications extends Component {
         seq.status == SCRIPT_ERROR ||
         seq.status == MISMATCH_SEQUENCES
     );
-    console.log("failures", failures);
     this.setState({
-      // reportData: _.map(failures, (fail) => ({ key: fail, ...fail })),
-      reportData: failures,
+      reportData: map(failures, (fail) => ({ key: fail, ...fail })),
       selectedApplication: submission,
       showApplicationErrorModal: true,
     });
@@ -449,8 +447,24 @@ class ValidateApplications extends Component {
     });
   };
 
+    /**
+   * OMNG-1089, Sprint-33, 'Retry' option for failed sequences (status other than 4) uploaded with site-to-site connector
+   */
+  retryUpload = (props) => {
+    this.setState({ selectedErrors: props });
+    // this.props.dispatch(
+    //   ApplicationActions.retryUploads(
+    //     { ids: map(this.state.selectedFailedUploads, "id") },
+    //     () => {
+    //       this.clearAllIntervals();
+    //       this.fetchApplications();
+    //     }
+    //   )
+    // );
+  };
+
   render() {
-    const { loading, bulkUploadedSubmissionsCount } = this.props;
+    const { loading, bulkUploadedSubmissionsCount, user, role } = this.props;
     const {
       bulkUploadedSubmissions,
       limit,
@@ -647,6 +661,9 @@ class ValidateApplications extends Component {
               application={selectedApplication}
               errors={reportData}
               onDelete={this.deleteSequences}
+              onRetry={this.retryUpload}
+              user={user}
+              role={role}
             />
           )}
         </ContentLayout>
@@ -671,6 +688,7 @@ function mapStateToProps(state) {
   return {
     loading: state.Api.loading,
     role: state.Login.role,
+    user: state.Login.user,
     selectedUploadedCustomer: state.Customer.selectedUploadedCustomer,
     bulkUploadedSubmissions: state.Application.bulkUploadedSubmissions, //getSubmissionsByCustomer(state),
     bulkUploadedSubmissionsCount:
