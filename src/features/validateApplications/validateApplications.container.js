@@ -528,10 +528,9 @@ class ValidateApplications extends Component {
                 >
                   <span
                     className={`${application.seqCount !== 0 &&
-                      application.errorCount === 0 &&
                       "validate-applications-layout__list__item-text-link"}`}
                     onClick={
-                      application.seqCount !== 0 && application.errorCount === 0
+                      application.seqCount !== 0
                         ? (e) => this.openApplicationManagement(application)
                         : ""
                     }
@@ -595,20 +594,15 @@ class ValidateApplications extends Component {
                 >
                   <Switch
                     size="small"
-                    disabled={get(application, "errorCount") != 0}
                     className="validate-applications-layout__list__item-text"
-                    checked={
-                      get(application, "errorCount") == 0 &&
-                      application.applicationStatus
-                    }
+                    checked={application.applicationStatus}
                     onClick={this.onStatusClick(application)}
                   ></Switch>
-                  <span
+                  <img
                     className="validate-applications-layout__list__item-text"
-                    style={{ paddingLeft: "12px" }}
-                  >
-                    {application.applicationStatus ? "On" : "Off"}
-                  </span>
+                    style={{ margin: "0 5px" }}
+                    src={application.applicationStatus ? "/images/unlocked.svg"  : "/images/locked.svg"}
+                  />
                 </Column>
               </Row>
             ))}
