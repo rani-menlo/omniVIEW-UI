@@ -110,6 +110,26 @@ class SubmissionCard extends Component {
     });
   };
 
+  /**
+   * As per story OMNG-1102, Sprint-33, Hiding the dropdown in the submission card header in the following scenarios
+   * 1. When uploading and scripts running process of the submission is in progress
+   * 2. When submission/sequences in the submission are deleting
+   * 3. When O_Admin role locks the submission, dropdown is invisible for other than O_Admin roles
+   */
+  isDropdownVisible = (submission) => {
+    const uploading = _.get(submission, "is_uploading");
+    const is_deleting = _.get(submission, "is_deleting");
+    if (
+      !submission.applicationStatus &&
+      !isLoggedInOmniciaAdmin(this.props.role)
+    ) {
+      return false;
+    }
+    if (!uploading && !submission.analyzing && !is_deleting) {
+      return true;
+    }
+  };
+
   render() {
     const {
       submission,
@@ -153,21 +173,20 @@ class SubmissionCard extends Component {
             >
               {_.get(submission, "name")}
             </span>
-            {!uploading &&
-              !submission.analyzing &&
-              !is_deleting && (
-                <Dropdown
-                  overlay={getMenu && getMenu()}  
-                  trigger={["click"]}
-                  onClick={getMenu}
-                  overlayClassName="submissioncard__heading-dropdown"
-                >
-                  <img
-                    src="/images/overflow.svg"
-                    className="submissioncard__heading-more"
-                  />
-                </Dropdown>
-              )}
+            {/* As per story OMNG-1102, Sprint-33, Showing the dropdown the submission heading */}
+            {this.isDropdownVisible(submission) && (
+              <Dropdown
+                overlay={getMenu && getMenu()}
+                trigger={["click"]}
+                onClick={getMenu}
+                overlayClassName="submissioncard__heading-dropdown"
+              >
+                <img
+                  src="/images/overflow.svg"
+                  className="submissioncard__heading-more"
+                />
+              </Dropdown>
+            )}
           </div>
           {/* Content of the application card */}
           {/* As per story OMNG-1102, Sprint-33, Locking the submission card  */}
