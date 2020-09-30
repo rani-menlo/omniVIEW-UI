@@ -225,19 +225,12 @@ class ValidateApplications extends Component {
       0,
       this.state.limit
     );
-    // filtering applications without errors
-    let withoutErrorApplications = filter(
-      bulkUploadedSubmissions,
-      (application) => {
-        return application.errorCount == 0;
-      }
-    );
     if (applicationStatus) {
       map(bulkUploadedSubmissions, (application) => {
         let applicationStatus = application.errorCount == 0 ? true : false;
         set(application, "applicationStatus", applicationStatus);
       });
-      checkedApplications = [...withoutErrorApplications];
+      checkedApplications = [...bulkUploadedSubmissions];
     } else {
       bulkUploadedSubmissions = map(bulkUploadedSubmissions, (application) => ({
         ...application,
@@ -257,7 +250,7 @@ class ValidateApplications extends Component {
       () => {
         let unselectedApps = checked
           ? checkedApplications
-          : withoutErrorApplications;
+          : bulkUploadedSubmissions;
         this.changeApplicationStatus(unselectedApps, checked);
       }
     );
@@ -275,13 +268,6 @@ class ValidateApplications extends Component {
       0,
       this.state.limit
     );
-    // filtering applications without errors
-    let withoutErrorApplications = filter(
-      bulkUploadedSubmissions,
-      (application) => {
-        return application.errorCount == 0;
-      }
-    );
     application.applicationStatus = checked;
     // If customer is selected
     if (checked) {
@@ -296,7 +282,7 @@ class ValidateApplications extends Component {
       uncheckedApplications.push(application);
     }
     //Checking if the applications without errors all are selected or not
-    TableColumns[4].allViewable = every(withoutErrorApplications, [
+    TableColumns[4].allViewable = every(checkedApplications, [
       "applicationStatus",
       true,
     ]);
@@ -601,7 +587,11 @@ class ValidateApplications extends Component {
                   <img
                     className="validate-applications-layout__list__item-text"
                     style={{ margin: "0 5px" }}
-                    src={application.applicationStatus ? "/images/unlocked.svg"  : "/images/locked.svg"}
+                    src={
+                      application.applicationStatus
+                        ? "/images/unlocked.svg"
+                        : "/images/locked.svg"
+                    }
                   />
                 </Column>
               </Row>

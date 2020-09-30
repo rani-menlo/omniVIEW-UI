@@ -80,12 +80,7 @@ class TableHeader extends Component {
                 <div className="tableHeader__item__status">
                   <Switch size="small" checked={viewAll} onClick={checkAll} />
                   <span className="tableHeader__item__status__label">
-                    <img
-                      style={{ margin: "0 5px" }}
-                      src={
-                        viewAll ? "/images/unlocked-white.svg" : "/images/locked-white.svg"
-                      }
-                    />
+                    {viewAll ? "All On" : "All Off"}
                   </span>
                 </div>
               )}
