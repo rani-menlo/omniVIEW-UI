@@ -43,7 +43,7 @@ class AddNewApplication extends Component {
       showClouds: true,
       enterRemoteDetails: false,
       path: "",
-      ftp_files_path: ["root"],
+      ftp_files_path: ["work"],
       auth_id: "",
       remoteDetails: null,
       remoteFiles: null,
@@ -812,9 +812,9 @@ class AddNewApplication extends Component {
   //go to the specified path on click of the ftp file name on breadcrumb
   goToSpecifiedFtpPath = (file_name, index) => () => {
     //If user clicks on root
-    if (file_name == "root" && index == 0) {
+    if (file_name == "work" && index == 0) {
       let ftp_files_path = [...this.state.ftp_files_path];
-      ftp_files_path = ["root"];
+      ftp_files_path = ["work"];
       let path = _.get(this.state.remoteDetails, "ftp_path", "");
       this.setState({ ftp_files_path, path }, () => {
         if (this.state.selectedCloud === "FTP") {
@@ -834,7 +834,7 @@ class AddNewApplication extends Component {
     ftp_files_path = _.tail(ftp_files_path);
     let files = ftp_files_path.length ? ftp_files_path.join("/") : "";
     path = `${path}/${files}`;
-    ftp_files_path = ["root", ...ftp_files_path];
+    ftp_files_path = ["work", ...ftp_files_path];
     this.setState({ ftp_files_path, path });
     if (this.state.selectedCloud === "FTP") {
       this.getContentsOfPath(path);
