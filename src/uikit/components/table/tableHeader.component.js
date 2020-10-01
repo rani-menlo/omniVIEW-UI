@@ -80,7 +80,9 @@ class TableHeader extends Component {
                 <div className="tableHeader__item__status">
                   <Switch size="small" checked={viewAll} onClick={checkAll} />
                   <span className="tableHeader__item__status__label">
-                    {viewAll ? "All On" : "All Off"}
+                    {viewAll
+                      ? translate("label.generic.allOn")
+                      : translate("label.generic.allOff")}
                   </span>
                 </div>
               )}
