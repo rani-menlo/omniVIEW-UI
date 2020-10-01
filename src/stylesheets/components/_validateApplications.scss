@@ -3,9 +3,6 @@
   &__list {
     margin-top: 24px;
     min-height: 325px;
-    .tableHeader {
-      align-items: start;
-    }
     &__item {
       padding: 15px 10px;
       &:nth-child(odd) {

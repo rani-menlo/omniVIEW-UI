@@ -558,6 +558,8 @@ class ApplicationDashboard extends Component {
    */
   onSubmissionSelected = (submission) => () => {
     if (
+      (!submission.applicationStatus &&
+        !isLoggedInOmniciaAdmin(this.props.role)) ||
       _.get(submission, "is_uploading") ||
       _.get(submission, "analyzing") ||
       _.get(submission, "is_submission") === 1 ||
@@ -1577,6 +1579,7 @@ class ApplicationDashboard extends Component {
                       updateUploadProgress={this.updateUploadProgress}
                       retryUpload={this.retryUpload}
                       openFailures={this.openFailures(submission)}
+                      role={role}
                     />
                   </div>
                 ))}

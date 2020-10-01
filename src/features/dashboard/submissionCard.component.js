@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import { Dropdown, Menu, Avatar, Modal, Table } from "antd";
 import _ from "lodash";
 import { translate } from "../../translations/translator";
-import { getFormattedDate } from "../../utils";
+import { getFormattedDate, isLoggedInOmniciaAdmin } from "../../utils";
 import {
   Text,
   Row,
@@ -110,6 +110,26 @@ class SubmissionCard extends Component {
     });
   };
 
+  /**
+   * As per story OMNG-1102, Sprint-33, Hiding the dropdown in the submission card header in the following scenarios
+   * 1. When uploading and scripts running process of the submission is in progress
+   * 2. When submission/sequences in the submission are deleting
+   * 3. When O_Admin role locks the submission, dropdown is invisible for other than O_Admin roles
+   */
+  isDropdownVisible = (submission) => {
+    const uploading = _.get(submission, "is_uploading");
+    const is_deleting = _.get(submission, "is_deleting");
+    if (
+      !submission.applicationStatus &&
+      !isLoggedInOmniciaAdmin(this.props.role)
+    ) {
+      return false;
+    }
+    if (!uploading && !submission.analyzing && !is_deleting) {
+      return true;
+    }
+  };
+
   render() {
     const {
       submission,
@@ -117,6 +137,7 @@ class SubmissionCard extends Component {
       getMenu,
       customer,
       openFailures,
+      role,
     } = this.props;
     const { crossRefs } = this.state;
     const uploading = _.get(submission, "is_uploading");
@@ -140,7 +161,11 @@ class SubmissionCard extends Component {
             <span
               className="submissioncard__heading-text global__cursor-pointer"
               style={{
-                ...((uploading || submission.analyzing || is_deleting) && {
+                ...((uploading ||
+                  submission.analyzing ||
+                  is_deleting ||
+                  (!submission.applicationStatus &&
+                    !isLoggedInOmniciaAdmin(this.props.role))) && {
                   cursor: "not-allowed",
                 }),
               }}
@@ -148,7 +173,8 @@ class SubmissionCard extends Component {
             >
               {_.get(submission, "name")}
             </span>
-            {!uploading && !submission.analyzing && !is_deleting && (
+            {/* As per story OMNG-1102, Sprint-33, Showing the dropdown the submission heading */}
+            {this.isDropdownVisible(submission) && (
               <Dropdown
                 overlay={getMenu && getMenu()}
                 trigger={["click"]}
@@ -163,255 +189,270 @@ class SubmissionCard extends Component {
             )}
           </div>
           {/* Content of the application card */}
-          <div
-            className="submissioncard__content"
-            style={{
-              ...((uploading ||
-                submission.analyzing ||
-                submission.sequence_count === 0 ||
-                is_deleting ||
-                (_.get(submission, "sequence_failed.length") &&
-                  is_submission == 1) ||
-                // _.get(submission, "sequence_failed.length") ==
-                //   _.get(submission, "sequence_count") ||
-                "") && {
-                cursor: "not-allowed",
-              }),
-            }}
-            onClick={onSelect && onSelect(submission)}
-          >
-            {/* When uploading multiple submissions via site to site connector,
+          {/* As per story OMNG-1102, Sprint-33, Locking the submission card  */}
+          {!submission.applicationStatus && !isLoggedInOmniciaAdmin(role) ? (
+            <>
+              <img src="/images/lock-circle.svg" style={{ padding: "60px" }} />
+            </>
+          ) : (
+            <div
+              className="submissioncard__content"
+              style={{
+                ...((uploading ||
+                  submission.analyzing ||
+                  submission.sequence_count === 0 ||
+                  is_deleting ||
+                  (_.get(submission, "sequence_failed.length") &&
+                    is_submission == 1) ||
+                  // _.get(submission, "sequence_failed.length") ==
+                  //   _.get(submission, "sequence_count") ||
+                  "") && {
+                  cursor: "not-allowed",
+                }),
+              }}
+              onClick={onSelect && onSelect(submission)}
+            >
+              {/* When uploading multiple submissions via site to site connector,
             in the backend pre-validations will be done, so till the time we need
             to show the message "Validation is in progress" as part of the story OMNG-1100, Sprint-32 */}
-            {submission.sequence_count === 0 && uploading && (
-              <React.Fragment>
-                <div style={{ padding: "10px" }}>
-                  <Text
-                    type="medium"
-                    textStyle={{ marginTop: "30%", textAlign: "center" }}
-                    text="Validation is in progress..."
-                  />
-                </div>
-              </React.Fragment>
-            )}
-            {/* when delete sequences is inprogress displaying below block */}
-            {is_deleting && (
-              <React.Fragment>
-                <div style={{ padding: "10px" }}>
-                  <Text
-                    type="medium"
-                    textStyle={{ marginTop: "30%", textAlign: "center" }}
-                    text="Delete Sequence(s) is in progress..."
-                  />
-                </div>
-              </React.Fragment>
-            )}
-            {(uploading ||
-              submission.analyzing ||
-              (_.get(submission, "sequence_failed.length") &&
-                is_submission == 1) ||
-              "") &&
-              !is_deleting &&
-              submission.sequence_count !== 0 && (
+              {submission.sequence_count === 0 && uploading && (
                 <React.Fragment>
                   <div style={{ padding: "10px" }}>
-                    {/* Displaying uploaded sequences by total sequences */}
-                    {(_.get(submission, "sequence_inProgress.length") ||
-                      "") && (
-                      <Text
-                        type="medium"
-                        textStyle={{ color: "#00d592" }}
-                        text={`Sequences Uploaded: ${_.get(
-                          submission,
-                          "sequence_success.length",
-                          0
-                        ) +
-                          _.get(
-                            submission,
-                            "sequence_processing.length",
-                            0
-                          )} / ${_.get(submission, "sequence_count", 0)}`}
-                      />
-                    )}
-                    {/* Displaying processing sequences and sucess sequences by total sequences when there are no pending sequences */}
-                    {!(
-                      _.get(submission, "sequence_inProgress.length") || ""
-                    ) && (
-                      <Text
-                        type="medium"
-                        textStyle={{ color: "#00d592" }}
-                        text={`Sequences Uploaded: ${_.get(
-                          submission,
-                          "sequence_success.length",
-                          0
-                        ) +
-                          _.get(
-                            submission,
-                            "sequence_processing.length",
-                            0
-                          )} / ${_.get(submission, "sequence_count", 0)}`}
-                      />
-                    )}
-                    {/* Displaying Failed Sequences */}
-                    {/* {(_.get(submission, "sequence_failed.length") || "") && ( */}
-                    {/* {_.get(submission, "sequence_failed.length") ==
-                    _.get(submission, "sequence_count") && ( */}
                     <Text
                       type="medium"
-                      textStyle={{ color: "red" }}
-                      text={`Sequences Failed: ${_.get(
-                        submission,
-                        "sequence_failed.length",
-                        0
-                      )}`}
+                      textStyle={{ marginTop: "30%", textAlign: "center" }}
+                      text="Validation is in progress..."
                     />
-                    {/* )} */}
-                    {/* )} */}
-                    {submission.analyzing &&
-                      !(_.get(submission, "sequence_failed.length") || "") && (
-                        <Text
-                          type="medium"
-                          textStyle={{ marginTop: "12%", textAlign: "center" }}
-                          text="Processing uploaded sequence(s)..."
-                        />
-                      )}
-                    {uploading &&
-                      !submission.analyzing &&
-                      (_.get(submission, "sequence_inProgress.length") ||
+                  </div>
+                </React.Fragment>
+              )}
+              {/* when delete sequences is inprogress displaying below block */}
+              {is_deleting && (
+                <React.Fragment>
+                  <div style={{ padding: "10px" }}>
+                    <Text
+                      type="medium"
+                      textStyle={{ marginTop: "30%", textAlign: "center" }}
+                      text="Delete Sequence(s) is in progress..."
+                    />
+                  </div>
+                </React.Fragment>
+              )}
+              {(uploading ||
+                submission.analyzing ||
+                (_.get(submission, "sequence_failed.length") &&
+                  is_submission == 1) ||
+                "") &&
+                !is_deleting &&
+                submission.sequence_count !== 0 && (
+                  <React.Fragment>
+                    <div style={{ padding: "10px" }}>
+                      {/* Displaying uploaded sequences by total sequences */}
+                      {(_.get(submission, "sequence_inProgress.length") ||
                         "") && (
                         <Text
                           type="medium"
-                          textStyle={{ marginTop: "12%", textAlign: "center" }}
-                          text="Upload is in progress..."
+                          textStyle={{ color: "#00d592" }}
+                          text={`Sequences Uploaded: ${_.get(
+                            submission,
+                            "sequence_success.length",
+                            0
+                          ) +
+                            _.get(
+                              submission,
+                              "sequence_processing.length",
+                              0
+                            )} / ${_.get(submission, "sequence_count", 0)}`}
                         />
                       )}
-                  </div>
-                  {_.get(submission, "sequence_inProgress.length") == 0 &&
-                    _.get(submission, "sequence_failed.length") != 0 && (
-                      <OmniButton
-                        className="submissioncard__content-report"
-                        label="View Report"
-                        onClick={openFailures}
-                        type="danger"
-                        buttonStyle={{ borderColor: "unset" }}
-                      />
-                    )}
-                </React.Fragment>
-              )}
-            {/* Sequence is uploaded successfully (or) process of deleting sequences is done and able to access the application */}
-            {!uploading &&
-              !submission.analyzing &&
-              // !(
-              //   submission.sequence_failed && submission.sequence_failed.length
-              // ) &&
-              is_submission == 0 &&
-              !is_deleting && (
-                <React.Fragment>
-                  <div className="submissioncard__content__item">
-                    <p className="submissioncard__content__item-label">
-                      {translate("label.dashboard.addedby")}
-                    </p>
-                    <div
-                      style={{ marginTop: "10px" }}
-                      className="global__center-vert"
-                    >
-                      <Suspense fallback={<p>Loading...</p>}>
-                        <LazyImageLoader
-                          type="circle"
-                          width="30px"
-                          height="30px"
-                          path={submission.profile}
+                      {/* Displaying processing sequences and sucess sequences by total sequences when there are no pending sequences */}
+                      {!(
+                        _.get(submission, "sequence_inProgress.length") || ""
+                      ) && (
+                        <Text
+                          type="medium"
+                          textStyle={{ color: "#00d592" }}
+                          text={`Sequences Uploaded: ${_.get(
+                            submission,
+                            "sequence_success.length",
+                            0
+                          ) +
+                            _.get(
+                              submission,
+                              "sequence_processing.length",
+                              0
+                            )} / ${_.get(submission, "sequence_count", 0)}`}
                         />
-                      </Suspense>
+                      )}
+                      {/* Displaying Failed Sequences */}
+                      {/* {(_.get(submission, "sequence_failed.length") || "") && ( */}
+                      {/* {_.get(submission, "sequence_failed.length") ==
+                    _.get(submission, "sequence_count") && ( */}
+                      <Text
+                        type="medium"
+                        textStyle={{ color: "red" }}
+                        text={`Sequences Failed: ${_.get(
+                          submission,
+                          "sequence_failed.length",
+                          0
+                        )}`}
+                      />
+                      {/* )} */}
+                      {/* )} */}
+                      {submission.analyzing &&
+                        !(
+                          _.get(submission, "sequence_failed.length") || ""
+                        ) && (
+                          <Text
+                            type="medium"
+                            textStyle={{
+                              marginTop: "12%",
+                              textAlign: "center",
+                            }}
+                            text="Processing uploaded sequence(s)..."
+                          />
+                        )}
+                      {uploading &&
+                        !submission.analyzing &&
+                        (_.get(submission, "sequence_inProgress.length") ||
+                          "") && (
+                          <Text
+                            type="medium"
+                            textStyle={{
+                              marginTop: "12%",
+                              textAlign: "center",
+                            }}
+                            text="Upload is in progress..."
+                          />
+                        )}
+                    </div>
+                    {_.get(submission, "sequence_inProgress.length") == 0 &&
+                      _.get(submission, "sequence_failed.length") != 0 && (
+                        <OmniButton
+                          className="submissioncard__content-report"
+                          label="View Report"
+                          onClick={openFailures}
+                          type="danger"
+                          buttonStyle={{ borderColor: "unset" }}
+                        />
+                      )}
+                  </React.Fragment>
+                )}
+              {/* Sequence is uploaded successfully (or) process of deleting sequences is done and able to access the application */}
+              {!uploading &&
+                !submission.analyzing &&
+                // !(
+                //   submission.sequence_failed && submission.sequence_failed.length
+                // ) &&
+                is_submission == 0 &&
+                !is_deleting && (
+                  <React.Fragment>
+                    <div className="submissioncard__content__item">
+                      <p className="submissioncard__content__item-label">
+                        {translate("label.dashboard.addedby")}
+                      </p>
                       <div
-                        className="submissioncard__content__item-text"
-                        style={{
-                          whiteSpace: "nowrap",
-                          marginLeft: "6px",
-                          maxWidth: "90px",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          textAlign: "right",
-                        }}
-                        title={_.get(submission, "created_by", "")}
+                        style={{ marginTop: "10px" }}
+                        className="global__center-vert"
                       >
-                        {_.get(submission, "created_by", "")}
+                        <Suspense fallback={<p>Loading...</p>}>
+                          <LazyImageLoader
+                            type="circle"
+                            width="30px"
+                            height="30px"
+                            path={submission.profile}
+                          />
+                        </Suspense>
+                        <div
+                          className="submissioncard__content__item-text"
+                          style={{
+                            whiteSpace: "nowrap",
+                            marginLeft: "6px",
+                            maxWidth: "90px",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            textAlign: "right",
+                          }}
+                          title={_.get(submission, "created_by", "")}
+                        >
+                          {_.get(submission, "created_by", "")}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <div className="submissioncard__content__item">
-                    <span className="submissioncard__content__item-label">
-                      {translate("label.dashboard.sequences")}:
-                    </span>
-                    <span className="submissioncard__content__item-text">
-                      {_.get(submission, "sequence_count", 0)}
-                    </span>
-                    {_.get(submission, "broken_x_ref", "") != 0 &&
-                      !(
-                        submission.sequence_failed &&
-                        submission.sequence_failed.length
-                      ) && (
-                        <span className="submissioncard__content__item-text-crossreficon">
-                          <img
-                            src="/images/info_icon.png"
-                            className=""
-                            onClick={this.openCrossrefsModal}
-                          />
-                        </span>
-                      )}
-                    {_.get(submission, "sequence_failed") &&
-                      _.get(submission, "sequence_failed.length") != 0 && (
-                        <span className="submissioncard__content__item-text-crossreficon">
-                          <img
-                            src="/images/error.png"
-                            className=""
-                            onClick={openFailures}
-                          />
-                        </span>
-                      )}
-                  </div>
-                  <div className="submissioncard__content__item">
-                    <span className="submissioncard__content__item-label">
-                      {translate("label.dashboard.addedon")}:
-                    </span>
-                    <span className="submissioncard__content__item-text">
-                      {getFormattedDate(_.get(submission, "created_at")) ||
-                        "12/01/2018"}
-                    </span>
-                  </div>
-                  <div className="submissioncard__content__item">
-                    <span className="submissioncard__content__item-label">
-                      {translate("label.dashboard.lastupdated")}:
-                    </span>
-                    <span className="submissioncard__content__item-text">
-                      {getFormattedDate(_.get(submission, "updated_at")) ||
-                        "12/01/2018"}
-                    </span>
-                  </div>
-                  <div className="submissioncard__content__item">
-                    <span className="submissioncard__content__item-label">
-                      {translate("label.dashboard.submissioncenter")}:
-                    </span>
-                    <span className="submissioncard__content__item-text">
-                      {_.get(submission, "submission_center", "")}
-                    </span>
-                  </div>
-                  <div
-                    className="global__hr-line"
-                    style={{ marginTop: "20px" }}
-                  />
-                  <div
-                    className="submissioncard__content__item"
-                    style={{ paddingTop: "4px" }}
-                  >
-                    <span className="submissioncard__content__item-label">
-                      {translate("label.dashboard.users")}:
-                    </span>
-                    <div>{customer.number_of_users}</div>
-                  </div>
-                </React.Fragment>
-              )}
-          </div>
+                    <div className="submissioncard__content__item">
+                      <span className="submissioncard__content__item-label">
+                        {translate("label.dashboard.sequences")}:
+                      </span>
+                      <span className="submissioncard__content__item-text">
+                        {_.get(submission, "sequence_count", 0)}
+                      </span>
+                      {_.get(submission, "broken_x_ref", "") != 0 &&
+                        !(
+                          submission.sequence_failed &&
+                          submission.sequence_failed.length
+                        ) && (
+                          <span className="submissioncard__content__item-text-crossreficon">
+                            <img
+                              src="/images/info_icon.png"
+                              className=""
+                              onClick={this.openCrossrefsModal}
+                            />
+                          </span>
+                        )}
+                      {_.get(submission, "sequence_failed") &&
+                        _.get(submission, "sequence_failed.length") != 0 && (
+                          <span className="submissioncard__content__item-text-crossreficon">
+                            <img
+                              src="/images/error.png"
+                              className=""
+                              onClick={openFailures}
+                            />
+                          </span>
+                        )}
+                    </div>
+                    <div className="submissioncard__content__item">
+                      <span className="submissioncard__content__item-label">
+                        {translate("label.dashboard.addedon")}:
+                      </span>
+                      <span className="submissioncard__content__item-text">
+                        {getFormattedDate(_.get(submission, "created_at")) ||
+                          "12/01/2018"}
+                      </span>
+                    </div>
+                    <div className="submissioncard__content__item">
+                      <span className="submissioncard__content__item-label">
+                        {translate("label.dashboard.lastupdated")}:
+                      </span>
+                      <span className="submissioncard__content__item-text">
+                        {getFormattedDate(_.get(submission, "updated_at")) ||
+                          "12/01/2018"}
+                      </span>
+                    </div>
+                    <div className="submissioncard__content__item">
+                      <span className="submissioncard__content__item-label">
+                        {translate("label.dashboard.submissioncenter")}:
+                      </span>
+                      <span className="submissioncard__content__item-text">
+                        {_.get(submission, "submission_center", "")}
+                      </span>
+                    </div>
+                    <div
+                      className="global__hr-line"
+                      style={{ marginTop: "20px" }}
+                    />
+                    <div
+                      className="submissioncard__content__item"
+                      style={{ paddingTop: "4px" }}
+                    >
+                      <span className="submissioncard__content__item-label">
+                        {translate("label.dashboard.users")}:
+                      </span>
+                      <div>{customer.number_of_users}</div>
+                    </div>
+                  </React.Fragment>
+                )}
+            </div>
+          )}
         </div>
         {/* Cross referenced sequences info */}
         <Modal
