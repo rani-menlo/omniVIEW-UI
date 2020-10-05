@@ -45,6 +45,7 @@ class AssignPermissions extends Component {
           UsermanagementActions.fetchUsers({
             customerId: selectedCustomer.id,
             includeLoggedInUser: false,
+            isOmnicia: true
           })
         );
         return;
