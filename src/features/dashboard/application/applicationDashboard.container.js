@@ -313,6 +313,7 @@ class ApplicationDashboard extends Component {
     _.map(data, (seq) => {
       switch (seq.status) {
         case UPLOAD_INPROGRES:
+        case UPLOAD_SUCCESS:
           inProgress.push(seq);
           break;
         case UPLOAD_FAILED:
