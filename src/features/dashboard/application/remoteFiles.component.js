@@ -168,7 +168,7 @@ class RemoteFiles extends Component {
                 </div>
               );
             })}
-            {cloud == "FTP" && remoteFiles.length == 0 && (
+            {remoteFiles.length == 0 && (
               <Text
                 type="extra_bold"
                 size="14px"
