@@ -707,7 +707,10 @@ class TreeNode extends Component {
   };
 
   fullyCollapse = () => {
-    this.setState({ fullyExpand: false, expand: false });
+    const hash = _.get(this.state, "properties.hash");
+    hash
+      ? this.props.fullyExpanded()
+      : this.setState({ fullyExpand: false, expand: false });
   };
 
   setCheckboxValue = (checkboxValue) => {
@@ -742,27 +745,22 @@ class TreeNode extends Component {
     return (
       <Menu>
         {this.state.nodes.length && (
-          <Menu.Item
-            onClick={!this.state.expand ? this.fullyExpand : this.fullyCollapse}
-          >
+          <Menu.Item onClick={this.fullyExpand}>
             <div className="global__center-vert">
-              <img
-                src={
-                  !this.state.expand
-                    ? "/images/plus-black.svg"
-                    : "/images/minus-black.png"
-                }
-                style={style}
-              />
+              <img src="/images/plus-black.svg" style={style} />
               <Text
                 type="regular"
                 size="12px"
-                text={
-                  !this.state.expand
-                    ? translate("label.node.fullyexpand")
-                    : "Fully Collapse Item"
-                }
+                text={translate("label.node.fullyexpand")}
               />
+            </div>
+          </Menu.Item>
+        )}
+        {this.state.nodes.length && (
+          <Menu.Item onClick={this.fullyCollapse}>
+            <div className="global__center-vert">
+              <img src="/images/minus-black.png" style={style} />
+              <Text type="regular" size="12px" text={translate("label.node.fullyCollapse")} />
             </div>
           </Menu.Item>
         )}
@@ -918,7 +916,7 @@ class TreeNode extends Component {
         </div>
         {expand &&
           _.map(nodes, (node, idx) => {
-            const key = node && node.label ? node.label : "" + idx + mode;
+            const key = node && `${_.get(node, "label", "")}${idx}${mode}`;
             return (
               <TreeNode
                 ref={this.nodeRefs[idx]}

@@ -292,6 +292,7 @@
   "text.permissions.filelevel": "Select the users you want to permit access to the selected sequence, folder, or file.",
 
   "label.node.fullyexpand": "Fully Expand Item",
+  "label.node.fullyCollapse": "Fully Collapse Item",
   "label.node.selectinlifecycle": "Select in Life Cycle View",
   "label.node.assignuseraccess": "Assign User Access",
   "label.menu.openinomniview": "Open in omniVIEW",
