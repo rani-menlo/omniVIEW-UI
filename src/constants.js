@@ -267,16 +267,16 @@ const CLOUDS = {
  * Application names should match with any of the the below list.
  */
 const APPLICATION_TYPES = [
-  /^anda\d{6}$/,
-  /^bla\d{6}$/,
-  /^dmf\d{6}$/,
-  /^eua\d{6}$/,
-  /^ide\d{6}$/,
-  /^ind\d{6}$/,
-  /^nda\d{6}$/,
-  /^pma\d{6}$/,
-  /^510k\d{6}$/,
-  /^si\d{6}$/,
+  /^[anda]+?\d{6}$/,
+  /^[bla]+?\d{6}$/,
+  /^[dmf]+?\d{6}$/,
+  /^[eua]+?\d{6}$/,
+  /^[ide]+?\d{6}$/,
+  /^[ind]+?\d{6}$/,
+  /^[nda]+?\d{6}$/,
+  /^[pma]+?\d{6}$/,
+  /^[510k]+?\d{6}$/,
+  /^[si]+?\d{6}$/,
   /^[0-9]{6}$/,
 ];
 
