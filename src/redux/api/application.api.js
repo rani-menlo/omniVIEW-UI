@@ -49,11 +49,15 @@ export default {
   isValidFTPSubmissionFolder: (data) => api.post(URI.IS_VALID_FOLDER, data),
   isValidFTPSequenceFolder: (data) =>
     api.post(URI.IS_VALID_SEQUENCE_FOLDER, data),
+  isValidSiteToSiteSequenceFolder: (data) =>
+    api.post(URI.IS_VALID_SITETOSITE_SEQUENCE_FOLDER, data),
   getSubmissionLookupInfo: () => api.get(URI.SUBMISSION_LOOKUP_INFO),
   saveAfsSubmissionDetails: (data) =>
     api.post(URI.SAVE_AFS_SUBMISSION_DETAILS, data),
   saveSubmissionDetails: (data) => api.post(URI.SAVE_SUBMISSION_DETAILS, data),
   saveSequenceDetails: (data) => api.post(URI.SAVE_SEQUENCE_DETAILS, data),
+  saveSequencesFromSiteToSite: (data) =>
+    api.post(URI.SAVE_SEQUENCES_FROM_SITETOSITE, data),
   monitorStatus: (data) => api.post(URI.MONITOR_STATUS, data),
   retryUploads: (data) => api.post(URI.RETRY_UPLOADS, data),
   deleteSubmission: (data) => api.post(URI.DELETE_SUBMISSION, data),

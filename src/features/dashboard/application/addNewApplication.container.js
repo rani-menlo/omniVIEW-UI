@@ -159,11 +159,11 @@ class AddNewApplication extends Component {
         this.setState({ remoteDetails });
         path = ftp_path;
       }
-      if(isAddingSequence){
+      if (isAddingSequence) {
         showCheckAll = _.some(remoteFiles, (file) =>
-        minFourDigitsInString(file.name)
-      );
-      }else{
+          minFourDigitsInString(file.name)
+        );
+      } else {
         showCheckAll = _.some(remoteFiles, (file) =>
           validatingApplicationFolderNames(file.name)
         );
@@ -441,16 +441,30 @@ class AddNewApplication extends Component {
   proceedToUploadSequence = async () => {
     this.showLoading();
     let { selectedCustomer, selectedSubmission } = this.props;
-    let { validSequencesArray } = this.state;
+    let { validSequencesArray, selectedCloud, remoteFiles } = this.state;
     validSequencesArray = validSequencesArray.map((seq) => seq.ftpPath);
-    const res = await ApplicationApi.saveSequenceDetails({
-      customer_id: selectedCustomer.id,
-      submission_id: selectedSubmission.id,
-      additional_details: {
-        auth_id: this.state.auth_id,
-        sequence_paths: validSequencesArray,
-      },
-    });
+    let res = "";
+    if (selectedCloud === "FTP") {
+      res = await ApplicationApi.saveSequenceDetails({
+        customer_id: selectedCustomer.id,
+        submission_id: selectedSubmission.id,
+        additional_details: {
+          auth_id: this.state.auth_id,
+          sequence_paths: validSequencesArray,
+        },
+      });
+    } else {
+      let submission_names = [];
+      remoteFiles.map((file) => {
+        file.checked && submission_names.push(`${_.get(file, "name", "")}`);
+      });
+      res = await ApplicationApi.saveSequencesFromSiteToSite({
+        customerId: selectedCustomer.id,
+        submissionId: selectedSubmission.id,
+        submissionPath: _.get(this.state, "path", ""),
+        sequencesList: submission_names,
+      });
+    }
     if (res.data.error) {
       this.setState(
         { selectedFolderError: res.data.message },
@@ -557,6 +571,7 @@ class AddNewApplication extends Component {
       isAddingSequence,
       selectedFolderPath,
       selectedCloud,
+      remoteFiles,
     } = this.state;
     let { selectedCustomer, selectedSubmission } = this.props;
     path = `${path}/${_.get(selectedFolder, "name", "")}`;
@@ -571,17 +586,27 @@ class AddNewApplication extends Component {
       if (!this.getCheckedPaths().length) {
         return;
       }
-      //Sprint-33, OMNG-1126, API for saving sequences to the existing application via Site-to-Site connector
-      // if(selectedCloud !== "FTP"){
-      //   this.saveAFSSequences();
-      //   return;
-      // }
       this.showLoading();
-      let res = await ApplicationApi.isValidFTPSequenceFolder({
-        customer_id: selectedCustomer.id,
-        ftp_paths: this.getCheckedPaths(),
-        submission_id: selectedSubmission.id,
-      });
+      let res = "";
+      //Validating the sequences before uploading
+      if (selectedCloud === "FTP") {
+        res = await ApplicationApi.isValidFTPSequenceFolder({
+          customer_id: selectedCustomer.id,
+          ftp_paths: this.getCheckedPaths(),
+          submission_id: selectedSubmission.id,
+        });
+      } else {
+        let submission_names = [];
+        remoteFiles.map((file) => {
+          file.checked && submission_names.push(`${_.get(file, "name", "")}`);
+        });
+        res = await ApplicationApi.isValidSiteToSiteSequenceFolder({
+          customerId: selectedCustomer.id,
+          submissionPath: _.get(this.state, "path", ""),
+          submissionId: selectedSubmission.id,
+          sequencesList: submission_names,
+        });
+      }
       if (_.get(res, "data.error")) {
         this.setState(
           {
@@ -1107,10 +1132,7 @@ class AddNewApplication extends Component {
 
           <div style={{ marginTop: "20px" }}>
             {showClouds && (
-              <ChooseCloud
-                onCloudSelect={this.onCloudSelect}
-                role={role}
-              />
+              <ChooseCloud onCloudSelect={this.onCloudSelect} role={role} />
             )}
             {enterRemoteDetails && (
               <RemoteDetails
